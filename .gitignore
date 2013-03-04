@@ -1,0 +1,9 @@
+*.o
+*.moc
+*.pyc
+.~lock*
+*~
+.directory
+*.kate-swp
+Debug/*
+Release/*
