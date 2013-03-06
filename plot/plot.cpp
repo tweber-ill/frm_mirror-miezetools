@@ -60,6 +60,13 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	double dxmin, dxmax, dymin, dymax;
 	estimate_minmax(dxmin, dxmax, dymin, dymax);
 
+	double dPadX = (dxmax-dxmin) / 16.;
+	double dPadY = (dymax-dymin) / 16.;
+	dxmin -= dPadX;
+	dxmax += dPadX;
+	dymin -= dPadY;
+	dymax += dPadY;
+
 	QSize size = this->size();
 	double dCurH = size.height() - 32;
 	double dCurW = size.width() - 32;

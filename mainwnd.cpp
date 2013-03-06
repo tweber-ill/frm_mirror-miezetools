@@ -59,7 +59,7 @@ MiezeMainWnd::MiezeMainWnd()
 	Plot *pPlot = new Plot(this);
 	m_pmdi->addSubWindow(pPlot);
 	double dx[] = {10., 20., 30., 40., 50., 60.,};
-	double dy[] = {10., 20., 30., 40., 50., 60.,};
+	double dy[] = {10., 70., 30., 40., 50., 60.,};
 	double dyerr[] = {5., 5., 5., 5., 5., 5.};
 	pPlot->plot(6, dx, dy, dyerr);
 
