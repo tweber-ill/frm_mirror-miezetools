@@ -46,6 +46,12 @@ void Plot::estimate_minmax(double& dxmin, double& dxmax, double& dymin, double& 
 	}
 }
 
+QColor Plot::GetColor(unsigned int iPlotObj)
+{
+	QColor col = QColor::fromRgbF(0., 0., 0., 1.);
+	return col;
+}
+
 void Plot::paintEvent (QPaintEvent *pEvent)
 {
 	QPainter painter(this);
@@ -55,31 +61,92 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	estimate_minmax(dxmin, dxmax, dymin, dymax);
 
 	QSize size = this->size();
-	double dCurH = size.height();
-	double dCurW = size.width();
+	double dCurH = size.height() - 32;
+	double dCurW = size.width() - 32;
 
-	double dScaleX = dCurW/(dxmax-dxmin) * 0.9;
-	double dScaleY = dCurH/(dymax-dymin) * 0.9;
+	double dScaleX = dCurW/(dxmax-dxmin) * 1.0;
+	double dScaleY = dCurH/(dymax-dymin) * 1.0;
 
-	painter.translate(-dxmin*dScaleX, -dymin*dScaleY);
-	painter.scale(dScaleX, dScaleY);
+	painter.translate(-dxmin*dScaleX+16., dymin*dScaleY+dCurH+16.);
+	painter.scale(dScaleX, -dScaleY);
 
 	painter.setRenderHint(QPainter::Antialiasing, true);
-	QPen pen = QColor::fromRgb(0,0,0,255);
-	pen.setWidthF(1.);
-	painter.setPen(pen);
 
 	// for all plot objects
-	for(const PlotObj& obj : m_vecObjs)
+	for(unsigned int iObj=0; iObj<m_vecObjs.size(); ++iObj)
 	{
+		const PlotObj& obj = m_vecObjs[iObj];
+		QColor col = GetColor(iObj);
+
 		//for all points
 		for(unsigned int uiPt=0; uiPt<obj.coord.size(); ++uiPt)
 		{
 			const QPointF& coord = obj.coord[uiPt];
 			const QPointF& err = obj.err[uiPt];
 
-			painter.drawPoint(coord);
+			// point
+			painter.setPen(Qt::NoPen);
+			QBrush brush(Qt::SolidPattern);
+			brush.setColor(col);
+			painter.setBrush(brush);
+			painter.drawEllipse(coord, 2./dScaleX, 2./dScaleY);
+
+			// y error bar
+			if(err.y() != 0.)
+			{
+				QPen penerr(col);
+				penerr.setWidthF(1.5/dScaleX);
+				painter.setPen(penerr);
+				painter.drawLine(QLineF(coord.x(), coord.y()-err.y()/2.,
+													coord.x(), coord.y()+err.y()/2.));
+			}
+
+			// x error bar
+			if(err.y() != 0.)
+			{
+				QPen penerr(col);
+				penerr.setWidthF(1.5/dScaleX);
+				painter.setPen(penerr);
+				painter.drawLine(QLineF(coord.x()-err.x()/2., coord.y(),
+													coord.x()+err.x()/2., coord.y()));
+			}
 		}
+	}
+
+
+	QPen pen = QColor::fromRgb(0,0,0,255);
+	pen.setStyle(Qt::SolidLine);
+
+	// x axis
+	pen.setWidthF(1.5/dScaleY);
+	painter.setPen(pen);
+	painter.drawLine(QLineF(dxmin, dymin, dxmax, dymin));
+	painter.drawLine(QLineF(dxmin, dymax, dxmax, dymax));
+
+	// y axis
+	pen.setWidthF(1.5/dScaleX);
+	painter.setPen(pen);
+	painter.drawLine(QLineF(dxmin, dymin, dxmin, dymax));
+	painter.drawLine(QLineF(dxmax, dymin, dxmax, dymax));
+
+	// grid
+	pen.setColor(QColor::fromRgbF(0., 0., 0., 0.5));
+	pen.setStyle(Qt::DotLine);
+
+	const unsigned int iNumGridLines = 10;
+	for(unsigned int iGrid=1; iGrid<iNumGridLines+1; ++iGrid)
+	{
+		// x line
+		pen.setWidthF(1./dScaleY);
+		painter.setPen(pen);
+		painter.drawLine(QLineF(dxmin, dymin+iGrid*(dymax-dymin)/double(iNumGridLines+1),
+											dxmax, dymin+iGrid*(dymax-dymin)/double(iNumGridLines+1)));
+
+		// y line
+		pen.setWidthF(1./dScaleY);
+		painter.setPen(pen);
+		painter.drawLine(QLineF(dxmin+iGrid*(dxmax-dxmin)/double(iNumGridLines+1), dymin,
+											dxmin+iGrid*(dxmax-dxmin)/double(iNumGridLines+1), dymax));
 	}
 
 	painter.restore();

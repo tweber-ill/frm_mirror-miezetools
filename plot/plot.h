@@ -6,6 +6,7 @@
  */
 
 #include <QtGui/QWidget>
+#include <QtGui/QColor>
 #include <vector>
 
 #ifndef __MIEZE_PLOTTER__
@@ -26,6 +27,7 @@ protected:
 
 	std::vector<PlotObj> m_vecObjs;
 	void estimate_minmax(double& dxmin, double& dxmax, double& dymin, double& dymax);
+	QColor GetColor(unsigned int iPlotObj);
 
 public:
 	Plot(QWidget* pParent=0);
