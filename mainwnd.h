@@ -18,6 +18,7 @@ protected:
 
 protected slots:
 	void SubWindowChanged();
+	void FileLoadTriggered();
 
 public:
 	MiezeMainWnd();
