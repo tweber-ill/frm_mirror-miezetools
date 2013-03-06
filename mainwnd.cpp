@@ -6,11 +6,14 @@
  */
 
 #include "mainwnd.h"
+
 #include<QtGui/QLabel>
 #include<QtGui/QMenu>
 #include<QtGui/QMenuBar>
  #include <QtGui/QMdiSubWindow>
 #include <iostream>
+
+#include "plot/plot.h"
 
 MiezeMainWnd::MiezeMainWnd()
 {
@@ -53,10 +56,11 @@ MiezeMainWnd::MiezeMainWnd()
 
 
 
-
-	m_pmdi->addSubWindow(new QLabel("test"));
-	m_pmdi->addSubWindow(new QLabel("test 2"));
-	m_pmdi->addSubWindow(new QLabel("test 3"));
+	Plot *pPlot = new Plot(this);
+	m_pmdi->addSubWindow(pPlot);
+	double dx[] = {10., 20., 30., 40., 50., 60.,};
+	double dy[] = {10., 20., 30., 40., 50., 60.,};
+	pPlot->plot(6, dx, dy);
 
 
 
@@ -75,15 +79,16 @@ MiezeMainWnd::MiezeMainWnd()
 }
 
 MiezeMainWnd::~MiezeMainWnd()
-{
-
-}
+{}
 
 
 void MiezeMainWnd::SubWindowChanged()
 {
 	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
-	QWidget *pWdg = pWnd->widget();
+	if(pWnd)
+	{
+		QWidget *pWdg = pWnd->widget();
+	}
 
 	// ...
 }

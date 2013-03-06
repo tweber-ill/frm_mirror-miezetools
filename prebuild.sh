@@ -2,7 +2,7 @@
 
 
 
-#echo "building uis..."
+#echo -e "building uis..."
 
 #cd ui
 #for file in *.ui
@@ -19,4 +19,4 @@
 echo -e "building mocs..."
 
 moc mainwnd.h -o mainwnd.moc
-
+moc plot/plot.h -o plot/plot.moc
