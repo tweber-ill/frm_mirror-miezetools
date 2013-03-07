@@ -12,11 +12,13 @@
 #include<QtGui/QMenuBar>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 #include <iostream>
 
 #include "plot/plot.h"
 #include "settings.h"
 #include "helper/string.h"
+#include "loader/loadtxt.h"
 
 MiezeMainWnd::MiezeMainWnd()
 {
@@ -61,16 +63,6 @@ MiezeMainWnd::MiezeMainWnd()
 	this->setMenuBar(pMenuBar);
 	//--------------------------------------------------------------------------------
 
-
-	/*
-	// Test
-	Plot *pPlot = new Plot(this);
-	m_pmdi->addSubWindow(pPlot);
-	double dx[] = {10., 20., 30., 40., 50., 60.,};
-	double dy[] = {10., 70., 30., 40., 50., 60.,};
-	double dyerr[] = {5., 5., 5., 5., 5., 5.};
-	pPlot->plot(6, dx, dy, dyerr);
-	*/
 
 	//--------------------------------------------------------------------------------
 	// Connections
@@ -125,6 +117,52 @@ void MiezeMainWnd::FileLoadTriggered()
 	}
 	else 	if(is_equal(strExt, "dat"))
 	{
+		LoadTxt * pdat = new LoadTxt();
+		if(!pdat->Load(strFile1.c_str()))
+		{
+			QString strErr = QString("Could not load \"") + strFile +QString("\".");
+			QMessageBox::critical(this, "Error", strErr);
+			return;
+		}
+
+		//dat.SetMapVal<int>("which-col-is-x", 0);
+        //dat.SetMapVal<int>("which-col-is-y", 1);
+        //dat.SetMapVal<int>("which-col-is-yerr", 2);
+
+        int iArrayDim = 1;
+        const LoadTxt::t_mapComm& mapComm = pdat->GetCommMap();
+		LoadTxt::t_mapComm::const_iterator iter = mapComm.find("type");
+		if(iter != mapComm.end() && (*iter).second.size()>=1)
+		{
+				const std::string& strType = (*iter).second[0];
+
+				if(strType.compare(0,8, "array_1d") == 0)
+						iArrayDim = 1;
+				else if(strType.compare(0,8, "array_2d") == 0)
+						iArrayDim = 2;
+				else if(strType.compare(0,8, "array_3d") == 0)
+						iArrayDim = 3;
+		}
+
+		if(iArrayDim == 1)
+		{
+			Data1D * pdat1d = new Data1D(*pdat);
+
+			int iX=0, iY=1, iYErr=2;
+			pdat1d->GetColumnIndices(iX, iY, iYErr);
+			const double *pdx = pdat1d->GetColumn(iX);
+			const double *pdy = pdat1d->GetColumn(iY);
+			const double *pdyerr = pdat1d->GetColumn(iYErr);
+
+			Plot *pPlot = new Plot(m_pmdi);
+			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
+			m_pmdi->addSubWindow(pPlot);
+			pPlot->show();
+
+			delete pdat1d;
+		}
+
+		delete pdat;
 	}
 }
 
