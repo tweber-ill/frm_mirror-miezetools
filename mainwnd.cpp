@@ -129,21 +129,9 @@ void MiezeMainWnd::SubWindowChanged()
 	// ...
 }
 
-void MiezeMainWnd::FileLoadTriggered()
+void MiezeMainWnd::LoadFile(const std::string& strFile)
 {
-	QSettings *pGlobals = Settings::GetGlobals();
-
-	QString strLastDir = pGlobals->value("main/lastdir", ".").toString();
-
-	QString strFile = QFileDialog::getOpenFileName(this, "Open data file...", strLastDir,
-					"DAT files (*.dat *.DAT);;PAD files (*.pad *.PAD);;TOF files (*.tof *.TOF);;All files (*.*)");
-	if(strFile.size() == 0)
-		return;
-
-	std::string strFile1 = strFile.toAscii().data();
-	std::string strExt = get_fileext(strFile1);
-
-	pGlobals->setValue("main/lastdir", QString(::get_dir(strFile1).c_str()));
+	std::string strExt = get_fileext(strFile);
 
 	if(is_equal(strExt, "tof"))
 	{
@@ -154,9 +142,9 @@ void MiezeMainWnd::FileLoadTriggered()
 	else 	if(is_equal(strExt, "dat"))
 	{
 		LoadTxt * pdat = new LoadTxt();
-		if(!pdat->Load(strFile1.c_str()))
+		if(!pdat->Load(strFile.c_str()))
 		{
-			QString strErr = QString("Could not load \"") + strFile +QString("\".");
+			QString strErr = QString("Could not load \"") + QString(strFile.c_str()) +QString("\".");
 			QMessageBox::critical(this, "Error", strErr);
 			return;
 		}
@@ -191,7 +179,7 @@ void MiezeMainWnd::FileLoadTriggered()
 			const double *pdyerr = pdat1d->GetColumn(iYErr);
 
 			std::ostringstream ostrTitle;
-			ostrTitle << "Plot #" << m_iPlotCnt++ << " - " << get_file(strFile1);
+			ostrTitle << "Plot #" << m_iPlotCnt++ << " - " << get_file(strFile);
 
 			Plot *pPlot = new Plot(m_pmdi, ostrTitle.str().c_str());
 			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
@@ -201,6 +189,36 @@ void MiezeMainWnd::FileLoadTriggered()
 		}
 
 		delete pdat;
+	}
+}
+
+void MiezeMainWnd::FileLoadTriggered()
+{
+	QSettings *pGlobals = Settings::GetGlobals();
+
+	QString strLastDir = pGlobals->value("main/lastdir", ".").toString();
+
+	QStringList strFiles = QFileDialog::getOpenFileNames(this, "Open data file...", strLastDir,
+					"DAT files (*.dat *.DAT);;PAD files (*.pad *.PAD);;TOF files (*.tof *.TOF);;All files (*.*)");
+	if(strFiles.size() == 0)
+		return;
+
+	bool bDirSet=false;
+	for(const QString& strFile : strFiles)
+	{
+		if(strFile == "")
+			continue;
+
+		std::string strFile1 = strFile.toAscii().data();
+		std::string strExt = get_fileext(strFile1);
+
+		if(!bDirSet)
+		{
+			pGlobals->setValue("main/lastdir", QString(::get_dir(strFile1).c_str()));
+			bDirSet = true;
+		}
+
+		LoadFile(strFile1);
 	}
 }
 

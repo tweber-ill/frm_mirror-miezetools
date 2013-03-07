@@ -8,6 +8,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
 #include <vector>
+#include <string>
 
 #ifndef __MAINWND_H__
 #define __MAINWND_H__
@@ -32,6 +33,7 @@ public:
 	virtual ~MiezeMainWnd();
 
 	void AddSubWindow(QWidget* pWnd);
+	void LoadFile(const std::string& strFile);
 };
 
 #endif
