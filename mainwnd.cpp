@@ -20,7 +20,7 @@
 #include "helper/string.h"
 #include "loader/loadtxt.h"
 
-MiezeMainWnd::MiezeMainWnd()
+MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 {
 	this->setWindowTitle("mieze tool");
 
@@ -36,6 +36,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QAction *pLoad = new QAction(this);
 	pLoad->setText("Load...");
+	pLoad->setShortcut(Qt::CTRL + Qt::Key_L);
 	pMenuFile->addAction(pLoad);
 
 	QAction *pExit = new QAction(this);
@@ -45,7 +46,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 
 	// Windows
-	QMenu* pMenuWindows = new QMenu(this);
+	/*QMenu**/ pMenuWindows = new QMenu(this);
 	pMenuWindows->setTitle("Windows");
 
 	QAction *pWndTile = new QAction(this);
@@ -55,6 +56,9 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pWndCsc = new QAction(this);
 	pWndCsc->setText("Cascade");
 	pMenuWindows->addAction(pWndCsc);
+
+	pMenuWindows->addSeparator();
+
 
 
 	QMenuBar *pMenuBar = new QMenuBar(this);
@@ -72,6 +76,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
 
+	QObject::connect(pMenuWindows, SIGNAL(aboutToShow()), this, SLOT(UpdateSubWndList()));
 	QObject::connect(m_pmdi, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(SubWindowChanged()));
 
 
@@ -81,6 +86,37 @@ MiezeMainWnd::MiezeMainWnd()
 MiezeMainWnd::~MiezeMainWnd()
 {}
 
+void MiezeMainWnd::UpdateSubWndList()
+{
+	// remove previous list
+	for(QAction* pAction : m_vecSubWndActions)
+	{
+		pMenuWindows->removeAction(pAction);
+		pAction->disconnect();
+		delete pAction;
+	}
+	m_vecSubWndActions.clear();
+
+	// add new list
+	QList<QMdiSubWindow*> list = m_pmdi->subWindowList();
+	for(auto item : list)
+	{
+		const QWidget* pWidget = item->widget();
+		if(pWidget)
+		{
+			QString strTitle = pWidget->windowTitle();
+
+			QAction *pAction = new QAction(pMenuWindows);
+			pAction->setText(strTitle);
+			m_vecSubWndActions.push_back(pAction);
+
+			pMenuWindows->addAction(pAction);
+
+			QObject::connect(pAction, SIGNAL(triggered()), pWidget, SLOT(showNormal()));
+			QObject::connect(pAction, SIGNAL(triggered()), pWidget, SLOT(setFocus()));
+		}
+	}
+}
 
 void MiezeMainWnd::SubWindowChanged()
 {
@@ -154,10 +190,12 @@ void MiezeMainWnd::FileLoadTriggered()
 			const double *pdy = pdat1d->GetColumn(iY);
 			const double *pdyerr = pdat1d->GetColumn(iYErr);
 
-			Plot *pPlot = new Plot(m_pmdi);
+			std::ostringstream ostrTitle;
+			ostrTitle << "Plot #" << m_iPlotCnt++ << " - " << get_file(strFile1);
+
+			Plot *pPlot = new Plot(m_pmdi, ostrTitle.str().c_str());
 			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
-			m_pmdi->addSubWindow(pPlot);
-			pPlot->show();
+			AddSubWindow(pPlot);
 
 			delete pdat1d;
 		}
@@ -165,6 +203,14 @@ void MiezeMainWnd::FileLoadTriggered()
 		delete pdat;
 	}
 }
+
+void MiezeMainWnd::AddSubWindow(QWidget* pWnd)
+{
+	m_pmdi->addSubWindow(pWnd);
+	pWnd->show();
+}
+
+
 
 #include "mainwnd.moc"
 

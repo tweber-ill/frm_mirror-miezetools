@@ -30,7 +30,7 @@ protected:
 	QColor GetColor(unsigned int iPlotObj);
 
 public:
-	Plot(QWidget* pParent=0);
+	Plot(QWidget* pParent=0, const char* pcTitle=0);
 	virtual ~Plot();
 
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0);

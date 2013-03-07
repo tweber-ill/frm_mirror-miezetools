@@ -7,6 +7,7 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
+#include <vector>
 
 #ifndef __MAINWND_H__
 #define __MAINWND_H__
@@ -15,14 +16,22 @@ class MiezeMainWnd : public QMainWindow
 { Q_OBJECT
 protected:
 	QMdiArea *m_pmdi;
+	unsigned int m_iPlotCnt;
+
+	QMenu* pMenuWindows;
+	std::vector<QAction*> m_vecSubWndActions;
+
 
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
+	void UpdateSubWndList();
 
 public:
 	MiezeMainWnd();
 	virtual ~MiezeMainWnd();
+
+	void AddSubWindow(QWidget* pWnd);
 };
 
 #endif

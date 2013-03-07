@@ -10,10 +10,10 @@
 #include <limits>
 #include <iostream>
 
-Plot::Plot(QWidget* pParent) : QWidget(pParent)
+Plot::Plot(QWidget* pParent, const char* pcTitle) : QWidget(pParent)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
-	this->setWindowTitle("Plot");
+	this->setWindowTitle(QString(pcTitle));
 }
 
 Plot::~Plot() {}
