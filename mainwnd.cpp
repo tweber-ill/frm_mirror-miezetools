@@ -124,6 +124,12 @@ void MiezeMainWnd::SubWindowChanged()
 	if(pWnd)
 	{
 		QWidget *pWdg = pWnd->widget();
+
+		SubWindowType type = ((SubWindowBase*)pWdg)->GetType();
+		if(type == PLOT_1D)
+		{
+
+		}
 	}
 
 	// ...

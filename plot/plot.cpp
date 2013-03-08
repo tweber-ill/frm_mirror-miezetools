@@ -10,13 +10,16 @@
 #include <limits>
 #include <iostream>
 
-Plot::Plot(QWidget* pParent, const char* pcTitle) : QWidget(pParent)
+Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
 }
 
-Plot::~Plot() {}
+Plot::~Plot()
+{
+	clear();
+}
 
 QSize Plot::minimumSizeHint() const
 {
@@ -29,22 +32,24 @@ void Plot::estimate_minmax(double& dxmin, double& dxmax, double& dymin, double& 
 	dxmax = dymax = -dxmin;
 
 	// for all plot objects
-	for(const PlotObj& obj : m_vecObjs)
+	for(const Data1& obj : m_vecObjs)
 	{
 		//for all points
-		for(unsigned int uiPt=0; uiPt<obj.coord.size(); ++uiPt)
+		for(unsigned int uiPt=0; uiPt<obj.GetLength(); ++uiPt)
 		{
-			const QPointF& coord = obj.coord[uiPt];
-			const QPointF& err = obj.err[uiPt];
+			double x = obj.GetX(uiPt);
+			double y = obj.GetY(uiPt);
+			double xerr = obj.GetXErr(uiPt);
+			double yerr = obj.GetYErr(uiPt);
 
-			if(coord.x() - err.x() < dxmin)
-				dxmin = coord.x() - err.x();
-			if(coord.x() + err.x() > dxmax)
-				dxmax = coord.x() + err.x();
-			if(coord.y() - err.y() < dymin)
-				dymin = coord.y() - err.y();
-			if(coord.y() + err.y() > dymax)
-				dymax = coord.y() + err.y();
+			if(x - xerr < dxmin)
+				dxmin = x - xerr;
+			if(x + xerr > dxmax)
+				dxmax = x + xerr;
+			if(y - yerr < dymin)
+				dymin = y - yerr;
+			if(y + yerr > dymax)
+				dymax = y + yerr;
 		}
 	}
 }
@@ -114,14 +119,14 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	// for all plot objects
 	for(unsigned int iObj=0; iObj<m_vecObjs.size(); ++iObj)
 	{
-		const PlotObj& obj = m_vecObjs[iObj];
+		const Data1& obj = m_vecObjs[iObj];
 		QColor col = GetColor(iObj);
 
 		//for all points
-		for(unsigned int uiPt=0; uiPt<obj.coord.size(); ++uiPt)
+		for(unsigned int uiPt=0; uiPt<obj.GetLength(); ++uiPt)
 		{
-			const QPointF& coord = obj.coord[uiPt];
-			const QPointF& err = obj.err[uiPt];
+			const QPointF coord(obj.GetX(uiPt), obj.GetY(uiPt));
+			const QPointF err(obj.GetXErr(uiPt), obj.GetYErr(uiPt));
 
 			// point
 			painter.setPen(Qt::NoPen);
@@ -157,14 +162,7 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 
 void Plot::plot(unsigned int iNum, const double *px, const double *py, const double *pyerr, const double *pxerr)
 {
-	PlotObj obj;
-
-	for(unsigned int i=0; i<iNum; ++i)
-	{
-		obj.coord.push_back(QPointF(px[i], py[i]));
-		obj.err.push_back(QPointF(pxerr?pxerr[i]:0., pyerr?pyerr[i]:0.));
-	}
-
+	Data1 obj(iNum, px, py, pyerr, pxerr);
 	m_vecObjs.push_back(obj);
 }
 
