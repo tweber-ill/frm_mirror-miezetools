@@ -33,7 +33,7 @@ public:
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0);
 	void clear();
 
-	SubWindowType GetType() { return PLOT_1D; }
+	virtual SubWindowType GetType() { return PLOT_1D; }
 };
 
 

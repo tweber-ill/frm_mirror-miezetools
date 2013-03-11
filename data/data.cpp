@@ -6,6 +6,7 @@
  */
 
 #include "data.h"
+#include <limits>
 
 Data1::Data1(unsigned int uiNum, const double* pValsX, const double* pValsY,
 														  const double *pErrsY, const double *pErrsX)
@@ -22,4 +23,25 @@ Data1::Data1(unsigned int uiNum, const double* pValsX, const double* pValsY,
 			this->SetYErr(i, pErrsY?pErrsY[i]:0.);
 		}
 	}
+}
+
+
+
+Data2::Data2(unsigned int iW, unsigned int iH, const double* pDat, const double *pErr)
+{
+	this->SetSize(iW, iH);
+	this->SetVals(pDat, pErr);
+}
+
+void Data2::SetVals(const double* pDat, const double *pErr)
+{
+	m_dMin = std::numeric_limits<double>::max();
+	m_dMax = -m_dMin;
+
+	for(unsigned int iY=0; iY<m_iHeight; ++iY)
+		for(unsigned int iX=0; iX<m_iWidth; ++iX)
+		{
+			this->SetVal(iX, iY, pDat ? pDat[iY*m_iWidth + iX] : 0.);
+			this->SetErr(iX, iY, pErr ? pErr[iY*m_iWidth + iX] : 0.);
+		}
 }

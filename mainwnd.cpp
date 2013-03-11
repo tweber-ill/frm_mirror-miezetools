@@ -13,11 +13,17 @@
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
+
 #include <iostream>
+#include <fstream>
+#include <math.h>
 
 #include "plot/plot.h"
+#include "plot/plot2d.h"
 #include "settings.h"
 #include "helper/string.h"
+#include "helper/file.h"
+#include "helper/misc.h"
 #include "loader/loadtxt.h"
 
 MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
@@ -144,6 +150,27 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 	}
 	else 	if(is_equal(strExt, "pad"))
 	{
+		std::ifstream ifstr(strFile.c_str(), std::ios_base::binary);
+		if(!ifstr.is_open())
+			return;
+
+		uint iW, iH;
+		uint uiSize = ::get_file_size(ifstr);
+		iW = iH = sqrt(uiSize/4);
+
+		uint *pDat = new uint[iW*iH];
+
+		ifstr.read((char*)pDat, iW*iH*4);
+		double *pdDat = new double[iW*iH];
+		convert(pdDat, pDat, iW*iH);
+		delete[] pDat;
+
+		std::string strTitle = GetPlotTitle(get_file(strFile));
+		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
+		pPlot->plot(iW, iH, pdDat);
+		AddSubWindow(pPlot);
+
+		delete[] pdDat;
 	}
 	else 	if(is_equal(strExt, "dat"))
 	{
@@ -184,18 +211,45 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			const double *pdy = pdat1d->GetColumn(iY);
 			const double *pdyerr = pdat1d->GetColumn(iYErr);
 
-			std::ostringstream ostrTitle;
-			ostrTitle << "Plot #" << m_iPlotCnt++ << " - " << get_file(strFile);
+			std::string strTitle = GetPlotTitle(get_file(strFile));
 
-			Plot *pPlot = new Plot(m_pmdi, ostrTitle.str().c_str());
+			Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
 			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
 			AddSubWindow(pPlot);
 
 			delete pdat1d;
 		}
+		else if(iArrayDim == 2)
+		{
+			Data2D * pdat2d = new Data2D(*pdat);
+
+			uint iW = pdat2d->GetXDim();
+			uint iH = pdat2d->GetYDim();
+
+			double *pDat = new double[iW*iH];
+
+			for(uint iY=0; iY<iH; ++iY)
+				for(uint iX=0; iX<iW; ++iX)
+					pDat[iY*iW + iX] = pdat2d->GetVal(iX, iY);
+
+			std::string strTitle = GetPlotTitle(get_file(strFile));
+			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
+			pPlot->plot(iW, iH, pDat);
+			AddSubWindow(pPlot);
+
+			delete[] pDat;
+			delete pdat2d;
+		}
 
 		delete pdat;
 	}
+}
+
+std::string MiezeMainWnd::GetPlotTitle(const std::string& strFile)
+{
+	std::ostringstream ostrTitle;
+	ostrTitle << "Plot #" << m_iPlotCnt++ << " - " << strFile;
+	return ostrTitle.str();
 }
 
 void MiezeMainWnd::FileLoadTriggered()

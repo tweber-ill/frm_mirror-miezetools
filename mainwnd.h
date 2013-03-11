@@ -17,7 +17,9 @@ class MiezeMainWnd : public QMainWindow
 { Q_OBJECT
 protected:
 	QMdiArea *m_pmdi;
+
 	unsigned int m_iPlotCnt;
+	std::string GetPlotTitle(const std::string& strFile);
 
 	QMenu* pMenuWindows;
 	std::vector<QAction*> m_vecSubWndActions;
