@@ -10,37 +10,6 @@
 #include "../helper/misc.h"
 
 
-inline uint lerprgb(uchar r1, uchar g1, uchar b1,
-							uchar r2, uchar g2, uchar b2,
-							double dval)
-{
-	uchar r = lerp(r1, r2, dval);
-	uchar g = lerp(g1, g2, dval);
-	uchar b = lerp(b1, b2, dval);
-
-	return (0xff<<24) | (r<<16) | (g<<8) | (b);
-}
-
-inline uint lerprgb(uint col1, uint col2, double dval)
-{
-	uchar r1 = uchar((col1&0x00ff0000) >> 16);
-	uchar r2 = uchar((col2&0x00ff0000) >> 16);
-
-	uchar g1 = uchar((col1&0x0000ff00) >> 8);
-	uchar g2 = uchar((col2&0x0000ff00) >> 8);
-
-	uchar b1 = uchar(col1&0x000000ff);
-	uchar b2 = uchar(col2&0x000000ff);
-
-
-	uchar r = lerp(r1, r2, dval);
-	uchar g = lerp(g1, g2, dval);
-	uchar b = lerp(b1, b2, dval);
-
-	return (0xff<<24) | (r<<16) | (g<<8) | (b);
-}
-
-
 Plot2d::Plot2d(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pImg(0)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
@@ -65,8 +34,13 @@ uint Plot2d::GetSpectroColor(double dVal) const
 	double dMax = m_dat.GetMax();
 	double dSpec = (dVal-dMin) / (dMax-dMin);
 
-	const uint col1[] = {0xff0000ff, 0xff00ff00, 0xffffff00};
-	const uint col2[] = {0xff00ff00, 0xffffff00, 0xffff0000};
+	const uint blue = 0xff0000ff;
+	const uint red = 0xffff0000;
+	const uint yellow = 0xffffff00;
+	const uint cyan = 0xff00ffff;
+
+	const uint col1[] = {blue, cyan, yellow};
+	const uint col2[] = {cyan, yellow, red};
 
 	const uint iNumCols = sizeof(col1)/sizeof(col1[0]);
 	const double dNumCols = double(iNumCols);
