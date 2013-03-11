@@ -259,7 +259,7 @@ void MiezeMainWnd::FileLoadTriggered()
 	QString strLastDir = pGlobals->value("main/lastdir", ".").toString();
 
 	QStringList strFiles = QFileDialog::getOpenFileNames(this, "Open data file...", strLastDir,
-					"DAT files (*.dat *.DAT);;PAD files (*.pad *.PAD);;TOF files (*.tof *.TOF);;All files (*.*)");
+					"DAT files (*.dat);;PAD files (*.pad);;TOF files (*.tof);;All data files (*.dat *.pad *.tof);;All files (*.*)");
 	if(strFiles.size() == 0)
 		return;
 
@@ -288,6 +288,24 @@ void MiezeMainWnd::AddSubWindow(QWidget* pWnd)
 	pWnd->show();
 }
 
+void MiezeMainWnd::keyPressEvent (QKeyEvent * event)
+{
+	SubWindowBase* pWndBase = 0;
+	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
+	if(pWnd && pWnd->widget())
+		pWndBase = (SubWindowBase*)pWnd->widget();
+
+	if(event->key()==Qt::Key_L && pWndBase)
+	{
+		if(pWndBase->GetType() == PLOT_2D)
+		{
+			Plot2d* plt = (Plot2d*)pWndBase;
+			plt->SetLog(!plt->GetLog());
+		}
+	}
+	else
+		QMainWindow::keyPressEvent(event);
+}
 
 
 #include "mainwnd.moc"

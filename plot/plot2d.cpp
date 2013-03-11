@@ -7,10 +7,11 @@
 
 #include "plot2d.h"
 #include <QtGui/QPainter>
+#include <iostream>
 #include "../helper/misc.h"
 
 
-Plot2d::Plot2d(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pImg(0)
+Plot2d::Plot2d(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pImg(0), m_bLog(1)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
@@ -32,6 +33,17 @@ uint Plot2d::GetSpectroColor(double dVal) const
 {
 	double dMin = m_dat.GetMin();
 	double dMax = m_dat.GetMax();
+
+	if(m_bLog)
+	{
+		dVal = safe_log10(dVal);
+		dMin = floor(safe_log10(dMin));
+		dMax = ceil(safe_log10(dMax));
+
+		if(dMin < -1)
+			dMin = -1;
+	}
+
 	double dSpec = (dVal-dMin) / (dMax-dMin);
 
 	const uint blue = 0xff0000ff;
@@ -41,6 +53,11 @@ uint Plot2d::GetSpectroColor(double dVal) const
 
 	const uint col1[] = {blue, cyan, yellow};
 	const uint col2[] = {cyan, yellow, red};
+
+	if(dVal < dMin)
+		return blue;
+	else if(dVal > dMax)
+		return red;
 
 	const uint iNumCols = sizeof(col1)/sizeof(col1[0]);
 	const double dNumCols = double(iNumCols);
@@ -94,7 +111,22 @@ void Plot2d::RefreshPlot()
 			//m_pImg->setPixel(iX, iY, GetSpectroColor(m_dat.GetVal(iX, iY)));
 		}
 	}
+
+	this->repaint();
 }
 
+void Plot2d::SetLog(bool bLog)
+{
+	if(m_bLog == bLog)
+		return;
+
+	m_bLog = bLog;
+	RefreshPlot();
+}
+
+bool Plot2d::GetLog() const
+{
+	return m_bLog;
+}
 
 #include "plot2d.moc"

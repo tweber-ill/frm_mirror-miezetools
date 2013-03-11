@@ -24,6 +24,7 @@ protected:
 	QMenu* pMenuWindows;
 	std::vector<QAction*> m_vecSubWndActions;
 
+	virtual void keyPressEvent (QKeyEvent * event);
 
 protected slots:
 	void SubWindowChanged();

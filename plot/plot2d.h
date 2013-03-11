@@ -10,6 +10,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
+#include <QtGui/QKeyEvent>
 #include <vector>
 
 #include "../subwnd.h"
@@ -23,6 +24,7 @@ protected:
 
 	Data2 m_dat;
 	QImage *m_pImg;
+	bool m_bLog;
 
 	uint GetSpectroColor(double dVal) const;
 
@@ -33,6 +35,9 @@ public:
 	void plot(unsigned int iW, unsigned int iH, const double *pdat);
 	void clear();
 	void RefreshPlot();
+
+	void SetLog(bool bLog);
+	bool GetLog() const;
 
 	virtual SubWindowType GetType() { return PLOT_2D; }
 };
