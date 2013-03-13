@@ -75,14 +75,24 @@ QColor Plot::GetColor(unsigned int iPlotObj)
 
 void Plot::paintEvent (QPaintEvent *pEvent)
 {
-	QPainter painter(this);
-	painter.save();
-
 	QSize size = this->size();
 	double dStartX = PAD_X;
 	double dStartY = PAD_Y;
 	double dCurH = size.height() - PAD_Y*2;
 	double dCurW = size.width() - PAD_X*2;
+
+
+	QPainter painter(this);
+	painter.save();
+
+	painter.setFont(QFont("Numbus Mono L", 10));
+	painter.drawText(QRect(0, 0, size.width(), PAD_Y), Qt::AlignCenter, m_strTitle);
+	painter.drawText(QRect(0, size.height() - PAD_Y, size.width(), PAD_Y), Qt::AlignCenter, m_strXAxis);
+
+	painter.save();
+	painter.rotate(90);
+	painter.drawText(QRect(0, 0, size.height(), -PAD_X), Qt::AlignCenter, m_strYAxis);
+	painter.restore();
 
 	QPen pen = QColor::fromRgb(0,0,0,255);
 	pen.setStyle(Qt::SolidLine);

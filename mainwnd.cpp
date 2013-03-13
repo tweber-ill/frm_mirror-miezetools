@@ -236,6 +236,12 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			AddSubWindow(pPlot);
 			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
 
+			std::string strLabX, strLabY, strPlotTitle;
+			pdat1d->GetLabels(strLabX, strLabY);
+			pdat1d->GetTitle(strPlotTitle);
+			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
+			pPlot->SetTitle(strPlotTitle.c_str());
+
 			delete pdat1d;
 		}
 		else if(iArrayDim == 2)

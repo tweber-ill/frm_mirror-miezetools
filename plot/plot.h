@@ -30,6 +30,8 @@ protected:
 	double m_dxmin, m_dxmax, m_dymin, m_dymax;
 	void estimate_minmax();
 
+	QString m_strXAxis, m_strYAxis, m_strTitle;
+
 	QColor GetColor(unsigned int iPlotObj);
 
 public:
@@ -40,6 +42,13 @@ public:
 	void clear();
 
 	virtual SubWindowType GetType() { return PLOT_1D; }
+
+	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
+	void SetLabels(const char* pcX, const char* pcY)
+	{
+		m_strXAxis = QString(pcX);
+		m_strYAxis = QString(pcY);
+	}
 };
 
 
