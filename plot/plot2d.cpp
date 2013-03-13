@@ -150,7 +150,6 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 {
 	const QPoint& pt = pEvent->pos();
 	QSize size = this->size();
-	QRect rect(PAD_X,PAD_Y,size.width()-2*PAD_X,size.height()-2*PAD_Y);
 
 	double dX = double(pt.x()-PAD_X) / double(size.width()-2*PAD_X) * double(m_dat.GetWidth());
 	double dY = double(pt.y()-PAD_Y) / double(size.height()-2*PAD_Y) * double(m_dat.GetHeight());

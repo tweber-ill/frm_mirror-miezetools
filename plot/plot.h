@@ -10,6 +10,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
+#include <QtGui/QKeyEvent>
 #include <vector>
 
 #include "../subwnd.h"
@@ -21,9 +22,14 @@ class Plot : public SubWindowBase
 protected:
 	virtual QSize	minimumSizeHint () const;
 	virtual void paintEvent (QPaintEvent *pEvent);
+	virtual void mouseMoveEvent(QMouseEvent* pEvent);
+	void RefreshStatusMsgs();
 
 	std::vector<Data1> m_vecObjs;
-	void estimate_minmax(double& dxmin, double& dxmax, double& dymin, double& dymax);
+
+	double m_dxmin, m_dxmax, m_dymin, m_dymax;
+	void estimate_minmax();
+
 	QColor GetColor(unsigned int iPlotObj);
 
 public:

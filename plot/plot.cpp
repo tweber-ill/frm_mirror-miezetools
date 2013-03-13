@@ -9,11 +9,17 @@
 #include <QtGui/QPainter>
 #include <limits>
 #include <iostream>
+#include "../helper/string.h"
 
-Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent)
+#define PAD_X 16
+#define PAD_Y 16
+
+Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent),
+									m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
+	this->setMouseTracking(true);
 }
 
 Plot::~Plot()
@@ -26,10 +32,10 @@ QSize Plot::minimumSizeHint() const
 	return QSize(320,240);
 }
 
-void Plot::estimate_minmax(double& dxmin, double& dxmax, double& dymin, double& dymax)
+void Plot::estimate_minmax()
 {
-	dxmin = dymin = std::numeric_limits<double>::max();
-	dxmax = dymax = -dxmin;
+	m_dxmin = m_dymin = std::numeric_limits<double>::max();
+	m_dxmax = m_dymax = -m_dxmin;
 
 	// for all plot objects
 	for(const Data1& obj : m_vecObjs)
@@ -42,16 +48,23 @@ void Plot::estimate_minmax(double& dxmin, double& dxmax, double& dymin, double& 
 			double xerr = obj.GetXErr(uiPt);
 			double yerr = obj.GetYErr(uiPt);
 
-			if(x - xerr < dxmin)
-				dxmin = x - xerr;
-			if(x + xerr > dxmax)
-				dxmax = x + xerr;
-			if(y - yerr < dymin)
-				dymin = y - yerr;
-			if(y + yerr > dymax)
-				dymax = y + yerr;
+			if(x - xerr < m_dxmin)
+				m_dxmin = x - xerr;
+			if(x + xerr > m_dxmax)
+				m_dxmax = x + xerr;
+			if(y - yerr < m_dymin)
+				m_dymin = y - yerr;
+			if(y + yerr > m_dymax)
+				m_dymax = y + yerr;
 		}
 	}
+
+	const double dPadX = (m_dxmax-m_dxmin) / 16.;
+	const double dPadY = (m_dymax-m_dymin) / 16.;
+	m_dxmin -= dPadX;
+	m_dxmax += dPadX;
+	m_dymin -= dPadY;
+	m_dymax += dPadY;
 }
 
 QColor Plot::GetColor(unsigned int iPlotObj)
@@ -66,10 +79,10 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	painter.save();
 
 	QSize size = this->size();
-	double dStartX = 16.;
-	double dStartY = 16.;
-	double dCurH = size.height() - 32.;
-	double dCurW = size.width() - 32.;
+	double dStartX = PAD_X;
+	double dStartY = PAD_Y;
+	double dCurH = size.height() - PAD_Y*2;
+	double dCurW = size.width() - PAD_X*2;
 
 	QPen pen = QColor::fromRgb(0,0,0,255);
 	pen.setStyle(Qt::SolidLine);
@@ -95,23 +108,11 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 											dStartX+iGrid*dCurW/double(iNumGridLines+1), dStartY+dCurH));
 	}
 
-
-
-	double dxmin, dxmax, dymin, dymax;
-	estimate_minmax(dxmin, dxmax, dymin, dymax);
-
-	double dPadX = (dxmax-dxmin) / 16.;
-	double dPadY = (dymax-dymin) / 16.;
-	dxmin -= dPadX;
-	dxmax += dPadX;
-	dymin -= dPadY;
-	dymax += dPadY;
-
-	double dScaleX = dCurW/(dxmax-dxmin) * 1.0;
-	double dScaleY = dCurH/(dymax-dymin) * 1.0;
+	double dScaleX = dCurW/(m_dxmax-m_dxmin) * 1.0;
+	double dScaleY = dCurH/(m_dymax-m_dymin) * 1.0;
 	//std::cout << dScaleX << " " << dScaleY << std::endl;
 
-	painter.translate(-dxmin*dScaleX+16., dymin*dScaleY+dCurH+16.);
+	painter.translate(-m_dxmin*dScaleX+PAD_X, m_dymin*dScaleY+dCurH+PAD_Y);
 	painter.scale(dScaleX, -dScaleY);
 
 	painter.setRenderHint(QPainter::Antialiasing, true);
@@ -164,6 +165,9 @@ void Plot::plot(unsigned int iNum, const double *px, const double *py, const dou
 {
 	Data1 obj(iNum, px, py, pyerr, pxerr);
 	m_vecObjs.push_back(obj);
+
+	estimate_minmax();
+	RefreshStatusMsgs();
 }
 
 void Plot::clear()
@@ -172,5 +176,38 @@ void Plot::clear()
 	this->repaint();
 }
 
+void Plot::RefreshStatusMsgs()
+{
+	QString strTitle = this->windowTitle();
+	emit SetStatusMsg(strTitle.toAscii().data(), 0);
+}
+
+void Plot::mouseMoveEvent(QMouseEvent* pEvent)
+{
+	const QPoint& pt = pEvent->pos();
+	const QSize size = this->size();
+
+	const double dw = m_dxmax-m_dxmin;
+	const double dh = m_dymax-m_dymin;
+
+	// map between [0..1]
+	double dX = double(pt.x()-PAD_X) / double(size.width()-2*PAD_X);
+	double dY = 1. - double(pt.y()-PAD_Y) / double(size.height()-2*PAD_Y);
+
+	// transform to plot ranges
+	dX = m_dxmin + dX*dw;
+	dY = m_dymin + dY*dh;
+
+	if(dX < m_dxmin) dX = m_dxmin;
+	if(dX > m_dxmax) dX = m_dxmax;
+	if(dY < m_dymin) dY = m_dymin;
+	if(dY > m_dymax) dY = m_dymax;
+
+	std::ostringstream ostr;
+	ostr << "(" << dX << ", " << dY << ")";
+
+	emit SetStatusMsg(ostr.str().c_str(), 2);
+	RefreshStatusMsgs();
+}
 
 #include "plot.moc"
