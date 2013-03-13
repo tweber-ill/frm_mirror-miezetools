@@ -7,8 +7,10 @@
 
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
+#include <QtGui/QLabel>
 #include <vector>
 #include <string>
+#include "subwnd.h"
 
 #ifndef __MAINWND_H__
 #define __MAINWND_H__
@@ -24,6 +26,8 @@ protected:
 	QMenu* pMenuWindows;
 	std::vector<QAction*> m_vecSubWndActions;
 
+	QLabel *m_pStatusLabelLeft, *m_pStatusLabelMiddle, *m_pStatusLabelRight;
+
 	virtual void keyPressEvent (QKeyEvent * event);
 
 protected slots:
@@ -35,8 +39,11 @@ public:
 	MiezeMainWnd();
 	virtual ~MiezeMainWnd();
 
-	void AddSubWindow(QWidget* pWnd);
+	void AddSubWindow(SubWindowBase* pWnd);
 	void LoadFile(const std::string& strFile);
+
+public slots:
+	void SetStatusMsg(const char* pcMsg, int iPos);
 };
 
 #endif

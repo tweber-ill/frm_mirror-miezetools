@@ -13,6 +13,7 @@
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
+#include <QtGui/QStatusBar>
 
 #include <iostream>
 #include <fstream>
@@ -41,9 +42,13 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	pMenuFile->setTitle("File");
 
 	QAction *pLoad = new QAction(this);
-	pLoad->setText("Load...");
+	pLoad->setText("Open...");
 	pLoad->setShortcut(Qt::CTRL + Qt::Key_L);
 	pMenuFile->addAction(pLoad);
+
+	QAction *pCloseAll = new QAction(this);
+	pCloseAll->setText("Close All");
+	pMenuFile->addAction(pCloseAll);
 
 	QAction *pExit = new QAction(this);
 	pExit->setText("Exit");
@@ -75,17 +80,31 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 
 
 	//--------------------------------------------------------------------------------
-	// Connections
+	// Status Bar
+	QStatusBar* pStatusBar = new QStatusBar(this);
+	this->setStatusBar(pStatusBar);
+	m_pStatusLabelLeft = new QLabel(this);
+	m_pStatusLabelMiddle = new QLabel(this);
+	m_pStatusLabelRight = new QLabel(this);
+	m_pStatusLabelLeft->setAlignment(Qt::AlignLeft);
+	m_pStatusLabelMiddle->setAlignment(Qt::AlignHCenter);
+	m_pStatusLabelRight->setAlignment(Qt::AlignRight);
+	pStatusBar->addWidget(m_pStatusLabelLeft, 1);
+	pStatusBar->addWidget(m_pStatusLabelMiddle, 1);
+	pStatusBar->addWidget(m_pStatusLabelRight, 1);
+	//--------------------------------------------------------------------------------
 
+
+	//--------------------------------------------------------------------------------
+	// Connections
 	QObject::connect(pLoad, SIGNAL(triggered()), this, SLOT(FileLoadTriggered()));
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
+	QObject::connect(pCloseAll, SIGNAL(triggered()), m_pmdi, SLOT(closeAllSubWindows()));
 
 	QObject::connect(pMenuWindows, SIGNAL(aboutToShow()), this, SLOT(UpdateSubWndList()));
 	QObject::connect(m_pmdi, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(SubWindowChanged()));
-
-
 	//--------------------------------------------------------------------------------
 }
 
@@ -167,8 +186,8 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 		std::string strTitle = GetPlotTitle(get_file(strFile));
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
-		pPlot->plot(iW, iH, pdDat);
 		AddSubWindow(pPlot);
+		pPlot->plot(iW, iH, pdDat);
 
 		delete[] pdDat;
 	}
@@ -214,8 +233,8 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			std::string strTitle = GetPlotTitle(get_file(strFile));
 
 			Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
 			AddSubWindow(pPlot);
+			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
 
 			delete pdat1d;
 		}
@@ -234,8 +253,8 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 			std::string strTitle = GetPlotTitle(get_file(strFile));
 			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
-			pPlot->plot(iW, iH, pDat);
 			AddSubWindow(pPlot);
+			pPlot->plot(iW, iH, pDat);
 
 			delete[] pDat;
 			delete pdat2d;
@@ -282,8 +301,10 @@ void MiezeMainWnd::FileLoadTriggered()
 	}
 }
 
-void MiezeMainWnd::AddSubWindow(QWidget* pWnd)
+void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
 {
+	QObject::connect(pWnd, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
+
 	m_pmdi->addSubWindow(pWnd);
 	pWnd->show();
 }
@@ -307,6 +328,22 @@ void MiezeMainWnd::keyPressEvent (QKeyEvent * event)
 		QMainWindow::keyPressEvent(event);
 }
 
+void MiezeMainWnd::SetStatusMsg(const char* pcMsg, int iPos)
+{
+	QLabel* pLabels[] = {m_pStatusLabelLeft, m_pStatusLabelMiddle, m_pStatusLabelRight};
+	if(iPos>=3 || iPos<0)
+	{
+		this->statusBar()->showMessage(pcMsg, 5000);
+		return;
+	}
+
+	QLabel* pLabel = pLabels[iPos];
+
+	QString strMsg(pcMsg);
+	if(pLabel->text() != strMsg)
+		pLabel->setText(pcMsg);
+}
 
 #include "mainwnd.moc"
+#include "subwnd.moc"
 

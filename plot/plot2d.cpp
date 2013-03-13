@@ -8,13 +8,18 @@
 #include "plot2d.h"
 #include <QtGui/QPainter>
 #include <iostream>
+#include <sstream>
 #include "../helper/misc.h"
+#include "../helper/string.h"
 
+#define PAD_X 16
+#define PAD_Y 16
 
 Plot2d::Plot2d(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pImg(0), m_bLog(1)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
+	this->setMouseTracking(true);
 }
 
 Plot2d::~Plot2d()
@@ -82,8 +87,7 @@ void Plot2d::paintEvent (QPaintEvent *pEvent)
 	painter.save();
 
 	QSize size = this->size();
-
-	QRect rect(16,16,size.width()-32,size.height()-32);
+	QRect rect(PAD_X,PAD_Y,size.width()-2*PAD_X,size.height()-2*PAD_Y);
 	painter.drawImage(rect, *m_pImg);
 
 	painter.restore();
@@ -113,6 +117,7 @@ void Plot2d::RefreshPlot()
 	}
 
 	this->repaint();
+	RefreshStatusMsgs();
 }
 
 void Plot2d::SetLog(bool bLog)
@@ -127,6 +132,45 @@ void Plot2d::SetLog(bool bLog)
 bool Plot2d::GetLog() const
 {
 	return m_bLog;
+}
+
+void Plot2d::RefreshStatusMsgs()
+{
+	std::ostringstream ostr_total;
+	ostr_total << "total counts: " << group_numbers<uint>(m_dat.GetTotal());
+	emit SetStatusMsg(ostr_total.str().c_str(), 1);
+
+	QString strTitle = this->windowTitle();
+	if(m_bLog)
+		strTitle += QString(" (log)");
+	emit SetStatusMsg(strTitle.toAscii().data(), 0);
+}
+
+void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
+{
+	const QPoint& pt = pEvent->pos();
+	QSize size = this->size();
+	QRect rect(PAD_X,PAD_Y,size.width()-2*PAD_X,size.height()-2*PAD_Y);
+
+	double dX = double(pt.x()-PAD_X) / double(size.width()-2*PAD_X) * double(m_dat.GetWidth());
+	double dY = double(pt.y()-PAD_Y) / double(size.height()-2*PAD_Y) * double(m_dat.GetHeight());
+
+	if(dX < 0.) dX = 0.;
+	if(dX > m_dat.GetWidth()-1) dX = m_dat.GetWidth()-1;
+	if(dY < 0.) dY = 0.;
+	if(dY > m_dat.GetHeight()-1) dY = m_dat.GetHeight()-1;
+
+	uint iX = uint(dX);
+	uint iY = uint(dY);
+	uint iPixelVal = m_dat.GetVal(iX, iY);
+
+	iY = m_dat.GetHeight()-1-iY;
+
+	std::ostringstream ostr;
+	ostr << "pixel (" << iX << ", " << iY << "): " << group_numbers<uint>(iPixelVal);
+
+	emit SetStatusMsg(ostr.str().c_str(), 2);
+	RefreshStatusMsgs();
 }
 
 #include "plot2d.moc"

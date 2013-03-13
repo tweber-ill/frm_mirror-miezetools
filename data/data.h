@@ -71,6 +71,7 @@ protected:
 	std::vector<double> m_vecVals;
 	std::vector<double> m_vecErrs;
 	double m_dMin, m_dMax;
+	double m_dTotal;	// sum of all values
 
 public:
 	Data2(unsigned int iW=128, unsigned int iH=128, const double* pDat=0, const double *pErr=0);
@@ -109,6 +110,8 @@ public:
 
 	double GetMin() const { return m_dMin; }
 	double GetMax() const { return m_dMax; }
+
+	double GetTotal() const { return m_dTotal; }
 };
 
 #endif

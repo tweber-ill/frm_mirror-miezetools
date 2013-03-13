@@ -21,6 +21,8 @@ class Plot2d : public SubWindowBase
 protected:
 	virtual QSize	minimumSizeHint () const;
 	virtual void paintEvent (QPaintEvent *pEvent);
+	virtual void mouseMoveEvent(QMouseEvent* pEvent);
+	void RefreshStatusMsgs();
 
 	Data2 m_dat;
 	QImage *m_pImg;
