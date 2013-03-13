@@ -188,6 +188,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
 		AddSubWindow(pPlot);
 		pPlot->plot(iW, iH, pdDat);
+		pPlot->SetLabels("x pixels", "y pixels", "");
 
 		delete[] pdDat;
 	}
@@ -261,6 +262,12 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
 			AddSubWindow(pPlot);
 			pPlot->plot(iW, iH, pDat);
+
+			std::string strLabX, strLabY, strLabZ, strPlotTitle;
+			pdat2d->GetLabels(strLabX, strLabY, strLabZ);
+			pdat2d->GetTitle(strPlotTitle);
+			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
+			pPlot->SetTitle(strPlotTitle.c_str());
 
 			delete[] pDat;
 			delete pdat2d;

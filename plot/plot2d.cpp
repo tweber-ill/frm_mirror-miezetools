@@ -82,11 +82,22 @@ QSize Plot2d::minimumSizeHint() const
 void Plot2d::paintEvent (QPaintEvent *pEvent)
 {
 	if(!m_pImg) return;
+	QSize size = this->size();
 
 	QPainter painter(this);
 	painter.save();
 
-	QSize size = this->size();
+	// axis labels
+	painter.setFont(QFont("Numbus Mono L", 10));
+	painter.drawText(QRect(0, 0, size.width(), PAD_Y), Qt::AlignCenter, m_strTitle);
+	painter.drawText(QRect(0, size.height() - PAD_Y, size.width(), PAD_Y), Qt::AlignCenter, m_strXAxis);
+
+	painter.save();
+	painter.rotate(-90);
+	painter.drawText(QRect(0, 0, -size.height(), PAD_X), Qt::AlignCenter, m_strYAxis);
+	painter.restore();
+
+
 	QRect rect(PAD_X,PAD_Y,size.width()-2*PAD_X,size.height()-2*PAD_Y);
 	painter.drawImage(rect, *m_pImg);
 

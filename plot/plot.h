@@ -41,14 +41,14 @@ public:
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0);
 	void clear();
 
-	virtual SubWindowType GetType() { return PLOT_1D; }
-
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	void SetLabels(const char* pcX, const char* pcY)
 	{
 		m_strXAxis = QString(pcX);
 		m_strYAxis = QString(pcY);
 	}
+
+	virtual SubWindowType GetType() { return PLOT_1D; }
 };
 
 

@@ -28,6 +28,8 @@ protected:
 	QImage *m_pImg;
 	bool m_bLog;
 
+	QString m_strXAxis, m_strYAxis, m_strZAxis, m_strTitle;
+
 	uint GetSpectroColor(double dVal) const;
 
 public:
@@ -40,6 +42,14 @@ public:
 
 	void SetLog(bool bLog);
 	bool GetLog() const;
+
+	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
+	void SetLabels(const char* pcX, const char* pcY, const char* pcZ)
+	{
+		m_strXAxis = QString(pcX);
+		m_strYAxis = QString(pcY);
+		m_strZAxis = QString(pcZ);
+	}
 
 	virtual SubWindowType GetType() { return PLOT_2D; }
 };

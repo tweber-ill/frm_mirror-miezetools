@@ -90,8 +90,8 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	painter.drawText(QRect(0, size.height() - PAD_Y, size.width(), PAD_Y), Qt::AlignCenter, m_strXAxis);
 
 	painter.save();
-	painter.rotate(90);
-	painter.drawText(QRect(0, 0, size.height(), -PAD_X), Qt::AlignCenter, m_strYAxis);
+	painter.rotate(-90);
+	painter.drawText(QRect(0, 0, -size.height(), PAD_X), Qt::AlignCenter, m_strYAxis);
 	painter.restore();
 
 	QPen pen = QColor::fromRgb(0,0,0,255);
@@ -190,6 +190,7 @@ void Plot::RefreshStatusMsgs()
 {
 	QString strTitle = this->windowTitle();
 	emit SetStatusMsg(strTitle.toAscii().data(), 0);
+	emit SetStatusMsg("", 1);
 }
 
 void Plot::mouseMoveEvent(QMouseEvent* pEvent)
