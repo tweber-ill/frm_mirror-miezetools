@@ -21,6 +21,7 @@
 
 #include "plot/plot.h"
 #include "plot/plot2d.h"
+#include "plot/plot3d.h"
 #include "settings.h"
 #include "helper/string.h"
 #include "helper/file.h"
@@ -186,11 +187,12 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 		std::string strTitle = GetPlotTitle(get_file(strFile));
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
-		AddSubWindow(pPlot);
 		pPlot->plot(iW, iH, pdDat);
 		pPlot->SetLabels("x pixels", "y pixels", "");
 
 		delete[] pdDat;
+
+		AddSubWindow(pPlot);
 	}
 	else 	if(is_equal(strExt, "dat"))
 	{
@@ -234,7 +236,6 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			std::string strTitle = GetPlotTitle(get_file(strFile));
 
 			Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-			AddSubWindow(pPlot);
 			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
 
 			std::string strLabX, strLabY, strPlotTitle;
@@ -244,24 +245,29 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			pPlot->SetTitle(strPlotTitle.c_str());
 
 			delete pdat1d;
+
+			AddSubWindow(pPlot);
 		}
 		else if(iArrayDim == 2)
 		{
-			Data2D * pdat2d = new Data2D(*pdat);
+			Data2D* pdat2d = new Data2D(*pdat);
 
-			uint iW = pdat2d->GetXDim();
-			uint iH = pdat2d->GetYDim();
+			const uint iW = pdat2d->GetXDim();
+			const uint iH = pdat2d->GetYDim();
 
 			double *pDat = new double[iW*iH];
+			double *pErr = new double[iW*iH];
 
 			for(uint iY=0; iY<iH; ++iY)
 				for(uint iX=0; iX<iW; ++iX)
+				{
 					pDat[iY*iW + iX] = pdat2d->GetVal(iX, iY);
+					pErr[iY*iW + iX] = pdat2d->GetErr(iX, iY);
+				}
 
 			std::string strTitle = GetPlotTitle(get_file(strFile));
-			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
-			AddSubWindow(pPlot);
-			pPlot->plot(iW, iH, pDat);
+			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), false);
+			pPlot->plot(iW, iH, pDat, pErr);
 
 			std::string strLabX, strLabY, strLabZ, strPlotTitle;
 			pdat2d->GetLabels(strLabX, strLabY, strLabZ);
@@ -270,7 +276,46 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			pPlot->SetTitle(strPlotTitle.c_str());
 
 			delete[] pDat;
+			delete[] pErr;
 			delete pdat2d;
+
+			AddSubWindow(pPlot);
+		}
+		else if(iArrayDim == 3)
+		{
+			Data3D* pdat3d = new Data3D(*pdat);
+
+			const uint iW = pdat3d->GetXDim();
+			const uint iH = pdat3d->GetYDim();
+			const uint iT = pdat3d->GetTDim();
+
+			double *pDat = new double[iW*iH*iT];
+			double *pErr = new double[iW*iH*iT];
+
+			for(uint iZ=0; iZ<iT; ++iZ)
+				for(uint iY=0; iY<iH; ++iY)
+					for(uint iX=0; iX<iW; ++iX)
+					{
+						pDat[iZ*iW*iH + iY*iW + iX] = pdat3d->GetVal(iX, iY, iZ);
+						pErr[iZ*iW*iH + iY*iW + iX] = pdat3d->GetErr(iX, iY, iZ);
+					}
+
+
+			std::string strTitle = GetPlotTitle(get_file(strFile));
+			Plot3d *pPlot = new Plot3d(m_pmdi, strTitle.c_str(), false);
+			pPlot->plot(iW, iH, iT, pDat, pErr);
+
+			std::string strLabX, strLabY, strLabZ, strPlotTitle;
+			pdat3d->GetLabels(strLabX, strLabY, strLabZ);
+			pdat3d->GetTitle(strPlotTitle);
+			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
+			pPlot->SetTitle(strPlotTitle.c_str());
+
+			delete[] pDat;
+			delete[] pErr;
+			delete pdat3d;
+
+			AddSubWindow(pPlot);
 		}
 
 		delete pdat;
@@ -280,7 +325,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 std::string MiezeMainWnd::GetPlotTitle(const std::string& strFile)
 {
 	std::ostringstream ostrTitle;
-	ostrTitle << "Plot #" << m_iPlotCnt++ << " - " << strFile;
+	ostrTitle << "Plot #" << (m_iPlotCnt++) << " - " << strFile;
 	return ostrTitle.str();
 }
 
@@ -331,7 +376,7 @@ void MiezeMainWnd::keyPressEvent (QKeyEvent * event)
 
 	if(event->key()==Qt::Key_L && pWndBase)
 	{
-		if(pWndBase->GetType() == PLOT_2D)
+		if(pWndBase->GetType() == PLOT_2D || pWndBase->GetType() == PLOT_3D)
 		{
 			Plot2d* plt = (Plot2d*)pWndBase;
 			plt->SetLog(!plt->GetLog());

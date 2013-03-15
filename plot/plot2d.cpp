@@ -15,7 +15,9 @@
 #define PAD_X 16
 #define PAD_Y 16
 
-Plot2d::Plot2d(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pImg(0), m_bLog(1)
+Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData)
+			: SubWindowBase(pParent),
+			  m_pImg(0), m_bLog(1), m_bCountData(bCountData)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
@@ -45,8 +47,11 @@ uint Plot2d::GetSpectroColor(double dVal) const
 		dMin = floor(safe_log10(dMin));
 		dMax = ceil(safe_log10(dMax));
 
-		if(dMin < -1)
-			dMin = -1;
+		if(m_bCountData)
+		{
+			if(dMin < -1)
+				dMin = -1;
+		}
 	}
 
 	double dSpec = (dVal-dMin) / (dMax-dMin);
@@ -104,10 +109,10 @@ void Plot2d::paintEvent (QPaintEvent *pEvent)
 	painter.restore();
 }
 
-void Plot2d::plot(unsigned int iW, unsigned int iH, const double *pdat)
+void Plot2d::plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr)
 {
 	m_dat.SetSize(iW, iH);
-	m_dat.SetVals(pdat);
+	m_dat.SetVals(pdat, perr);
 
 	RefreshPlot();
 }
@@ -127,7 +132,7 @@ void Plot2d::RefreshPlot()
 		}
 	}
 
-	this->repaint();
+	this->repaint(rect());
 	RefreshStatusMsgs();
 }
 
@@ -147,9 +152,16 @@ bool Plot2d::GetLog() const
 
 void Plot2d::RefreshStatusMsgs()
 {
-	std::ostringstream ostr_total;
-	ostr_total << "total counts: " << group_numbers<uint>(m_dat.GetTotal());
-	emit SetStatusMsg(ostr_total.str().c_str(), 1);
+	if(m_bCountData)
+	{
+		std::ostringstream ostr_total;
+		ostr_total << "total counts: " << group_numbers<uint>(m_dat.GetTotal());
+		emit SetStatusMsg(ostr_total.str().c_str(), 1);
+	}
+	else
+	{
+		emit SetStatusMsg("", 1);
+	}
 
 	QString strTitle = this->windowTitle();
 	if(m_bLog)
@@ -172,12 +184,20 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 
 	uint iX = uint(dX);
 	uint iY = uint(dY);
-	uint iPixelVal = m_dat.GetVal(iX, iY);
+	double dPixelVal = m_dat.GetVal(iX, iY);
+	uint iPixelVal = uint(dPixelVal);
 
 	iY = m_dat.GetHeight()-1-iY;
 
 	std::ostringstream ostr;
-	ostr << "pixel (" << iX << ", " << iY << "): " << group_numbers<uint>(iPixelVal);
+	if(m_bCountData)
+	{
+		ostr << "pixel (" << iX << ", " << iY << "): " << group_numbers<uint>(iPixelVal);
+	}
+	else
+	{
+		ostr << "pixel (" << iX << ", " << iY << "): " << dPixelVal;
+	}
 
 	emit SetStatusMsg(ostr.str().c_str(), 2);
 	RefreshStatusMsgs();

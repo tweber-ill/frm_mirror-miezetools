@@ -27,16 +27,17 @@ protected:
 	Data2 m_dat;
 	QImage *m_pImg;
 	bool m_bLog;
+	bool m_bCountData;
 
 	QString m_strXAxis, m_strYAxis, m_strZAxis, m_strTitle;
 
 	uint GetSpectroColor(double dVal) const;
 
 public:
-	Plot2d(QWidget* pParent=0, const char* pcTitle=0);
+	Plot2d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
 	virtual ~Plot2d();
 
-	void plot(unsigned int iW, unsigned int iH, const double *pdat);
+	void plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr=0);
 	void clear();
 	void RefreshPlot();
 

@@ -13,7 +13,8 @@
 enum SubWindowType
 {
 	PLOT_1D,
-	PLOT_2D
+	PLOT_2D,
+	PLOT_3D
 };
 
 class SubWindowBase : public QWidget
