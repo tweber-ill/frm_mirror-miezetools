@@ -203,4 +203,5 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 	RefreshStatusMsgs();
 }
 
+
 #include "plot2d.moc"

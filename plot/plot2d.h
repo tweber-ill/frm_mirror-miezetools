@@ -52,6 +52,8 @@ public:
 		m_strZAxis = QString(pcZ);
 	}
 
+	const QString& GetZStr() const { return m_strZAxis; }
+
 	virtual SubWindowType GetType() { return PLOT_2D; }
 };
 

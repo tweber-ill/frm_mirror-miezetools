@@ -267,6 +267,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 			std::string strTitle = GetPlotTitle(get_file(strFile));
 			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), false);
+
 			pPlot->plot(iW, iH, pDat, pErr);
 
 			std::string strLabX, strLabY, strLabZ, strPlotTitle;
@@ -302,7 +303,8 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 
 			std::string strTitle = GetPlotTitle(get_file(strFile));
-			Plot3d *pPlot = new Plot3d(m_pmdi, strTitle.c_str(), false);
+			Plot3dWrapper *pPlotWrapper = new Plot3dWrapper(m_pmdi, strTitle.c_str(), false);
+			Plot3d *pPlot = (Plot3d*)pPlotWrapper->GetActualWidget();
 			pPlot->plot(iW, iH, iT, pDat, pErr);
 
 			std::string strLabX, strLabY, strLabZ, strPlotTitle;
@@ -315,7 +317,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			delete[] pErr;
 			delete pdat3d;
 
-			AddSubWindow(pPlot);
+			AddSubWindow(pPlotWrapper);
 		}
 
 		delete pdat;
@@ -361,7 +363,8 @@ void MiezeMainWnd::FileLoadTriggered()
 
 void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
 {
-	QObject::connect(pWnd, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
+	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
+	QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
 
 	m_pmdi->addSubWindow(pWnd);
 	pWnd->show();
@@ -378,7 +381,7 @@ void MiezeMainWnd::keyPressEvent (QKeyEvent * event)
 	{
 		if(pWndBase->GetType() == PLOT_2D || pWndBase->GetType() == PLOT_3D)
 		{
-			Plot2d* plt = (Plot2d*)pWndBase;
+			Plot2d* plt = (Plot2d*)pWndBase->GetActualWidget();
 			plt->SetLog(!plt->GetLog());
 		}
 	}

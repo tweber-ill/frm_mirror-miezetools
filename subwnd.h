@@ -23,9 +23,11 @@ Q_OBJECT
 public:
 	SubWindowBase(QWidget* pParent=0) : QWidget(pParent) {}
 	virtual SubWindowType GetType() = 0;
+	virtual SubWindowBase* GetActualWidget() { return this; }
 
 signals:
 		void SetStatusMsg(const char* pcMsg, int iPos);
+		void DataLoaded();
 };
 
 #endif
