@@ -54,6 +54,7 @@ Plot3dWrapper::Plot3dWrapper(QWidget* pParent, const char* pcTitle, bool bCountD
 	m_pLabel->setText("t: ");
 	pLayout->addWidget(m_pLabel, 1,0,1,1);
 
+
 	QObject::connect(m_pPlot, SIGNAL(DataLoaded()), this, SLOT(DataLoaded()));
 	QObject::connect(m_pSlider, SIGNAL(valueChanged(int)), this, SLOT(SliderValueChanged()));
 }

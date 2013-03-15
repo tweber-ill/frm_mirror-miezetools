@@ -23,3 +23,4 @@ moc subwnd.h -o subwnd.moc
 moc plot/plot.h -o plot/plot.moc
 moc plot/plot2d.h -o plot/plot2d.moc
 moc plot/plot3d.h -o plot/plot3d.moc
+moc plot/plot4d.h -o plot/plot4d.moc
