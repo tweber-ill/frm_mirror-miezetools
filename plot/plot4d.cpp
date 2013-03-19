@@ -45,23 +45,23 @@ Plot4dWrapper::Plot4dWrapper(QWidget* pParent, const char* pcTitle, bool bCountD
 	QGridLayout *pLayout = new QGridLayout(this);
 	pLayout->addWidget(m_pPlot, 0, 0, 1, 2);
 
+	m_pLabelF = new QLabel(this);
+	m_pLabelF->setText("foil: ");
+	pLayout->addWidget(m_pLabelF, 1,0,1,1);
+
 	m_pSliderF = new QSlider(this);
 	m_pSliderF->setOrientation(Qt::Horizontal);
 	m_pSliderF->setTracking(1);
 	pLayout->addWidget(m_pSliderF, 1,1,1,1);
 
-	m_pLabelF = new QLabel(this);
-	m_pLabelF->setText("foil: ");
-	pLayout->addWidget(m_pLabelF, 1,0,1,1);
+	m_pLabelT = new QLabel(this);
+	m_pLabelT->setText("t: ");
+	pLayout->addWidget(m_pLabelT, 2,0,1,1);
 
 	m_pSliderT = new QSlider(this);
 	m_pSliderT->setOrientation(Qt::Horizontal);
 	m_pSliderT->setTracking(1);
 	pLayout->addWidget(m_pSliderT, 2,1,1,1);
-
-	m_pLabelT = new QLabel(this);
-	m_pLabelT->setText("t: ");
-	pLayout->addWidget(m_pLabelT, 2,0,1,1);
 
 
 	QObject::connect(m_pPlot, SIGNAL(DataLoaded()), this, SLOT(DataLoaded()));

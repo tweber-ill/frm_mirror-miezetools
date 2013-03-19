@@ -45,14 +45,14 @@ Plot3dWrapper::Plot3dWrapper(QWidget* pParent, const char* pcTitle, bool bCountD
 	QGridLayout *pLayout = new QGridLayout(this);
 	pLayout->addWidget(m_pPlot, 0, 0, 1, 2);
 
+	m_pLabel = new QLabel(this);
+	m_pLabel->setText("t: ");
+	pLayout->addWidget(m_pLabel, 1,0,1,1);
+
 	m_pSlider = new QSlider(this);
 	m_pSlider->setOrientation(Qt::Horizontal);
 	m_pSlider->setTracking(1);
 	pLayout->addWidget(m_pSlider, 1,1,1,1);
-
-	m_pLabel = new QLabel(this);
-	m_pLabel->setText("t: ");
-	pLayout->addWidget(m_pLabel, 1,0,1,1);
 
 
 	QObject::connect(m_pPlot, SIGNAL(DataLoaded()), this, SLOT(DataLoaded()));

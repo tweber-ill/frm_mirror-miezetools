@@ -22,11 +22,13 @@
 #include "plot/plot.h"
 #include "plot/plot2d.h"
 #include "plot/plot3d.h"
+#include "plot/plot4d.h"
 #include "settings.h"
 #include "helper/string.h"
 #include "helper/file.h"
 #include "helper/misc.h"
 #include "loader/loadtxt.h"
+#include "loader/loadcasc.h"
 
 MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 {
@@ -167,23 +169,46 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 	if(is_equal(strExt, "tof"))
 	{
+		TofFile tof(strFile.c_str());
+		if(!tof.IsOpen())
+			return;
+
+		const uint iW = tof.GetWidth();
+		const uint iH = tof.GetHeight();
+		const uint iTcCnt = tof.GetTcCnt();
+		const uint iFoilCnt = tof.GetFoilCnt();
+
+		double *pdDat = new double[iW*iH*iTcCnt*iFoilCnt];
+
+		for(uint iFoil=0; iFoil<iFoilCnt; ++iFoil)
+		{
+			const uint* pDat = tof.GetData(iFoil);
+			convert(pdDat+iW*iH*iTcCnt*iFoil, pDat, iW*iH*iTcCnt);
+		}
+
+		std::string strTitle = GetPlotTitle(get_file(strFile));
+
+		Plot4dWrapper *pPlotWrapper = new Plot4dWrapper(m_pmdi, strTitle.c_str(), false);
+		Plot4d *pPlot = (Plot4d*)pPlotWrapper->GetActualWidget();
+		pPlot->plot(iW, iH, iTcCnt, iFoilCnt, pdDat, 0);
+		pPlot->SetLabels("x pixels", "y pixels", "");
+
+		delete[] pdDat;
+		AddSubWindow(pPlotWrapper);
 	}
 	else 	if(is_equal(strExt, "pad"))
 	{
-		std::ifstream ifstr(strFile.c_str(), std::ios_base::binary);
-		if(!ifstr.is_open())
+		PadFile pad(strFile.c_str());
+		if(!pad.IsOpen())
 			return;
 
-		uint iW, iH;
-		uint uiSize = ::get_file_size(ifstr);
-		iW = iH = sqrt(uiSize/4);
+		const uint* pDat = pad.GetData();
 
-		uint *pDat = new uint[iW*iH];
+		const uint iW = pad.GetWidth();
+		const uint iH = pad.GetHeight();
 
-		ifstr.read((char*)pDat, iW*iH*4);
 		double *pdDat = new double[iW*iH];
 		convert(pdDat, pDat, iW*iH);
-		delete[] pDat;
 
 		std::string strTitle = GetPlotTitle(get_file(strFile));
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
@@ -379,7 +404,7 @@ void MiezeMainWnd::keyPressEvent (QKeyEvent * event)
 
 	if(event->key()==Qt::Key_L && pWndBase)
 	{
-		if(pWndBase->GetType() == PLOT_2D || pWndBase->GetType() == PLOT_3D)
+		if(pWndBase->GetType() == PLOT_2D || pWndBase->GetType() == PLOT_3D  || pWndBase->GetType() == PLOT_4D)
 		{
 			Plot2d* plt = (Plot2d*)pWndBase->GetActualWidget();
 			plt->SetLog(!plt->GetLog());

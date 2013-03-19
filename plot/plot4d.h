@@ -5,8 +5,8 @@
  * @date 15-mar-2013
  */
 
-#ifndef __MIEZE_PLOT3D__
-#define __MIEZE_PLOT3D__
+#ifndef __MIEZE_PLOT4D__
+#define __MIEZE_PLOT4D__
 
 #include "plot2d.h"
 #include <QtGui/QSlider>
