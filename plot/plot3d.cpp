@@ -5,8 +5,12 @@
  * @date 15-mar-2013
  */
 #include "plot3d.h"
+
 #include <QtGui/QGridLayout>
 #include <iostream>
+#include <sstream>
+
+#include "../helper/string.h"
 
 Plot3d::Plot3d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 		: Plot2d(pParent, pcTitle, bCountData), m_iCurT(0)
@@ -91,5 +95,22 @@ void Plot3dWrapper::SliderValueChanged()
 	m_pPlot->RefreshTSlice(iVal);
 }
 
+
+void Plot3d::RefreshStatusMsgs()
+{
+	Plot2d::RefreshStatusMsgs();
+
+	if(m_bCountData)
+	{
+		std::ostringstream ostr_total;
+		ostr_total << "total counts: " << group_numbers<uint>(GetData().GetTotal())
+					  << ", counts: " << group_numbers<uint>(GetData2().GetTotal());
+		emit SetStatusMsg(ostr_total.str().c_str(), 1);
+	}
+	else
+	{
+		emit SetStatusMsg("", 1);
+	}
+}
 
 #include "plot3d.moc"

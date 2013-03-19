@@ -22,7 +22,7 @@ protected:
 	virtual QSize	minimumSizeHint () const;
 	virtual void paintEvent (QPaintEvent *pEvent);
 	virtual void mouseMoveEvent(QMouseEvent* pEvent);
-	void RefreshStatusMsgs();
+	virtual void RefreshStatusMsgs();
 
 	Data2 m_dat;
 	QImage *m_pImg;
@@ -42,7 +42,7 @@ public:
 
 	void plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr=0);
 	void clear();
-	void RefreshPlot();
+	virtual void RefreshPlot();
 
 	void SetLog(bool bLog);
 	bool GetLog() const;

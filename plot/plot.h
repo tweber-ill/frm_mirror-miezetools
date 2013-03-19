@@ -23,7 +23,7 @@ protected:
 	virtual QSize	minimumSizeHint () const;
 	virtual void paintEvent (QPaintEvent *pEvent);
 	virtual void mouseMoveEvent(QMouseEvent* pEvent);
-	void RefreshStatusMsgs();
+	virtual void RefreshStatusMsgs();
 
 	std::vector<Data1> m_vecObjs;
 

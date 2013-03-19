@@ -6,9 +6,11 @@
  */
 
 #include "plot2d.h"
+
 #include <QtGui/QPainter>
 #include <iostream>
 #include <sstream>
+
 #include "../helper/misc.h"
 #include "../helper/string.h"
 

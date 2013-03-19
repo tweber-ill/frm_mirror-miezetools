@@ -18,6 +18,8 @@ protected:
 	Data4 m_dat4;
 	uint m_iCurT, m_iCurF;
 
+	virtual void RefreshStatusMsgs();
+
 public:
 	Plot4d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
 	virtual ~Plot4d();

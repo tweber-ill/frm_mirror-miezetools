@@ -5,8 +5,12 @@
  * @date 15-mar-2013
  */
 #include "plot4d.h"
+
 #include <QtGui/QGridLayout>
 #include <iostream>
+#include <sstream>
+
+#include "../helper/string.h"
 
 Plot4d::Plot4d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 		: Plot2d(pParent, pcTitle, bCountData), m_iCurT(0), m_iCurF(0)
@@ -109,5 +113,21 @@ void Plot4dWrapper::SliderValueChanged()
 	m_pPlot->RefreshTFSlice(iValT, iValF);
 }
 
+void Plot4d::RefreshStatusMsgs()
+{
+	Plot2d::RefreshStatusMsgs();
+
+	if(m_bCountData)
+	{
+		std::ostringstream ostr_total;
+		ostr_total << "total counts: " << group_numbers<uint>(GetData().GetTotal())
+					  << ", counts: " << group_numbers<uint>(GetData2().GetTotal());
+		emit SetStatusMsg(ostr_total.str().c_str(), 1);
+	}
+	else
+	{
+		emit SetStatusMsg("", 1);
+	}
+}
 
 #include "plot4d.moc"
