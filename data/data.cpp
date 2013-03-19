@@ -34,7 +34,9 @@ Data2::Data2(unsigned int iW, unsigned int iH, const double* pDat, const double 
 
 {
 	this->SetSize(iW, iH);
-	this->SetVals(pDat, pErr);
+
+	if(pDat)
+		this->SetVals(pDat, pErr);
 }
 
 void Data2::SetVals(const double* pDat, const double *pErr)
@@ -66,7 +68,9 @@ Data3::Data3(unsigned int iW, unsigned int iH, unsigned int iT, const double* pD
 
 {
 	this->SetSize(iW, iH, iT);
-	this->SetVals(pDat, pErr);
+
+	if(pDat)
+		this->SetVals(pDat, pErr);
 }
 
 void Data3::SetVals(const double* pDat, const double *pErr)
@@ -93,13 +97,19 @@ Data2 Data3::GetVal(unsigned int iT) const
 {
 	Data2 dat(m_iWidth, m_iHeight);
 
+	double dTotal = 0.;
 	for(unsigned int iY=0; iY<m_iHeight; ++iY)
 		for(unsigned int iX=0; iX<m_iWidth; ++iX)
 		{
-			dat.SetVal(iX, iY, iT<m_iDepth ? this->GetVal(iX, iY, iT) : 0.);
+			double dVal = iT<m_iDepth ? this->GetVal(iX, iY, iT) : 0.;
+
+			dat.SetVal(iX, iY, dVal);
 			dat.SetErr(iX, iY, iT<m_iDepth ? this->GetErr(iX, iY, iT) : 0.);
+
+			dTotal += dVal;
 		}
 
+	dat.SetTotal(dTotal);
 	return dat;
 }
 
@@ -112,7 +122,16 @@ Data4::Data4(unsigned int iW, unsigned int iH, unsigned int iD, unsigned int iD2
 
 {
 	this->SetSize(iW, iH, iD, iD2);
-	this->SetVals(pDat, pErr);
+
+	if(pDat)
+		this->SetVals(pDat, pErr);
+}
+
+void Data4::SetVal(unsigned int iX, unsigned int iY, unsigned int iD, unsigned int iD2, double dVal)
+{
+	m_vecVals[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX] = dVal;
+	m_dMin = std::min(m_dMin, dVal);
+	m_dMax = std::max(m_dMax, dVal);
 }
 
 void Data4::SetVals(const double* pDat, const double *pErr)
@@ -122,24 +141,30 @@ void Data4::SetVals(const double* pDat, const double *pErr)
 	m_dTotal = 0.;
 
 	for(unsigned int iD2=0; iD2<m_iDepth2; ++iD2)
-		for(unsigned int iD=0; iD<m_iDepth; ++iD)
-			for(unsigned int iY=0; iY<m_iHeight; ++iY)
-				for(unsigned int iX=0; iX<m_iWidth; ++iX)
-				{
-					double dVal = pDat ? pDat[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX] : 0.;
-					double dErr = pErr ? pErr[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX] : 0.;
+		SetVals(iD2, pDat+iD2*m_iDepth*m_iWidth*m_iHeight, pErr+iD2*m_iDepth*m_iWidth*m_iHeight);
+}
 
-					this->SetVal(iX, iY, iD, iD2, dVal);
-					this->SetErr(iX, iY, iD, iD2, dErr);
+void Data4::SetVals(unsigned int iD2, const double *pDat, const double *pErr)
+{
+	for(unsigned int iD=0; iD<m_iDepth; ++iD)
+		for(unsigned int iY=0; iY<m_iHeight; ++iY)
+			for(unsigned int iX=0; iX<m_iWidth; ++iX)
+			{
+				double dVal = pDat ? pDat[iD*m_iWidth*m_iHeight + iY*m_iWidth + iX] : 0.;
+				double dErr = pErr ? pErr[iD*m_iWidth*m_iHeight + iY*m_iWidth + iX] : 0.;
 
-					m_dTotal += dVal;
-				}
+				this->SetVal(iX, iY, iD, iD2, dVal);
+				this->SetErr(iX, iY, iD, iD2, dErr);
+
+				m_dTotal += dVal;
+			}
 }
 
 Data2 Data4::GetVal(unsigned int iD, unsigned int iD2) const
 {
 	Data2 dat(m_iWidth, m_iHeight);
 
+	double dTotal = 0.;
 	for(unsigned int iY=0; iY<m_iHeight; ++iY)
 		for(unsigned int iX=0; iX<m_iWidth; ++iX)
 		{
@@ -152,8 +177,11 @@ Data2 Data4::GetVal(unsigned int iD, unsigned int iD2) const
 
 			dat.SetVal(iX, iY, dVal);
 			dat.SetErr(iX, iY, dErr);
+
+			dTotal += dVal;
 		}
 
+	dat.SetTotal(dTotal);
 	return dat;
 }
 

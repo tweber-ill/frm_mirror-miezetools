@@ -22,10 +22,12 @@ public:
 	Plot3d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
 	virtual ~Plot3d();
 
+	void plot_manual();
 	void plot(uint iW, uint iH, uint iT, const double *pdat, const double *perr=0);
 	void RefreshTSlice(uint iT);
 
 	const Data3& GetData() const { return m_dat3; }
+	Data3& GetData() { return m_dat3; }
 	uint GetCurT() const { return m_iCurT; }
 
 	virtual SubWindowType GetType() { return PLOT_3D; }

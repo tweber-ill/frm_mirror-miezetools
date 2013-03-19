@@ -2,7 +2,7 @@
  * pad/tof files
  *
  * @author Tobias Weber
- * @date September 2012
+ * @date September 2012, 19-mar-2013
  */
 
 #include "loadcasc.h"
@@ -34,6 +34,11 @@ const unsigned int* PadFile::GetData()
 
 	unsigned int *pDat = (unsigned int*)m_file.map(qint64(0), qint64(iW*iH*sizeof(int)));
 	return pDat;
+}
+
+void PadFile::ReleaseData(const unsigned int *pv)
+{
+	m_file.unmap((uchar*)pv);
 }
 
 
@@ -86,4 +91,9 @@ const unsigned int* TofFile::GetData(unsigned int iFoil)
 	unsigned int *pDat = (unsigned int*)m_file.map(qint64(iStartIdx*iW*iH),
 														qint64(iW*iH*iTcCnt*sizeof(int)));
 	return pDat;
+}
+
+void TofFile::ReleaseData(const unsigned int *pv)
+{
+	m_file.unmap((uchar*)pv);
 }

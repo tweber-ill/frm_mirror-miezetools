@@ -22,10 +22,12 @@ public:
 	Plot4d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
 	virtual ~Plot4d();
 
+	void plot_manual();
 	void plot(uint iW, uint iH, uint iT, uint iF, const double *pdat, const double *perr=0);
 	void RefreshTFSlice(uint iT, uint iF);
 
 	const Data4& GetData() const { return m_dat4; }
+	Data4& GetData() { return m_dat4; }
 	uint GetCurT() const { return m_iCurT; }
 	uint GetCurF() const { return m_iCurF; }
 

@@ -178,22 +178,26 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		const uint iTcCnt = tof.GetTcCnt();
 		const uint iFoilCnt = tof.GetFoilCnt();
 
-		double *pdDat = new double[iW*iH*iTcCnt*iFoilCnt];
+		std::string strTitle = GetPlotTitle(get_file(strFile));
+		Plot4dWrapper *pPlotWrapper = new Plot4dWrapper(m_pmdi, strTitle.c_str(), true);
+		Plot4d *pPlot = (Plot4d*)pPlotWrapper->GetActualWidget();
+		Data4& dat4 = pPlot->GetData();
+		dat4.SetSize(iW, iH, iTcCnt, iFoilCnt);
 
+		double *pdDat = new double[iW*iH*iTcCnt];
 		for(uint iFoil=0; iFoil<iFoilCnt; ++iFoil)
 		{
 			const uint* pDat = tof.GetData(iFoil);
-			convert(pdDat+iW*iH*iTcCnt*iFoil, pDat, iW*iH*iTcCnt);
+			convert(pdDat, pDat, iW*iH*iTcCnt);
+			tof.ReleaseData(pDat);
+
+			dat4.SetVals(iFoil, pdDat, 0);
 		}
+		delete[] pdDat;
 
-		std::string strTitle = GetPlotTitle(get_file(strFile));
-
-		Plot4dWrapper *pPlotWrapper = new Plot4dWrapper(m_pmdi, strTitle.c_str(), false);
-		Plot4d *pPlot = (Plot4d*)pPlotWrapper->GetActualWidget();
-		pPlot->plot(iW, iH, iTcCnt, iFoilCnt, pdDat, 0);
+		pPlot->plot_manual();
 		pPlot->SetLabels("x pixels", "y pixels", "");
 
-		delete[] pdDat;
 		AddSubWindow(pPlotWrapper);
 	}
 	else 	if(is_equal(strExt, "pad"))
@@ -211,7 +215,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		convert(pdDat, pDat, iW*iH);
 
 		std::string strTitle = GetPlotTitle(get_file(strFile));
-		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str());
+		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), true);
 		pPlot->plot(iW, iH, pdDat);
 		pPlot->SetLabels("x pixels", "y pixels", "");
 

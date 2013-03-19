@@ -37,6 +37,9 @@ public:
 	Plot2d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
 	virtual ~Plot2d();
 
+	const Data2& GetData2() const { return m_dat; }
+	Data2& GetData2() { return m_dat; }
+
 	void plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr=0);
 	void clear();
 	void RefreshPlot();

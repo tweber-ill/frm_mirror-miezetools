@@ -2,7 +2,7 @@
  * pad/tof files
  *
  * @author Tobias Weber
- * @date September 2012
+ * @date September 2012, 19-mar-2013
  */
 
 #ifndef __PADTOF__
@@ -25,6 +25,7 @@ public:
 
 	bool IsOpen() const;
 	const unsigned int* GetData();
+	void ReleaseData(const unsigned int *pv);
 };
 
 
@@ -45,6 +46,7 @@ public:
 
 	bool IsOpen() const;
 	const unsigned int* GetData(unsigned int iFoil);
+	void ReleaseData(const unsigned int *pv);
 };
 
 #endif

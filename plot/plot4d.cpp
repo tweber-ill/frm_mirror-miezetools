@@ -16,13 +16,18 @@ Plot4d::Plot4d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 
 Plot4d::~Plot4d() {}
 
+void Plot4d::plot_manual()
+{
+	RefreshTFSlice(0,0);
+	emit DataLoaded();
+}
+
 void Plot4d::plot(uint iW, uint iH, uint iT, uint iF, const double *pdat, const double *perr)
 {
 	m_dat4.SetSize(iW, iH, iT, iF);
 	m_dat4.SetVals(pdat, perr);
-	RefreshTFSlice(0,0);
 
-	emit DataLoaded();
+	plot_manual();
 }
 
 void Plot4d::RefreshTFSlice(uint iT, uint iF)

@@ -115,6 +115,7 @@ public:
 	double GetMax() const { return m_dMax; }
 
 	double GetTotal() const { return m_dTotal; }
+	void SetTotal(double dTot) { m_dTotal = dTot; }
 };
 
 
@@ -170,6 +171,7 @@ public:
 	double GetMax() const { return m_dMax; }
 
 	double GetTotal() const { return m_dTotal; }
+	void SetTotal(double dTot) { m_dTotal = dTot; }
 
 	Data2 GetVal(unsigned int iT) const;
 };
@@ -213,20 +215,17 @@ public:
 	double GetErr(unsigned int iX, unsigned int iY, unsigned int iD, unsigned int iD2) const
 	{ return m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX]; }
 
-	void SetVal(unsigned int iX, unsigned int iY, unsigned int iD, unsigned int iD2, double dVal)
-	{
-		m_vecVals[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX] = dVal;
-		m_dMin = std::min(m_dMin, dVal);
-		m_dMax = std::max(m_dMax, dVal);
-	}
+	void SetVal(unsigned int iX, unsigned int iY, unsigned int iD, unsigned int iD2, double dVal);
 	void SetErr(unsigned int iX, unsigned int iY, unsigned int iD, unsigned int iD2, double dVal)
 	{ m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX] = dVal; }
 	void SetVals(const double *pDat, const double *pErr=0);
+	void SetVals(unsigned int iD2, const double *pDat, const double *pErr=0);
 
 	double GetMin() const { return m_dMin; }
 	double GetMax() const { return m_dMax; }
 
 	double GetTotal() const { return m_dTotal; }
+	void SetTotal(double dTot) { m_dTotal = dTot; }
 
 	Data2 GetVal(unsigned int iD, unsigned int iD2) const;
 };

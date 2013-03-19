@@ -17,13 +17,18 @@ Plot3d::Plot3d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 Plot3d::~Plot3d()
 {}
 
+void Plot3d::plot_manual()
+{
+	RefreshTSlice(0);
+	emit DataLoaded();
+}
+
 void Plot3d::plot(uint iW, uint iH, uint iT, const double *pdat, const double *perr)
 {
 	m_dat3.SetSize(iW, iH, iT);
 	m_dat3.SetVals(pdat, perr);
-	RefreshTSlice(0);
 
-	emit DataLoaded();
+	plot_manual();
 }
 
 void Plot3d::RefreshTSlice(uint iT)
