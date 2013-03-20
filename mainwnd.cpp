@@ -165,7 +165,12 @@ void MiezeMainWnd::SubWindowChanged()
 
 void MiezeMainWnd::LoadFile(const std::string& strFile)
 {
+	std::string strFileNoDir = ::get_file(strFile);
 	std::string strExt = get_fileext(strFile);
+
+	std::ostringstream ostrMsg;
+	ostrMsg << "Loading " << strFileNoDir << "...";
+	this->SetStatusMsg(ostrMsg.str().c_str(),0);
 
 	if(is_equal(strExt, "tof"))
 	{
@@ -178,7 +183,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		const uint iTcCnt = tof.GetTcCnt();
 		const uint iFoilCnt = tof.GetFoilCnt();
 
-		std::string strTitle = GetPlotTitle(get_file(strFile));
+		std::string strTitle = GetPlotTitle(strFileNoDir);
 		Plot4dWrapper *pPlotWrapper = new Plot4dWrapper(m_pmdi, strTitle.c_str(), true);
 		Plot4d *pPlot = (Plot4d*)pPlotWrapper->GetActualWidget();
 		Data4& dat4 = pPlot->GetData();
@@ -214,7 +219,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		double *pdDat = new double[iW*iH];
 		convert(pdDat, pDat, iW*iH);
 
-		std::string strTitle = GetPlotTitle(get_file(strFile));
+		std::string strTitle = GetPlotTitle(strFileNoDir);
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), true);
 		pPlot->plot(iW, iH, pdDat);
 		pPlot->SetLabels("x pixels", "y pixels", "");
@@ -262,7 +267,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			const double *pdy = pdat1d->GetColumn(iY);
 			const double *pdyerr = pdat1d->GetColumn(iYErr);
 
-			std::string strTitle = GetPlotTitle(get_file(strFile));
+			std::string strTitle = GetPlotTitle(strFileNoDir);
 
 			Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
 			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
@@ -294,7 +299,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 					pErr[iY*iW + iX] = pdat2d->GetErr(iX, iY);
 				}
 
-			std::string strTitle = GetPlotTitle(get_file(strFile));
+			std::string strTitle = GetPlotTitle(strFileNoDir);
 			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), false);
 
 			pPlot->plot(iW, iH, pDat, pErr);
@@ -331,7 +336,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 					}
 
 
-			std::string strTitle = GetPlotTitle(get_file(strFile));
+			std::string strTitle = GetPlotTitle(strFileNoDir);
 			Plot3dWrapper *pPlotWrapper = new Plot3dWrapper(m_pmdi, strTitle.c_str(), false);
 			Plot3d *pPlot = (Plot3d*)pPlotWrapper->GetActualWidget();
 			pPlot->plot(iW, iH, iT, pDat, pErr);
@@ -431,7 +436,10 @@ void MiezeMainWnd::SetStatusMsg(const char* pcMsg, int iPos)
 
 	QString strMsg(pcMsg);
 	if(pLabel->text() != strMsg)
+	{
 		pLabel->setText(pcMsg);
+		pLabel->repaint();
+	}
 }
 
 #include "mainwnd.moc"
