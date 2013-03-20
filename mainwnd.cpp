@@ -363,11 +363,11 @@ std::string MiezeMainWnd::GetPlotTitle(const std::string& strFile)
 void MiezeMainWnd::FileLoadTriggered()
 {
 	QSettings *pGlobals = Settings::GetGlobals();
-
 	QString strLastDir = pGlobals->value("main/lastdir", ".").toString();
 
 	QStringList strFiles = QFileDialog::getOpenFileNames(this, "Open data file...", strLastDir,
-					"DAT files (*.dat);;PAD files (*.pad);;TOF files (*.tof);;All data files (*.dat *.pad *.tof);;All files (*.*)");
+					"All data files (*.dat *.pad *.tof);;TOF files (*.tof);;PAD files(*.pad);;DAT files (*.dat);;All files (*.*)",
+					0, QFileDialog::DontUseNativeDialog);
 	if(strFiles.size() == 0)
 		return;
 
