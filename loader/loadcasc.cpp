@@ -6,6 +6,11 @@
  */
 
 #include "loadcasc.h"
+#include "../settings.h"
+
+#include <QtCore/QVector>
+#include <QtCore/QList>
+
 
 PadFile::PadFile(const char* pcFile) : m_file(QString(pcFile))
 {
@@ -19,12 +24,12 @@ bool PadFile::IsOpen() const { return m_file.isOpen(); }
 
 unsigned int PadFile::GetWidth()
 {
-	return 128;
+	return Settings::Get<unsigned int>("casc/x_res");
 }
 
 unsigned int PadFile::GetHeight()
 {
-	return 128;
+	return Settings::Get<unsigned int>("casc/y_res");
 }
 
 const unsigned int* PadFile::GetData()
@@ -59,18 +64,24 @@ unsigned int TofFile::GetHeight()
 
 unsigned int TofFile::GetFoilCnt()
 {
-	return 6;
+	return Settings::Get<unsigned int>("casc/foil_cnt");
 }
 
 unsigned int TofFile::GetTcCnt()
 {
-	return 16;
+	return Settings::Get<unsigned int>("casc/tc_cnt");
 }
 
 std::vector<unsigned int> TofFile::GetStartIndices()
 {
-	std::vector<unsigned int> vecStartIndices = {0, 16, 32, 64, 80, 96};
-	return vecStartIndices;
+	QList<QVariant> lst = Settings::Get<QList<QVariant> >("casc/foil_idx");
+
+	std::vector<unsigned int> vec;
+	vec.resize(lst.size());
+	for(int i=0; i<lst.size(); ++i)
+		vec[i] = lst[i].toUInt();
+
+	return vec;
 }
 
 bool TofFile::IsOpen() const { return m_file.isOpen(); }

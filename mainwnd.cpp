@@ -377,7 +377,7 @@ void MiezeMainWnd::FileLoadTriggered()
 		if(strFile == "")
 			continue;
 
-		std::string strFile1 = strFile.toAscii().data();
+		std::string strFile1 = strFile.toStdString();
 		std::string strExt = get_fileext(strFile1);
 
 		if(!bDirSet)

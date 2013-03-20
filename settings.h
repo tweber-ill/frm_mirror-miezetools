@@ -14,10 +14,18 @@ class Settings
 {
 	protected:
 		static QSettings *s_pGlobals;
+		static void SetDefaults();
 
 	public:
 		static QSettings *GetGlobals();
 		static void free();
+
+		template<typename T>
+		static T Get(const char* pcKey)
+		{
+			QSettings *pSett = GetGlobals();
+			return pSett->value(pcKey).value<T>();
+		}
 };
 
 #endif
