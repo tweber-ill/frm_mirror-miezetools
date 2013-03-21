@@ -29,9 +29,11 @@ protected:
 	bool m_bLog;
 	bool m_bCountData;
 
+	QRect m_rectImage, m_rectCB;
 	QString m_strXAxis, m_strYAxis, m_strZAxis, m_strTitle;
 
 	uint GetSpectroColor(double dVal) const;
+	uint GetSpectroColor01(double dVal) const;
 
 public:
 	Plot2d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
