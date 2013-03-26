@@ -54,6 +54,7 @@ public:
 	void plotfit(double(*)(double));
 
 	void clear();
+	void clearfit();
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	void SetLabels(const char* pcX, const char* pcY)

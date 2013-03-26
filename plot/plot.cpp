@@ -11,8 +11,8 @@
 #include <iostream>
 #include "../helper/string.h"
 
-#define PAD_X 16
-#define PAD_Y 16
+#define PAD_X 18
+#define PAD_Y 18
 
 Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent),
 									m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.)
@@ -86,13 +86,13 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	QPainter painter(this);
 	painter.save();
 
-	painter.setFont(QFont("Numbus Mono L", 10));
+	painter.setFont(QFont("Nimbus Sans L", 10));
 	painter.drawText(QRect(0, 0, size.width(), PAD_Y), Qt::AlignCenter, m_strTitle);
-	painter.drawText(QRect(0, size.height() - PAD_Y, size.width(), PAD_Y), Qt::AlignCenter, m_strXAxis);
+	painter.drawText(QRect(0, size.height() - PAD_Y+2, size.width(), PAD_Y), Qt::AlignCenter, m_strXAxis);
 
 	painter.save();
 	painter.rotate(-90);
-	painter.drawText(QRect(0, 0, -size.height(), PAD_X), Qt::AlignCenter, m_strYAxis);
+	painter.drawText(QRect(0, 0, -size.height(), PAD_X-4), Qt::AlignCenter, m_strYAxis);
 	painter.restore();
 
 	QPen pen = QColor::fromRgb(0,0,0,255);
@@ -131,40 +131,56 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	// for all plot objects
 	for(unsigned int iObj=0; iObj<m_vecObjs.size(); ++iObj)
 	{
-		const Data1& obj = m_vecObjs[iObj].dat;
+		const PlotObj& pltobj = m_vecObjs[iObj];
+		const Data1& obj = pltobj.dat;
 		QColor col = GetColor(iObj);
 
-		//for all points
-		for(unsigned int uiPt=0; uiPt<obj.GetLength(); ++uiPt)
+		if(pltobj.plttype == PLOT_DATA)
 		{
-			const QPointF coord(obj.GetX(uiPt), obj.GetY(uiPt));
-			const QPointF err(obj.GetXErr(uiPt), obj.GetYErr(uiPt));
-
-			// point
-			painter.setPen(Qt::NoPen);
-			QBrush brush(Qt::SolidPattern);
-			brush.setColor(col);
-			painter.setBrush(brush);
-			painter.drawEllipse(coord, 2./dScaleX, 2./dScaleY);
-
-			// y error bar
-			if(err.y() != 0.)
+			//for all points
+			for(unsigned int uiPt=0; uiPt<obj.GetLength(); ++uiPt)
 			{
-				QPen penerr(col);
-				penerr.setWidthF(1.5/dScaleX);
-				painter.setPen(penerr);
-				painter.drawLine(QLineF(coord.x(), coord.y()-err.y()/2.,
-													coord.x(), coord.y()+err.y()/2.));
+				const QPointF coord(obj.GetX(uiPt), obj.GetY(uiPt));
+				const QPointF err(obj.GetXErr(uiPt), obj.GetYErr(uiPt));
+
+				// point
+				painter.setPen(Qt::NoPen);
+				QBrush brush(Qt::SolidPattern);
+				brush.setColor(col);
+				painter.setBrush(brush);
+				painter.drawEllipse(coord, 2./dScaleX, 2./dScaleY);
+
+				// y error bar
+				if(err.y() != 0.)
+				{
+					QPen penerr(col);
+					penerr.setWidthF(1.5/dScaleX);
+					painter.setPen(penerr);
+					painter.drawLine(QLineF(coord.x(), coord.y()-err.y()/2.,
+														coord.x(), coord.y()+err.y()/2.));
+				}
+
+				// x error bar
+				if(err.y() != 0.)
+				{
+					QPen penerr(col);
+					penerr.setWidthF(1.5/dScaleX);
+					painter.setPen(penerr);
+					painter.drawLine(QLineF(coord.x()-err.x()/2., coord.y(),
+														coord.x()+err.x()/2., coord.y()));
+				}
 			}
+		}
+		else if(pltobj.plttype == PLOT_FIT)
+		{
+			painter.setPen(QColor::fromRgb(0,0,255,255));
 
-			// x error bar
-			if(err.y() != 0.)
+			for(unsigned int uiPt=0; uiPt<obj.GetLength()-1; ++uiPt)
 			{
-				QPen penerr(col);
-				penerr.setWidthF(1.5/dScaleX);
-				painter.setPen(penerr);
-				painter.drawLine(QLineF(coord.x()-err.x()/2., coord.y(),
-													coord.x()+err.x()/2., coord.y()));
+				const QPointF coord(obj.GetX(uiPt), obj.GetY(uiPt));
+				const QPointF coordNext(obj.GetX(uiPt+1), obj.GetY(uiPt+1));
+
+				painter.drawLine(coord, coordNext);
 			}
 		}
 	}
@@ -187,9 +203,43 @@ void Plot::plot(unsigned int iNum, const double *px, const double *py, const dou
 	RefreshStatusMsgs();
 }
 
-void Plot::plotfit(double(*pfkt)(double))
+void Plot::plotfit(double(*pfkt)(double dx))
 {
-	// TODO
+	clearfit();
+	const uint iCnt = 128;
+
+	PlotObj pltobj;
+	pltobj.plttype = PLOT_FIT;
+	pltobj.strName = "fit";
+	Data1& dat = pltobj.dat;
+
+	const double dPadX = (m_dxmax-m_dxmin) / 128.;
+
+	double dxmin = m_dxmin + dPadX;
+	double dxmax = m_dxmax - dPadX;
+
+	dat.SetLength(iCnt);
+	for(uint iX=0; iX<iCnt; ++iX)
+	{
+		double dX = dxmin + (dxmax-dxmin)*double(iX)/double(iCnt-1);
+
+		dat.SetX(iX, dX);
+		dat.SetY(iX, pfkt(dX));
+	}
+
+	m_vecObjs.push_back(pltobj);
+}
+
+void Plot::clearfit()
+{
+	for(uint i=0; i<m_vecObjs.size(); ++i)
+	{
+		if(m_vecObjs[i].plttype == PLOT_FIT)
+		{
+			m_vecObjs.erase(m_vecObjs.begin()+i);
+			--i;
+		}
+	}
 }
 
 void Plot::clear()

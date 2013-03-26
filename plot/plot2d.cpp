@@ -112,7 +112,7 @@ void Plot2d::paintEvent (QPaintEvent *pEvent)
 	painter.save();
 
 	// axis labels
-	painter.setFont(QFont("Numbus Mono L", 9));
+	painter.setFont(QFont("Nimbus Sans L", 10));
 	painter.drawText(QRect(0, 0, size.width(), PAD_Y), Qt::AlignCenter, m_strTitle);
 	painter.drawText(QRect(0, size.height() - PAD_Y, size.width(), PAD_Y+4), Qt::AlignCenter, m_strXAxis);
 

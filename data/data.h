@@ -55,6 +55,14 @@ public:
 
 	unsigned int GetLength() const { return m_vecValsX.size(); }
 
+	void clear()
+	{
+		m_vecValsX.clear();
+		m_vecValsY.clear();
+		m_vecErrsX.clear();
+		m_vecErrsY.clear();
+	}
+
 	void SetLength(uint uiLen)
 	{
 		m_vecValsX.resize(uiLen);
