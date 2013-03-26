@@ -28,6 +28,8 @@ protected:
 	QImage *m_pImg;
 	bool m_bLog;
 	bool m_bCountData;
+	bool m_bHasXYMinMax;
+	double m_dXMin, m_dXMax, m_dYMin, m_dYMax;
 
 	QRect m_rectImage, m_rectCB;
 	QString m_strXAxis, m_strYAxis, m_strZAxis, m_strTitle;
@@ -45,6 +47,8 @@ public:
 	void plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr=0);
 	void clear();
 	virtual void RefreshPlot();
+
+	void SetXYMinMax(double dXMin, double dXMax, double dYMin, double dYMax);
 
 	void SetLog(bool bLog);
 	bool GetLog() const;

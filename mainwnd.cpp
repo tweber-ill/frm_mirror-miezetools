@@ -228,7 +228,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 		AddSubWindow(pPlot);
 	}
-	else 	if(is_equal(strExt, "dat"))
+	else 	if(is_equal(strExt, "dat") || is_equal(strExt, "sim"))
 	{
 		LoadTxt * pdat = new LoadTxt();
 		if(!pdat->Load(strFile.c_str()))
@@ -310,6 +310,10 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
 			pPlot->SetTitle(strPlotTitle.c_str());
 
+			double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
+			if(pdat2d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
+				pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
+
 			delete[] pDat;
 			delete[] pErr;
 			delete pdat2d;
@@ -347,6 +351,10 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
 			pPlot->SetTitle(strPlotTitle.c_str());
 
+			double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
+			if(pdat3d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
+				pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
+
 			delete[] pDat;
 			delete[] pErr;
 			delete pdat3d;
@@ -371,7 +379,7 @@ void MiezeMainWnd::FileLoadTriggered()
 	QString strLastDir = pGlobals->value("main/lastdir", ".").toString();
 
 	QStringList strFiles = QFileDialog::getOpenFileNames(this, "Open data file...", strLastDir,
-					"All data files (*.dat *.pad *.tof);;TOF files (*.tof);;PAD files(*.pad);;DAT files (*.dat);;All files (*.*)",
+					"All data files (*.dat *.sim *.pad *.tof);;TOF files (*.tof);;PAD files(*.pad);;DAT files (*.dat *.sim)",
 					0, QFileDialog::DontUseNativeDialog);
 	if(strFiles.size() == 0)
 		return;

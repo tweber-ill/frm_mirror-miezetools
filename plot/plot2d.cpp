@@ -19,7 +19,8 @@
 
 Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData)
 			: SubWindowBase(pParent),
-			  m_pImg(0), m_bLog(1), m_bCountData(bCountData)
+			  m_pImg(0), m_bLog(bCountData), m_bCountData(bCountData),
+			  m_bHasXYMinMax(0)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
@@ -36,6 +37,15 @@ void Plot2d::clear()
 		delete m_pImg;
 		m_pImg = 0;
 	}
+}
+
+void Plot2d::SetXYMinMax(double dXMin, double dXMax, double dYMin, double dYMax)
+{
+	this->m_bHasXYMinMax = 1;
+	this->m_dXMin = dXMin;
+	this->m_dXMax = dXMax;
+	this->m_dYMin = dYMin;
+	this->m_dYMax = dYMax;
 }
 
 uint Plot2d::GetSpectroColor01(double dVal) const
@@ -208,7 +218,7 @@ void Plot2d::RefreshStatusMsgs()
 
 	QString strTitle = this->windowTitle();
 	if(m_bLog)
-		strTitle += QString(" (log)");
+		strTitle += QString(" (log10)");
 	emit SetStatusMsg(strTitle.toAscii().data(), 0);
 }
 
@@ -235,13 +245,25 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 		double dPixelVal = m_dat.GetVal(iX, iY);
 		uint iPixelVal = uint(dPixelVal);
 
+		dY = double(m_dat.GetHeight())-1.-dY;
 		iY = m_dat.GetHeight()-1-iY;
 
 		std::ostringstream ostr;
-		if(m_bCountData)
-			ostr << "pixel (" << iX << ", " << iY << "): " << group_numbers<uint>(iPixelVal);
+
+		if(m_bHasXYMinMax)
+		{
+			double dX_Val = dX / double(m_dat.GetWidth()-1) * (m_dXMax-m_dXMin) + m_dXMin;
+			double dY_Val = dY / double(m_dat.GetHeight()-1) * (m_dYMax-m_dYMin) + m_dYMin;
+
+			ostr << "(" << dX_Val << ", " << dY_Val << "): ";
+		}
 		else
-			ostr << "pixel (" << iX << ", " << iY << "): " << dPixelVal;
+			ostr << "pixel (" << iX << ", " << iY << "): ";
+
+		if(m_bCountData)
+			ostr << group_numbers<uint>(iPixelVal);
+		else
+			ostr << dPixelVal;
 
 		emit SetStatusMsg(ostr.str().c_str(), 2);
 		RefreshStatusMsgs();
