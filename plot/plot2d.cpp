@@ -110,6 +110,7 @@ void Plot2d::paintEvent (QPaintEvent *pEvent)
 
 	QPainter painter(this);
 	painter.save();
+	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	// axis labels
 	painter.setFont(QFont("Nimbus Sans L", 10));
@@ -139,14 +140,14 @@ void Plot2d::paintEvent (QPaintEvent *pEvent)
 
 
 	// colorbar frame
-	m_rectCB = QRect(rect.right()+iColorBarPad, rect.top(), iColorBarWidth ,rect.height());
+	m_rectCB = QRect(rect.right()+iColorBarPad, rect.top()+1, iColorBarWidth, rect.height()-1);
 	painter.drawRect(m_rectCB);
 
 	// colorbar
 	QPen penOrg = painter.pen();
-	for(int iB=0; iB<size.height()-2*PAD_Y; ++iB)
+	for(int iB=0; iB<m_rectCB.height()-1; ++iB)
 	{
-		double dCBVal = double(iB)/double(size.height()-2*PAD_Y);
+		double dCBVal = double(iB)/double(m_rectCB.height()-1);
 
 		QPen penCB = penOrg;
 		penCB.setColor(GetSpectroColor01(dCBVal));
@@ -273,7 +274,10 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 	{
 		this->setCursor(Qt::CrossCursor);
 
-		double dVal01 = 1. - double(pt.y()-m_rectCB.top()+1) / double(m_rectCB.height());
+		double dVal01 = 1. - double(pt.y()-m_rectCB.top()+1) / double(m_rectCB.height()-1);
+		if(dVal01 > 1.) dVal01 = 1.;
+		else if(dVal01 < 0.) dVal01 = 0.;
+
 		double dMin = m_dat.GetMin();
 		double dMax = m_dat.GetMax();
 		double dVal = 0.;

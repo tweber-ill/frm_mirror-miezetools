@@ -85,6 +85,7 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 
 	QPainter painter(this);
 	painter.save();
+	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	painter.setFont(QFont("Nimbus Sans L", 10));
 	painter.drawText(QRect(0, 0, size.width(), PAD_Y), Qt::AlignCenter, m_strTitle);
@@ -125,8 +126,6 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 
 	painter.translate(-m_dxmin*dScaleX+PAD_X, m_dymin*dScaleY+dCurH+PAD_Y);
 	painter.scale(dScaleX, -dScaleY);
-
-	painter.setRenderHint(QPainter::Antialiasing, true);
 
 	// for all plot objects
 	for(unsigned int iObj=0; iObj<m_vecObjs.size(); ++iObj)
@@ -270,6 +269,11 @@ void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 	// transform to plot ranges
 	dX = m_dxmin + dX*dw;
 	dY = m_dymin + dY*dh;
+
+	if(dX>=m_dxmin && dX<=m_dxmax && dY>=m_dymin && dY<=m_dymax)
+		this->setCursor(Qt::CrossCursor);
+	else
+		this->setCursor(Qt::ArrowCursor);
 
 	if(dX < m_dxmin) dX = m_dxmin;
 	if(dX > m_dxmax) dX = m_dxmax;
