@@ -89,7 +89,7 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 
 	painter.setFont(QFont("Nimbus Sans L", 10));
 	painter.drawText(QRect(0, 0, size.width(), PAD_Y), Qt::AlignCenter, m_strTitle);
-	painter.drawText(QRect(0, size.height() - PAD_Y+2, size.width(), PAD_Y), Qt::AlignCenter, m_strXAxis);
+	painter.drawText(QRect(0, size.height()-PAD_Y+2, size.width(), PAD_Y-2), Qt::AlignCenter, m_strXAxis);
 
 	painter.save();
 	painter.rotate(-90);

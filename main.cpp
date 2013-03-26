@@ -6,9 +6,16 @@
 
 #include <QtGui/QApplication>
 #include <iostream>
+#include <string>
 
 #include "mainwnd.h"
 #include "settings.h"
+
+static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
+{
+	for(int iFile=0; iFile<iNum; ++iFile)
+		wnd.LoadFile(pcFiles[iFile]);
+}
 
 int main(int argc, char **argv)
 {
@@ -24,8 +31,10 @@ int main(int argc, char **argv)
 
 		wnd.show();
 
-		iRet = a.exec();
+		if(argc>1)
+			load_files(wnd, argc-1, argv+1);
 
+		iRet = a.exec();
 		pGlobals->setValue("main/geo", wnd.saveGeometry());
 	}
 	catch(const std::exception& ex)
