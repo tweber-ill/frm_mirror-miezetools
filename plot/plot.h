@@ -16,6 +16,18 @@
 #include "../subwnd.h"
 #include "../data/data.h"
 
+enum PlotType
+{
+	PLOT_DATA,
+	PLOT_FIT,
+};
+
+struct PlotObj
+{
+	Data1 dat;
+	std::string strName;
+	PlotType plttype;
+};
 
 class Plot : public SubWindowBase
 { Q_OBJECT
@@ -25,7 +37,7 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent* pEvent);
 	virtual void RefreshStatusMsgs();
 
-	std::vector<Data1> m_vecObjs;
+	std::vector<PlotObj> m_vecObjs;
 
 	double m_dxmin, m_dxmax, m_dymin, m_dymax;
 	void estimate_minmax();
@@ -38,7 +50,9 @@ public:
 	Plot(QWidget* pParent=0, const char* pcTitle=0);
 	virtual ~Plot();
 
-	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0);
+	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
+	void plotfit(double(*)(double));
+
 	void clear();
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }

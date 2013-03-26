@@ -38,8 +38,9 @@ void Plot::estimate_minmax()
 	m_dxmax = m_dymax = -m_dxmin;
 
 	// for all plot objects
-	for(const Data1& obj : m_vecObjs)
+	for(const PlotObj& pltobj : m_vecObjs)
 	{
+		const Data1& obj = pltobj.dat;
 		//for all points
 		for(unsigned int uiPt=0; uiPt<obj.GetLength(); ++uiPt)
 		{
@@ -130,7 +131,7 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	// for all plot objects
 	for(unsigned int iObj=0; iObj<m_vecObjs.size(); ++iObj)
 	{
-		const Data1& obj = m_vecObjs[iObj];
+		const Data1& obj = m_vecObjs[iObj].dat;
 		QColor col = GetColor(iObj);
 
 		//for all points
@@ -171,13 +172,24 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	painter.restore();
 }
 
-void Plot::plot(unsigned int iNum, const double *px, const double *py, const double *pyerr, const double *pxerr)
+void Plot::plot(unsigned int iNum, const double *px, const double *py, const double *pyerr, const double *pxerr,
+							PlotType plttype, const char* pcLegend)
 {
-	Data1 obj(iNum, px, py, pyerr, pxerr);
-	m_vecObjs.push_back(obj);
+	PlotObj pltobj;
+	pltobj.dat = Data1(iNum, px, py, pyerr, pxerr);
+	pltobj.plttype = plttype;
+	if(pcLegend)
+		pltobj.strName = std::string(pcLegend);
+
+	m_vecObjs.push_back(pltobj);
 
 	estimate_minmax();
 	RefreshStatusMsgs();
+}
+
+void Plot::plotfit(double(*pfkt)(double))
+{
+	// TODO
 }
 
 void Plot::clear()
