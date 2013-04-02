@@ -29,6 +29,9 @@
 #include "helper/misc.h"
 #include "loader/loadtxt.h"
 #include "loader/loadcasc.h"
+#include "dialogs/ListDlg.h"
+#include "dialogs/CombineDlg.h"
+
 
 MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 {
@@ -59,9 +62,25 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	pMenuFile->addAction(pExit);
 
 
+	// Tools
+	QMenu *pMenuTools = new QMenu(this);
+	pMenuTools->setTitle("Tools");
+
+	QAction *pCombineGraphs = new QAction(this);
+	pCombineGraphs->setText("Combine Graphs...");
+	pMenuTools->addAction(pCombineGraphs);
+
+
+
 	// Windows
 	/*QMenu**/ pMenuWindows = new QMenu(this);
 	pMenuWindows->setTitle("Windows");
+
+	QAction *pWndList = new QAction(this);
+	pWndList->setText("List...");
+	pMenuWindows->addAction(pWndList);
+
+	pMenuWindows->addSeparator();
 
 	QAction *pWndTile = new QAction(this);
 	pWndTile->setText("Tile");
@@ -77,6 +96,7 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 
 	QMenuBar *pMenuBar = new QMenuBar(this);
 	pMenuBar->addMenu(pMenuFile);
+	pMenuBar->addMenu(pMenuTools);
 	pMenuBar->addMenu(pMenuWindows);
 	this->setMenuBar(pMenuBar);
 	//--------------------------------------------------------------------------------
@@ -102,6 +122,10 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	// Connections
 	QObject::connect(pLoad, SIGNAL(triggered()), this, SLOT(FileLoadTriggered()));
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
+
+	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
+
+	QObject::connect(pWndList, SIGNAL(triggered()), this, SLOT(ShowListWindowsDlg()));
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
 	QObject::connect(pCloseAll, SIGNAL(triggered()), m_pmdi, SLOT(closeAllSubWindows()));
@@ -449,6 +473,48 @@ void MiezeMainWnd::SetStatusMsg(const char* pcMsg, int iPos)
 		pLabel->repaint();
 	}
 }
+
+void MiezeMainWnd::ShowListWindowsDlg()
+{
+	ListGraphsDlg dlg(this);
+
+	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
+	for(QMdiSubWindow *pItem : lst)
+	{
+		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
+		if(pWnd)
+			dlg.AddSubWnd(pWnd);
+	}
+
+	int iStatus = dlg.exec();
+	/*if(iStatus == QDialog::Accepted)
+	{
+		std::list<SubWindowBase*> lstWnds = dlg.GetSelectedSubWnds();
+
+		for(auto wnd : lstWnds)
+			std::cout << wnd->windowTitle().toStdString() << std::endl;
+	}*/
+}
+
+void MiezeMainWnd::ShowCombineGraphsDlg()
+{
+	CombineGraphsDlg dlg(this);
+
+	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
+	for(QMdiSubWindow *pItem : lst)
+	{
+		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
+		if(pWnd)
+			dlg.AddAvailSubWnd(pWnd);
+	}
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		Plot *pPlot = dlg.CreatePlot(GetPlotTitle("combined plot"), m_pmdi);
+		AddSubWindow(pPlot);
+	}
+}
+
 
 #include "mainwnd.moc"
 #include "subwnd.moc"

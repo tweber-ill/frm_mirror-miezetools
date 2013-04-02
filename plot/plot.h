@@ -57,6 +57,8 @@ public:
 	void clearfit();
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
+	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }
+
 	void SetLabels(const char* pcX, const char* pcY)
 	{
 		m_strXAxis = QString(pcX);
@@ -64,6 +66,7 @@ public:
 	}
 
 	virtual SubWindowType GetType() { return PLOT_1D; }
+	virtual double GetTotalCounts() const { return 0.; }
 };
 
 

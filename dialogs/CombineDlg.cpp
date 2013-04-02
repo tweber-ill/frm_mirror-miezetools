@@ -1,0 +1,107 @@
+/*
+ * mieze-tool
+ * @author tweber
+ * @date 02-apr-2013
+ */
+
+#include "CombineDlg.h"
+#include "ListDlg.h"
+
+
+CombineGraphsDlg::CombineGraphsDlg(QWidget* pParent)
+{
+	this->setupUi(this);
+
+	connect(btnAdd, SIGNAL(clicked(bool)), this, SLOT(AddItemSelected()));
+	connect(btnDel, SIGNAL(clicked(bool)), this, SLOT(RemoveItemSelected()));
+}
+
+
+CombineGraphsDlg::~CombineGraphsDlg()
+{
+}
+
+void CombineGraphsDlg::AddAvailSubWnd(SubWindowBase* pSubWnd)
+{
+	m_allSubWnds.push_back(pSubWnd);
+}
+
+void CombineGraphsDlg::AddItemSelected()
+{
+	ListGraphsDlg dlg(this);
+
+	for(SubWindowBase *pItem : m_allSubWnds)
+		dlg.AddSubWnd(pItem);
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		std::list<SubWindowBase*> lstWnds = dlg.GetSelectedSubWnds();
+
+		for(auto wnd : lstWnds)
+		{
+			ListGraphsItem* pItem = new ListGraphsItem(listGraphs);
+			pItem->setSubWnd(wnd);
+			pItem->setText(wnd->windowTitle());
+
+			listGraphs->addItem(pItem);
+		}
+	}
+}
+
+void CombineGraphsDlg::RemoveItemSelected()
+{
+	for(auto pItem : listGraphs->selectedItems())
+		delete pItem;
+}
+
+
+#define COMBINE_TYPE_COUNTS 		0
+#define COMBINE_TYPE_CONTRASTS 	1
+
+Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotParent) const
+{
+	const int iCnt = listGraphs->count();
+	double *pdX = new double[iCnt];
+	double *pdY = new double[iCnt];
+	double *pdYErr = new double[iCnt];
+
+	const int iComboIdx = comboType->currentIndex();
+
+	for(int iCur=0; iCur<iCnt; ++iCur)
+	{
+		ListGraphsItem* pItem = (ListGraphsItem*)listGraphs->item(iCur);
+
+		pdX[iCur] = iCur;
+		if(iComboIdx == COMBINE_TYPE_COUNTS)
+		{
+			pdY[iCur] = pItem->subWnd()->GetTotalCounts();
+			pdYErr[iCur] = sqrt(pdY[iCur]);
+		}
+		else
+		{
+			pdY[iCur] = 0.;
+			pdYErr[iCur] = 0.;
+		}
+	}
+
+	Plot *pPlot = new Plot(pPlotParent, strTitle.c_str());
+	pPlot->plot(iCnt, pdX, pdY, pdYErr);
+
+
+	std::string strLabX, strLabY, strPlotTitle;
+
+	if(iComboIdx == COMBINE_TYPE_COUNTS)
+	{
+		strLabX = "index";
+		strLabY = "counts";
+	}
+
+	pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
+	pPlot->SetTitle(strPlotTitle.c_str());
+
+	delete[] pdX; delete[] pdY; delete[] pdYErr;
+	return pPlot;
+}
+
+
+#include "CombineDlg.moc"

@@ -9,6 +9,7 @@
 #define __MIEZE_SUBWNDBASE__
 
 #include <QtGui/QWidget>
+#include <string>
 
 enum SubWindowType
 {
@@ -25,6 +26,9 @@ public:
 	SubWindowBase(QWidget* pParent=0) : QWidget(pParent) {}
 	virtual SubWindowType GetType() = 0;
 	virtual SubWindowBase* GetActualWidget() { return this; }
+
+	//virtual std::string GetTitle() const = 0;
+	virtual double GetTotalCounts() const = 0;
 
 signals:
 		void SetStatusMsg(const char* pcMsg, int iPos);

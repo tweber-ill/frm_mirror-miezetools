@@ -7,3 +7,4 @@
 *.kate-swp
 Debug/*
 Release/*
+ui/*.h

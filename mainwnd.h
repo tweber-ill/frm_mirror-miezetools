@@ -34,6 +34,8 @@ protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
 	void UpdateSubWndList();
+	void ShowListWindowsDlg();
+	void ShowCombineGraphsDlg();
 
 public:
 	MiezeMainWnd();

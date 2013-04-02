@@ -54,6 +54,8 @@ public:
 	bool GetLog() const;
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
+	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }
+
 	void SetLabels(const char* pcX, const char* pcY, const char* pcZ)
 	{
 		m_strXAxis = QString(pcX);
@@ -64,6 +66,7 @@ public:
 	const QString& GetZStr() const { return m_strZAxis; }
 
 	virtual SubWindowType GetType() { return PLOT_2D; }
+	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
 };
 
 #endif
