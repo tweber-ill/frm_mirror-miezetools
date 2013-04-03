@@ -9,6 +9,7 @@
 #define __MIEZE_SETTINGS__
 
 #include <QtCore/QSettings>
+#include <QtCore/QVariant>
 
 class Settings
 {
@@ -25,6 +26,13 @@ class Settings
 		{
 			QSettings *pSett = GetGlobals();
 			return pSett->value(pcKey).value<T>();
+		}
+
+		template<typename T>
+		static void Set(const char* pcKey, const T& t)
+		{
+			QSettings *pSett = GetGlobals();
+			pSett->setValue(pcKey, QVariant(t));
 		}
 };
 

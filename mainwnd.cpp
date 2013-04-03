@@ -31,6 +31,7 @@
 #include "loader/loadcasc.h"
 #include "dialogs/ListDlg.h"
 #include "dialogs/CombineDlg.h"
+#include "dialogs/SettingsDlg.h"
 
 
 MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
@@ -56,9 +57,16 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	pCloseAll->setText("Close All");
 	pMenuFile->addAction(pCloseAll);
 
+	pMenuFile->addSeparator();
+
+	QAction *pSettings = new QAction(this);
+	pSettings->setText("Settings...");
+	pMenuFile->addAction(pSettings);
+
+	pMenuFile->addSeparator();
+
 	QAction *pExit = new QAction(this);
 	pExit->setText("Exit");
-	pMenuFile->addSeparator();
 	pMenuFile->addAction(pExit);
 
 
@@ -121,6 +129,7 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	//--------------------------------------------------------------------------------
 	// Connections
 	QObject::connect(pLoad, SIGNAL(triggered()), this, SLOT(FileLoadTriggered()));
+	QObject::connect(pSettings, SIGNAL(triggered()), this, SLOT(SettingsTriggered()));
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
@@ -427,6 +436,15 @@ void MiezeMainWnd::FileLoadTriggered()
 	}
 }
 
+void MiezeMainWnd::SettingsTriggered()
+{
+	SettingsDlg dlg(this);
+	if(dlg.exec() == QDialog::Accepted)
+	{
+
+	}
+}
+
 void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
 {
 	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
@@ -514,7 +532,6 @@ void MiezeMainWnd::ShowCombineGraphsDlg()
 		AddSubWindow(pPlot);
 	}
 }
-
 
 #include "mainwnd.moc"
 #include "subwnd.moc"

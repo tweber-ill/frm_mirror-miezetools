@@ -33,6 +33,7 @@ protected:
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
+	void SettingsTriggered();
 	void UpdateSubWndList();
 	void ShowListWindowsDlg();
 	void ShowCombineGraphsDlg();

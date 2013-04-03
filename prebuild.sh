@@ -31,5 +31,6 @@ moc plot/plot4d.h -o plot/plot4d.moc
 
 moc dialogs/ListDlg.h -o dialogs/ListDlg.moc
 moc dialogs/CombineDlg.h -o dialogs/CombineDlg.moc
+moc dialogs/SettingsDlg.h -o dialogs/SettingsDlg.moc
 
 echo -e "\n"
