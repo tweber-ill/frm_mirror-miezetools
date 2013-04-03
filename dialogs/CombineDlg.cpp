@@ -60,6 +60,15 @@ void CombineGraphsDlg::RemoveItemSelected()
 
 Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotParent) const
 {
+	bool bXMinOk=0, bXMaxOk=0;
+	double dXMin = editXMin->text().toDouble(&bXMinOk);
+	double dXMax = editXMax->text().toDouble(&bXMaxOk);
+	if(!bXMinOk || !bXMaxOk)
+	{
+		dXMin = 0.;
+		dXMax = 1.;
+	}
+
 	const int iCnt = listGraphs->count();
 	double *pdX = new double[iCnt];
 	double *pdY = new double[iCnt];
@@ -71,7 +80,7 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 	{
 		ListGraphsItem* pItem = (ListGraphsItem*)listGraphs->item(iCur);
 
-		pdX[iCur] = iCur;
+		pdX[iCur] = double(iCur)/double(iCnt-1) * (dXMax - dXMin) + dXMin;
 		if(iComboIdx == COMBINE_TYPE_COUNTS)
 		{
 			pdY[iCur] = pItem->subWnd()->GetTotalCounts();
@@ -89,12 +98,11 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 
 
 	std::string strLabX, strLabY, strPlotTitle;
+	strLabX = editXLab->text().toStdString();
+	strPlotTitle = editTitle->text().toStdString();
 
 	if(iComboIdx == COMBINE_TYPE_COUNTS)
-	{
-		strLabX = "index";
-		strLabY = "counts";
-	}
+		strLabY = "Counts";
 
 	pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
 	pPlot->SetTitle(strPlotTitle.c_str());
