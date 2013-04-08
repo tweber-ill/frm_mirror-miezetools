@@ -15,6 +15,7 @@
 
 #include "../subwnd.h"
 #include "../data/data.h"
+#include "../fitter/fitter.h"
 
 enum PlotType
 {
@@ -51,13 +52,17 @@ public:
 	virtual ~Plot();
 
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
-	void plotfit(double(*)(double));
+	void plotfit(const FunctionModel& fkt);
 
 	void clear();
 	void clearfit();
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }
+
+	unsigned int GetDataCount() const { return m_vecObjs.size(); }
+	const PlotObj& GetData(unsigned int iIdx=0) const { return m_vecObjs[iIdx]; }
+	PlotObj& GetData(unsigned int iIdx=0) { return m_vecObjs[iIdx]; }
 
 	void SetLabels(const char* pcX, const char* pcY)
 	{

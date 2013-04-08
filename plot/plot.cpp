@@ -202,7 +202,7 @@ void Plot::plot(unsigned int iNum, const double *px, const double *py, const dou
 	RefreshStatusMsgs();
 }
 
-void Plot::plotfit(double(*pfkt)(double dx))
+void Plot::plotfit(const FunctionModel& fkt)
 {
 	clearfit();
 	const uint iCnt = 128;
@@ -223,7 +223,7 @@ void Plot::plotfit(double(*pfkt)(double dx))
 		double dX = dxmin + (dxmax-dxmin)*double(iX)/double(iCnt-1);
 
 		dat.SetX(iX, dX);
-		dat.SetY(iX, pfkt(dX));
+		dat.SetY(iX, fkt(dX));
 	}
 
 	m_vecObjs.push_back(pltobj);

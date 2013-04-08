@@ -23,23 +23,31 @@
 #include "plot/plot2d.h"
 #include "plot/plot3d.h"
 #include "plot/plot4d.h"
+
 #include "settings.h"
+
 #include "helper/string.h"
 #include "helper/file.h"
 #include "helper/misc.h"
+
 #include "loader/loadtxt.h"
 #include "loader/loadcasc.h"
+
 #include "dialogs/ListDlg.h"
 #include "dialogs/CombineDlg.h"
 #include "dialogs/SettingsDlg.h"
 
+#include "fitter/models/msin.h"
+#include "fitter/models/gauss.h"
+
 
 MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 {
-	this->setWindowTitle("mieze tool");
+	this->setWindowTitle("Cattus, a MIEZE tool");
 
 	m_pmdi = new QMdiArea(this);
 	this->setCentralWidget(m_pmdi);
+
 
 	//--------------------------------------------------------------------------------
 	// Menus
@@ -70,6 +78,7 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	pMenuFile->addAction(pExit);
 
 
+
 	// Tools
 	QMenu *pMenuTools = new QMenu(this);
 	pMenuTools->setTitle("Tools");
@@ -78,6 +87,25 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	pCombineGraphs->setText("Combine Graphs...");
 	pMenuTools->addAction(pCombineGraphs);
 
+	pMenuTools->addSeparator();
+
+	QAction *pFit = new QAction(this);
+	pFit->setText("Fit...");
+	pMenuTools->addAction(pFit);
+
+
+	QMenu *pMenuQuickFit = new QMenu(pMenuTools);
+	pMenuQuickFit->setTitle("Quick Fit");
+
+	QAction *pQFitMieze = new QAction(this);
+	pQFitMieze->setText("MIEZE Sine Signal");
+	pMenuQuickFit->addAction(pQFitMieze);
+
+	QAction *pQFitGauss = new QAction(this);
+	pQFitGauss->setText("Gaussian");
+	pMenuQuickFit->addAction(pQFitGauss);
+
+	pMenuTools->addMenu(pMenuQuickFit);
 
 
 	// Windows
@@ -133,6 +161,9 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
+	QObject::connect(pFit, SIGNAL(triggered()), this, SLOT(ShowFitDlg()));
+	QObject::connect(pQFitMieze, SIGNAL(triggered()), this, SLOT(QuickFitMIEZE()));
+	QObject::connect(pQFitGauss, SIGNAL(triggered()), this, SLOT(QuickFitGauss()));
 
 	QObject::connect(pWndList, SIGNAL(triggered()), this, SLOT(ShowListWindowsDlg()));
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
@@ -532,6 +563,123 @@ void MiezeMainWnd::ShowCombineGraphsDlg()
 		AddSubWindow(pPlot);
 	}
 }
+
+SubWindowBase* MiezeMainWnd::GetActivePlot()
+{
+
+	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
+	if(pWnd && pWnd->widget())
+	{
+		SubWindowBase* pWndBase = (SubWindowBase*)pWnd->widget();
+		if(!pWndBase)
+			return 0;
+
+		return pWndBase->GetActualWidget();
+	}
+
+	return 0;
+}
+
+void MiezeMainWnd::ShowFitDlg()
+{
+
+}
+
+void MiezeMainWnd::QuickFitMIEZE()
+{
+	SubWindowBase* pSWB = GetActivePlot();
+	if(!pSWB)
+	{
+		QMessageBox::critical(this, "Error", "No active plot.");
+		return;
+	}
+
+	if(pSWB->GetType() == PLOT_1D)
+	{
+		Plot* pPlot = (Plot*)pSWB;
+
+		if(pPlot->GetDataCount() == 0)
+		{
+			QMessageBox::critical(this, "Error", "No data found.");
+			return;
+		}
+
+		Data1& dat = pPlot->GetData(0).dat;
+
+		if(dat.GetLength() < 2)
+		{
+			QMessageBox::critical(this, "Error", "Not enough data points.");
+			return;
+		}
+
+		double *px = vec_to_array<double>(dat.GetX());
+		double *py = vec_to_array<double>(dat.GetY());
+		double *pyerr = vec_to_array<double>(dat.GetYErr());
+		autodeleter<double> _a0(px, 1);
+		autodeleter<double> _a1(py, 1);
+		autodeleter<double> _a2(pyerr, 1);
+
+		double dNumOsc = 2.;
+		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));;
+
+		MiezeSinModel *pModel;
+		if(!::get_mieze_contrast(dFreq, dNumOsc, dat.GetLength(), px, py, pyerr, &pModel))
+			QMessageBox::warning(this, "Error", "Invalid fit.");
+
+		if(!pModel) return;
+		pPlot->plotfit(*pModel);
+		pPlot->repaint();
+	}
+	else
+	{
+		QMessageBox::critical(this, "Error", "Fitting for this plot type not (yet) implemented.");
+	}
+}
+
+void MiezeMainWnd::QuickFitGauss()
+{
+	SubWindowBase* pSWB = GetActivePlot();
+	if(!pSWB)
+	{
+		QMessageBox::critical(this, "Error", "No active plot.");
+		return;
+	}
+
+	if(pSWB->GetType() == PLOT_1D)
+	{
+		Plot* pPlot = (Plot*)pSWB;
+
+		if(pPlot->GetDataCount() == 0)
+		{
+			QMessageBox::critical(this, "Error", "No data found.");
+			return;
+		}
+
+		Data1& dat = pPlot->GetData(0).dat;
+
+		double *px = vec_to_array<double>(dat.GetX());
+		double *py = vec_to_array<double>(dat.GetY());
+		double *pyerr = vec_to_array<double>(dat.GetYErr());
+		autodeleter<double> _a0(px, 1);
+		autodeleter<double> _a1(py, 1);
+		autodeleter<double> _a2(pyerr, 1);
+
+
+		GaussModel *pModel;
+		if(!::get_gauss(dat.GetLength(), px, py, pyerr, &pModel))
+			QMessageBox::warning(this, "Error", "Invalid fit.");
+
+		if(!pModel) return;
+		pPlot->plotfit(*pModel);
+		pPlot->repaint();
+	}
+	else
+	{
+		QMessageBox::critical(this, "Error", "Fitting for this plot type not (yet) implemented.");
+	}
+}
+
+
 
 #include "mainwnd.moc"
 #include "subwnd.moc"

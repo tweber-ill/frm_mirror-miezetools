@@ -55,6 +55,11 @@ public:
 
 	unsigned int GetLength() const { return m_vecValsX.size(); }
 
+	const std::vector<double>& GetX() const { return m_vecValsX; }
+	const std::vector<double>& GetY() const { return m_vecValsY; }
+	const std::vector<double>& GetXErr() const { return m_vecErrsX; }
+	const std::vector<double>& GetYErr() const { return m_vecErrsY; }
+
 	void clear()
 	{
 		m_vecValsX.clear();

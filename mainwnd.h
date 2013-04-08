@@ -30,6 +30,8 @@ protected:
 
 	virtual void keyPressEvent (QKeyEvent * event);
 
+	SubWindowBase* GetActivePlot();
+
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
@@ -37,6 +39,11 @@ protected slots:
 	void UpdateSubWndList();
 	void ShowListWindowsDlg();
 	void ShowCombineGraphsDlg();
+
+	void ShowFitDlg();
+	void QuickFitMIEZE();
+	void QuickFitGauss();
+
 
 public:
 	MiezeMainWnd();
