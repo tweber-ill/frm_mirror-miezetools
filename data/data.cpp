@@ -113,6 +113,32 @@ Data2 Data3::GetVal(unsigned int iT) const
 	return dat;
 }
 
+Data1 Data3::GetXYSum() const
+{
+	Data1 dat;
+	dat.SetLength(this->GetDepth());
+
+	for(uint iT=0; iT<GetDepth(); ++iT)
+	{
+		double dSum = 0.;
+		double dErrSum = 0.;
+
+		for(uint iY=0; iY<GetHeight(); ++iY)
+			for(uint iX=0; iX<GetWidth(); ++iX)
+			{
+				dSum += GetVal(iX, iY, iT);
+				dErrSum += GetErr(iX, iY, iT);
+			}
+
+		dat.SetX(iT, iT);
+		dat.SetXErr(iT, 0.);
+		dat.SetY(iT, dSum);
+		dat.SetYErr(iT, dErrSum);
+	}
+
+	return dat;
+}
+
 
 
 Data4::Data4(unsigned int iW, unsigned int iH, unsigned int iD, unsigned int iD2, const double* pDat, const double *pErr)
@@ -185,3 +211,28 @@ Data2 Data4::GetVal(unsigned int iD, unsigned int iD2) const
 	return dat;
 }
 
+Data1 Data4::GetXYSum(unsigned int iD2) const
+{
+	Data1 dat;
+	dat.SetLength(this->GetDepth());
+
+	for(uint iT=0; iT<GetDepth(); ++iT)
+	{
+		double dSum = 0.;
+		double dErrSum = 0.;
+
+		for(uint iY=0; iY<GetHeight(); ++iY)
+			for(uint iX=0; iX<GetWidth(); ++iX)
+			{
+				dSum += GetVal(iX, iY, iT, iD2);
+				dErrSum += GetErr(iX, iY, iT, iD2);
+			}
+
+		dat.SetX(iT, iT);
+		dat.SetXErr(iT, 0.);
+		dat.SetY(iT, dSum);
+		dat.SetYErr(iT, dErrSum);
+	}
+
+	return dat;
+}

@@ -187,6 +187,7 @@ public:
 	void SetTotal(double dTot) { m_dTotal = dTot; }
 
 	Data2 GetVal(unsigned int iT) const;
+	Data1 GetXYSum() const;
 };
 
 class Data4 : public DataInterface
@@ -241,6 +242,7 @@ public:
 	void SetTotal(double dTot) { m_dTotal = dTot; }
 
 	Data2 GetVal(unsigned int iD, unsigned int iD2) const;
+	Data1 GetXYSum(unsigned int iD2) const;
 };
 
 #endif

@@ -19,11 +19,6 @@
 #include <fstream>
 #include <math.h>
 
-#include "plot/plot.h"
-#include "plot/plot2d.h"
-#include "plot/plot3d.h"
-#include "plot/plot4d.h"
-
 #include "settings.h"
 
 #include "helper/string.h"
@@ -594,6 +589,11 @@ void MiezeMainWnd::QuickFitMIEZE()
 		return;
 	}
 
+	QuickFitMIEZE(pSWB);
+}
+
+void MiezeMainWnd::QuickFitMIEZE(SubWindowBase* pSWB)
+{
 	if(pSWB->GetType() == PLOT_1D)
 	{
 		Plot* pPlot = (Plot*)pSWB;
@@ -622,7 +622,7 @@ void MiezeMainWnd::QuickFitMIEZE()
 		double dNumOsc = 2.;
 		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));;
 
-		MiezeSinModel *pModel;
+		MiezeSinModel *pModel = 0;
 		if(!::get_mieze_contrast(dFreq, dNumOsc, dat.GetLength(), px, py, pyerr, &pModel))
 			QMessageBox::warning(this, "Error", "Invalid fit.");
 
@@ -630,9 +630,77 @@ void MiezeMainWnd::QuickFitMIEZE()
 		pPlot->plotfit(*pModel);
 		pPlot->repaint();
 	}
+	else if(pSWB->GetType() == PLOT_3D)
+	{
+		Plot3d *pPlot3d = (Plot3d*)pSWB;
+		Plot *plot1d = Convert3d1d(pPlot3d);
+		QuickFitMIEZE(plot1d);
+	}
+	else if(pSWB->GetType() == PLOT_4D)
+	{
+		Plot4d *pPlot4d = (Plot4d*)pSWB;
+		Plot *plot1d = Convert4d1d(pPlot4d);
+		QuickFitMIEZE(plot1d);
+	}
+
 	else
 	{
-		QMessageBox::critical(this, "Error", "Fitting for this plot type not (yet) implemented.");
+		QMessageBox::critical(this, "Error", "Fitting for this plot type is not supported.");
+	}
+}
+
+Plot* MiezeMainWnd::Convert3d1d(Plot3d* pPlot3d)
+{
+	std::string strTitle = pPlot3d->windowTitle().toStdString();
+	strTitle += std::string(" -> t channels");
+
+	Data1 dat = pPlot3d->GetData().GetXYSum();
+
+	double *pdx = vec_to_array<double>(dat.GetX());
+	double *pdy = vec_to_array<double>(dat.GetY());
+	double *pdyerr = vec_to_array<double>(dat.GetYErr());
+	autodeleter<double> _a0(pdx, 1);
+	autodeleter<double> _a1(pdy, 1);
+	autodeleter<double> _a2(pdyerr, 1);
+
+	Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
+	pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
+
+	pPlot->SetLabels(pPlot3d->GetZStr().toAscii().data(), "intensity");
+	pPlot->SetTitle("");
+
+	AddSubWindow(pPlot);
+	return pPlot;
+}
+
+Plot* MiezeMainWnd::Convert4d1d(Plot4d* pPlot4d, int iFoil)
+{
+	if(iFoil<0)
+	{
+		return Convert4d1d(pPlot4d, 0);
+	}
+	else
+	{
+		std::string strTitle = pPlot4d->windowTitle().toStdString();
+		strTitle += std::string(" -> t channels");
+
+		Data1 dat = pPlot4d->GetData().GetXYSum(iFoil);
+
+		double *pdx = vec_to_array<double>(dat.GetX());
+		double *pdy = vec_to_array<double>(dat.GetY());
+		double *pdyerr = vec_to_array<double>(dat.GetYErr());
+		autodeleter<double> _a0(pdx, 1);
+		autodeleter<double> _a1(pdy, 1);
+		autodeleter<double> _a2(pdyerr, 1);
+
+		Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
+		pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
+
+		pPlot->SetLabels(pPlot4d->GetZStr().toAscii().data(), "intensity");
+		pPlot->SetTitle("");
+
+		AddSubWindow(pPlot);
+		return pPlot;
 	}
 }
 
@@ -665,7 +733,7 @@ void MiezeMainWnd::QuickFitGauss()
 		autodeleter<double> _a2(pyerr, 1);
 
 
-		GaussModel *pModel;
+		GaussModel *pModel = 0;
 		if(!::get_gauss(dat.GetLength(), px, py, pyerr, &pModel))
 			QMessageBox::warning(this, "Error", "Invalid fit.");
 
@@ -675,7 +743,7 @@ void MiezeMainWnd::QuickFitGauss()
 	}
 	else
 	{
-		QMessageBox::critical(this, "Error", "Fitting for this plot type not (yet) implemented.");
+		QMessageBox::critical(this, "Error", "Fitting for this plot type is not supported.");
 	}
 }
 

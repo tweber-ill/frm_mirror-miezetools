@@ -11,6 +11,10 @@
 #include <vector>
 #include <string>
 #include "subwnd.h"
+#include "plot/plot.h"
+#include "plot/plot2d.h"
+#include "plot/plot3d.h"
+#include "plot/plot4d.h"
 
 #ifndef __MAINWND_H__
 #define __MAINWND_H__
@@ -32,6 +36,9 @@ protected:
 
 	SubWindowBase* GetActivePlot();
 
+	Plot* Convert3d1d(Plot3d* pPlot3d);
+	Plot* Convert4d1d(Plot4d* pPlot4d, int iFoil=-1);
+
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
@@ -42,8 +49,8 @@ protected slots:
 
 	void ShowFitDlg();
 	void QuickFitMIEZE();
+	void QuickFitMIEZE(SubWindowBase* pSWB);
 	void QuickFitGauss();
-
 
 public:
 	MiezeMainWnd();
