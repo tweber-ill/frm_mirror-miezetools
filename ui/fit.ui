@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>438</width>
+    <width>423</width>
     <height>465</height>
    </rect>
   </property>
@@ -55,11 +55,21 @@
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <column>
-          <property name="text">
-           <string>Parameter</string>
-          </property>
-         </column>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerItem</enum>
+         </property>
+         <property name="horizontalScrollMode">
+          <enum>QAbstractItemView::ScrollPerItem</enum>
+         </property>
+         <property name="gridStyle">
+          <enum>Qt::SolidLine</enum>
+         </property>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>128</number>
+         </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>23</number>
+         </attribute>
          <column>
           <property name="text">
            <string>Lower limit</string>
@@ -94,11 +104,15 @@
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <column>
-          <property name="text">
-           <string>Parameter</string>
-          </property>
-         </column>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerItem</enum>
+         </property>
+         <property name="horizontalScrollMode">
+          <enum>QAbstractItemView::ScrollPerItem</enum>
+         </property>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>128</number>
+         </attribute>
          <column>
           <property name="text">
            <string>Hint</string>

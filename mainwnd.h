@@ -52,6 +52,8 @@ protected slots:
 	void QuickFitMIEZE(SubWindowBase* pSWB);
 	void QuickFitGauss();
 
+	void ShowAbout();
+
 public:
 	MiezeMainWnd();
 	virtual ~MiezeMainWnd();

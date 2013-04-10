@@ -39,7 +39,7 @@
 
 MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 {
-	this->setWindowTitle("Cattus, a MIEZE tool");
+	this->setWindowTitle("Cattus, a MIEZE toolset");
 
 	m_pmdi = new QMdiArea(this);
 	this->setCentralWidget(m_pmdi);
@@ -126,10 +126,21 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 
 
 
+	// Help
+	QMenu* pMenuHelp = new QMenu(this);
+	pMenuHelp->setTitle("Help");
+	QAction* pAbout = new QAction(this);
+	pAbout->setText("About...");
+	pMenuHelp->addAction(pAbout);
+
+
+
+
 	QMenuBar *pMenuBar = new QMenuBar(this);
 	pMenuBar->addMenu(pMenuFile);
 	pMenuBar->addMenu(pMenuTools);
 	pMenuBar->addMenu(pMenuWindows);
+	pMenuBar->addMenu(pMenuHelp);
 	this->setMenuBar(pMenuBar);
 	//--------------------------------------------------------------------------------
 
@@ -165,6 +176,8 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
 	QObject::connect(pCloseAll, SIGNAL(triggered()), m_pmdi, SLOT(closeAllSubWindows()));
+
+	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
 
 	QObject::connect(pMenuWindows, SIGNAL(aboutToShow()), this, SLOT(UpdateSubWndList()));
 	QObject::connect(m_pmdi, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(SubWindowChanged()));
@@ -766,7 +779,10 @@ void MiezeMainWnd::QuickFitGauss()
 	}
 }
 
-
+void MiezeMainWnd::ShowAbout()
+{
+	// TODO
+}
 
 #include "mainwnd.moc"
 #include "subwnd.moc"

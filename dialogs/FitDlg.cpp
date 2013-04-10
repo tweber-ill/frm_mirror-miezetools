@@ -29,6 +29,9 @@ FitDlg::~FitDlg()
 
 void FitDlg::FunctionChanged(const QString& strFkt)
 {
+	tableLimits->setRowCount(0);
+	tableHints->setRowCount(0);
+
 	Parser parser;
 	parser.SetVerbose(false);
 
@@ -63,15 +66,39 @@ void FitDlg::FunctionChanged(const QString& strFkt)
 	}
 	catch(const std::exception& ex)
 	{
-		labelStatus->setText("Invalid function.");
+		labelStatus->setText("Invalid function (bad input).");
 		return;
 	}
 	labelStatus->setText("Function ok.");
 
 	const std::vector<Symbol>&syms = parser.GetSymbols();
-	for(const Symbol& sym : syms)
-	{
+	tableLimits->setRowCount(syms.size());
+	tableHints->setRowCount(syms.size());
 
+	for(unsigned int iSym=0; iSym<syms.size(); ++iSym)
+	{
+		const Symbol& sym = syms[iSym];
+
+        QTableWidgetItem *pItemParam = new QTableWidgetItem();
+        pItemParam->setText(sym.strIdent.c_str());
+        tableLimits->setVerticalHeaderItem(iSym, pItemParam);
+
+        QTableWidgetItem *pItemLower = new QTableWidgetItem();
+        tableLimits->setItem(iSym,0,pItemLower);
+
+        QTableWidgetItem *pItemUpper = new QTableWidgetItem();
+        tableLimits->setItem(iSym,1,pItemUpper);
+
+
+        QTableWidgetItem *pItemHints = new QTableWidgetItem();
+        pItemHints->setText(sym.strIdent.c_str());
+        tableHints->setVerticalHeaderItem(iSym, pItemHints);
+
+        QTableWidgetItem *pItemHint = new QTableWidgetItem();
+        tableHints->setItem(iSym,0,pItemHint);
+
+        QTableWidgetItem *pItemDelta = new QTableWidgetItem();
+        tableHints->setItem(iSym,1,pItemDelta);
 	}
 }
 
