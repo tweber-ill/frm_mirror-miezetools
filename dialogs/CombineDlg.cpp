@@ -50,6 +50,9 @@ void CombineGraphsDlg::AddItemSelected()
 
 void CombineGraphsDlg::RemoveItemSelected()
 {
+	if(listGraphs->selectedItems().size() == 0)
+		listGraphs->selectAll();
+
 	for(auto pItem : listGraphs->selectedItems())
 		delete pItem;
 }

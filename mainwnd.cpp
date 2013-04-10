@@ -31,6 +31,7 @@
 #include "dialogs/ListDlg.h"
 #include "dialogs/CombineDlg.h"
 #include "dialogs/SettingsDlg.h"
+#include "dialogs/FitDlg.h"
 
 #include "fitter/models/msin.h"
 #include "fitter/models/gauss.h"
@@ -561,7 +562,6 @@ void MiezeMainWnd::ShowCombineGraphsDlg()
 
 SubWindowBase* MiezeMainWnd::GetActivePlot()
 {
-
 	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
 	if(pWnd && pWnd->widget())
 	{
@@ -577,7 +577,11 @@ SubWindowBase* MiezeMainWnd::GetActivePlot()
 
 void MiezeMainWnd::ShowFitDlg()
 {
+	FitDlg dlg(this, m_pmdi);
+	if(dlg.exec() == QDialog::Accepted)
+	{
 
+	}
 }
 
 void MiezeMainWnd::QuickFitMIEZE()
