@@ -26,7 +26,7 @@ protected:
 
 	Data2 m_dat;
 	QImage *m_pImg;
-	bool m_bLog;
+	bool m_bLog, m_bXIsLog, m_bYIsLog;
 	bool m_bCountData;
 	bool m_bHasXYMinMax;
 	double m_dXMin, m_dXMax, m_dYMin, m_dYMax;
@@ -52,6 +52,9 @@ public:
 
 	void SetLog(bool bLog);
 	bool GetLog() const;
+
+	void SetXIsLog(bool bLogX) { m_bXIsLog = bLogX; }
+	void SetYIsLog(bool bLogY) { m_bYIsLog = bLogY; }
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }

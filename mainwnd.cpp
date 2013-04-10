@@ -338,6 +338,11 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
 			pPlot->SetTitle(strPlotTitle.c_str());
 
+			bool bXLog=0, bYLog=0;
+			pdat1d->GetLogScale(bXLog, bYLog);
+			pPlot->SetXIsLog(bXLog);
+			pPlot->SetYIsLog(bYLog);
+
 			delete pdat1d;
 
 			AddSubWindow(pPlot);
@@ -355,8 +360,8 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			for(uint iY=0; iY<iH; ++iY)
 				for(uint iX=0; iX<iW; ++iX)
 				{
-					pDat[iY*iW + iX] = pdat2d->GetVal(iX, iY);
-					pErr[iY*iW + iX] = pdat2d->GetErr(iX, iY);
+					pDat[iY*iW + iX] = pdat2d->GetVal(iX, iH-iY-1);
+					pErr[iY*iW + iX] = pdat2d->GetErr(iX, iH-iY-1);
 				}
 
 			std::string strTitle = GetPlotTitle(strFileNoDir);
@@ -373,6 +378,11 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
 			if(pdat2d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
 				pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
+
+			bool bXLog=0, bYLog=0;
+			pdat2d->GetLogScale(bXLog, bYLog);
+			pPlot->SetXIsLog(bXLog);
+			pPlot->SetYIsLog(bYLog);
 
 			delete[] pDat;
 			delete[] pErr;
@@ -395,8 +405,8 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 				for(uint iY=0; iY<iH; ++iY)
 					for(uint iX=0; iX<iW; ++iX)
 					{
-						pDat[iZ*iW*iH + iY*iW + iX] = pdat3d->GetVal(iX, iY, iZ);
-						pErr[iZ*iW*iH + iY*iW + iX] = pdat3d->GetErr(iX, iY, iZ);
+						pDat[iZ*iW*iH + iY*iW + iX] = pdat3d->GetVal(iX, iH-iY-1, iZ);
+						pErr[iZ*iW*iH + iY*iW + iX] = pdat3d->GetErr(iX, iH-iY-1, iZ);
 					}
 
 
@@ -414,6 +424,11 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
 			if(pdat3d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
 				pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
+
+			bool bXLog=0, bYLog=0;
+			pdat3d->GetLogScale(bXLog, bYLog);
+			pPlot->SetXIsLog(bXLog);
+			pPlot->SetYIsLog(bYLog);
 
 			delete[] pDat;
 			delete[] pErr;

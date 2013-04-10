@@ -43,6 +43,8 @@ protected:
 	double m_dxmin, m_dxmax, m_dymin, m_dymax;
 	void estimate_minmax();
 
+	bool m_bXIsLog, m_bYIsLog;
+
 	QString m_strXAxis, m_strYAxis, m_strTitle;
 
 	QColor GetColor(unsigned int iPlotObj);
@@ -69,6 +71,9 @@ public:
 		m_strXAxis = QString(pcX);
 		m_strYAxis = QString(pcY);
 	}
+
+	void SetXIsLog(bool bLogX) { m_bXIsLog = bLogX; }
+	void SetYIsLog(bool bLogY) { m_bYIsLog = bLogY; }
 
 	virtual SubWindowType GetType() { return PLOT_1D; }
 	virtual double GetTotalCounts() const { return 0.; }

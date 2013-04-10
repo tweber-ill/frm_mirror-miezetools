@@ -20,7 +20,7 @@
 Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData)
 			: SubWindowBase(pParent),
 			  m_pImg(0), m_bLog(bCountData), m_bCountData(bCountData),
-			  m_bHasXYMinMax(0)
+			  m_bHasXYMinMax(0), m_bXIsLog(0), m_bYIsLog(0)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
@@ -89,9 +89,9 @@ uint Plot2d::GetSpectroColor(double dVal) const
 	const uint blue = 0xff0000ff;
 	const uint red = 0xffff0000;
 
-	if(dVal < dMin)
+	if(dVal <= dMin)
 		return blue;
-	else if(dVal > dMax)
+	else if(dVal >= dMax)
 		return red;
 
 	double dSpec = (dVal-dMin) / (dMax-dMin);
@@ -253,8 +253,27 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 
 		if(m_bHasXYMinMax)
 		{
-			double dX_Val = dX / double(m_dat.GetWidth()-1) * (m_dXMax-m_dXMin) + m_dXMin;
-			double dY_Val = dY / double(m_dat.GetHeight()-1) * (m_dYMax-m_dYMin) + m_dYMin;
+			// range 0..1
+			double dX_Val = dX / double(m_dat.GetWidth()-1);
+			double dY_Val = dY / double(m_dat.GetHeight()-1);
+
+			if(m_bXIsLog)
+			{
+				double dXMin = log10(m_dXMin);
+				double dXMax = log10(m_dXMax);
+				dX_Val = pow(10., dXMin + dX_Val*(dXMax-dXMin));
+			}
+			else
+				dX_Val = dX_Val * (m_dXMax-m_dXMin) + m_dXMin;
+
+			if(m_bYIsLog)
+			{
+				double dYMin = log10(m_dYMin);
+				double dYMax = log10(m_dYMax);
+				dY_Val = pow(10., dYMin + dY_Val*(dYMax-dYMin));
+			}
+			else
+				dY_Val = dY_Val * (m_dYMax-m_dYMin) + m_dYMin;
 
 			ostr << "(" << dX_Val << ", " << dY_Val << "): ";
 		}

@@ -15,7 +15,8 @@
 #define PAD_Y 18
 
 Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent),
-									m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.)
+									m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.),
+									m_bXIsLog(0), m_bYIsLog(0)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
@@ -266,19 +267,37 @@ void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 	double dX = double(pt.x()-PAD_X) / double(size.width()-2*PAD_X);
 	double dY = 1. - double(pt.y()-PAD_Y) / double(size.height()-2*PAD_Y);
 
-	// transform to plot ranges
-	dX = m_dxmin + dX*dw;
-	dY = m_dymin + dY*dh;
-
-	if(dX>=m_dxmin && dX<=m_dxmax && dY>=m_dymin && dY<=m_dymax)
+	if(dX>=0. && dX<=1. && dY>=0. && dY<=1.)
 		this->setCursor(Qt::CrossCursor);
 	else
 		this->setCursor(Qt::ArrowCursor);
 
-	if(dX < m_dxmin) dX = m_dxmin;
-	if(dX > m_dxmax) dX = m_dxmax;
-	if(dY < m_dymin) dY = m_dymin;
-	if(dY > m_dymax) dY = m_dymax;
+	if(m_bXIsLog)
+	{
+		double dXMin = log10(m_dxmin);
+		double dXMax = log10(m_dxmax);
+		dX = pow(10., dXMin + dX*(dXMax-dXMin));
+	}
+	else
+	{
+		dX = m_dxmin + dX*dw;
+		if(dX < m_dxmin) dX = m_dxmin;
+		if(dX > m_dxmax) dX = m_dxmax;
+	}
+
+	if(m_bYIsLog)
+	{
+		double dYMin = log10(m_dymin);
+		double dYMax = log10(m_dymax);
+		dY = pow(10., dYMin + dY*(dYMax-dYMin));
+	}
+	else
+	{
+		dY = m_dymin + dY*dh;
+		if(dY < m_dymin) dY = m_dymin;
+		if(dY > m_dymax) dY = m_dymax;
+	}
+
 
 	std::ostringstream ostr;
 	ostr << "(" << dX << ", " << dY << ")";
