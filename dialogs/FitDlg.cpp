@@ -6,9 +6,13 @@
 
 #include "FitDlg.h"
 #include "ListDlg.h"
+#include "../fitter/models/freefit.h"
+#include "../helper/string.h"
 
 #include <QtGui/QMdiSubWindow>
 #include <set>
+#include <vector>
+#include <iostream>
 
 FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi)
 {
@@ -17,10 +21,59 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 	connect(btnAdd, SIGNAL(clicked(bool)), this, SLOT(AddItemSelected()));
 	connect(btnAddActive, SIGNAL(clicked(bool)), this, SLOT(AddActiveItemSelected()));
 	connect(btnDel, SIGNAL(clicked(bool)), this, SLOT(RemoveItemSelected()));
+	connect(editFkt, SIGNAL(textChanged(const QString&)), this, SLOT(FunctionChanged(const QString&)));
 }
 
 FitDlg::~FitDlg()
 {}
+
+void FitDlg::FunctionChanged(const QString& strFkt)
+{
+	Parser parser;
+	parser.SetVerbose(false);
+
+	std::vector<Symbol> vecFreeParams;
+	Symbol symFree;
+	symFree.strIdent = "x";
+	vecFreeParams.push_back(symFree);
+	parser.SetFreeParams(vecFreeParams);
+
+
+	std::string strTheFkt = strFkt.toStdString();
+	::trim(strTheFkt);
+	if(strTheFkt.length()==0)
+	{
+		labelStatus->setText("No function given.");
+		return;
+	}
+
+	if(!Parser::CheckValidLexemes(strTheFkt))
+	{
+		labelStatus->setText("Invalid characters in function.");
+		return;
+	}
+
+	try
+	{
+		if(!parser.ParseExpression(strTheFkt))
+		{
+			labelStatus->setText("Invalid function.");
+			return;
+		}
+	}
+	catch(const std::exception& ex)
+	{
+		labelStatus->setText("Invalid function.");
+		return;
+	}
+	labelStatus->setText("Function ok.");
+
+	const std::vector<Symbol>&syms = parser.GetSymbols();
+	for(const Symbol& sym : syms)
+	{
+
+	}
+}
 
 void FitDlg::AddActiveItemSelected()
 {

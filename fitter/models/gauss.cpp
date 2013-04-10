@@ -49,7 +49,7 @@ double GaussModel::GetAmp() const
 	if(!m_bNormalized)
 		return m_amp;
 	else
-		return m_amp*sqrt(2.*M_PI*fabs(GetSigma()));
+		return m_amp/sqrt(2.*M_PI*fabs(GetSigma()));
 }
 
 double GaussModel::GetMeanErr() const { return m_x0err; }

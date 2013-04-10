@@ -83,6 +83,8 @@ class Parser
 		// print tree & symbol map
 		void PrintTree() const;
 		void PrintSymbolMap() const;
+
+		static bool CheckValidLexemes(const std::string& str);
 };
 
 // global default

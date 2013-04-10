@@ -18,6 +18,7 @@ namespace ascii = boost::spirit::ascii;
 namespace ph = boost::phoenix;
 namespace fus = boost::fusion;
 
+#include <ctype.h>
 #include <iostream>
 #include <map>
 #include "parser.h"
@@ -472,6 +473,27 @@ static std::string get_expression(const Node& node, const std::vector<Symbol>& s
 	return get_expression(node, syms, vecFreeParams, bFillInSyms, bGnuPlotSyntax);
 }
 
+static bool check_tree_sanity(const Node& n)
+{
+	for(const  Node& child : n.vecChildren)
+		if(!check_tree_sanity(child))
+			return false;
+		
+	if((n.iType==NODE_MINUS_INV || n.iType==NODE_DIV_INV) && n.vecChildren.size() < 2)
+		return false;
+
+	if((n.iType==NODE_PLUS || n.iType==NODE_MINUS) && n.vecChildren.size() < 1)
+		return false;
+	if((n.iType==NODE_MULT || n.iType==NODE_DIV) && n.vecChildren.size() < 2)
+		return false;
+	
+	if((n.iType==NODE_POW) && n.vecChildren.size() < 2)
+		return false;
+
+
+	return true;
+}
+
 static void optimize_tree(Node& n)
 {
 	for(Node& child : n.vecChildren)
@@ -496,7 +518,7 @@ static void optimize_tree(Node& n)
 
 	// (x+0) => (x)
 	// (x-0) => (x)
-	if((n.iType==NODE_PLUS || n.iType==NODE_MINUS) && n.vecChildren[1].iType==NODE_DOUBLE && n.vecChildren[1].dVal==0.)
+	if((n.iType==NODE_PLUS || n.iType==NODE_MINUS) && n.vecChildren.size()==2 && n.vecChildren[1].iType==NODE_DOUBLE && n.vecChildren[1].dVal==0.)
 	{
 		Node tmp = n.vecChildren[0];
 		n = tmp;
@@ -509,7 +531,7 @@ static void optimize_tree(Node& n)
 		n = tmp;
 	}
 	// (0+x) => (x)
-	if((n.iType==NODE_PLUS) && n.vecChildren[0].iType==NODE_DOUBLE && n.vecChildren[0].dVal==0.)
+	if((n.iType==NODE_PLUS) && n.vecChildren.size()==2 && n.vecChildren[0].iType==NODE_DOUBLE && n.vecChildren[0].dVal==0.)
 	{
 		Node tmp = n.vecChildren[1];
 		n = tmp;
@@ -529,7 +551,7 @@ static void optimize_tree(Node& n)
 
 	// (0-x) => (-x)
 	// (0+x) => (+x)
-	if((n.iType==NODE_PLUS || n.iType==NODE_MINUS) && n.vecChildren[0].iType==NODE_DOUBLE && n.vecChildren[0].dVal==0.)
+	if((n.iType==NODE_PLUS || n.iType==NODE_MINUS) && n.vecChildren.size()==2 && n.vecChildren[0].iType==NODE_DOUBLE && n.vecChildren[0].dVal==0.)
 	{
 		Node tmp = n.vecChildren[1];
 		n.vecChildren[0] = tmp;
@@ -904,7 +926,20 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 		return false;
 	}
 
+	if(!check_tree_sanity(node))
+	{
+		std::cerr << "Syntax tree is not sane." << std::endl;
+		return false;
+	}
+
 	optimize_tree(node);
+
+	if(!check_tree_sanity(node))
+	{
+		std::cerr << "Optimized syntax tree is not sane." << std::endl;
+		return false;
+	}
+
 	create_symbol_map(node, syms, vecFreeParams);
 	//print_node(node,0);
 
@@ -1044,6 +1079,21 @@ bool Parser::IsOk() const { return m_bOk; }
 // print tree & symbol map
 void Parser::PrintTree() const { ::print_node(m_node); }
 void Parser::PrintSymbolMap() const { ::print_symbol_map(m_syms); }
+
+bool Parser::CheckValidLexemes(const std::string& str)
+{
+	for(char c : str)
+	{
+		if(isalnum(c) || isblank(c) ||
+				c=='+' || c=='-' || c=='*' || c=='/' || c=='^' ||
+				c=='(' || c==')' || c=='_' || c=='.' || c==',')
+			continue;
+		else
+			return false;
+	}
+	return true;
+}
+
 
 //======================================================================
 

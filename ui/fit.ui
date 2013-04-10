@@ -24,13 +24,6 @@
        <string>User-defined Fit</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Type:</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="1">
         <widget class="QComboBox" name="comboFitType">
          <item>
@@ -57,17 +50,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="editFkt"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="checkLimits">
-         <property name="text">
-          <string>Limits:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
+       <item row="5" column="1">
         <widget class="QTableWidget" name="tableLimits">
          <property name="enabled">
           <bool>false</bool>
@@ -89,14 +72,24 @@
          </column>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="checkHints">
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="editFkt"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
          <property name="text">
-          <string>Hints:</string>
+          <string>Type:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="checkLimits">
+         <property name="text">
+          <string>Limits:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
         <widget class="QTableWidget" name="tableHints">
          <property name="enabled">
           <bool>false</bool>
@@ -111,6 +104,18 @@
            <string>Hint</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>Deviation</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="checkHints">
+         <property name="text">
+          <string>Hints:</string>
+         </property>
         </widget>
        </item>
       </layout>
@@ -191,51 +196,44 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+    <widget class="QFrame" name="frame_2">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
      </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
      </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="labelStatus">
+        <property name="text">
+         <string>Ready.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>FitDlg</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>FitDlg</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>checkLimits</sender>
    <signal>toggled(bool)</signal>
@@ -265,6 +263,38 @@
     <hint type="destinationlabel">
      <x>268</x>
      <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>FitDlg</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>457</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>218</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>FitDlg</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>457</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>218</x>
+     <y>232</y>
     </hint>
    </hints>
   </connection>

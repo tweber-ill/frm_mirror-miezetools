@@ -25,6 +25,7 @@
 	void AddItemSelected();
 	void AddActiveItemSelected();
 	void RemoveItemSelected();
+	void FunctionChanged(const QString&);
 
  public:
 	 FitDlg(QWidget* pParent, QMdiArea *pmdi);
