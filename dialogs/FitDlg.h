@@ -10,6 +10,7 @@
 #include "../ui/ui_fit.h"
 #include "../subwnd.h"
 
+#include <string>
 #include <QtGui/QMdiArea>
 
  class FitDlg : public QDialog, Ui::FitDlg
@@ -20,6 +21,9 @@
 
 	 void RemoveDuplicate();
 	 void DoFit();
+
+	 std::string GetHintsString() const;
+	 std::string GetLimitsString() const;
 
  protected slots:
 	void AddItemSelected();

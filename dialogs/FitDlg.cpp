@@ -13,6 +13,7 @@
 #include <set>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi)
 {
@@ -171,9 +172,58 @@ void FitDlg::RemoveDuplicate()
 	}
 }
 
+std::string FitDlg::GetHintsString() const
+{
+	std::ostringstream ostr;
+
+	for(unsigned int i=0; i<tableHints->rowCount(); ++i)
+	{
+
+	}
+
+	return ostr.str();
+}
+
+std::string FitDlg::GetLimitsString() const
+{
+	std::ostringstream ostr;
+
+
+	return ostr.str();
+}
+
 void FitDlg::DoFit()
 {
+	const bool bLimits = checkLimits->isChecked();
+	const bool bHints = checkHints->isChecked();
 
+	std::string strLimits, strHints;
+
+	if(bLimits) strLimits = GetLimitsString();
+	if(bHints) strHints = GetHintsString();
+
+	const std::string strFkt = editFkt->text().toStdString();
+
+	if(comboFitType->currentIndex() == 0)		// 1d fit
+	{
+/*		bool get_freefit(unsigned int iLen,
+							const double* px, const double* py, const double* pdy,
+							const char* pcExp, const char* pcLimits, const char* pcHints,
+							std::vector<std::string>& vecFittedNames,
+							std::vector<double>& vecFittedParams,
+							std::vector<double>& vecFittedErrs,
+							FreeFktModel** pFinalModel)*/
+
+
+	}
+	else if(comboFitType->currentIndex() == 1)		// 1d fit (pixel-wise)
+	{
+
+	}
+	else if(comboFitType->currentIndex() == 2)		// 2d fit
+	{
+
+	}
 }
 
 void FitDlg::accept()
