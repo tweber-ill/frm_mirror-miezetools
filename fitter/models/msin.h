@@ -28,7 +28,7 @@ class MiezeSinModel : public FunctionModel
 		virtual bool SetParams(const std::vector<double>& vecParams);
 		virtual double operator()(double x) const;
 		virtual FunctionModel* copy() const;
-		virtual std::string print() const;
+		virtual std::string print(bool bFillInSyms=true) const;
 
 		double GetContrast() const;
 		double GetContrastErr() const;

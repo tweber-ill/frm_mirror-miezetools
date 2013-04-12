@@ -25,7 +25,7 @@ class FunctionModel
 		virtual double operator()(double x) const = 0;
 
 		virtual FunctionModel* copy() const = 0;
-		virtual std::string print() const = 0;
+		virtual std::string print(bool bFillInSyms=true) const = 0;
 
 		virtual ~FunctionModel();
 };
@@ -42,7 +42,7 @@ class FunctionModel_nd
 		virtual double operator()(const double* px) const = 0;
 
 		virtual FunctionModel_nd* copy() const = 0;
-		virtual std::string print() const = 0;
+		virtual std::string print(bool bFillInSyms=true) const = 0;
 
 		virtual ~FunctionModel_nd();
 };

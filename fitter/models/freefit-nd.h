@@ -36,7 +36,7 @@ class FreeFktModel_nd : public FunctionModel_nd
 		virtual double operator()(const double* x) const;
 
 		virtual FunctionModel_nd* copy() const;
-		virtual std::string print() const;
+		virtual std::string print(bool bFillInSyms=true) const;
 
 		const Node& GetRootNode() const
 		{ return m_parser.GetRootNode(); }

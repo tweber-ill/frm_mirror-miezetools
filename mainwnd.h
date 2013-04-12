@@ -64,11 +64,11 @@ public:
 	MiezeMainWnd();
 	virtual ~MiezeMainWnd();
 
-	void AddSubWindow(SubWindowBase* pWnd);
 	void LoadFile(const std::string& strFile);
 
 public slots:
 	void SetStatusMsg(const char* pcMsg, int iPos);
+	void AddSubWindow(SubWindowBase* pWnd);
 };
 
 #endif

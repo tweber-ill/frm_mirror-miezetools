@@ -59,14 +59,24 @@ double GaussModel::GetHWHMErr() const { return SIGMA2HWHM * m_spreaderr; }
 double GaussModel::GetAmpErr() const { return m_amperr; }
 
 
-std::string GaussModel::print() const
+std::string GaussModel::print(bool bFillInSyms) const
 {
 	std::ostringstream ostr;
-	ostr << m_amp;
-	if(m_bNormalized)
-		ostr << "/sqrt(2*pi * " << m_spread << ")";
-	ostr << " * exp(-0.5 * ((x-" << m_x0 << ")/"
-		 << m_spread << ")**2)";
+	if(bFillInSyms)
+	{
+		ostr << m_amp;
+		if(m_bNormalized)
+			ostr << "/sqrt(2*pi * " << m_spread << ")";
+		ostr << " * exp(-0.5 * ((x-" << m_x0 << ")/"
+			 << m_spread << ")**2)";
+	}
+	else
+	{
+		ostr << "amp";
+		if(m_bNormalized)
+			ostr << "/sqrt(2*pi * sigma)";
+		ostr << " * exp(-0.5 * ((x-x0) / sigma)**2)";
+	}
 	return ostr.str();
 }
 

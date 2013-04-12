@@ -79,9 +79,9 @@ FunctionModel* FreeFktModel::copy() const
 	return new FreeFktModel(m_parser);
 }
 
-std::string FreeFktModel::print() const
+std::string FreeFktModel::print(bool bFillInSyms) const
 {
-	return m_parser.GetExpression(true, true);
+	return m_parser.GetExpression(bFillInSyms, false);
 }
 
 
@@ -258,7 +258,6 @@ bool get_freefit(unsigned int iLen,
 	
 	*pFinalModel = new FreeFktModel(freemod);
 
-	/*
 	{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 
@@ -273,7 +272,6 @@ bool get_freefit(unsigned int iLen,
 		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 	}
-	*/
 
 	return bValidFit;
 }

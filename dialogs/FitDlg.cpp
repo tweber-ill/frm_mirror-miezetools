@@ -33,6 +33,8 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 	connect(btnAdd, SIGNAL(clicked(bool)), this, SLOT(AddItemSelected()));
 	connect(btnAddActive, SIGNAL(clicked(bool)), this, SLOT(AddActiveItemSelected()));
 	connect(btnDel, SIGNAL(clicked(bool)), this, SLOT(RemoveItemSelected()));
+
+	connect(comboFitType, SIGNAL(currentIndexChanged(int)), this, SLOT(FunctionTypeChanged()));
 	connect(editFkt, SIGNAL(textChanged(const QString&)), this, SLOT(FunctionChanged(const QString&)));
 
 	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
@@ -43,6 +45,11 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 
 FitDlg::~FitDlg()
 {}
+
+void FitDlg::FunctionTypeChanged()
+{
+	FunctionChanged(editFkt->text());
+}
 
 void FitDlg::FunctionChanged(const QString& strFkt)
 {
@@ -56,6 +63,14 @@ void FitDlg::FunctionChanged(const QString& strFkt)
 	Symbol symFree;
 	symFree.strIdent = "x";
 	vecFreeParams.push_back(symFree);
+
+	if(comboFitType->currentIndex() == 2)		// 2d fit
+	{
+		Symbol symFreeY;
+		symFreeY.strIdent = "y";
+		vecFreeParams.push_back(symFreeY);
+	}
+
 	parser.SetFreeParams(vecFreeParams);
 
 
@@ -201,9 +216,9 @@ void FitDlg::UpdateSourceList()
 	for(QMdiSubWindow* pWnd : lst)
 	{
 		SubWindowBase* pPlot = (SubWindowBase*)pWnd->widget();
-		//pPlot = pPlot->GetActualWidget();
 
 		setItems.insert(pPlot);
+		setItems.insert(pPlot->GetActualWidget());
 	}
 
 	// check if the plots from the list are in the set of all windows
@@ -291,6 +306,8 @@ void FitDlg::DoFit()
 		{
 			SubWindowBase* pSWB = ((ListGraphsItem*)listGraphs->item(iWnd))->subWnd();
 			Plot* pPlot = (Plot*)pSWB->ConvertTo1d();
+			const bool bCreatedNewPlot = (pPlot != pSWB);
+
 			if(!pPlot)
 			{
 				delete listGraphs->item(iWnd);
@@ -333,11 +350,14 @@ void FitDlg::DoFit()
 									vecFittedNames, vecFittedParams, vecFittedErrs,
 									&pModel);
 
-			if(bOk && pModel)
-			{
+			 if(pModel)
+			 {
 				pPlot->plotfit(*pModel);
 				pPlot->repaint();
-			}
+			 }
+
+			if(bCreatedNewPlot)
+				emit AddSubWindow(pPlot);
 		}
 	}
 	else if(comboFitType->currentIndex() == 1)		// 1d fit (pixel-wise)

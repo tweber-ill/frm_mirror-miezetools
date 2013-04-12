@@ -607,6 +607,7 @@ void MiezeMainWnd::ShowFitDlg()
 	if(!m_pfitdlg)
 	{
 		m_pfitdlg = new FitDlg(this, m_pmdi);
+		QObject::connect(m_pfitdlg, SIGNAL(AddSubWindow(SubWindowBase*)), this, SLOT(AddSubWindow(SubWindowBase*)));
 	}
 
 	m_pfitdlg->show();

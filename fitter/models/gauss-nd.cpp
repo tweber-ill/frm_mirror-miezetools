@@ -93,17 +93,31 @@ FunctionModel_nd* GaussModel_nd::copy() const
 	return new GaussModel_nd(m_uiDim, m_amp, m_pspread, m_px0);
 }
 
-std::string GaussModel_nd::print() const
+std::string GaussModel_nd::print(bool bFillInSyms) const
 {
 	const char* pcVar[] = {"x", "y", "z", "w"};
-	
+
 	std::ostringstream ostr;
-	ostr << m_amp;
 	
-	for(unsigned int i=0; i<m_uiDim; ++i)
+	if(bFillInSyms)
 	{
-		ostr << " * exp(-0.5 * ((" << pcVar[i] <<  "-" << m_px0[i] << ")/"
-			 << m_pspread[i] << ")**2)";
+		ostr << m_amp;
+
+		for(unsigned int i=0; i<m_uiDim; ++i)
+		{
+			ostr << " * exp(-0.5 * ((" << pcVar[i] <<  "-" << m_px0[i] << ")/"
+				 << m_pspread[i] << ")**2)";
+		}
+	}
+	else
+	{
+		ostr << "amp";
+
+		for(unsigned int i=0; i<m_uiDim; ++i)
+		{
+			ostr << " * exp(-0.5 * ((" << pcVar[i] <<  "-" << m_px0[i] << ")/"
+				 << "sigma_" << pcVar[i] << ")**2)";
+		}
 	}
 
 	return ostr.str();

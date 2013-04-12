@@ -210,7 +210,7 @@ void Plot::plotfit(const FunctionModel& fkt)
 
 	PlotObj pltobj;
 	pltobj.plttype = PLOT_FIT;
-	pltobj.strName = "fit";
+	pltobj.strName = fkt.print(0);
 	Data1& dat = pltobj.dat;
 
 	const double dPadX = (m_dxmax-m_dxmin) / 128.;

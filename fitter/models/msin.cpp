@@ -37,11 +37,13 @@ MiezeSinModel::MiezeSinModel(double dFreq, double dAmp,
 MiezeSinModel::~MiezeSinModel()
 {}
 
-std::string MiezeSinModel::print() const
+std::string MiezeSinModel::print(bool bFillInSyms) const
 {
 	std::ostringstream ostr;
-	ostr << m_damp << "*sin(" << m_dfreq << "*x + "
-		 << m_dphase << ") + " << m_doffs;
+	if(bFillInSyms)
+		ostr << m_damp << "*sin(" << m_dfreq << "*x + " << m_dphase << ") + " << m_doffs;
+	else
+		ostr << "amp * sin(freq*x + phase) + offs";
 	return ostr.str();
 }
 

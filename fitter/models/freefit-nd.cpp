@@ -124,9 +124,9 @@ FunctionModel_nd* FreeFktModel_nd::copy() const
 	return new FreeFktModel_nd(*this);
 }
 
-std::string FreeFktModel_nd::print() const
+std::string FreeFktModel_nd::print(bool bFillInSyms) const
 {
-	return m_parser.GetExpression(true, true);
+	return m_parser.GetExpression(bFillInSyms, true);
 }
 
 

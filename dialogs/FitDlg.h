@@ -29,6 +29,8 @@
 	void AddItemSelected();
 	void AddActiveItemSelected();
 	void RemoveItemSelected();
+
+	void FunctionTypeChanged();
 	void FunctionChanged(const QString&);
 
 	void ButtonBoxClicked(QAbstractButton*);
@@ -38,6 +40,9 @@
 	 virtual ~FitDlg();
 
 public slots:
+
+signals:
+	void AddSubWindow(SubWindowBase* pWnd);
  };
 
 

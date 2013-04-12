@@ -27,7 +27,7 @@ class GaussModel_nd : public FunctionModel_nd
 		virtual bool SetParams(const std::vector<double>& vecParams);
 		virtual double operator()(const double* x) const;
 		virtual FunctionModel_nd* copy() const;
-		virtual std::string print() const;
+		virtual std::string print(bool bFillInSyms=true) const;
 };
 
 int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
