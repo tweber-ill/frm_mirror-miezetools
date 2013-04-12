@@ -185,10 +185,17 @@ bool get_freefit(unsigned int iLen,
 		double dMinLim, dMaxLim;
 		if(freefit_get_limits(sym.strIdent, dMinLim, dMaxLim, vecLimits))
 		{
-			if(dMinLim >= dMaxLim)
+			if(dMinLim > dMaxLim)
+			{
+				double dTmpLim = dMinLim;
 				dMinLim = dMaxLim;
+				dMaxLim = dTmpLim;
+			}
 
-			params.SetLimits(sym.strIdent, dMinLim, dMaxLim);
+			if(dMinLim != dMaxLim)
+				params.SetLimits(sym.strIdent, dMinLim, dMaxLim);
+			//else
+			//	params.Fix(sym.strIdent);
 		}
 	}
 

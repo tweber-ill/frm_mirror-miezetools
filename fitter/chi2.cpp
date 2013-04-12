@@ -32,7 +32,7 @@ double Chi2Function::chi2(const std::vector<double>& vecParams) const
 	for(unsigned int i=0; i<m_uiLen; ++i)
 	{
 		double d = (*pfkt)(m_px[i]) - m_py[i];
-		double dy = m_pdy[i];
+		double dy = m_pdy ? m_pdy[i] : 0.1*d;	// assume 10% error if none given
 		if(fabs(dy) < std::numeric_limits<double>::min())
 			dy = std::numeric_limits<double>::min();
 
@@ -60,7 +60,7 @@ double Chi2Function_nd::chi2(const std::vector<double>& vecParams) const
 			px[iX] = m_vecpx[iX][i];
 		
 		double d = (*pfkt)(px) - m_py[i];
-		double dy = m_pdy[i];
+		double dy = m_pdy ? m_pdy[i] : 0.1*d;	// assume 10% error if none given
 		if(fabs(dy) < std::numeric_limits<double>::min())
 			dy = std::numeric_limits<double>::min();
 

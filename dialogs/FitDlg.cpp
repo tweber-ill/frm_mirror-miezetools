@@ -18,10 +18,13 @@
 #include "../plot/plot4d.h"
 
 #include <QtGui/QMdiSubWindow>
+#include <QtGui/QMessageBox>
+
 #include <set>
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <limits>
 
 FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi)
 {
@@ -33,6 +36,9 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 	connect(editFkt, SIGNAL(textChanged(const QString&)), this, SLOT(FunctionChanged(const QString&)));
 
 	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
+
+	tableLimits->setColumnWidth(2,50);
+	tableHints->setColumnWidth(2,50);
 }
 
 FitDlg::~FitDlg()
@@ -96,9 +102,11 @@ void FitDlg::FunctionChanged(const QString& strFkt)
 
         QTableWidgetItem *pItemLower = new QTableWidgetItem();
         tableLimits->setItem(iSym,0,pItemLower);
-
         QTableWidgetItem *pItemUpper = new QTableWidgetItem();
         tableLimits->setItem(iSym,1,pItemUpper);
+        QTableWidgetItem *pItemActive0 = new QTableWidgetItem();
+        pItemActive0->setText("0");
+        tableLimits->setItem(iSym,2,pItemActive0);
 
 
         QTableWidgetItem *pItemHints = new QTableWidgetItem();
@@ -107,9 +115,11 @@ void FitDlg::FunctionChanged(const QString& strFkt)
 
         QTableWidgetItem *pItemHint = new QTableWidgetItem();
         tableHints->setItem(iSym,0,pItemHint);
-
         QTableWidgetItem *pItemDelta = new QTableWidgetItem();
         tableHints->setItem(iSym,1,pItemDelta);
+        QTableWidgetItem *pItemActive1 = new QTableWidgetItem();
+        pItemActive1->setText("0");
+        tableHints->setItem(iSym,2,pItemActive1);
 	}
 }
 
@@ -213,45 +223,65 @@ std::string FitDlg::GetTableString(QTableWidget* pTable) const
 {
 	std::ostringstream ostr;
 
-	for(int i=0; i<tableHints->rowCount(); ++i)
+	for(int i=0; i<pTable->rowCount(); ++i)
 	{
+		QTableWidgetItem* pItemActive = pTable->item(i,2);
+
 		bool bOk = 0;
-		QTableWidgetItem* pHint = tableHints->item(i,0);
-		double dHint = pHint->text().toDouble(&bOk);
-		if(!bOk)
+		bool bActive = pItemActive->text().toInt(&bOk);
+		if(!bOk) bActive = 0;
+		if(!bActive) continue;
+
+		QTableWidgetItem* pItem1 = pTable->item(i,0);
+		std::string strVal1 = pItem1->text().toStdString();
+		::trim(strVal1);
+		if(strVal1.length() == 0)
 		{
-			dHint = 0.;
-			pHint->setText("0");
+			if(bActive)
+			{
+				pItemActive->setText("0");
+				continue;
+			}
 		}
 
-		QTableWidgetItem* pDelta = tableHints->item(i,1);
-		double dDelta = pDelta->text().toDouble(&bOk);
-		if(!bOk)
+		QTableWidgetItem* pItem2 = pTable->item(i,1);
+		std::string strVal2 = pItem2->text().toStdString();
+		::trim(strVal2);
+		if(strVal2.length() == 0)
 		{
-			dDelta = 0.;
-			pDelta->setText("0");
+			if(bActive)
+			{
+				pItemActive->setText("0");
+				continue;
+			}
 		}
 
-		std::string strParam = tableHints->verticalHeaderItem(i)->text().toStdString();
-
-		ostr << strParam << "=" << dHint << ":" << dDelta;
-		if(i<tableHints->rowCount()-1) ostr << "; ";
+		std::string strParam = pTable->verticalHeaderItem(i)->text().toStdString();
+		ostr << strParam << "=" << strVal1 << ":" << strVal2 << "; ";
 	}
 
-	std::cout << ostr.str() << std::endl;
-	return ostr.str();
+	std::string str = ostr.str();
+	str = str.substr(0, str.length()-2);		// remove last "; "
+	::trim(str);
+	//std::cout << str << std::endl;
+	return str;
 }
 
 void FitDlg::DoFit()
 {
+	bool bAssumeErrorIfZero = 1;
+
 	UpdateSourceList();
+	if(tableLimits->rowCount() == 0)
+	{
+		QMessageBox::critical(this, "Error", "No parameters for fitting given.");
+		return;
+	}
 
-	const bool bLimits = checkLimits->isChecked();
-	const bool bHints = checkHints->isChecked();
-
-	std::string strLimits, strHints;
-	if(bLimits) strLimits = GetTableString(tableLimits);
-	if(bHints) strHints = GetTableString(tableHints);
+	std::string strLimits = GetTableString(tableLimits);
+	std::string strHints = GetTableString(tableHints);
+	const bool bLimits = (strLimits.length()!=0);
+	const bool bHints = (strHints.length()!=0);
 
 	const std::string strFkt = editFkt->text().toStdString();
 
@@ -261,6 +291,12 @@ void FitDlg::DoFit()
 		{
 			SubWindowBase* pSWB = ((ListGraphsItem*)listGraphs->item(iWnd))->subWnd();
 			Plot* pPlot = (Plot*)pSWB->ConvertTo1d();
+			if(!pPlot)
+			{
+				delete listGraphs->item(iWnd);
+				--iWnd;
+				continue;
+			}
 
 			if(pPlot->GetDataCount() == 0)
 			{
@@ -276,6 +312,16 @@ void FitDlg::DoFit()
 			autodeleter<double> _a0(px, 1);
 			autodeleter<double> _a1(py, 1);
 			autodeleter<double> _a2(pyerr, 1);
+
+			if(bAssumeErrorIfZero)
+			{
+				double dMaxY = *std::max_element(py, py+dat.GetLength());
+				for(unsigned int iErr=0; iErr<dat.GetLength(); ++iErr)
+				{
+					if(pyerr[iErr] < std::numeric_limits<double>::min())
+						pyerr[iErr] = dMaxY * 0.1;
+				}
+			}
 
 			std::vector<std::string> vecFittedNames;
 			std::vector<double> vecFittedParams;
