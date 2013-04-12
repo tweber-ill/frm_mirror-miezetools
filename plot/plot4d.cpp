@@ -11,6 +11,7 @@
 #include <sstream>
 
 #include "../helper/string.h"
+#include "../helper/misc.h"
 
 Plot4d::Plot4d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 		: Plot2d(pParent, pcTitle, bCountData), m_iCurT(0), m_iCurF(0)
@@ -127,6 +128,39 @@ void Plot4d::RefreshStatusMsgs()
 	else
 	{
 		emit SetStatusMsg("", 1);
+	}
+}
+
+Plot* Plot4d::ConvertTo1d(int iFoil)
+{
+	const Plot4d* pPlot4d = this;
+
+	if(iFoil<0)
+	{
+		// TODO
+		return ConvertTo1d(0);
+	}
+	else
+	{
+		std::string strTitle = pPlot4d->windowTitle().toStdString();
+		strTitle += std::string(" -> t channels");
+
+		Data1 dat = pPlot4d->GetData().GetXYSum(iFoil);
+
+		double *pdx = vec_to_array<double>(dat.GetX());
+		double *pdy = vec_to_array<double>(dat.GetY());
+		double *pdyerr = vec_to_array<double>(dat.GetYErr());
+		autodeleter<double> _a0(pdx, 1);
+		autodeleter<double> _a1(pdy, 1);
+		autodeleter<double> _a2(pdyerr, 1);
+
+		Plot *pPlot = new Plot(0, strTitle.c_str());
+		pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
+
+		pPlot->SetLabels(pPlot4d->GetZStr().toAscii().data(), "intensity");
+		pPlot->SetTitle("");
+
+		return pPlot;
 	}
 }
 

@@ -9,6 +9,8 @@
 #define __MIEZE_PLOT3D__
 
 #include "plot2d.h"
+#include "plot.h"
+
 #include <QtGui/QSlider>
 #include <QtGui/QLabel>
 
@@ -34,6 +36,8 @@ public:
 
 	virtual SubWindowType GetType() { return PLOT_3D; }
 	virtual double GetTotalCounts() const { return m_dat3.GetTotal(); }
+
+	virtual Plot* ConvertTo1d(int iParam=0);
 };
 
 
@@ -55,6 +59,8 @@ public:
 
 	virtual std::string GetTitle() const { return m_pPlot->GetTitle(); }
 	virtual double GetTotalCounts() const { return m_pPlot->GetTotalCounts(); }
+
+	virtual Plot* ConvertTo1d(int iFoil) { return m_pPlot->ConvertTo1d(iFoil); }
 
 public slots:
 	void DataLoaded();

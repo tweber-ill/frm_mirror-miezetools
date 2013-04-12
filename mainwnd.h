@@ -8,13 +8,18 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
 #include <QtGui/QLabel>
+
 #include <vector>
 #include <string>
+
 #include "subwnd.h"
 #include "plot/plot.h"
 #include "plot/plot2d.h"
 #include "plot/plot3d.h"
 #include "plot/plot4d.h"
+
+#include "dialogs/FitDlg.h"
+
 
 #ifndef __MAINWND_H__
 #define __MAINWND_H__
@@ -23,6 +28,7 @@ class MiezeMainWnd : public QMainWindow
 { Q_OBJECT
 protected:
 	QMdiArea *m_pmdi;
+	FitDlg *m_pfitdlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);

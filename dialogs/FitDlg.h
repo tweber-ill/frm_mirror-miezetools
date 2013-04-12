@@ -22,8 +22,8 @@
 	 void RemoveDuplicate();
 	 void DoFit();
 
-	 std::string GetHintsString() const;
-	 std::string GetLimitsString() const;
+	 std::string GetTableString(QTableWidget* pTable) const;
+	 void UpdateSourceList();
 
  protected slots:
 	void AddItemSelected();
@@ -31,12 +31,13 @@
 	void RemoveItemSelected();
 	void FunctionChanged(const QString&);
 
+	void ButtonBoxClicked(QAbstractButton*);
+
  public:
 	 FitDlg(QWidget* pParent, QMdiArea *pmdi);
 	 virtual ~FitDlg();
 
-		public slots:
-			virtual void accept();
+public slots:
  };
 
 

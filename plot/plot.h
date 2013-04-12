@@ -77,6 +77,7 @@ public:
 
 	virtual SubWindowType GetType() { return PLOT_1D; }
 	virtual double GetTotalCounts() const { return 0.; }
+	virtual Plot* ConvertTo1d(int iParam=0) { return (Plot*)this; }
 };
 
 

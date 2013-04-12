@@ -31,13 +31,12 @@
 #include "dialogs/ListDlg.h"
 #include "dialogs/CombineDlg.h"
 #include "dialogs/SettingsDlg.h"
-#include "dialogs/FitDlg.h"
 
 #include "fitter/models/msin.h"
 #include "fitter/models/gauss.h"
 
 
-MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1)
+MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 {
 	this->setWindowTitle("Cattus, a MIEZE toolset");
 
@@ -605,11 +604,13 @@ SubWindowBase* MiezeMainWnd::GetActivePlot()
 
 void MiezeMainWnd::ShowFitDlg()
 {
-	FitDlg dlg(this, m_pmdi);
-	if(dlg.exec() == QDialog::Accepted)
+	if(!m_pfitdlg)
 	{
-
+		m_pfitdlg = new FitDlg(this, m_pmdi);
 	}
+
+	m_pfitdlg->show();
+	m_pfitdlg->activateWindow();
 }
 
 void MiezeMainWnd::QuickFitMIEZE()
@@ -683,57 +684,24 @@ void MiezeMainWnd::QuickFitMIEZE(SubWindowBase* pSWB)
 
 Plot* MiezeMainWnd::Convert3d1d(Plot3d* pPlot3d)
 {
-	std::string strTitle = pPlot3d->windowTitle().toStdString();
-	strTitle += std::string(" -> t channels");
-
-	Data1 dat = pPlot3d->GetData().GetXYSum();
-
-	double *pdx = vec_to_array<double>(dat.GetX());
-	double *pdy = vec_to_array<double>(dat.GetY());
-	double *pdyerr = vec_to_array<double>(dat.GetYErr());
-	autodeleter<double> _a0(pdx, 1);
-	autodeleter<double> _a1(pdy, 1);
-	autodeleter<double> _a2(pdyerr, 1);
-
-	Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-	pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
-
-	pPlot->SetLabels(pPlot3d->GetZStr().toAscii().data(), "intensity");
-	pPlot->SetTitle("");
-
-	AddSubWindow(pPlot);
+	Plot* pPlot = pPlot3d->ConvertTo1d();
+	if(pPlot)
+	{
+		pPlot->setParent(m_pmdi);
+		AddSubWindow(pPlot);
+	}
 	return pPlot;
 }
 
 Plot* MiezeMainWnd::Convert4d1d(Plot4d* pPlot4d, int iFoil)
 {
-	if(iFoil<0)
+	Plot* pPlot = pPlot4d->ConvertTo1d(iFoil);
+	if(pPlot)
 	{
-		return Convert4d1d(pPlot4d, 0);
-	}
-	else
-	{
-		std::string strTitle = pPlot4d->windowTitle().toStdString();
-		strTitle += std::string(" -> t channels");
-
-		Data1 dat = pPlot4d->GetData().GetXYSum(iFoil);
-
-		double *pdx = vec_to_array<double>(dat.GetX());
-		double *pdy = vec_to_array<double>(dat.GetY());
-		double *pdyerr = vec_to_array<double>(dat.GetYErr());
-		autodeleter<double> _a0(pdx, 1);
-		autodeleter<double> _a1(pdy, 1);
-		autodeleter<double> _a2(pdyerr, 1);
-
-		Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-		pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
-
-		pPlot->SetLabels(pPlot4d->GetZStr().toAscii().data(), "intensity");
-		pPlot->SetTitle("");
-
+		pPlot->setParent(m_pmdi);
 		AddSubWindow(pPlot);
-		return pPlot;
 	}
+	return pPlot;
 }
 
 void MiezeMainWnd::QuickFitGauss()

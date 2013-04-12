@@ -11,6 +11,7 @@
 #include <sstream>
 
 #include "../helper/string.h"
+#include "../helper/misc.h"
 
 Plot3d::Plot3d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 		: Plot2d(pParent, pcTitle, bCountData), m_iCurT(0)
@@ -111,6 +112,31 @@ void Plot3d::RefreshStatusMsgs()
 	{
 		emit SetStatusMsg("", 1);
 	}
+}
+
+Plot* Plot3d::ConvertTo1d(int iParam)
+{
+	const Plot3d* pPlot3d = this;
+
+	std::string strTitle = pPlot3d->windowTitle().toStdString();
+	strTitle += std::string(" -> t channels");
+
+	Data1 dat = pPlot3d->GetData().GetXYSum();
+
+	double *pdx = vec_to_array<double>(dat.GetX());
+	double *pdy = vec_to_array<double>(dat.GetY());
+	double *pdyerr = vec_to_array<double>(dat.GetYErr());
+	autodeleter<double> _a0(pdx, 1);
+	autodeleter<double> _a1(pdy, 1);
+	autodeleter<double> _a2(pdyerr, 1);
+
+	Plot *pPlot = new Plot(0, strTitle.c_str());
+	pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
+
+	pPlot->SetLabels(pPlot3d->GetZStr().toAscii().data(), "intensity");
+	pPlot->SetTitle("");
+
+	return pPlot;
 }
 
 #include "plot3d.moc"

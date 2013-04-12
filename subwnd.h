@@ -11,6 +11,8 @@
 #include <QtGui/QWidget>
 #include <string>
 
+class Plot;
+
 enum SubWindowType
 {
 	PLOT_1D,
@@ -29,6 +31,8 @@ public:
 
 	//virtual std::string GetTitle() const = 0;
 	virtual double GetTotalCounts() const = 0;
+
+	virtual Plot* ConvertTo1d(int iParam=-1) { return 0; }
 
 signals:
 		void SetStatusMsg(const char* pcMsg, int iPos);
