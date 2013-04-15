@@ -53,6 +53,9 @@ void FitDlg::FunctionTypeChanged()
 
 void FitDlg::FunctionChanged(const QString& strFkt)
 {
+	if(tableLimits->rowCount())
+		SaveLastParams();
+
 	tableLimits->setRowCount(0);
 	tableHints->setRowCount(0);
 
@@ -64,7 +67,7 @@ void FitDlg::FunctionChanged(const QString& strFkt)
 	symFree.strIdent = "x";
 	vecFreeParams.push_back(symFree);
 
-	if(comboFitType->currentIndex() == 2)		// 2d fit
+	if(comboFitType->currentIndex() == 1)		// 2d fit
 	{
 		Symbol symFreeY;
 		symFreeY.strIdent = "y";
@@ -135,6 +138,74 @@ void FitDlg::FunctionChanged(const QString& strFkt)
         QTableWidgetItem *pItemActive1 = new QTableWidgetItem();
         pItemActive1->setText("0");
         tableHints->setItem(iSym,2,pItemActive1);
+	}
+
+	RestoreLastParams();
+}
+
+void FitDlg::SaveLastParams()
+{
+	//m_mapParams.clear();
+
+	if(tableHints->rowCount() != tableLimits->rowCount())
+		return;
+
+	for(int iRow=0; iRow<tableHints->rowCount(); ++iRow)
+	{
+		QTableWidgetItem* pHeader = tableHints->verticalHeaderItem(iRow);
+		if(!pHeader) continue;
+		std::string strParamName = pHeader->text().toStdString();
+
+		FitParams params;
+
+		const QTableWidgetItem* pItemHint = tableHints->item(iRow,0);
+		const QTableWidgetItem* pItemErr = tableHints->item(iRow,1);
+		const QTableWidgetItem* pItemHintActive = tableHints->item(iRow,2);
+		const QTableWidgetItem* pItemMin = tableLimits->item(iRow,0);
+		const QTableWidgetItem* pItemMax = tableLimits->item(iRow,1);
+		const QTableWidgetItem* pItemLimitActive = tableLimits->item(iRow,2);
+
+		if(pItemHint) params.strHint = pItemHint->text().toStdString();
+		if(pItemErr) params.strErr = pItemErr->text().toStdString();
+		if(pItemMin) params.strMin = pItemMin->text().toStdString();
+		if(pItemMax) params.strMax = pItemMax->text().toStdString();
+		if(pItemHintActive) params.bHintActive = pItemHintActive->text().toInt();
+		if(pItemLimitActive) params.bLimitActive = pItemLimitActive->text().toInt();
+
+		m_mapParams[strParamName] = params;
+	}
+}
+
+void FitDlg::RestoreLastParams()
+{
+	if(tableHints->rowCount() != tableLimits->rowCount())
+		return;
+
+	for(int iRow=0; iRow<tableHints->rowCount(); ++iRow)
+	{
+		QTableWidgetItem* pHeader = tableHints->verticalHeaderItem(iRow);
+		if(!pHeader) continue;
+		std::string strParamName = pHeader->text().toStdString();
+
+		t_mapParams::const_iterator iter = m_mapParams.find(strParamName);
+		if(iter == m_mapParams.end())
+			continue;
+
+		FitParams params = (*iter).second;
+
+		QTableWidgetItem* pItemHint = tableHints->item(iRow,0);
+		QTableWidgetItem* pItemErr = tableHints->item(iRow,1);
+		QTableWidgetItem* pItemHintActive = tableHints->item(iRow,2);
+		QTableWidgetItem* pItemMin = tableLimits->item(iRow,0);
+		QTableWidgetItem* pItemMax = tableLimits->item(iRow,1);
+		QTableWidgetItem* pItemLimitActive = tableLimits->item(iRow,2);
+
+		if(pItemHint) pItemHint->setText(params.strHint.c_str());
+		if(pItemErr) pItemErr->setText(params.strErr.c_str());
+		if(pItemMin) pItemMin->setText(params.strMin.c_str());
+		if(pItemMax) pItemMax->setText(params.strMax.c_str());
+		if(pItemHintActive) pItemHintActive->setText(params.bHintActive ? "1" : "0");
+		if(pItemLimitActive) pItemLimitActive->setText(params.bLimitActive ? "1" : "0");
 	}
 }
 
@@ -282,9 +353,35 @@ std::string FitDlg::GetTableString(QTableWidget* pTable) const
 	return str;
 }
 
+void FitDlg::UpdateHint(const std::string& str, double dVal, double dErr)
+{
+	for(int iRow=0; iRow<tableHints->rowCount(); ++iRow)
+	{
+		QTableWidgetItem* pHeader = tableHints->verticalHeaderItem(iRow);
+		if(pHeader && pHeader->text().toStdString() == str)
+		{
+			QTableWidgetItem* pItemVal = tableHints->item(iRow,0);
+			QTableWidgetItem* pItemErr = tableHints->item(iRow,1);
+
+			if(pItemVal && pItemErr)
+			{
+				std::ostringstream ostr;
+				ostr << dVal;
+				pItemVal->setText(ostr.str().c_str());
+
+				std::ostringstream ostrErr;
+				ostrErr << dErr;
+				pItemErr->setText(ostrErr.str().c_str());
+			}
+			break;
+		}
+	}
+}
+
 void FitDlg::DoFit()
 {
 	bool bAssumeErrorIfZero = 1;
+	bool bUpdateHints = 1;
 
 	UpdateSourceList();
 	if(tableLimits->rowCount() == 0)
@@ -352,6 +449,12 @@ void FitDlg::DoFit()
 
 			 if(pModel)
 			 {
+				 if(bUpdateHints)
+				 {
+					 for(unsigned int iParam=0; iParam<vecFittedNames.size(); ++iParam)
+						 UpdateHint(vecFittedNames[iParam], vecFittedParams[iParam], vecFittedErrs[iParam]);
+				 }
+
 				pPlot->plotfit(*pModel);
 				pPlot->repaint();
 			 }
@@ -360,11 +463,7 @@ void FitDlg::DoFit()
 				emit AddSubWindow(pPlot);
 		}
 	}
-	else if(comboFitType->currentIndex() == 1)		// 1d fit (pixel-wise)
-	{
-
-	}
-	else if(comboFitType->currentIndex() == 2)		// 2d fit
+	else if(comboFitType->currentIndex() == 1)		// 2d fit
 	{
 
 	}

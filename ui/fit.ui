@@ -28,12 +28,7 @@
         <widget class="QComboBox" name="comboFitType">
          <item>
           <property name="text">
-           <string>1D Fit (total)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>1D Fit (pixel-wise)</string>
+           <string>1D Fit</string>
           </property>
          </item>
          <item>

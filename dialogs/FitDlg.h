@@ -11,7 +11,15 @@
 #include "../subwnd.h"
 
 #include <string>
+#include <map>
 #include <QtGui/QMdiArea>
+
+struct FitParams
+{
+	std::string strMin, strMax;
+	std::string strHint, strErr;
+	bool bHintActive, bLimitActive;
+};
 
  class FitDlg : public QDialog, Ui::FitDlg
  { Q_OBJECT
@@ -19,11 +27,18 @@
  protected:
 	 QMdiArea *m_pmdi;
 
+
+	 typedef std::map<std::string, FitParams> t_mapParams;
+	 t_mapParams m_mapParams;
+	 void SaveLastParams();
+	 void RestoreLastParams();
+
 	 void RemoveDuplicate();
 	 void DoFit();
 
 	 std::string GetTableString(QTableWidget* pTable) const;
 	 void UpdateSourceList();
+	 void UpdateHint(const std::string& str, double dVal, double dErr);
 
  protected slots:
 	void AddItemSelected();
