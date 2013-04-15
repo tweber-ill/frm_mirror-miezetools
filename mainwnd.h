@@ -59,6 +59,7 @@ protected slots:
 	void QuickFitGauss();
 
 	void ShowAbout();
+	void ShowBrowser();
 
 public:
 	MiezeMainWnd();

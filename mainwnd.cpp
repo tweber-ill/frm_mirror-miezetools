@@ -128,6 +128,9 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 	// Help
 	QMenu* pMenuHelp = new QMenu(this);
 	pMenuHelp->setTitle("Help");
+	QAction* pBrowser = new QAction(this);
+	pBrowser->setText("Add Browser Toolbar");
+	pMenuHelp->addAction(pBrowser);
 	QAction* pAbout = new QAction(this);
 	pAbout->setText("About...");
 	pMenuHelp->addAction(pAbout);
@@ -177,6 +180,7 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 	QObject::connect(pCloseAll, SIGNAL(triggered()), m_pmdi, SLOT(closeAllSubWindows()));
 
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
+	QObject::connect(pBrowser, SIGNAL(triggered()), this, SLOT(ShowBrowser()));
 
 	QObject::connect(pMenuWindows, SIGNAL(aboutToShow()), this, SLOT(UpdateSubWndList()));
 	QObject::connect(m_pmdi, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(SubWindowChanged()));
@@ -751,6 +755,15 @@ void MiezeMainWnd::QuickFitGauss()
 void MiezeMainWnd::ShowAbout()
 {
 	// TODO
+}
+
+void MiezeMainWnd::ShowBrowser()
+{
+#ifdef Q_WS_WIN
+	QMessageBox::critical(this, "Error", "Too many browser toolbars already installed.\nCannot add more.");
+#else
+	QMessageBox::information(this, "Unsupported", "This is not the right operating system\nfor such nonsense.");
+#endif
 }
 
 #include "mainwnd.moc"
