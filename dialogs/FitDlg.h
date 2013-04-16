@@ -14,6 +14,16 @@
 #include <map>
 #include <QtGui/QMdiArea>
 
+
+struct SpecialFitResult
+{
+	bool bOk;
+	bool bCreatedNewPlot;
+	Plot *pPlot;
+
+	std::string strErr;
+};
+
 struct FitParams
 {
 	std::string strMin, strMax;
@@ -35,6 +45,7 @@ struct FitParams
 
 	 void RemoveDuplicate();
 	 void DoFit();
+	 void DoSpecialFit();
 
 	 std::string GetTableString(QTableWidget* pTable) const;
 	 void UpdateSourceList();
@@ -53,6 +64,8 @@ struct FitParams
  public:
 	 FitDlg(QWidget* pParent, QMdiArea *pmdi);
 	 virtual ~FitDlg();
+
+	 static SpecialFitResult DoSpecialFit(SubWindowBase* pSWB, int iFkt);
 
 public slots:
 

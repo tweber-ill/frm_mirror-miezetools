@@ -266,15 +266,18 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		dat4.SetSize(iW, iH, iTcCnt, iFoilCnt);
 
 		double *pdDat = new double[iW*iH*iTcCnt];
+		double *pdErr = new double[iW*iH*iTcCnt];
 		for(uint iFoil=0; iFoil<iFoilCnt; ++iFoil)
 		{
 			const uint* pDat = tof.GetData(iFoil);
 			convert(pdDat, pDat, iW*iH*iTcCnt);
 			tof.ReleaseData(pDat);
 
-			dat4.SetVals(iFoil, pdDat, 0);
+			apply_fkt(pdDat, pdErr, ::sqrt, iW*iH*iTcCnt);
+			dat4.SetVals(iFoil, pdDat, pdErr);
 		}
 		delete[] pdDat;
+		delete[] pdErr;
 
 		pPlot->plot_manual();
 		pPlot->SetLabels("x pixels", "y pixels", "");
@@ -620,70 +623,33 @@ void MiezeMainWnd::ShowFitDlg()
 
 void MiezeMainWnd::QuickFitMIEZE()
 {
-	SubWindowBase* pSWB = GetActivePlot();
+	QuickFit((SubWindowBase*)GetActivePlot(), 0);
+}
+
+void MiezeMainWnd::QuickFitGauss()
+{
+	QuickFit((SubWindowBase*)GetActivePlot(), 1);
+}
+
+void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
+{
 	if(!pSWB)
 	{
 		QMessageBox::critical(this, "Error", "No active plot.");
 		return;
 	}
 
-	QuickFitMIEZE(pSWB);
-}
-
-void MiezeMainWnd::QuickFitMIEZE(SubWindowBase* pSWB)
-{
-	if(pSWB->GetType() == PLOT_1D)
+	SpecialFitResult res = FitDlg::DoSpecialFit(pSWB, iFkt);
+	if(!res.bOk)
 	{
-		Plot* pPlot = (Plot*)pSWB;
-
-		if(pPlot->GetDataCount() == 0)
-		{
-			QMessageBox::critical(this, "Error", "No data found.");
-			return;
-		}
-
-		Data1& dat = pPlot->GetData(0).dat;
-
-		if(dat.GetLength() < 2)
-		{
-			QMessageBox::critical(this, "Error", "Not enough data points.");
-			return;
-		}
-
-		double *px = vec_to_array<double>(dat.GetX());
-		double *py = vec_to_array<double>(dat.GetY());
-		double *pyerr = vec_to_array<double>(dat.GetYErr());
-		autodeleter<double> _a0(px, 1);
-		autodeleter<double> _a1(py, 1);
-		autodeleter<double> _a2(pyerr, 1);
-
-		double dNumOsc = 2.;
-		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));;
-
-		MiezeSinModel *pModel = 0;
-		if(!::get_mieze_contrast(dFreq, dNumOsc, dat.GetLength(), px, py, pyerr, &pModel))
-			QMessageBox::warning(this, "Error", "Invalid fit.");
-
-		if(!pModel) return;
-		pPlot->plotfit(*pModel);
-		pPlot->repaint();
-	}
-	else if(pSWB->GetType() == PLOT_3D)
-	{
-		Plot3d *pPlot3d = (Plot3d*)pSWB;
-		Plot *plot1d = Convert3d1d(pPlot3d);
-		QuickFitMIEZE(plot1d);
-	}
-	else if(pSWB->GetType() == PLOT_4D)
-	{
-		Plot4d *pPlot4d = (Plot4d*)pSWB;
-		Plot *plot1d = Convert4d1d(pPlot4d);
-		QuickFitMIEZE(plot1d);
+		QMessageBox::critical(this, "Error", res.strErr.c_str());
+		return;
 	}
 
-	else
+	if(res.bCreatedNewPlot)
 	{
-		QMessageBox::critical(this, "Error", "Fitting for this plot type is not supported.");
+		res.pPlot->setParent(m_pmdi);
+		AddSubWindow(res.pPlot);
 	}
 }
 
@@ -707,49 +673,6 @@ Plot* MiezeMainWnd::Convert4d1d(Plot4d* pPlot4d, int iFoil)
 		AddSubWindow(pPlot);
 	}
 	return pPlot;
-}
-
-void MiezeMainWnd::QuickFitGauss()
-{
-	SubWindowBase* pSWB = GetActivePlot();
-	if(!pSWB)
-	{
-		QMessageBox::critical(this, "Error", "No active plot.");
-		return;
-	}
-
-	if(pSWB->GetType() == PLOT_1D)
-	{
-		Plot* pPlot = (Plot*)pSWB;
-
-		if(pPlot->GetDataCount() == 0)
-		{
-			QMessageBox::critical(this, "Error", "No data found.");
-			return;
-		}
-
-		Data1& dat = pPlot->GetData(0).dat;
-
-		double *px = vec_to_array<double>(dat.GetX());
-		double *py = vec_to_array<double>(dat.GetY());
-		double *pyerr = vec_to_array<double>(dat.GetYErr());
-		autodeleter<double> _a0(px, 1);
-		autodeleter<double> _a1(py, 1);
-		autodeleter<double> _a2(pyerr, 1);
-
-
-		GaussModel *pModel = 0;
-		if(!::get_gauss(dat.GetLength(), px, py, pyerr, &pModel))
-			QMessageBox::warning(this, "Error", "Invalid fit.");
-
-		if(!pModel) return;
-		pPlot->plotfit(*pModel);
-		pPlot->repaint();
-	}
-	else
-	{
-		QMessageBox::critical(this, "Error", "Fitting for this plot type is not supported.");
-	}
 }
 
 void MiezeMainWnd::ShowAbout()

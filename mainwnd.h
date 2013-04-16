@@ -54,8 +54,8 @@ protected slots:
 	void ShowCombineGraphsDlg();
 
 	void ShowFitDlg();
+	void QuickFit(SubWindowBase* pSWB, int iFkt);
 	void QuickFitMIEZE();
-	void QuickFitMIEZE(SubWindowBase* pSWB);
 	void QuickFitGauss();
 
 	void ShowAbout();

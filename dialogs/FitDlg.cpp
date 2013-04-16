@@ -8,6 +8,8 @@
 #include "ListDlg.h"
 
 #include "../fitter/models/freefit.h"
+#include "../fitter/models/msin.h"
+#include "../fitter/models/gauss.h"
 
 #include "../helper/string.h"
 #include "../helper/misc.h"
@@ -25,6 +27,7 @@
 #include <iostream>
 #include <sstream>
 #include <limits>
+#include <math.h>
 
 FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi)
 {
@@ -378,6 +381,99 @@ void FitDlg::UpdateHint(const std::string& str, double dVal, double dErr)
 	}
 }
 
+SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
+{
+	bool bAssumeErrorIfZero = 1;
+	SpecialFitResult res;
+
+	res.bOk = 0;
+	res.pPlot = (Plot*)pSWB->ConvertTo1d();
+	res.bCreatedNewPlot = (res.pPlot != pSWB);
+	if(!res.pPlot)
+		return res;
+
+	if(res.pPlot->GetDataCount() == 0)
+	{
+		res.strErr = "No data found.";
+		return res;
+	}
+
+	Data1& dat = res.pPlot->GetData(0).dat;
+	double *px = vec_to_array<double>(dat.GetX());
+	double *py = vec_to_array<double>(dat.GetY());
+	double *pyerr = vec_to_array<double>(dat.GetYErr());
+	autodeleter<double> _a0(px, 1);
+	autodeleter<double> _a1(py, 1);
+	autodeleter<double> _a2(pyerr, 1);
+
+	if(bAssumeErrorIfZero)
+	{
+		double dMaxY = *std::max_element(py, py+dat.GetLength());
+		for(unsigned int iErr=0; iErr<dat.GetLength(); ++iErr)
+		{
+			if(pyerr[iErr] < std::numeric_limits<double>::min())
+				pyerr[iErr] = dMaxY * 0.1;
+		}
+	}
+
+
+	FunctionModel* pFkt = 0;
+	bool bOk = 0;
+	if(iFkt == 0) 				// MIEZE sine
+	{
+		if(dat.GetLength() < 2)
+		{
+			res.strErr = "Too few data points for MIEZE sine fit.";
+			return res;
+		}
+
+		double dNumOsc = 2.;
+		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));;
+
+		MiezeSinModel *pModel = 0;
+		bOk = ::get_mieze_contrast(dFreq, dNumOsc, dat.GetLength(), px, py, pyerr, &pModel);
+
+		pFkt = pModel;
+	}
+	else if(iFkt == 1) 		// Gaussian
+	{
+		GaussModel *pModel = 0;
+		bOk = ::get_gauss(dat.GetLength(), px, py, pyerr, &pModel);
+		pFkt = pModel;
+	}
+
+	if(pFkt)
+	{
+		res.pPlot->plotfit(*pFkt);
+		res.pPlot->repaint();
+		res.bOk = 1;
+	}
+
+	return res;
+}
+
+void FitDlg::DoSpecialFit()
+{
+	UpdateSourceList();
+	const int iFkt = comboSpecialFkt->currentIndex();
+
+	for(int iWnd=0; iWnd<listGraphs->count(); ++iWnd)
+	{
+		SubWindowBase* pSWB = ((ListGraphsItem*)listGraphs->item(iWnd))->subWnd();
+		SpecialFitResult res = DoSpecialFit(pSWB, iFkt);
+
+		if(!res.pPlot)
+		{
+			delete listGraphs->item(iWnd);
+			--iWnd;
+			continue;
+		}
+
+		if(res.bCreatedNewPlot)
+			emit AddSubWindow(res.pPlot);
+	}
+}
+
 void FitDlg::DoFit()
 {
 	bool bAssumeErrorIfZero = 1;
@@ -473,7 +569,10 @@ void FitDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 {
 	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::ApplyRole)
 	{
+		if(tabs->currentWidget() == tabUser)
 			DoFit();
+		else if(tabs->currentWidget() == tabSpecial)
+			DoSpecialFit();
 	}
 	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::RejectRole)
 	{
@@ -481,7 +580,11 @@ void FitDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	}
 	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
 	{
-		DoFit();
+		if(tabs->currentWidget() == tabUser)
+			DoFit();
+		else if(tabs->currentWidget() == tabSpecial)
+			DoSpecialFit();
+
 		QDialog::accept();
 	}
 }

@@ -133,7 +133,7 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 	Plot *pPlot = new Plot(0, strTitle.c_str());
 	pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
 
-	pPlot->SetLabels(pPlot3d->GetZStr().toAscii().data(), "intensity");
+	pPlot->SetLabels(/*pPlot3d->GetZStr().toAscii().data()*/"t", "I");
 	pPlot->SetTitle("");
 
 	return pPlot;
