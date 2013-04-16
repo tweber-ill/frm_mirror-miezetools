@@ -381,6 +381,8 @@ void FitDlg::UpdateHint(const std::string& str, double dVal, double dErr)
 	}
 }
 
+//-----------------------------------------------------------------------------------------------------------------------------
+
 SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 {
 	bool bAssumeErrorIfZero = 1;
@@ -419,7 +421,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 
 	FunctionModel* pFkt = 0;
 	bool bOk = 0;
-	if(iFkt == 0) 				// MIEZE sine
+	if(iFkt == FIT_MIEZE_SINE) 				// MIEZE sine
 	{
 		if(dat.GetLength() < 2)
 		{
@@ -435,7 +437,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 
 		pFkt = pModel;
 	}
-	else if(iFkt == 1) 		// Gaussian
+	else if(iFkt == FIT_GAUSSIAN) 		// Gaussian
 	{
 		GaussModel *pModel = 0;
 		bOk = ::get_gauss(dat.GetLength(), px, py, pyerr, &pModel);
@@ -473,6 +475,18 @@ void FitDlg::DoSpecialFit()
 			emit AddSubWindow(res.pPlot);
 	}
 }
+
+
+//-----------------------------------------------------------------------------------------------------------------------------
+
+
+void FitDlg::DoSpecialFitPixelwise()
+{
+
+}
+
+
+//-----------------------------------------------------------------------------------------------------------------------------
 
 void FitDlg::DoFit()
 {
@@ -572,7 +586,12 @@ void FitDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 		if(tabs->currentWidget() == tabUser)
 			DoFit();
 		else if(tabs->currentWidget() == tabSpecial)
-			DoSpecialFit();
+		{
+			if(radio1D->isChecked())
+				DoSpecialFit();
+			else if(radio1DPixel->isChecked())
+				DoSpecialFitPixelwise();
+		}
 	}
 	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::RejectRole)
 	{
@@ -583,7 +602,12 @@ void FitDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 		if(tabs->currentWidget() == tabUser)
 			DoFit();
 		else if(tabs->currentWidget() == tabSpecial)
-			DoSpecialFit();
+		{
+			if(radio1D->isChecked())
+				DoSpecialFit();
+			else if(radio1DPixel->isChecked())
+				DoSpecialFitPixelwise();
+		}
 
 		QDialog::accept();
 	}

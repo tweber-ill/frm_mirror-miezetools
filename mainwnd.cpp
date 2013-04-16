@@ -31,6 +31,7 @@
 #include "dialogs/ListDlg.h"
 #include "dialogs/CombineDlg.h"
 #include "dialogs/SettingsDlg.h"
+#include "dialogs/AboutDlg.h"
 
 #include "fitter/models/msin.h"
 #include "fitter/models/gauss.h"
@@ -621,15 +622,8 @@ void MiezeMainWnd::ShowFitDlg()
 	m_pfitdlg->activateWindow();
 }
 
-void MiezeMainWnd::QuickFitMIEZE()
-{
-	QuickFit((SubWindowBase*)GetActivePlot(), 0);
-}
-
-void MiezeMainWnd::QuickFitGauss()
-{
-	QuickFit((SubWindowBase*)GetActivePlot(), 1);
-}
+void MiezeMainWnd::QuickFitMIEZE() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MIEZE_SINE); }
+void MiezeMainWnd::QuickFitGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_GAUSSIAN); }
 
 void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
 {
@@ -677,7 +671,8 @@ Plot* MiezeMainWnd::Convert4d1d(Plot4d* pPlot4d, int iFoil)
 
 void MiezeMainWnd::ShowAbout()
 {
-	// TODO
+	AboutDlg dlg(this);
+	dlg.exec();
 }
 
 void MiezeMainWnd::ShowBrowser()
@@ -691,4 +686,4 @@ void MiezeMainWnd::ShowBrowser()
 
 #include "mainwnd.moc"
 #include "subwnd.moc"
-
+#include "dialogs/AboutDlg.moc"

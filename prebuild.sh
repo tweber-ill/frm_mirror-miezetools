@@ -33,5 +33,6 @@ moc dialogs/ListDlg.h -o dialogs/ListDlg.moc
 moc dialogs/CombineDlg.h -o dialogs/CombineDlg.moc
 moc dialogs/SettingsDlg.h -o dialogs/SettingsDlg.moc
 moc dialogs/FitDlg.h -o dialogs/FitDlg.moc
+moc dialogs/AboutDlg.h -o dialogs/AboutDlg.moc
 
 echo -e "\n"

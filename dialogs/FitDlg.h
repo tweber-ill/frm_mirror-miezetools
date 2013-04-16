@@ -14,6 +14,13 @@
 #include <map>
 #include <QtGui/QMdiArea>
 
+#define FIT_MIEZE_SINE 					0
+#define FIT_GAUSSIAN 						1
+#define FIT_DOUBLE_GAUSSIAN 			2
+
+#define FIT_MIEZE_SINE_PIXELWISE 			0
+#define FIT_MIEZE_SINE_PIXELWISE_FFT 	1
+
 
 struct SpecialFitResult
 {
@@ -46,6 +53,7 @@ struct FitParams
 	 void RemoveDuplicate();
 	 void DoFit();
 	 void DoSpecialFit();
+	 void DoSpecialFitPixelwise();
 
 	 std::string GetTableString(QTableWidget* pTable) const;
 	 void UpdateSourceList();

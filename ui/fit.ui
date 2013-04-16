@@ -130,14 +130,17 @@
        <string>Special Fit</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_4">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelFkt">
          <property name="text">
           <string>Function:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="1" column="1">
         <widget class="QComboBox" name="comboSpecialFkt">
          <item>
           <property name="text">
@@ -152,6 +155,50 @@
          <item>
           <property name="text">
            <string>Double Gaussian</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QRadioButton" name="radio1D">
+         <property name="text">
+          <string>1D Fit</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QRadioButton" name="radio1DPixel">
+         <property name="text">
+          <string>1D Fit (pixel-wise)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="labelPixel">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Function:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="comboBoxSpecialFktPixel">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>MIEZE Sine</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>MIEZE Sine (FFT)</string>
           </property>
          </item>
         </widget>
@@ -296,6 +343,70 @@
     <hint type="destinationlabel">
      <x>218</x>
      <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radio1DPixel</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>comboBoxSpecialFktPixel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>82</x>
+     <y>99</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>290</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radio1DPixel</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelPixel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>82</x>
+     <y>99</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>44</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radio1D</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>labelFkt</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>48</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>44</x>
+     <y>74</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radio1D</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>comboSpecialFkt</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>48</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>290</x>
+     <y>74</y>
     </hint>
    </hints>
   </connection>
