@@ -99,7 +99,7 @@ const unsigned int* TofFile::GetData(unsigned int iFoil)
 	std::vector<unsigned int> vecStartIndices = GetStartIndices();
 	const unsigned int iStartIdx = vecStartIndices[iFoil];
 
-	unsigned int *pDat = (unsigned int*)m_file.map(qint64(iStartIdx*iW*iH),
+	unsigned int *pDat = (unsigned int*)m_file.map(qint64(iStartIdx*iW*iH*sizeof(int)),
 														qint64(iW*iH*iTcCnt*sizeof(int)));
 	return pDat;
 }

@@ -271,7 +271,12 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		for(uint iFoil=0; iFoil<iFoilCnt; ++iFoil)
 		{
 			const uint* pDat = tof.GetData(iFoil);
-			convert(pdDat, pDat, iW*iH*iTcCnt);
+			//convert(pdDat, pDat, iW*iH*iTcCnt);
+
+			for(unsigned int iTc=0; iTc<iTcCnt; ++iTc)
+				for(unsigned int iY=0; iY<iH; ++iY)
+					convert(pdDat+iTc*iW*iH + iY*iW, pDat + iTc*iW*iH + (iH-iY-1)*iW, iW);
+
 			tof.ReleaseData(pDat);
 
 			apply_fkt(pdDat, pdErr, ::sqrt, iW*iH*iTcCnt);
@@ -297,7 +302,9 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		const uint iH = pad.GetHeight();
 
 		double *pdDat = new double[iW*iH];
-		convert(pdDat, pDat, iW*iH);
+		//convert(pdDat, pDat, iW*iH);
+		for(unsigned int iY=0; iY<iH; ++iY)
+			convert(pdDat+iY*iW, pDat+(iH-iY-1)*iW, iW);
 
 		std::string strTitle = GetPlotTitle(strFileNoDir);
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), true);

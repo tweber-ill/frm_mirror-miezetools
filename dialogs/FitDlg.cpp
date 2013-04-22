@@ -435,6 +435,8 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 		MiezeSinModel *pModel = 0;
 		bOk = ::get_mieze_contrast(dFreq, dNumOsc, dat.GetLength(), px, py, pyerr, &pModel);
 
+		std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
+						<< ", phase = " << pModel->GetPhase() << " +- " << pModel->GetPhaseErr() << std::endl;
 		pFkt = pModel;
 	}
 	else if(iFkt == FIT_GAUSSIAN) 		// Gaussian
