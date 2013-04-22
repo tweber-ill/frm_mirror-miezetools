@@ -190,7 +190,7 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 			bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdxFoil, pdyFoil, pdyerrFoil, &pModel);
 
 			//std::cout << "fit: " << pModel->print(1) << std::endl;
-			double dCnts = sum_vec<double>(vecY);
+			double dCnts = sum_vec(vecY);
 			dTotalCnts += dCnts;
 			pdPhases[iFoil] = pModel->GetPhase();
 			dMeanPhase += pdPhases[iFoil] * dCnts;

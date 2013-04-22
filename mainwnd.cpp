@@ -271,11 +271,11 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		for(uint iFoil=0; iFoil<iFoilCnt; ++iFoil)
 		{
 			const uint* pDat = tof.GetData(iFoil);
-			//convert(pdDat, pDat, iW*iH*iTcCnt);
+			convert(pdDat, pDat, iW*iH*iTcCnt);
 
-			for(unsigned int iTc=0; iTc<iTcCnt; ++iTc)
-				for(unsigned int iY=0; iY<iH; ++iY)
-					convert(pdDat+iTc*iW*iH + iY*iW, pDat + iTc*iW*iH + (iH-iY-1)*iW, iW);
+			//for(unsigned int iTc=0; iTc<iTcCnt; ++iTc)
+			//	for(unsigned int iY=0; iY<iH; ++iY)
+			//		convert(pdDat+iTc*iW*iH + iY*iW, pDat + iTc*iW*iH + (iH-iY-1)*iW, iW);
 
 			tof.ReleaseData(pDat);
 
@@ -302,9 +302,9 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		const uint iH = pad.GetHeight();
 
 		double *pdDat = new double[iW*iH];
-		//convert(pdDat, pDat, iW*iH);
-		for(unsigned int iY=0; iY<iH; ++iY)
-			convert(pdDat+iY*iW, pDat+(iH-iY-1)*iW, iW);
+		convert(pdDat, pDat, iW*iH);
+		//for(unsigned int iY=0; iY<iH; ++iY)
+		//	convert(pdDat+iY*iW, pDat+(iH-iY-1)*iW, iW);
 
 		std::string strTitle = GetPlotTitle(strFileNoDir);
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), true);
@@ -387,8 +387,8 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			for(uint iY=0; iY<iH; ++iY)
 				for(uint iX=0; iX<iW; ++iX)
 				{
-					pDat[iY*iW + iX] = pdat2d->GetVal(iX, iH-iY-1);
-					pErr[iY*iW + iX] = pdat2d->GetErr(iX, iH-iY-1);
+					pDat[iY*iW + iX] = pdat2d->GetVal(iX, iY);
+					pErr[iY*iW + iX] = pdat2d->GetErr(iX, iY);
 				}
 
 			std::string strTitle = GetPlotTitle(strFileNoDir);
@@ -432,8 +432,8 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 				for(uint iY=0; iY<iH; ++iY)
 					for(uint iX=0; iX<iW; ++iX)
 					{
-						pDat[iZ*iW*iH + iY*iW + iX] = pdat3d->GetVal(iX, iH-iY-1, iZ);
-						pErr[iZ*iW*iH + iY*iW + iX] = pdat3d->GetErr(iX, iH-iY-1, iZ);
+						pDat[iZ*iW*iH + iY*iW + iX] = pdat3d->GetVal(iX, iY, iZ);
+						pErr[iZ*iW*iH + iY*iW + iX] = pdat3d->GetErr(iX, iY, iZ);
 					}
 
 
