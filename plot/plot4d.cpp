@@ -156,6 +156,7 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 		std::vector<double*> vecYFoil; vecYFoil.resize(iNumFoils);
 		std::vector<double*> vecYErrFoil; vecYErrFoil.resize(iNumFoils);
 		std::vector<double*> vecYCorrFoil; vecYCorrFoil.resize(iNumFoils);
+		std::vector<std::vector<double*>*> all_vecs = {&vecXFoil, &vecYFoil, &vecYErrFoil, &vecYCorrFoil};
 
 		double *pdPhases = new double[dat4.GetDepth()];
 		autodeleter<double> _a7(pdPhases, 1);
@@ -229,6 +230,12 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 
 		pPlot->SetLabels(/*pPlot4d->GetZStr().toAscii().data()*/"t", "I");
 		pPlot->SetTitle("");
+
+
+		// cleanup
+		for(std::vector<double*>* pVec : all_vecs)
+			for(double *pArr : *pVec)
+				delete[] pArr;
 
 		return pPlot;
 	}
