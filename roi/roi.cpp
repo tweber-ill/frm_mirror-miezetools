@@ -1186,7 +1186,7 @@ bool Roi::Load(const char* pcFile)
 			bool bOk=false;
 
 			std::string strQueryParam = pElem->GetParamName(iParam);
-			double dVal = xml.QueryDouble((strQueryBase + strQueryParam).c_str(),
+			double dVal = xml.Query<double>((strQueryBase + strQueryParam).c_str(),
 											0., &bOk);
 			if(!bOk)
 				break;
@@ -1209,7 +1209,7 @@ bool Roi::Save(const char* pcFile)
 	}
 
 	ofstr << "<?xml version=\"1.0\"?>\n\n";
-	ofstr << "<!-- ROI element configuration for Cascade Viewer -->\n\n";
+	ofstr << "<!-- ROI element configuration for Cattus -->\n\n";
 	ofstr << "<roi_elements>\n\n";
 
 	for(int i=0; i<GetNumElements(); ++i)
