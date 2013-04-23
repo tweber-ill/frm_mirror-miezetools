@@ -9,7 +9,9 @@
 #define __MIEZE_PLOT4D__
 
 #include "plot2d.h"
+#include "plot3d.h"
 #include "plot.h"
+
 #include <QtGui/QSlider>
 #include <QtGui/QLabel>
 
@@ -38,6 +40,7 @@ public:
 	virtual double GetTotalCounts() const { return m_dat4.GetTotal(); }
 
 	virtual Plot* ConvertTo1d(int iFoil);
+	virtual Plot3d* ConvertTo3d(int iFoil=-1);
 };
 
 
@@ -60,6 +63,7 @@ public:
 	virtual double GetTotalCounts() const { return m_pPlot->GetTotalCounts(); }
 
 	virtual Plot* ConvertTo1d(int iFoil) { return m_pPlot->ConvertTo1d(iFoil); }
+	virtual Plot3d* ConvertTo3d(int iFoil=-1) { return m_pPlot->ConvertTo3d(iFoil); }
 
 public slots:
 	void DataLoaded();

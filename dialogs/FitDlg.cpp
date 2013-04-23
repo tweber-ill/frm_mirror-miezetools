@@ -19,6 +19,8 @@
 #include "../plot/plot3d.h"
 #include "../plot/plot4d.h"
 
+#include "../settings.h"
+
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMessageBox>
 
@@ -429,7 +431,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 			return res;
 		}
 
-		double dNumOsc = 2.;
+		double dNumOsc = Settings::Get<double>("mieze/num_osc");
 		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));;
 
 		MiezeSinModel *pModel = 0;
@@ -482,10 +484,44 @@ void FitDlg::DoSpecialFit()
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
+SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFkt)
+{
+	SpecialFitPixelResult res;
+	res.bOk = 0;
+	res.pPlot[0] = res.pPlot[1] = 0;
+
+	Plot3d* pPlot3d = pSWB->ConvertTo3d(-1);
+	bool bCreatedNewPlot = !(pPlot3d==pSWB || pPlot3d==pSWB->GetActualWidget());
+
+
+
+
+
+	if(bCreatedNewPlot)
+		delete pPlot3d;
+	return res;
+}
 
 void FitDlg::DoSpecialFitPixelwise()
 {
+	const int iFkt = comboBoxSpecialFktPixel->currentIndex();
 
+	for(int iWnd=0; iWnd<listGraphs->count(); ++iWnd)
+	{
+		SubWindowBase* pSWB = ((ListGraphsItem*)listGraphs->item(iWnd))->subWnd();
+		SpecialFitPixelResult res = DoSpecialFitPixel(pSWB, iFkt);
+
+		if(!res.pPlot[0])
+		{
+			delete listGraphs->item(iWnd);
+			--iWnd;
+			continue;
+		}
+
+		emit AddSubWindow(res.pPlot[0]);
+		if(!checkOnlyContrast->isChecked())
+			emit AddSubWindow(res.pPlot[1]);
+	}
 }
 
 

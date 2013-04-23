@@ -28,7 +28,8 @@ Data1::Data1(unsigned int uiNum, const double* pValsX, const double* pValsY,
 
 
 Data2::Data2(unsigned int iW, unsigned int iH, const double* pDat, const double *pErr)
-			: m_dTotal(0.),
+			: m_iWidth(0), m_iHeight(0),
+			  	  m_dTotal(0.),
 			  	  m_dMin(std::numeric_limits<double>::max()),
 			  	  m_dMax(-std::numeric_limits<double>::max())
 
@@ -62,7 +63,8 @@ void Data2::SetVals(const double* pDat, const double *pErr)
 
 
 Data3::Data3(unsigned int iW, unsigned int iH, unsigned int iT, const double* pDat, const double *pErr)
-			: m_dTotal(0.),
+			: m_iWidth(0), m_iHeight(0), m_iDepth(0),
+			  m_dTotal(0.),
 			  m_dMin(std::numeric_limits<double>::max()),
 			  m_dMax(-std::numeric_limits<double>::max())
 
@@ -71,6 +73,39 @@ Data3::Data3(unsigned int iW, unsigned int iH, unsigned int iT, const double* pD
 
 	if(pDat)
 		this->SetVals(pDat, pErr);
+}
+
+void Data3::SetZero()
+{
+	for(unsigned int iT=0; iT<m_iDepth; ++iT)
+		for(unsigned int iY=0; iY<m_iHeight; ++iY)
+			for(unsigned int iX=0; iX<m_iWidth; ++iX)
+			{
+				SetVal(iX, iY, iT, 0.);
+				SetErr(iX, iY, iT, 0.);
+			}
+
+	m_dMin = m_dMax = m_dTotal = 0.;
+}
+
+void Data3::Add(const Data3& dat)
+{
+	m_dMin = std::numeric_limits<double>::max();
+	m_dMax = -m_dMin;
+	m_dTotal = 0.;
+
+	for(unsigned int iT=0; iT<m_iDepth; ++iT)
+		for(unsigned int iY=0; iY<m_iHeight; ++iY)
+			for(unsigned int iX=0; iX<m_iWidth; ++iX)
+			{
+				const double dNewVal = GetVal(iX, iY, iT)+dat.GetVal(iX, iY, iT);
+				const double dNewErr = GetErr(iX, iY, iT)+dat.GetErr(iX, iY, iT);
+
+				SetVal(iX, iY, iT, dNewVal);
+				SetErr(iX, iY, iT, dNewErr);
+
+				m_dTotal += dNewVal;
+			}
 }
 
 void Data3::SetVals(const double* pDat, const double *pErr)
@@ -142,7 +177,8 @@ Data1 Data3::GetXYSum() const
 
 
 Data4::Data4(unsigned int iW, unsigned int iH, unsigned int iD, unsigned int iD2, const double* pDat, const double *pErr)
-			: m_dTotal(0.),
+			: m_iWidth(0), m_iHeight(0), m_iDepth(0), m_iDepth2(0),
+			  m_dTotal(0.),
 			  m_dMin(std::numeric_limits<double>::max()),
 			  m_dMax(-std::numeric_limits<double>::max())
 
@@ -184,6 +220,21 @@ void Data4::SetVals(unsigned int iD2, const double *pDat, const double *pErr)
 
 				m_dTotal += dVal;
 			}
+}
+
+Data3 Data4::GetVal(unsigned int iD2) const
+{
+	Data3 dat(m_iWidth, m_iHeight, m_iDepth);
+
+	for(unsigned int iD=0; iD<m_iDepth; ++iD)
+		for(unsigned int iY=0; iY<m_iHeight; ++iY)
+			for(unsigned int iX=0; iX<m_iWidth; ++iX)
+			{
+				dat.SetVal(iX, iY, iD, this->GetVal(iX, iY, iD, iD2));
+				dat.SetErr(iX, iY, iD, this->GetErr(iX, iY, iD, iD2));
+			}
+
+	return dat;
 }
 
 Data2 Data4::GetVal(unsigned int iD, unsigned int iD2) const

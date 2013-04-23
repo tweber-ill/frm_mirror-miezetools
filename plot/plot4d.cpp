@@ -14,7 +14,10 @@
 #include "../helper/string.h"
 #include "../helper/misc.h"
 #include "../helper/fourier.h"
+
 #include "../fitter/models/msin.h"
+
+#include "../settings.h"
 
 
 Plot4d::Plot4d(QWidget* pParent, const char* pcTitle,  bool bCountData)
@@ -137,7 +140,7 @@ void Plot4d::RefreshStatusMsgs()
 
 Plot* Plot4d::ConvertTo1d(int iFoil)
 {
-	const double dNumOsc = 2.;
+	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 	const Plot4d* pPlot4d = this;
 
 	if(iFoil<0)
@@ -189,11 +192,16 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 			MiezeSinModel *pModel = 0;
 			double dThisNumOsc = dNumOsc;
 			bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdxFoil, pdyFoil, pdyerrFoil, &pModel);
+			pdPhases[iFoil] = pModel->GetPhase();
+
+			/*Fourier fourier(dat4.GetDepth());
+			double dCont, dPhi;
+			bool bOk = fourier.get_contrast(dThisNumOsc, pdyFoil, dCont, dPhi);
+			pdPhases[iFoil] = dPhi;*/
 
 			//std::cout << "fit: " << pModel->print(1) << std::endl;
 			double dCnts = sum_vec(vecY);
 			dTotalCnts += dCnts;
-			pdPhases[iFoil] = pModel->GetPhase();
 			dMeanPhase += pdPhases[iFoil] * dCnts;
 
 			if(pModel) delete pModel;
@@ -261,6 +269,36 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 
 		return pPlot;
 	}
+}
+
+Plot3d* Plot4d::ConvertTo3d(int iFoil)
+{
+	std::ostringstream ostrTitle;
+	ostrTitle << windowTitle().toStdString() << " -> ";
+
+	const Data4& dat4 = this->GetData();
+	Data3 dat3;
+
+	if(iFoil<0)
+	{
+		ostrTitle << "foil sum";
+
+		dat3.SetZero();
+		for(unsigned int iFoil=0; iFoil<dat4.GetDepth2(); ++iFoil)
+			dat3.Add(dat4.GetVal(iFoil));
+	}
+	else
+	{
+		ostrTitle << "foil " << iFoil;
+
+		dat3 = dat4.GetVal(iFoil);
+	}
+
+	Plot3d* pPlot = new Plot3d(0, ostrTitle.str().c_str(), m_bCountData);
+	pPlot->plot(dat3);
+	pPlot->SetLabels("x", "y", "I");
+
+	return pPlot;
 }
 
 #include "plot4d.moc"

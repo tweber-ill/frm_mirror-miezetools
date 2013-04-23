@@ -9,6 +9,8 @@
 
 #include "../ui/ui_fit.h"
 #include "../subwnd.h"
+#include "../plot/plot.h"
+#include "../plot/plot2d.h"
 
 #include <string>
 #include <map>
@@ -27,6 +29,14 @@ struct SpecialFitResult
 	bool bOk;
 	bool bCreatedNewPlot;
 	Plot *pPlot;
+
+	std::string strErr;
+};
+
+struct SpecialFitPixelResult
+{
+	bool bOk;
+	Plot2d *pPlot[2];
 
 	std::string strErr;
 };
@@ -74,6 +84,7 @@ struct FitParams
 	 virtual ~FitDlg();
 
 	 static SpecialFitResult DoSpecialFit(SubWindowBase* pSWB, int iFkt);
+	 static SpecialFitPixelResult DoSpecialFitPixel(SubWindowBase* pSWB, int iFkt);
 
 public slots:
 

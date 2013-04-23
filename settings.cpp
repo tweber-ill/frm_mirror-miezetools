@@ -37,6 +37,15 @@ void Settings::SetDefaults()
 	if(!s_pGlobals) return;
 
 	QStringList keys = s_pGlobals->allKeys();
+
+	// --------------------------------------------------------------------------------
+	// MIEZE
+	if(!keys.contains("mieze/num_osc")) s_pGlobals->setValue("mieze/num_osc", 2.);
+	// --------------------------------------------------------------------------------
+
+
+	// --------------------------------------------------------------------------------
+	// PAD/TOF
 	if(!keys.contains("casc/foil_cnt")) s_pGlobals->setValue("casc/foil_cnt", 6);
 	if(!keys.contains("casc/tc_cnt")) s_pGlobals->setValue("casc/tc_cnt", 16);
 	if(!keys.contains("casc/x_res")) s_pGlobals->setValue("casc/x_res", 128);
@@ -47,4 +56,5 @@ void Settings::SetDefaults()
 		QList<QVariant> lst = {0, 16, 32, 64, 80, 96};
 		s_pGlobals->setValue("casc/foil_idx", lst);
 	}
+	// --------------------------------------------------------------------------------
 }

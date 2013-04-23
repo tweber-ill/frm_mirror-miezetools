@@ -30,6 +30,12 @@ void SettingsDlg::accept()
 void SettingsDlg::LoadSettings()
 {
 	// --------------------------------------------------------------------------------
+	// MIEZE
+	spinNumOsc->setValue(Settings::Get<double>("mieze/num_osc"));
+	// --------------------------------------------------------------------------------
+
+
+	// --------------------------------------------------------------------------------
 	// TOF/PAD
 	spinResX->setValue(Settings::Get<unsigned int>("casc/x_res"));
 	spinResY->setValue(Settings::Get<unsigned int>("casc/y_res"));
@@ -51,6 +57,12 @@ void SettingsDlg::LoadSettings()
 
 void SettingsDlg::SaveSettings()
 {
+	// --------------------------------------------------------------------------------
+	// MIEZE
+	Settings::Set<double>("mieze/num_osc", spinNumOsc->value());
+	// --------------------------------------------------------------------------------
+
+
 	// --------------------------------------------------------------------------------
 	// TOF/PAD
 	Settings::Set<unsigned int>("casc/x_res", spinResX->value());

@@ -36,6 +36,12 @@ void Plot3d::plot(uint iW, uint iH, uint iT, const double *pdat, const double *p
 	plot_manual();
 }
 
+void Plot3d::plot(const Data3& dat3)
+{
+	m_dat3 = dat3;
+	plot_manual();
+}
+
 void Plot3d::RefreshTSlice(uint iT)
 {
 	m_iCurT = iT;

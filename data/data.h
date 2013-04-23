@@ -152,6 +152,8 @@ public:
 	unsigned int GetHeight() const { return m_iHeight; }
 	unsigned int GetDepth() const { return m_iDepth; }
 
+	void SetZero();
+
 	void SetSize(unsigned int iWidth, unsigned int iHeight, unsigned int iDepth)
 	{
 		if(m_iWidth==iWidth && m_iHeight==iHeight && m_iDepth==iDepth)
@@ -188,6 +190,8 @@ public:
 
 	Data2 GetVal(unsigned int iT) const;
 	Data1 GetXYSum() const;
+
+	void Add(const Data3& dat);
 };
 
 class Data4 : public DataInterface
@@ -241,6 +245,7 @@ public:
 	double GetTotal() const { return m_dTotal; }
 	void SetTotal(double dTot) { m_dTotal = dTot; }
 
+	Data3 GetVal(unsigned int iD2) const;
 	Data2 GetVal(unsigned int iD, unsigned int iD2) const;
 	Data1 GetXYSum(unsigned int iD2) const;
 };

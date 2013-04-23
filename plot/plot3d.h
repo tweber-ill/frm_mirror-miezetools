@@ -28,6 +28,7 @@ public:
 
 	void plot_manual();
 	void plot(uint iW, uint iH, uint iT, const double *pdat, const double *perr=0);
+	void plot(const Data3& dat3);
 	void RefreshTSlice(uint iT);
 
 	const Data3& GetData() const { return m_dat3; }
@@ -38,6 +39,7 @@ public:
 	virtual double GetTotalCounts() const { return m_dat3.GetTotal(); }
 
 	virtual Plot* ConvertTo1d(int iParam=0);
+	virtual Plot3d* ConvertTo3d(int iParam=-1) { return this; }
 };
 
 
@@ -61,6 +63,7 @@ public:
 	virtual double GetTotalCounts() const { return m_pPlot->GetTotalCounts(); }
 
 	virtual Plot* ConvertTo1d(int iFoil) { return m_pPlot->ConvertTo1d(iFoil); }
+	virtual Plot3d* ConvertTo3d(int iParam=-1) { return m_pPlot->ConvertTo3d(iParam); }
 
 public slots:
 	void DataLoaded();

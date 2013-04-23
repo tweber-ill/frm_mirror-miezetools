@@ -133,6 +133,16 @@
        <property name="fieldGrowthPolicy">
         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
        </property>
+       <item row="0" column="0">
+        <widget class="QRadioButton" name="radio1D">
+         <property name="text">
+          <string>1D Fit</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="labelFkt">
          <property name="text">
@@ -157,16 +167,6 @@
            <string>Double Gaussian</string>
           </property>
          </item>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QRadioButton" name="radio1D">
-         <property name="text">
-          <string>1D Fit</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
         </widget>
        </item>
        <item row="2" column="0">
@@ -201,6 +201,19 @@
            <string>MIEZE Sine (FFT)</string>
           </property>
          </item>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QCheckBox" name="checkOnlyContrast">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Only create contrast graph</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -407,6 +420,22 @@
     <hint type="destinationlabel">
      <x>290</x>
      <y>74</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radio1DPixel</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>checkOnlyContrast</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>82</x>
+     <y>99</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>290</x>
+     <y>149</y>
     </hint>
    </hints>
   </connection>
