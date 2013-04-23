@@ -40,6 +40,18 @@ Data2::Data2(unsigned int iW, unsigned int iH, const double* pDat, const double 
 		this->SetVals(pDat, pErr);
 }
 
+void Data2::SetZero()
+{
+		for(unsigned int iY=0; iY<m_iHeight; ++iY)
+			for(unsigned int iX=0; iX<m_iWidth; ++iX)
+			{
+				SetVal(iX, iY, 0.);
+				SetErr(iX, iY, 0.);
+			}
+
+	m_dMin = m_dMax = m_dTotal = 0.;
+}
+
 void Data2::SetVals(const double* pDat, const double *pErr)
 {
 	m_dMin = std::numeric_limits<double>::max();
@@ -145,6 +157,25 @@ Data2 Data3::GetVal(unsigned int iT) const
 		}
 
 	dat.SetTotal(dTotal);
+	return dat;
+}
+
+Data1 Data3::GetXY(unsigned int iX, unsigned int iY) const
+{
+	Data1 dat;
+	dat.SetLength(this->GetDepth());
+
+	for(uint iT=0; iT<GetDepth(); ++iT)
+	{
+		double dVal = GetVal(iX, iY, iT);
+		double dErr = GetErr(iX, iY, iT);
+
+		dat.SetX(iT, iT);
+		dat.SetXErr(iT, 0.);
+		dat.SetY(iT, dVal);
+		dat.SetYErr(iT, dErr);
+	}
+
 	return dat;
 }
 

@@ -516,6 +516,7 @@ void MiezeMainWnd::SettingsTriggered()
 
 void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
 {
+	pWnd->setParent(m_pmdi);
 	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
 	QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
 

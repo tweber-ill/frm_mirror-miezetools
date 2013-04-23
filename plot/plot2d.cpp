@@ -171,6 +171,12 @@ void Plot2d::plot(unsigned int iW, unsigned int iH, const double *pdat, const do
 	RefreshPlot();
 }
 
+void Plot2d::plot(const Data2& dat)
+{
+	m_dat = dat;
+	RefreshPlot();
+}
+
 void Plot2d::RefreshPlot()
 {
 	clear();

@@ -76,6 +76,18 @@ public:
 		m_vecErrsX.resize(uiLen);
 		m_vecErrsY.resize(uiLen);
 	}
+
+	template<typename T=double>
+	void ToArray(T* pX, T* pY, T *pYErr, T *pXErr=0)
+	{
+		for(unsigned int i=0; i<GetLength(); ++i)
+		{
+			if(pX) pX[i] = T(GetX(i));
+			if(pY) pY[i] = T(GetY(i));
+			if(pYErr) pYErr[i] = T(GetYErr(i));
+			if(pXErr) pXErr[i] = T(GetXErr(i));
+		}
+	}
 };
 
 
@@ -93,6 +105,8 @@ public:
 				const double* pDat=0, const double *pErr=0);
 	virtual ~Data2() {}
 	virtual DataType GetType() { return DATA_2D; }
+
+	void SetZero();
 
 	unsigned int GetWidth() const { return m_iWidth; }
 	unsigned int GetHeight() const { return m_iHeight; }
@@ -189,6 +203,7 @@ public:
 	void SetTotal(double dTot) { m_dTotal = dTot; }
 
 	Data2 GetVal(unsigned int iT) const;
+	Data1 GetXY(unsigned int iX, unsigned int iY) const;
 	Data1 GetXYSum() const;
 
 	void Add(const Data3& dat);

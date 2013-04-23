@@ -13,6 +13,7 @@
 
 #include "../helper/string.h"
 #include "../helper/misc.h"
+#include "../helper/fourier.h"
 
 #include "../plot/plot.h"
 #include "../plot/plot2d.h"
@@ -46,6 +47,8 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 
 	tableLimits->setColumnWidth(2,50);
 	tableHints->setColumnWidth(2,50);
+
+	spinFoil->setMaximum(Settings::Get<unsigned int>("casc/foil_cnt")-1);
 }
 
 FitDlg::~FitDlg()
@@ -454,6 +457,8 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 		res.pPlot->plotfit(*pFkt);
 		res.pPlot->repaint();
 		res.bOk = 1;
+
+		delete pFkt;
 	}
 
 	return res;
@@ -481,35 +486,106 @@ void FitDlg::DoSpecialFit()
 	}
 }
 
-
 //-----------------------------------------------------------------------------------------------------------------------------
 
-SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFkt)
+SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, int iFkt)
 {
 	SpecialFitPixelResult res;
 	res.bOk = 0;
 	res.pPlot[0] = res.pPlot[1] = 0;
 
-	Plot3d* pPlot3d = pSWB->ConvertTo3d(-1);
+	Plot3d* pPlot3d = pSWB->ConvertTo3d(iFoil);
 	bool bCreatedNewPlot = !(pPlot3d==pSWB || pPlot3d==pSWB->GetActualWidget());
 
+	const Data3& dat3 = pPlot3d->GetData();
+	const unsigned int iW = dat3.GetWidth(),
+			 	 	 	 	 	   iH = dat3.GetHeight();
 
+	Data2 dat2_c(iW, iH),
+			 dat2_ph(iW, iH);
+	dat2_c.SetZero();
+	dat2_ph.SetZero();
 
+	const unsigned int iTCnt = dat3.GetDepth();
+	double *px = new double[iTCnt];
+	double *py = new double[iTCnt];
+	double *pyerr = new double[iTCnt];
+
+	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
+
+	Fourier *pFFT = 0;
+	if(iFkt == FIT_MIEZE_SINE_PIXELWISE_FFT)
+		pFFT = new Fourier(iTCnt);
+
+	for(unsigned int iY=0; iY<iH; ++iY)
+	{
+		for(unsigned int iX=0; iX<iW; ++iX)
+		{
+			Data1 dat1 = dat3.GetXY(iX, iY);
+			dat1.ToArray<double>(px, py, pyerr);
+
+			if(iFkt == FIT_MIEZE_SINE_PIXELWISE)
+			{
+				double dThisNumOsc = dNumOsc;
+				double dFreq = dThisNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat1.GetLength()));;
+
+				MiezeSinModel *pModel = 0;
+				bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat1.GetLength(), px, py, pyerr, &pModel);
+				if(bOk)
+				{
+					dat2_c.SetVal(iX, iY, pModel->GetContrast());
+					dat2_c.SetErr(iX, iY, pModel->GetContrastErr());
+					dat2_ph.SetVal(iX, iY, pModel->GetPhase());
+					dat2_ph.SetErr(iX, iY, pModel->GetPhaseErr());
+				}
+				if(pModel) delete pModel;
+			}
+			else if(iFkt == FIT_MIEZE_SINE_PIXELWISE_FFT)
+			{
+				double dCont, dPhi;
+				bool bOk = pFFT->get_contrast(dNumOsc, py, dCont, dPhi);
+				if(bOk)
+				{
+					dat2_c.SetVal(iX, iY, dCont);
+					//dat2_c.SetErr(iX, iY, /*TODO*/);
+					dat2_ph.SetVal(iX, iY, dPhi);
+					//dat2_ph.SetErr(iX, iY, /*TODO*/);
+				}
+			}
+		}
+	}
+
+	delete[] px;
+	delete[] py;
+	delete[] pyerr;
+
+	if(pFFT) delete pFFT;
+
+	std::string strTitle = pPlot3d->windowTitle().toStdString();
+	strTitle += " -> ";
+
+	res.pPlot[0] = new Plot2d(0, (strTitle + std::string("contrast")).c_str(), 0);
+	res.pPlot[1] = new Plot2d(0, (strTitle + std::string("phase")).c_str(), 0);
+
+	res.pPlot[0]->plot(dat2_c);
+	res.pPlot[1]->plot(dat2_ph);
 
 
 	if(bCreatedNewPlot)
 		delete pPlot3d;
+
 	return res;
 }
 
 void FitDlg::DoSpecialFitPixelwise()
 {
 	const int iFkt = comboBoxSpecialFktPixel->currentIndex();
+	const int iFoil = spinFoil->value();
 
 	for(int iWnd=0; iWnd<listGraphs->count(); ++iWnd)
 	{
 		SubWindowBase* pSWB = ((ListGraphsItem*)listGraphs->item(iWnd))->subWnd();
-		SpecialFitPixelResult res = DoSpecialFitPixel(pSWB, iFkt);
+		SpecialFitPixelResult res = DoSpecialFitPixel(pSWB, iFoil, iFkt);
 
 		if(!res.pPlot[0])
 		{
@@ -521,11 +597,16 @@ void FitDlg::DoSpecialFitPixelwise()
 		emit AddSubWindow(res.pPlot[0]);
 		if(!checkOnlyContrast->isChecked())
 			emit AddSubWindow(res.pPlot[1]);
+		else
+		{
+			if(res.pPlot[1])
+				delete res.pPlot[1];
+		}
 	}
 }
 
-
 //-----------------------------------------------------------------------------------------------------------------------------
+
 
 void FitDlg::DoFit()
 {
@@ -606,6 +687,8 @@ void FitDlg::DoFit()
 
 				pPlot->plotfit(*pModel);
 				pPlot->repaint();
+
+				delete pModel;
 			 }
 
 			if(bCreatedNewPlot)

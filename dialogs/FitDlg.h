@@ -84,7 +84,7 @@ struct FitParams
 	 virtual ~FitDlg();
 
 	 static SpecialFitResult DoSpecialFit(SubWindowBase* pSWB, int iFkt);
-	 static SpecialFitPixelResult DoSpecialFitPixel(SubWindowBase* pSWB, int iFkt);
+	 static SpecialFitPixelResult DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, int iFkt);
 
 public slots:
 

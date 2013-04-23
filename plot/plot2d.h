@@ -45,6 +45,7 @@ public:
 	Data2& GetData2() { return m_dat; }
 
 	void plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr=0);
+	void plot(const Data2& dat);
 	void clear();
 	virtual void RefreshPlot();
 
