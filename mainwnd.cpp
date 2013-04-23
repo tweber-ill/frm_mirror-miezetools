@@ -75,22 +75,15 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 
 
 
-	// Tools
-	QMenu *pMenuTools = new QMenu(this);
-	pMenuTools->setTitle("Tools");
-
-	QAction *pCombineGraphs = new QAction(this);
-	pCombineGraphs->setText("Combine Graphs...");
-	pMenuTools->addAction(pCombineGraphs);
-
-	pMenuTools->addSeparator();
+	// Fit
+	QMenu *pMenuFit = new QMenu(this);
+	pMenuFit->setTitle("Fit");
 
 	QAction *pFit = new QAction(this);
-	pFit->setText("Fit...");
-	pMenuTools->addAction(pFit);
+	pFit->setText("Fit Function...");
+	pMenuFit->addAction(pFit);
 
-
-	QMenu *pMenuQuickFit = new QMenu(pMenuTools);
+	QMenu *pMenuQuickFit = new QMenu(pMenuFit);
 	pMenuQuickFit->setTitle("Quick Fit");
 
 	QAction *pQFitMieze = new QAction(this);
@@ -105,7 +98,22 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 	pQFitGauss->setText("Gaussian");
 	pMenuQuickFit->addAction(pQFitGauss);
 
-	pMenuTools->addMenu(pMenuQuickFit);
+	pMenuFit->addMenu(pMenuQuickFit);
+
+
+
+	// Tools
+	QMenu *pMenuTools = new QMenu(this);
+	pMenuTools->setTitle("Tools");
+
+	QAction *pCombineGraphs = new QAction(this);
+	pCombineGraphs->setText("Plot Counts/Contrasts...");
+	pMenuTools->addAction(pCombineGraphs);
+
+
+	// ROI
+	QMenu *pMenuROI = new QMenu(this);
+	pMenuROI->setTitle("ROI");
 
 
 	// Windows
@@ -145,7 +153,9 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 
 	QMenuBar *pMenuBar = new QMenuBar(this);
 	pMenuBar->addMenu(pMenuFile);
+	pMenuBar->addMenu(pMenuFit);
 	pMenuBar->addMenu(pMenuTools);
+	pMenuBar->addMenu(pMenuROI);
 	pMenuBar->addMenu(pMenuWindows);
 	pMenuBar->addMenu(pMenuHelp);
 	this->setMenuBar(pMenuBar);
