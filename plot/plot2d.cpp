@@ -249,11 +249,12 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 
 		uint iX = uint(dX);
 		uint iY = uint(dY);
-		double dPixelVal = m_dat.GetVal(iX, iY);
-		uint iPixelVal = uint(dPixelVal);
 
 		dY = double(m_dat.GetHeight())-1.-dY;
 		iY = m_dat.GetHeight()-1-iY;
+
+		double dPixelVal = m_dat.GetVal(iX, iY);
+		uint iPixelVal = uint(dPixelVal);
 
 		std::ostringstream ostr;
 

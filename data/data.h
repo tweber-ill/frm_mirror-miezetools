@@ -88,6 +88,14 @@ public:
 			if(pXErr) pXErr[i] = T(GetXErr(i));
 		}
 	}
+
+	double SumY() const
+	{
+		double dTotal = 0.;
+		for(unsigned int i=0; i<GetLength(); ++i)
+			dTotal += GetY(i);
+		return dTotal;
+	}
 };
 
 

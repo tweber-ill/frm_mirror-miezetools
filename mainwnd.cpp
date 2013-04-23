@@ -97,6 +97,10 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 	pQFitMieze->setText("MIEZE Sine Signal");
 	pMenuQuickFit->addAction(pQFitMieze);
 
+	QAction *pQFitMiezeArea = new QAction(this);
+	pQFitMiezeArea->setText("MIEZE Sine Signal (pixel-wise)");
+	pMenuQuickFit->addAction(pQFitMiezeArea);
+
 	QAction *pQFitGauss = new QAction(this);
 	pQFitGauss->setText("Gaussian");
 	pMenuQuickFit->addAction(pQFitGauss);
@@ -173,6 +177,7 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
 	QObject::connect(pFit, SIGNAL(triggered()), this, SLOT(ShowFitDlg()));
 	QObject::connect(pQFitMieze, SIGNAL(triggered()), this, SLOT(QuickFitMIEZE()));
+	QObject::connect(pQFitMiezeArea, SIGNAL(triggered()), this, SLOT(QuickFitMIEZEpixel()));
 	QObject::connect(pQFitGauss, SIGNAL(triggered()), this, SLOT(QuickFitGauss()));
 
 	QObject::connect(pWndList, SIGNAL(triggered()), this, SLOT(ShowListWindowsDlg()));
@@ -645,6 +650,7 @@ void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
 	if(!res.bOk)
 	{
 		QMessageBox::critical(this, "Error", res.strErr.c_str());
+		if(res.pPlot && res.bCreatedNewPlot) delete res.pPlot;
 		return;
 	}
 
@@ -653,6 +659,28 @@ void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
 		res.pPlot->setParent(m_pmdi);
 		AddSubWindow(res.pPlot);
 	}
+}
+
+void MiezeMainWnd::QuickFitMIEZEpixel()
+{
+	SubWindowBase *pSWB = this->GetActivePlot();
+	if(pSWB->GetType()!=PLOT_3D && pSWB->GetType()!=PLOT_4D)
+	{
+		QMessageBox::critical(this, "Error", "Wrong data type.");
+		return;
+	}
+
+	SpecialFitPixelResult res = FitDlg::DoSpecialFitPixel(pSWB, 0, FIT_MIEZE_SINE_PIXELWISE_FFT);
+	if(!res.bOk)
+	{
+		QMessageBox::critical(this, "Error", res.strErr.c_str());
+		if(res.pPlot[0]) delete res.pPlot[0];
+		if(res.pPlot[1]) delete res.pPlot[1];
+		return;
+	}
+
+	AddSubWindow(res.pPlot[0]);
+	if(res.pPlot[1]) delete res.pPlot[1];
 }
 
 Plot* MiezeMainWnd::Convert3d1d(Plot3d* pPlot3d)

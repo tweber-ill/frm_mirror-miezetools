@@ -56,6 +56,7 @@ protected slots:
 	void ShowFitDlg();
 	void QuickFit(SubWindowBase* pSWB, int iFkt);
 	void QuickFitMIEZE();
+	void QuickFitMIEZEpixel();
 	void QuickFitGauss();
 
 	void ShowAbout();

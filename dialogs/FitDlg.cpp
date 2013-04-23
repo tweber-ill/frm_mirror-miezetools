@@ -512,6 +512,7 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 	double *pyerr = new double[iTCnt];
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
+	const double dMinCts = 25.;
 
 	Fourier *pFFT = 0;
 	if(iFkt == FIT_MIEZE_SINE_PIXELWISE_FFT)
@@ -522,7 +523,12 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 		for(unsigned int iX=0; iX<iW; ++iX)
 		{
 			Data1 dat1 = dat3.GetXY(iX, iY);
+			if(dat1.SumY() < dMinCts)
+				continue;
+
 			dat1.ToArray<double>(px, py, pyerr);
+
+			double dC=0., dCErr=0., dPh=0., dPhErr=0.;
 
 			if(iFkt == FIT_MIEZE_SINE_PIXELWISE)
 			{
@@ -530,27 +536,29 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 				double dFreq = dThisNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat1.GetLength()));;
 
 				MiezeSinModel *pModel = 0;
-				bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat1.GetLength(), px, py, pyerr, &pModel);
-				if(bOk)
-				{
-					dat2_c.SetVal(iX, iY, pModel->GetContrast());
-					dat2_c.SetErr(iX, iY, pModel->GetContrastErr());
-					dat2_ph.SetVal(iX, iY, pModel->GetPhase());
-					dat2_ph.SetErr(iX, iY, pModel->GetPhaseErr());
-				}
+				res.bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat1.GetLength(), px, py, pyerr, &pModel);
+
+				dC = pModel->GetContrast();
+				dCErr = pModel->GetContrastErr();
+				dPh = pModel->GetPhase();
+				dPhErr = pModel->GetPhaseErr();
+
 				if(pModel) delete pModel;
 			}
 			else if(iFkt == FIT_MIEZE_SINE_PIXELWISE_FFT)
 			{
-				double dCont, dPhi;
-				bool bOk = pFFT->get_contrast(dNumOsc, py, dCont, dPhi);
-				if(bOk)
-				{
-					dat2_c.SetVal(iX, iY, dCont);
-					//dat2_c.SetErr(iX, iY, /*TODO*/);
-					dat2_ph.SetVal(iX, iY, dPhi);
-					//dat2_ph.SetErr(iX, iY, /*TODO*/);
-				}
+				res.bOk = pFFT->get_contrast(dNumOsc, py, dC, dPh);
+			}
+
+			if(res.bOk)
+			{
+				if(isnan(dC) || isinf(dC)) dC = 0.;
+				if(isnan(dPh) || isinf(dPh)) dPh = 0.;
+
+				dat2_c.SetVal(iX, iY, dC);
+				dat2_c.SetErr(iX, iY, dCErr);
+				dat2_ph.SetVal(iX, iY, dPh);
+				dat2_ph.SetErr(iX, iY, dPhErr);
 			}
 		}
 	}
