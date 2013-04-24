@@ -20,9 +20,7 @@
 Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData)
 			: SubWindowBase(pParent),
 			  m_pImg(0), m_bLog(bCountData), m_bCountData(bCountData),
-			  m_bHasXYMinMax(0), m_bXIsLog(0), m_bYIsLog(0),
-			  m_pbGlobalROIActive(0),
-			  m_pGlobalROI(0)
+			  m_bHasXYMinMax(0), m_bXIsLog(0), m_bYIsLog(0)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
@@ -214,15 +212,18 @@ bool Plot2d::GetLog() const
 
 void Plot2d::RefreshStatusMsgs()
 {
-	if(m_bCountData)
+	if(this->GetType() == PLOT_2D)
 	{
-		std::ostringstream ostr_total;
-		ostr_total << "total counts: " << group_numbers<uint>(m_dat.GetTotal());
-		emit SetStatusMsg(ostr_total.str().c_str(), 1);
-	}
-	else
-	{
-		emit SetStatusMsg("", 1);
+		if(m_bCountData)
+		{
+			std::ostringstream ostr_total;
+			ostr_total << "total counts: " << group_numbers<uint>(m_dat.GetTotal());
+			emit SetStatusMsg(ostr_total.str().c_str(), 1);
+		}
+		else
+		{
+			emit SetStatusMsg("", 1);
+		}
 	}
 
 	QString strTitle = this->windowTitle();
@@ -259,12 +260,14 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 		uint iPixelVal = uint(dPixelVal);
 
 		std::ostringstream ostr;
+		bool bPixelVal = 0;
 
+		double dX_Val = 0., dY_Val = 0.;
 		if(m_bHasXYMinMax)
 		{
 			// range 0..1
-			double dX_Val = dX / double(m_dat.GetWidth()-1);
-			double dY_Val = dY / double(m_dat.GetHeight()-1);
+			dX_Val = dX / double(m_dat.GetWidth()-1);
+			dY_Val = dY / double(m_dat.GetHeight()-1);
 
 			if(m_bXIsLog)
 			{
@@ -285,14 +288,33 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 				dY_Val = dY_Val * (m_dYMax-m_dYMin) + m_dYMin;
 
 			ostr << "(" << dX_Val << ", " << dY_Val << "): ";
+			bPixelVal = 0;
 		}
 		else
+		{
 			ostr << "pixel (" << iX << ", " << iY << "): ";
+			bPixelVal = 1;
+		}
 
 		if(m_bCountData)
 			ostr << group_numbers<uint>(iPixelVal);
 		else
 			ostr << dPixelVal;
+
+
+		if(m_dat.IsRoiActive())
+		{
+			bool bInsideRoi = 0;
+			const Roi *pRoi = m_dat.GetRoi();
+
+			if(bPixelVal)
+				bInsideRoi = pRoi->IsInside(iX, iY);
+			else
+				bInsideRoi = pRoi->IsInside(dX_Val, dY_Val);
+
+			ostr << " (" << (bInsideRoi?"in ROI":"not in ROI") << ")";
+		}
+
 
 		emit SetStatusMsg(ostr.str().c_str(), 2);
 		RefreshStatusMsgs();

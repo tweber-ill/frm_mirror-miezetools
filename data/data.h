@@ -14,6 +14,8 @@ typedef unsigned char uchar;
 #include<vector>
 #include<algorithm>
 
+#include "../roi/roi.h"
+
 enum DataType
 {
 	DATA_1D,
@@ -23,9 +25,43 @@ enum DataType
 };
 
 
-class DataInterface
+class RoiFlags
+{
+protected:
+	const bool *m_pbGlobalROIActive;
+	const Roi *m_pGlobalROI;
+
+public:
+	RoiFlags() : m_pbGlobalROIActive(0), m_pGlobalROI(0) {}
+	virtual ~RoiFlags() {}
+
+	bool IsRoiActive() const
+	{
+		if(m_pbGlobalROIActive)
+			return *m_pbGlobalROIActive;
+		return 0;
+	}
+
+	const Roi* GetRoi() const { return m_pGlobalROI; }
+
+	void CopyRoiFlagsFrom(const RoiFlags* pDat)
+	{
+		this->m_pbGlobalROIActive = pDat->m_pbGlobalROIActive;
+		this->m_pGlobalROI = pDat->m_pGlobalROI;
+	}
+
+	void SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
+	{
+		m_pGlobalROI = pROI;
+		m_pbGlobalROIActive = pbROIActive;
+	}
+};
+
+
+class DataInterface : public RoiFlags
 {
 public:
+	DataInterface() {}
 	virtual ~DataInterface() {}
 	virtual DataType GetType() = 0;
 };

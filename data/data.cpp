@@ -143,6 +143,7 @@ void Data3::SetVals(const double* pDat, const double *pErr)
 Data2 Data3::GetVal(unsigned int iT) const
 {
 	Data2 dat(m_iWidth, m_iHeight);
+	dat.CopyRoiFlagsFrom(this);
 
 	double dTotal = 0.;
 	for(unsigned int iY=0; iY<m_iHeight; ++iY)
@@ -256,6 +257,7 @@ void Data4::SetVals(unsigned int iD2, const double *pDat, const double *pErr)
 Data3 Data4::GetVal(unsigned int iD2) const
 {
 	Data3 dat(m_iWidth, m_iHeight, m_iDepth);
+	dat.CopyRoiFlagsFrom(this);
 
 	for(unsigned int iD=0; iD<m_iDepth; ++iD)
 		for(unsigned int iY=0; iY<m_iHeight; ++iY)
@@ -271,6 +273,7 @@ Data3 Data4::GetVal(unsigned int iD2) const
 Data2 Data4::GetVal(unsigned int iD, unsigned int iD2) const
 {
 	Data2 dat(m_iWidth, m_iHeight);
+	dat.CopyRoiFlagsFrom(this);
 
 	double dTotal = 0.;
 	for(unsigned int iY=0; iY<m_iHeight; ++iY)

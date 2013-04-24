@@ -278,6 +278,7 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 
 	const Data4& dat4 = this->GetData();
 	Data3 dat3;
+	dat3.CopyRoiFlagsFrom(&dat4);
 
 	if(iFoil<0)
 	{

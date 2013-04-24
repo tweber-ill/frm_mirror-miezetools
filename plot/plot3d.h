@@ -40,6 +40,9 @@ public:
 
 	virtual Plot* ConvertTo1d(int iParam=0);
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return this; }
+
+protected:
+	virtual DataInterface* GetInternalData() { return &m_dat3; }
 };
 
 

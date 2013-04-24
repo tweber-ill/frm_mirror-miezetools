@@ -41,6 +41,9 @@ public:
 
 	virtual Plot* ConvertTo1d(int iFoil);
 	virtual Plot3d* ConvertTo3d(int iFoil=-1);
+
+protected:
+	virtual DataInterface* GetInternalData() { return &m_dat4; }
 };
 
 

@@ -698,6 +698,8 @@ void MiezeMainWnd::SetStatusMsg(const char* pcMsg, int iPos)
 	QString strMsg(pcMsg);
 	if(pLabel->text() != strMsg)
 	{
+		//std::cout << "old: " << pLabel->text().toStdString() << ", new: " << strMsg.toStdString() << std::endl;
+
 		pLabel->setText(pcMsg);
 		pLabel->repaint();
 	}
@@ -800,6 +802,12 @@ void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
 void MiezeMainWnd::QuickFitMIEZEpixel()
 {
 	SubWindowBase *pSWB = this->GetActivePlot();
+	if(!pSWB)
+	{
+		QMessageBox::critical(this, "Error", "No active plot.");
+		return;
+	}
+
 	if(pSWB->GetType()!=PLOT_3D && pSWB->GetType()!=PLOT_4D)
 	{
 		QMessageBox::critical(this, "Error", "Wrong data type.");

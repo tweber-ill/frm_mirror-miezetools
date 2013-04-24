@@ -35,9 +35,6 @@ protected:
 	QRect m_rectImage, m_rectCB;
 	QString m_strXAxis, m_strYAxis, m_strZAxis, m_strTitle;
 
-	const bool *m_pbGlobalROIActive;
-	const Roi *m_pGlobalROI;
-
 	uint GetSpectroColor(double dVal) const;
 	uint GetSpectroColor01(double dVal) const;
 
@@ -76,10 +73,17 @@ public:
 	virtual SubWindowType GetType() { return PLOT_2D; }
 	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
 
+protected:
+	virtual DataInterface* GetInternalData() { return &m_dat; }
+
+public:
 	void SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
 	{
-		m_pbGlobalROIActive = pbROIActive;
-		m_pGlobalROI = pROI;
+		DataInterface* pDat = GetInternalData();
+		if(!pDat) return;
+
+		pDat->SetGlobalROI(pROI, pbROIActive);
+		GetData2().SetGlobalROI(pROI, pbROIActive);
 	}
 };
 
