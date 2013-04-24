@@ -18,6 +18,7 @@
 #include "plot/plot3d.h"
 #include "plot/plot4d.h"
 
+#include "dialogs/RoiDlg.h"
 #include "dialogs/FitDlg.h"
 
 
@@ -29,6 +30,7 @@ class MiezeMainWnd : public QMainWindow
 protected:
 	QMdiArea *m_pmdi;
 	FitDlg *m_pfitdlg;
+	RoiDlg *m_proidlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -45,13 +47,21 @@ protected:
 	Plot* Convert3d1d(Plot3d* pPlot3d);
 	Plot* Convert4d1d(Plot4d* pPlot4d, int iFoil=-1);
 
+	Roi m_mainROI;
+
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
-	void SettingsTriggered();
+
 	void UpdateSubWndList();
 	void ShowListWindowsDlg();
 	void ShowCombineGraphsDlg();
+
+	void SettingsTriggered();
+
+	void ROIManageTriggered();
+	void ROILoadTriggered();
+	void ROISaveTriggered();
 
 	void ShowFitDlg();
 	void QuickFit(SubWindowBase* pSWB, int iFkt);
@@ -61,6 +71,9 @@ protected slots:
 
 	void ShowAbout();
 	void ShowBrowser();
+
+	void NewRoiAvailable(const Roi* pROI);
+	void SetGlobalROI(bool bSet);
 
 public:
 	MiezeMainWnd();

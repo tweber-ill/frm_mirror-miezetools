@@ -37,7 +37,8 @@
 #include "fitter/models/gauss.h"
 
 
-MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
+MiezeMainWnd::MiezeMainWnd()
+					: m_iPlotCnt(1), m_pfitdlg(0), m_proidlg(new RoiDlg(this))
 {
 	this->setWindowTitle("Cattus, a MIEZE toolset");
 
@@ -54,23 +55,27 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 
 	QAction *pLoad = new QAction(this);
 	pLoad->setText("Open...");
+	pLoad->setIcon(QIcon::fromTheme("document-open"));
 	pLoad->setShortcut(Qt::CTRL + Qt::Key_L);
 	pMenuFile->addAction(pLoad);
 
 	QAction *pCloseAll = new QAction(this);
 	pCloseAll->setText("Close All");
+	pCloseAll->setIcon(QIcon::fromTheme("window-close"));
 	pMenuFile->addAction(pCloseAll);
 
 	pMenuFile->addSeparator();
 
 	QAction *pSettings = new QAction(this);
 	pSettings->setText("Settings...");
+	pSettings->setIcon(QIcon::fromTheme("preferences-system"));
 	pMenuFile->addAction(pSettings);
 
 	pMenuFile->addSeparator();
 
 	QAction *pExit = new QAction(this);
 	pExit->setText("Exit");
+	pExit->setIcon(QIcon::fromTheme("application-exit"));
 	pMenuFile->addAction(pExit);
 
 
@@ -115,6 +120,31 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 	QMenu *pMenuROI = new QMenu(this);
 	pMenuROI->setTitle("ROI");
 
+	QAction *pManageROI = new QAction(this);
+	pManageROI->setText("Manage ROI...");
+	pManageROI->setIcon(QIcon::fromTheme("list-add"));
+	pMenuROI->addAction(pManageROI);
+
+	pMenuROI->addSeparator();
+
+	QAction *pLoadROI = new QAction(this);
+	pLoadROI->setText("Load ROI...");
+	pLoadROI->setIcon(QIcon::fromTheme("document-open"));
+	pMenuROI->addAction(pLoadROI);
+
+	QAction *pSaveROI = new QAction(this);
+	pSaveROI->setText("Save ROI...");
+	pSaveROI->setIcon(QIcon::fromTheme("document-save-as"));
+	pMenuROI->addAction(pSaveROI);
+
+	pMenuROI->addSeparator();
+
+	QAction *pActiveROI = new QAction(this);
+	pActiveROI->setText("Global ROI Active");
+	pActiveROI->setCheckable(1);
+	pMenuROI->addAction(pActiveROI);
+
+
 
 	// Windows
 	/*QMenu**/ pMenuWindows = new QMenu(this);
@@ -143,9 +173,14 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 	pMenuHelp->setTitle("Help");
 	QAction* pBrowser = new QAction(this);
 	pBrowser->setText("Add Browser Toolbar");
+	pBrowser->setIcon(QIcon::fromTheme("applications-internet"));
 	pMenuHelp->addAction(pBrowser);
+
+	pMenuHelp->addSeparator();
+
 	QAction* pAbout = new QAction(this);
 	pAbout->setText("About...");
+	pAbout->setIcon(QIcon::fromTheme("help-about"));
 	pMenuHelp->addAction(pAbout);
 
 
@@ -190,6 +225,11 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 	QObject::connect(pQFitMiezeArea, SIGNAL(triggered()), this, SLOT(QuickFitMIEZEpixel()));
 	QObject::connect(pQFitGauss, SIGNAL(triggered()), this, SLOT(QuickFitGauss()));
 
+	QObject::connect(pManageROI, SIGNAL(triggered()), this, SLOT(ROIManageTriggered()));
+	QObject::connect(pLoadROI, SIGNAL(triggered()), this, SLOT(ROILoadTriggered()));
+	QObject::connect(pSaveROI, SIGNAL(triggered()), this, SLOT(ROISaveTriggered()));
+	QObject::connect(pActiveROI, SIGNAL(toggled(bool)), this, SLOT(SetGlobalROI(bool)));
+
 	QObject::connect(pWndList, SIGNAL(triggered()), this, SLOT(ShowListWindowsDlg()));
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
@@ -200,11 +240,16 @@ MiezeMainWnd::MiezeMainWnd() : m_iPlotCnt(1), m_pfitdlg(0)
 
 	QObject::connect(pMenuWindows, SIGNAL(aboutToShow()), this, SLOT(UpdateSubWndList()));
 	QObject::connect(m_pmdi, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(SubWindowChanged()));
+
+	QObject::connect(m_proidlg, SIGNAL(NewRoiAvailable(const Roi*)), this, SLOT(NewRoiAvailable(const Roi*)));
 	//--------------------------------------------------------------------------------
 }
 
 MiezeMainWnd::~MiezeMainWnd()
-{}
+{
+	if(m_pfitdlg) delete m_pfitdlg;
+	if(m_proidlg) delete m_proidlg;
+}
 
 void MiezeMainWnd::UpdateSubWndList()
 {
@@ -518,6 +563,81 @@ void MiezeMainWnd::FileLoadTriggered()
 
 		LoadFile(strFile1);
 	}
+}
+
+void MiezeMainWnd::ROIManageTriggered()
+{
+	if(!m_proidlg->isVisible())
+	{
+		m_proidlg->SetRoi(&m_mainROI);
+		m_proidlg->show();
+	}
+	m_proidlg->activateWindow();
+}
+
+void MiezeMainWnd::ROILoadTriggered()
+{
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_roi", ".").toString();
+
+	QString strFile = QFileDialog::getOpenFileName(this, "Open ROI file...", strLastDir,
+					"ROI files (*.roi *.ROI);;All files (*.*)",
+					0, QFileDialog::DontUseNativeDialog);
+	if(strFile.length() == 0)
+		return;
+
+
+	bool bDirSet=false;
+	std::string strFile1 = strFile.toStdString();
+
+	if(!bDirSet)
+	{
+		pGlobals->setValue("main/lastdir_roi", QString(::get_dir(strFile1).c_str()));
+		bDirSet = true;
+	}
+
+	if(!m_mainROI.Load(strFile1.c_str()))
+	{
+		QMessageBox::critical(this, "Error", "Could not load ROI.");
+		return;
+	}
+
+	m_proidlg->SetRoi(&m_mainROI);
+}
+
+void MiezeMainWnd::ROISaveTriggered()
+{
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_roi", ".").toString();
+
+	QString strFile = QFileDialog::getSaveFileName(this, "Save ROI file...", strLastDir,
+					"ROI files (*.roi *.ROI);;All files (*.*)",
+					0, QFileDialog::DontUseNativeDialog);
+	if(strFile.length() == 0)
+		return;
+
+
+	bool bDirSet=false;
+	std::string strFile1 = strFile.toStdString();
+
+	if(!bDirSet)
+	{
+		pGlobals->setValue("main/lastdir_roi", QString(::get_dir(strFile1).c_str()));
+		bDirSet = true;
+	}
+
+	if(!m_mainROI.Save(strFile1.c_str()))
+		QMessageBox::critical(this, "Error", "Could not save ROI.");
+}
+
+void MiezeMainWnd::NewRoiAvailable(const Roi* pROI)
+{
+	m_mainROI = *pROI;
+}
+
+void MiezeMainWnd::SetGlobalROI(bool bSet)
+{
+	// TODO: set ROIS for all plots
 }
 
 void MiezeMainWnd::SettingsTriggered()

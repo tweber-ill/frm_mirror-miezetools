@@ -711,7 +711,8 @@ void FitDlg::DoFit()
 
 void FitDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 {
-	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::ApplyRole)
+	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::ApplyRole ||
+	   buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
 	{
 		if(tabs->currentWidget() == tabUser)
 			DoFit();
@@ -727,18 +728,9 @@ void FitDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	{
 		reject();
 	}
-	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
-	{
-		if(tabs->currentWidget() == tabUser)
-			DoFit();
-		else if(tabs->currentWidget() == tabSpecial)
-		{
-			if(radio1D->isChecked())
-				DoSpecialFit();
-			else if(radio1DPixel->isChecked())
-				DoSpecialFitPixelwise();
-		}
 
+	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
+	{
 		QDialog::accept();
 	}
 }
