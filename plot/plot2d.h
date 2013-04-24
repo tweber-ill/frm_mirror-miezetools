@@ -15,6 +15,7 @@
 
 #include "../subwnd.h"
 #include "../data/data.h"
+#include "../roi/roi.h"
 
 class Plot2d : public SubWindowBase
 { Q_OBJECT
@@ -33,6 +34,9 @@ protected:
 
 	QRect m_rectImage, m_rectCB;
 	QString m_strXAxis, m_strYAxis, m_strZAxis, m_strTitle;
+
+	const bool *m_pbGlobalROIActive;
+	const Roi *m_pGlobalROI;
 
 	uint GetSpectroColor(double dVal) const;
 	uint GetSpectroColor01(double dVal) const;
@@ -71,6 +75,12 @@ public:
 
 	virtual SubWindowType GetType() { return PLOT_2D; }
 	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
+
+	void SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
+	{
+		m_pbGlobalROIActive = pbROIActive;
+		m_pGlobalROI = pROI;
+	}
 };
 
 #endif

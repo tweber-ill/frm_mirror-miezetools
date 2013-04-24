@@ -38,7 +38,8 @@
 
 
 MiezeMainWnd::MiezeMainWnd()
-					: m_iPlotCnt(1), m_pfitdlg(0), m_proidlg(new RoiDlg(this))
+					: m_iPlotCnt(1), m_pfitdlg(0),
+					  m_proidlg(new RoiDlg(this)), m_bmainROIActive(0)
 {
 	this->setWindowTitle("Cattus, a MIEZE toolset");
 
@@ -142,6 +143,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pActiveROI = new QAction(this);
 	pActiveROI->setText("Global ROI Active");
 	pActiveROI->setCheckable(1);
+	pActiveROI->setChecked(m_bmainROIActive);
 	pMenuROI->addAction(pActiveROI);
 
 
@@ -323,6 +325,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		std::string strTitle = GetPlotTitle(strFileNoDir);
 		Plot4dWrapper *pPlotWrapper = new Plot4dWrapper(m_pmdi, strTitle.c_str(), true);
 		Plot4d *pPlot = (Plot4d*)pPlotWrapper->GetActualWidget();
+		pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 		Data4& dat4 = pPlot->GetData();
 		dat4.SetSize(iW, iH, iTcCnt, iFoilCnt);
 
@@ -368,6 +371,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 		std::string strTitle = GetPlotTitle(strFileNoDir);
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), true);
+		pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 		pPlot->plot(iW, iH, pdDat);
 		pPlot->SetLabels("x pixels", "y pixels", "");
 
@@ -453,6 +457,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 			std::string strTitle = GetPlotTitle(strFileNoDir);
 			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), false);
+			pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 
 			pPlot->plot(iW, iH, pDat, pErr);
 
@@ -500,6 +505,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			std::string strTitle = GetPlotTitle(strFileNoDir);
 			Plot3dWrapper *pPlotWrapper = new Plot3dWrapper(m_pmdi, strTitle.c_str(), false);
 			Plot3d *pPlot = (Plot3d*)pPlotWrapper->GetActualWidget();
+			pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 			pPlot->plot(iW, iH, iT, pDat, pErr);
 
 			std::string strLabX, strLabY, strLabZ, strPlotTitle;
@@ -637,7 +643,7 @@ void MiezeMainWnd::NewRoiAvailable(const Roi* pROI)
 
 void MiezeMainWnd::SetGlobalROI(bool bSet)
 {
-	// TODO: set ROIS for all plots
+	m_bmainROIActive = bSet;
 }
 
 void MiezeMainWnd::SettingsTriggered()

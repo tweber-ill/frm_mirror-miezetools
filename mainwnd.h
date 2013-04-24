@@ -47,6 +47,7 @@ protected:
 	Plot* Convert3d1d(Plot3d* pPlot3d);
 	Plot* Convert4d1d(Plot4d* pPlot4d, int iFoil=-1);
 
+	bool m_bmainROIActive;
 	Roi m_mainROI;
 
 protected slots:

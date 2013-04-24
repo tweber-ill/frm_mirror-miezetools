@@ -20,7 +20,9 @@
 Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData)
 			: SubWindowBase(pParent),
 			  m_pImg(0), m_bLog(bCountData), m_bCountData(bCountData),
-			  m_bHasXYMinMax(0), m_bXIsLog(0), m_bYIsLog(0)
+			  m_bHasXYMinMax(0), m_bXIsLog(0), m_bYIsLog(0),
+			  m_pbGlobalROIActive(0),
+			  m_pGlobalROI(0)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
