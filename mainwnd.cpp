@@ -26,12 +26,14 @@
 #include "helper/misc.h"
 
 #include "loader/loadtxt.h"
+#include "loader/loadnicos.h"
 #include "loader/loadcasc.h"
 
 #include "dialogs/ListDlg.h"
 #include "dialogs/CombineDlg.h"
 #include "dialogs/SettingsDlg.h"
 #include "dialogs/AboutDlg.h"
+#include "dialogs/ComboDlg.h"
 
 #include "fitter/models/msin.h"
 #include "fitter/models/gauss.h"
@@ -389,145 +391,207 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			return;
 		}
 
-		//dat.SetMapVal<int>("which-col-is-x", 0);
-        //dat.SetMapVal<int>("which-col-is-y", 1);
-        //dat.SetMapVal<int>("which-col-is-yerr", 2);
+		TxtType dattype = pdat->GetFileType();
 
-        int iArrayDim = 1;
-        const LoadTxt::t_mapComm& mapComm = pdat->GetCommMap();
-		LoadTxt::t_mapComm::const_iterator iter = mapComm.find("type");
-		if(iter != mapComm.end() && (*iter).second.size()>=1)
+		if(dattype == MCSTAS_DATA)
 		{
-				const std::string& strType = (*iter).second[0];
+			//dat.SetMapVal<int>("which-col-is-x", 0);
+			//dat.SetMapVal<int>("which-col-is-y", 1);
+			//dat.SetMapVal<int>("which-col-is-yerr", 2);
 
-				if(strType.compare(0,8, "array_1d") == 0)
-						iArrayDim = 1;
-				else if(strType.compare(0,8, "array_2d") == 0)
-						iArrayDim = 2;
-				else if(strType.compare(0,8, "array_3d") == 0)
-						iArrayDim = 3;
+			int iArrayDim = 1;
+			const LoadTxt::t_mapComm& mapComm = pdat->GetCommMap();
+			LoadTxt::t_mapComm::const_iterator iter = mapComm.find("type");
+			if(iter != mapComm.end() && (*iter).second.size()>=1)
+			{
+					const std::string& strType = (*iter).second[0];
+
+					if(strType.compare(0,8, "array_1d") == 0)
+							iArrayDim = 1;
+					else if(strType.compare(0,8, "array_2d") == 0)
+							iArrayDim = 2;
+					else if(strType.compare(0,8, "array_3d") == 0)
+							iArrayDim = 3;
+			}
+
+			if(iArrayDim == 1)
+			{
+				Data1D * pdat1d = new Data1D(*pdat);
+
+				int iX=0, iY=1, iYErr=2;
+				pdat1d->GetColumnIndices(iX, iY, iYErr);
+				const double *pdx = pdat1d->GetColumn(iX);
+				const double *pdy = pdat1d->GetColumn(iY);
+				const double *pdyerr = pdat1d->GetColumn(iYErr);
+
+				std::string strTitle = GetPlotTitle(strFileNoDir);
+
+				Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
+				pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
+
+				std::string strLabX, strLabY, strPlotTitle;
+				pdat1d->GetLabels(strLabX, strLabY);
+				pdat1d->GetTitle(strPlotTitle);
+				pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
+				pPlot->SetTitle(strPlotTitle.c_str());
+
+				bool bXLog=0, bYLog=0;
+				pdat1d->GetLogScale(bXLog, bYLog);
+				pPlot->SetXIsLog(bXLog);
+				pPlot->SetYIsLog(bYLog);
+
+				delete pdat1d;
+
+				AddSubWindow(pPlot);
+			}
+			else if(iArrayDim == 2)
+			{
+				Data2D* pdat2d = new Data2D(*pdat);
+
+				const uint iW = pdat2d->GetXDim();
+				const uint iH = pdat2d->GetYDim();
+
+				double *pDat = new double[iW*iH];
+				double *pErr = new double[iW*iH];
+
+				for(uint iY=0; iY<iH; ++iY)
+					for(uint iX=0; iX<iW; ++iX)
+					{
+						pDat[iY*iW + iX] = pdat2d->GetVal(iX, iY);
+						pErr[iY*iW + iX] = pdat2d->GetErr(iX, iY);
+					}
+
+				std::string strTitle = GetPlotTitle(strFileNoDir);
+				Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), false);
+				pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
+
+				pPlot->plot(iW, iH, pDat, pErr);
+
+				std::string strLabX, strLabY, strLabZ, strPlotTitle;
+				pdat2d->GetLabels(strLabX, strLabY, strLabZ);
+				pdat2d->GetTitle(strPlotTitle);
+				pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
+				pPlot->SetTitle(strPlotTitle.c_str());
+
+				double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
+				if(pdat2d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
+					pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
+
+				bool bXLog=0, bYLog=0;
+				pdat2d->GetLogScale(bXLog, bYLog);
+				pPlot->SetXIsLog(bXLog);
+				pPlot->SetYIsLog(bYLog);
+
+				delete[] pDat;
+				delete[] pErr;
+				delete pdat2d;
+
+				AddSubWindow(pPlot);
+			}
+			else if(iArrayDim == 3)
+			{
+				Data3D* pdat3d = new Data3D(*pdat);
+
+				const uint iW = pdat3d->GetXDim();
+				const uint iH = pdat3d->GetYDim();
+				const uint iT = pdat3d->GetTDim();
+
+				double *pDat = new double[iW*iH*iT];
+				double *pErr = new double[iW*iH*iT];
+
+				for(uint iZ=0; iZ<iT; ++iZ)
+					for(uint iY=0; iY<iH; ++iY)
+						for(uint iX=0; iX<iW; ++iX)
+						{
+							pDat[iZ*iW*iH + iY*iW + iX] = pdat3d->GetVal(iX, iY, iZ);
+							pErr[iZ*iW*iH + iY*iW + iX] = pdat3d->GetErr(iX, iY, iZ);
+						}
+
+
+				std::string strTitle = GetPlotTitle(strFileNoDir);
+				Plot3dWrapper *pPlotWrapper = new Plot3dWrapper(m_pmdi, strTitle.c_str(), false);
+				Plot3d *pPlot = (Plot3d*)pPlotWrapper->GetActualWidget();
+				pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
+				pPlot->plot(iW, iH, iT, pDat, pErr);
+
+				std::string strLabX, strLabY, strLabZ, strPlotTitle;
+				pdat3d->GetLabels(strLabX, strLabY, strLabZ);
+				pdat3d->GetTitle(strPlotTitle);
+				pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
+				pPlot->SetTitle(strPlotTitle.c_str());
+
+				double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
+				if(pdat3d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
+					pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
+
+				bool bXLog=0, bYLog=0;
+				pdat3d->GetLogScale(bXLog, bYLog);
+				pPlot->SetXIsLog(bXLog);
+				pPlot->SetYIsLog(bYLog);
+
+				delete[] pDat;
+				delete[] pErr;
+				delete pdat3d;
+
+				AddSubWindow(pPlotWrapper);
+			}
 		}
-
-		if(iArrayDim == 1)
+		else if(dattype == NICOS_DATA)
 		{
-			Data1D * pdat1d = new Data1D(*pdat);
+			NicosData * pnicosdat = new NicosData(*pdat);
+			::autodeleter<NicosData> _a0(pnicosdat);
+			const std::string strCtrName = Settings::Get<QString>("nicos/counter_name").toStdString();
 
-			int iX=0, iY=1, iYErr=2;
-			pdat1d->GetColumnIndices(iX, iY, iYErr);
-			const double *pdx = pdat1d->GetColumn(iX);
-			const double *pdy = pdat1d->GetColumn(iY);
-			const double *pdyerr = pdat1d->GetColumn(iYErr);
+			bool bSelectNewXColumn = 0;
+			int iX = 0;
+			if(m_strLastXColumn.length())
+			{
+				iX = pnicosdat->GetColIdx(m_strLastXColumn);
+				if(iX == -1)
+					bSelectNewXColumn = 1;
+			}
+			else
+				bSelectNewXColumn = 1;
+
+			if(bSelectNewXColumn)
+			{
+				ComboDlg dlg(this);
+				dlg.SetValues(pnicosdat->GetColNames());
+				dlg.SetLabel("Select x values: ");
+
+				if(dlg.exec() == QDialog::Accepted)
+					iX = dlg.GetSelectedValue();
+				else
+					return;
+			}
+
+			int iY = pnicosdat->GetColIdx(strCtrName);
+			const double *pdx = pnicosdat->GetColumn(iX);
+			const double *pdy = pnicosdat->GetColumn(iY);
+			double *pdyerr = new double[pnicosdat->GetDim()];
+			::apply_fkt<double>(pdy, pdyerr, sqrt, pnicosdat->GetDim());
 
 			std::string strTitle = GetPlotTitle(strFileNoDir);
 
 			Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-			pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
+			pPlot->plot(pnicosdat->GetDim(), pdx, pdy, pdyerr);
 
-			std::string strLabX, strLabY, strPlotTitle;
-			pdat1d->GetLabels(strLabX, strLabY);
-			pdat1d->GetTitle(strPlotTitle);
+			delete[] pdyerr;
+
+			std::string strLabX = pnicosdat->GetColName(iX) + std::string(" (") + pnicosdat->GetColUnit(iX) +std::string(")") ;
+			std::string strLabY = pnicosdat->GetColName(iY) + std::string(" (") + pnicosdat->GetColUnit(iY) +std::string(")") ;
+			std::string strPlotTitle;
 			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
 			pPlot->SetTitle(strPlotTitle.c_str());
 
-			bool bXLog=0, bYLog=0;
-			pdat1d->GetLogScale(bXLog, bYLog);
-			pPlot->SetXIsLog(bXLog);
-			pPlot->SetYIsLog(bYLog);
-
-			delete pdat1d;
-
 			AddSubWindow(pPlot);
 		}
-		else if(iArrayDim == 2)
+		else
 		{
-			Data2D* pdat2d = new Data2D(*pdat);
-
-			const uint iW = pdat2d->GetXDim();
-			const uint iH = pdat2d->GetYDim();
-
-			double *pDat = new double[iW*iH];
-			double *pErr = new double[iW*iH];
-
-			for(uint iY=0; iY<iH; ++iY)
-				for(uint iX=0; iX<iW; ++iX)
-				{
-					pDat[iY*iW + iX] = pdat2d->GetVal(iX, iY);
-					pErr[iY*iW + iX] = pdat2d->GetErr(iX, iY);
-				}
-
-			std::string strTitle = GetPlotTitle(strFileNoDir);
-			Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), false);
-			pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
-
-			pPlot->plot(iW, iH, pDat, pErr);
-
-			std::string strLabX, strLabY, strLabZ, strPlotTitle;
-			pdat2d->GetLabels(strLabX, strLabY, strLabZ);
-			pdat2d->GetTitle(strPlotTitle);
-			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
-			pPlot->SetTitle(strPlotTitle.c_str());
-
-			double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
-			if(pdat2d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
-				pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
-
-			bool bXLog=0, bYLog=0;
-			pdat2d->GetLogScale(bXLog, bYLog);
-			pPlot->SetXIsLog(bXLog);
-			pPlot->SetYIsLog(bYLog);
-
-			delete[] pDat;
-			delete[] pErr;
-			delete pdat2d;
-
-			AddSubWindow(pPlot);
-		}
-		else if(iArrayDim == 3)
-		{
-			Data3D* pdat3d = new Data3D(*pdat);
-
-			const uint iW = pdat3d->GetXDim();
-			const uint iH = pdat3d->GetYDim();
-			const uint iT = pdat3d->GetTDim();
-
-			double *pDat = new double[iW*iH*iT];
-			double *pErr = new double[iW*iH*iT];
-
-			for(uint iZ=0; iZ<iT; ++iZ)
-				for(uint iY=0; iY<iH; ++iY)
-					for(uint iX=0; iX<iW; ++iX)
-					{
-						pDat[iZ*iW*iH + iY*iW + iX] = pdat3d->GetVal(iX, iY, iZ);
-						pErr[iZ*iW*iH + iY*iW + iX] = pdat3d->GetErr(iX, iY, iZ);
-					}
-
-
-			std::string strTitle = GetPlotTitle(strFileNoDir);
-			Plot3dWrapper *pPlotWrapper = new Plot3dWrapper(m_pmdi, strTitle.c_str(), false);
-			Plot3d *pPlot = (Plot3d*)pPlotWrapper->GetActualWidget();
-			pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
-			pPlot->plot(iW, iH, iT, pDat, pErr);
-
-			std::string strLabX, strLabY, strLabZ, strPlotTitle;
-			pdat3d->GetLabels(strLabX, strLabY, strLabZ);
-			pdat3d->GetTitle(strPlotTitle);
-			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
-			pPlot->SetTitle(strPlotTitle.c_str());
-
-			double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
-			if(pdat3d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
-				pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
-
-			bool bXLog=0, bYLog=0;
-			pdat3d->GetLogScale(bXLog, bYLog);
-			pPlot->SetXIsLog(bXLog);
-			pPlot->SetYIsLog(bYLog);
-
-			delete[] pDat;
-			delete[] pErr;
-			delete pdat3d;
-
-			AddSubWindow(pPlotWrapper);
+			QString strErr = "Unknown data format in file \"";
+			strErr += strFile.c_str();
+			strErr += "\".";
+			QMessageBox::critical(this, "Error", "Unknown data format.");
 		}
 
 		delete pdat;

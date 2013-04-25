@@ -206,7 +206,7 @@ void Plot::plot(unsigned int iNum, const double *px, const double *py, const dou
 void Plot::plotfit(const FunctionModel& fkt)
 {
 	clearfit();
-	const uint iCnt = 128;
+	const uint iCnt = 512;
 
 	PlotObj pltobj;
 	pltobj.plttype = PLOT_FIT;

@@ -50,6 +50,8 @@ protected:
 	bool m_bmainROIActive;
 	Roi m_mainROI;
 
+	std::string m_strLastXColumn;
+
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();

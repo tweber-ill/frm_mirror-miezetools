@@ -7,6 +7,7 @@
 #include "SettingsDlg.h"
 #include "../settings.h"
 #include "../helper/string.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -53,6 +54,12 @@ void SettingsDlg::LoadSettings()
 	}
 	editStartIndices->setText(ostr.str().c_str());
 	// --------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------
+	// Nicos data
+	editCounts->setText(Settings::Get<QString>("nicos/counter_name"));
+	editMon->setText(Settings::Get<QString>("nicos/monitor_name"));
+	// --------------------------------------------------------------------------------
 }
 
 void SettingsDlg::SaveSettings()
@@ -64,7 +71,7 @@ void SettingsDlg::SaveSettings()
 
 
 	// --------------------------------------------------------------------------------
-	// TOF/PAD
+	// TOF/PAD data
 	Settings::Set<unsigned int>("casc/x_res", spinResX->value());
 	Settings::Set<unsigned int>("casc/y_res", spinResY->value());
 	Settings::Set<unsigned int>("casc/tc_cnt", spinResT->value());
@@ -78,6 +85,12 @@ void SettingsDlg::SaveSettings()
 	for(unsigned int iIdx : vecIndices)
 		lst.push_back(iIdx);
 	Settings::Set<QList<QVariant> >("casc/foil_idx", lst);
+	// --------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------
+	// Nicos data
+	Settings::Set<QString>("nicos/counter_name", editCounts->text());
+	Settings::Set<QString>("nicos/monitor_name", editMon->text());
 	// --------------------------------------------------------------------------------
 }
 

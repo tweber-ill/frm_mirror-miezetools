@@ -45,11 +45,18 @@ void Settings::SetDefaults()
 
 
 	// --------------------------------------------------------------------------------
-	// PAD/TOF
+	// PAD/TOF data
 	if(!keys.contains("casc/foil_cnt")) s_pGlobals->setValue("casc/foil_cnt", 6);
 	if(!keys.contains("casc/tc_cnt")) s_pGlobals->setValue("casc/tc_cnt", 16);
 	if(!keys.contains("casc/x_res")) s_pGlobals->setValue("casc/x_res", 128);
 	if(!keys.contains("casc/y_res")) s_pGlobals->setValue("casc/y_res", 128);
+
+
+	// --------------------------------------------------------------------------------
+	// Nicos data
+	if(!keys.contains("nicos/counter_name")) s_pGlobals->setValue("nicos/counter_name", "ctr1");
+	if(!keys.contains("nicos/monitor_name")) s_pGlobals->setValue("nicos/monitor_name", "mon2");
+
 
 	if(!keys.contains("casc/foil_idx"))
 	{
