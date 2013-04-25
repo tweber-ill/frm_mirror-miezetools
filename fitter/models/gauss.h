@@ -17,12 +17,14 @@ class GaussModel : public FunctionModel
 	protected:
 		double m_amp, m_spread, m_x0;
 		double m_amperr, m_spreaderr, m_x0err;
+		double m_offs, m_offserr;
 		bool m_bNormalized;
 
 	public:
 		GaussModel(double damp=1., double dspread=1., double dx0=0.,
 				   double damperr=0., double dspreaderr=0., double dx0err=0.,
-				   bool bNormalized=0);
+				   bool bNormalized=0,
+				   double doffs=0., double doffserr=0.);
 		virtual ~GaussModel();
 
 		virtual bool SetParams(const std::vector<double>& vecParams);
@@ -35,12 +37,14 @@ class GaussModel : public FunctionModel
 		double GetFWHM() const;
 		double GetHWHM() const;
 		double GetAmp() const;
+		double GetOffs() const;
 
 		double GetMeanErr() const;
 		double GetSigmaErr() const;
 		double GetFWHMErr() const;
 		double GetHWHMErr() const;
 		double GetAmpErr() const;
+		double GetOffsErr() const;
 
 		void Normalize();
 		bool IsNormalized() const { return m_bNormalized; }

@@ -557,10 +557,13 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			{
 				ComboDlg dlg(this);
 				dlg.SetValues(pnicosdat->GetColNames());
-				dlg.SetLabel("Select x values: ");
+				dlg.SetLabel("Select x value: ");
 
 				if(dlg.exec() == QDialog::Accepted)
+				{
 					iX = dlg.GetSelectedValue();
+					m_strLastXColumn = pnicosdat->GetColName(iX);
+				}
 				else
 					return;
 			}
@@ -616,6 +619,7 @@ void MiezeMainWnd::FileLoadTriggered()
 	if(strFiles.size() == 0)
 		return;
 
+	m_strLastXColumn = "";
 	bool bDirSet=false;
 	for(const QString& strFile : strFiles)
 	{

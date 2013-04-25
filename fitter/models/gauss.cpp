@@ -31,9 +31,11 @@ static const double HWHM2SIGMA = 1./SIGMA2HWHM;
 // gauss model
 GaussModel::GaussModel(double damp, double dspread, double dx0,
 					   double damperr, double dspreaderr, double dx0err,
-					   bool bNormalized)
+					   bool bNormalized,
+					   double doffs, double doffserr)
 			: m_amp(damp), m_spread(dspread), m_x0(dx0),
 			  m_amperr(damperr), m_spreaderr(dspreaderr), m_x0err(dx0err),
+			  m_offs(doffs), m_offserr(doffserr),
 			  m_bNormalized(bNormalized)
 {}
 
@@ -44,6 +46,7 @@ double GaussModel::GetMean() const { return m_x0; }
 double GaussModel::GetSigma() const { return m_spread; }
 double GaussModel::GetFWHM() const { return SIGMA2FWHM * m_spread; }
 double GaussModel::GetHWHM() const { return SIGMA2HWHM * m_spread; }
+double GaussModel::GetOffs() const { return m_offs; }
 double GaussModel::GetAmp() const
 {
 	if(!m_bNormalized)
@@ -56,6 +59,7 @@ double GaussModel::GetMeanErr() const { return m_x0err; }
 double GaussModel::GetSigmaErr() const { return m_spreaderr; }
 double GaussModel::GetFWHMErr() const { return SIGMA2FWHM * m_spreaderr; }
 double GaussModel::GetHWHMErr() const { return SIGMA2HWHM * m_spreaderr; }
+double GaussModel::GetOffsErr() const { return m_offserr; }
 double GaussModel::GetAmpErr() const { return m_amperr; }
 
 
@@ -68,14 +72,14 @@ std::string GaussModel::print(bool bFillInSyms) const
 		if(m_bNormalized)
 			ostr << "/sqrt(2*pi * " << m_spread << ")";
 		ostr << " * exp(-0.5 * ((x-" << m_x0 << ")/"
-			 << m_spread << ")**2)";
+			 << m_spread << ")**2) + " << m_offs;
 	}
 	else
 	{
 		ostr << "amp";
 		if(m_bNormalized)
 			ostr << "/sqrt(2*pi * sigma)";
-		ostr << " * exp(-0.5 * ((x-x0) / sigma)**2)";
+		ostr << " * exp(-0.5 * ((x-x0) / sigma)**2) + offs";
 	}
 	return ostr.str();
 }
@@ -85,6 +89,7 @@ bool GaussModel::SetParams(const std::vector<double>& vecParams)
 	m_amp = vecParams[0];
 	m_spread = vecParams[1];
 	m_x0 = vecParams[2];
+	m_offs = vecParams[3];
 
 	return true;
 }
@@ -96,14 +101,14 @@ double GaussModel::operator()(double x) const
 		dNorm = 1./(sqrt(2.*M_PI*fabs(m_spread)));
 	
 	return m_amp * dNorm
-		* exp(-0.5 * ((x-m_x0)/m_spread)*((x-m_x0)/m_spread));
+		* exp(-0.5 * ((x-m_x0)/m_spread)*((x-m_x0)/m_spread)) + m_offs;
 }
 
 FunctionModel* GaussModel::copy() const
 {
 	return new GaussModel(m_amp, m_spread, m_x0,
 							m_amperr, m_spreaderr, m_x0err,
-							m_bNormalized);
+							m_bNormalized, m_offs, m_offserr);
 }
 
 void GaussModel::Normalize()
@@ -156,10 +161,12 @@ bool get_gauss(unsigned int iLen,
 	params.Add("amp", dAmp, 0.5*dAmp);
 	params.Add("spread", dSpread, (dXMax-dXMin)*0.5);
 	params.Add("x0", dx0, 0.1*dx0);
+	params.Add("offs", dMin, 0.1*dMin);
 
 	//params.SetLimits("amp", 0., dMax*(sqrt(2.*M_PI)*fabs(dSpread)));
 	params.SetLowerLimit("spread", 0.);
 	params.SetLimits("x0", dXMin, dXMax);
+	params.SetLimits("offs", dMin, dMax);
 
 	bool bValidFit=false;
 	std::vector<ROOT::Minuit2::FunctionMinimum> minis;
@@ -169,6 +176,7 @@ bool get_gauss(unsigned int iLen,
 		//params.Fix("amp");
 		//params.Fix("spread");
 		params.Fix("x0");
+		params.Fix("offs");
 
 		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/0);
 		ROOT::Minuit2::FunctionMinimum mini = migrad();
@@ -188,8 +196,9 @@ bool get_gauss(unsigned int iLen,
 
 
 	{
-		// step 1.5: find amp
+		// step 1.5: find amp & offs
 		params.Release("amp");
+		params.Release("offs");
 		params.Fix("spread");
 		params.Fix("x0");
 
@@ -201,6 +210,9 @@ bool get_gauss(unsigned int iLen,
 		{
 			params.SetValue("amp", mini.UserState().Value("amp"));
 			params.SetError("amp", mini.UserState().Error("amp"));
+
+			params.SetValue("offs", mini.UserState().Value("offs"));
+			params.SetError("offs", mini.UserState().Error("offs"));
 		}
 
 		minis.push_back(mini);
@@ -237,6 +249,7 @@ bool get_gauss(unsigned int iLen,
 		params.RemoveLimits("amp");
 		params.RemoveLimits("spread");
 		params.RemoveLimits("x0");
+		params.RemoveLimits("offs");
 
 		ROOT::Minuit2::MnMigrad migrad3(fkt, params, /*MINUIT_STRATEGY*/2);
 		ROOT::Minuit2::FunctionMinimum mini3 = migrad3();
@@ -252,10 +265,12 @@ bool get_gauss(unsigned int iLen,
 	dAmp = lastmini.UserState().Value("amp");
 	dSpread = lastmini.UserState().Value("spread");
 	dx0 = lastmini.UserState().Value("x0");
+	double doffs =lastmini.UserState().Value("offs");
 
 	double dAmpErr = lastmini.UserState().Error("amp");
 	double dSpreadErr = lastmini.UserState().Error("spread");
 	double dx0Err = lastmini.UserState().Error("x0");
+	double doffserr =lastmini.UserState().Error("offs");
 
 
 	dSpread = fabs(dSpread);
@@ -282,7 +297,7 @@ bool get_gauss(unsigned int iLen,
 	}*/
 
 	
-	*pmodel = new GaussModel(dAmp, dSpread, dx0, dAmpErr, dSpreadErr, dx0Err, bNormalized);
+	*pmodel = new GaussModel(dAmp, dSpread, dx0, dAmpErr, dSpreadErr, dx0Err, bNormalized, doffs, doffserr);
 	(*pmodel)->Normalize();
 
 	return bValidFit;
