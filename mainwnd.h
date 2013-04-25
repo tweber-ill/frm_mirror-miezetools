@@ -72,6 +72,7 @@ protected slots:
 	void QuickFitMIEZEpixel();
 	void QuickFitGauss();
 	void QuickFitDoubleGauss();
+	void BezierInterpolation();
 
 	void ShowAbout();
 	void ShowBrowser();

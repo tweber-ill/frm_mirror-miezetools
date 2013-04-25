@@ -203,7 +203,30 @@ void Plot::plot(unsigned int iNum, const double *px, const double *py, const dou
 	RefreshStatusMsgs();
 }
 
-void Plot::plotfit(const FunctionModel& fkt)
+void Plot::plot_param(const FunctionModel_param& fkt)
+{
+	clearfit();
+	const uint iCnt = 512;
+
+	PlotObj pltobj;
+	pltobj.plttype = PLOT_FIT;
+	pltobj.strName = "interpolation";
+	Data1& dat = pltobj.dat;
+
+	dat.SetLength(iCnt);
+	for(uint iX=0; iX<iCnt; ++iX)
+	{
+		double dT = double(iX)/double(iCnt-1);
+		boost::numeric::ublas::vector<double> vec = fkt(dT);
+
+		dat.SetX(iX, vec[0]);
+		dat.SetY(iX, vec[1]);
+	}
+
+	m_vecObjs.push_back(pltobj);
+}
+
+void Plot::plot_fkt(const FunctionModel& fkt)
 {
 	clearfit();
 	const uint iCnt = 512;

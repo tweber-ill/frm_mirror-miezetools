@@ -18,6 +18,7 @@
 
 #include "gauss.h"
 #include "../chi2.h"
+#include "../../helper/misc.h"
 
 //----------------------------------------------------------------------
 // see: http://mathworld.wolfram.com/GaussianFunction.html
@@ -222,6 +223,7 @@ bool get_gauss(unsigned int iLen,
 		params.Release("amp");
 		params.Release("spread");
 		params.Release("x0");
+		params.Release("offs");
 
 		ROOT::Minuit2::MnMigrad migrad2(fkt, params, /*MINUIT_STRATEGY*/1);
 		ROOT::Minuit2::FunctionMinimum mini2 = migrad2();

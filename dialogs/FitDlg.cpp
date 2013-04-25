@@ -460,7 +460,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 
 	if(pFkt)
 	{
-		res.pPlot->plotfit(*pFkt);
+		res.pPlot->plot_fkt(*pFkt);
 		res.pPlot->repaint();
 		res.bOk = 1;
 
@@ -699,7 +699,7 @@ void FitDlg::DoFit()
 						 UpdateHint(vecFittedNames[iParam], vecFittedParams[iParam], vecFittedErrs[iParam]);
 				 }
 
-				pPlot->plotfit(*pModel);
+				pPlot->plot_fkt(*pModel);
 				pPlot->repaint();
 
 				delete pModel;

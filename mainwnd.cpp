@@ -37,6 +37,7 @@
 
 #include "fitter/models/msin.h"
 #include "fitter/models/gauss.h"
+#include "fitter/models/interpolation.h"
 
 
 MiezeMainWnd::MiezeMainWnd()
@@ -117,6 +118,17 @@ MiezeMainWnd::MiezeMainWnd()
 
 	pMenuFit->addMenu(pMenuQuickFit);
 
+
+	pMenuFit->addSeparator();
+
+	QMenu *pMenuInterp = new QMenu(pMenuFit);
+	pMenuInterp->setTitle("Interpolation");
+
+	QAction *pInterpBezier = new QAction(this);
+	pInterpBezier->setText(QString::fromUtf8("Bézier Curve"));
+	pMenuInterp->addAction(pInterpBezier);
+
+	pMenuFit->addMenu(pMenuInterp);
 
 
 	// Tools
@@ -238,6 +250,8 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pQFitMiezeArea, SIGNAL(triggered()), this, SLOT(QuickFitMIEZEpixel()));
 	QObject::connect(pQFitGauss, SIGNAL(triggered()), this, SLOT(QuickFitGauss()));
 	QObject::connect(pQFitDGauss, SIGNAL(triggered()), this, SLOT(QuickFitDoubleGauss()));
+	QObject::connect(pInterpBezier, SIGNAL(triggered()), this, SLOT(BezierInterpolation()));
+
 
 	QObject::connect(pManageROI, SIGNAL(triggered()), this, SLOT(ROIManageTriggered()));
 	QObject::connect(pLoadROI, SIGNAL(triggered()), this, SLOT(ROILoadTriggered()));
@@ -876,6 +890,37 @@ void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
 		res.pPlot->setParent(m_pmdi);
 		AddSubWindow(res.pPlot);
 	}
+}
+
+void MiezeMainWnd::BezierInterpolation()
+{
+	SubWindowBase* pSWB = GetActivePlot();
+	if(!pSWB)
+	{
+		QMessageBox::critical(this, "Error", "No active plot.");
+		return;
+	}
+
+	if(pSWB->GetType() != PLOT_1D)
+	{
+		QMessageBox::critical(this, "Error", "Wrong data type, need 1D.");
+		return;
+	}
+
+	Plot *pPlot = (Plot*)pSWB;
+	const PlotObj& obj = pPlot->GetData(0);
+	const Data1& dat = obj.dat;
+
+	const double *px = ::vec_to_array(dat.GetX());
+	const double *py = ::vec_to_array(dat.GetY());
+
+	Bezier bezier(dat.GetLength(), px, py);
+	pPlot->plot_param(bezier);
+
+	delete[] px;
+	delete[] py;
+
+	pPlot->repaint();
 }
 
 void MiezeMainWnd::QuickFitMIEZEpixel()

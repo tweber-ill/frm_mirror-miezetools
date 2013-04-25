@@ -54,7 +54,8 @@ public:
 	virtual ~Plot();
 
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
-	void plotfit(const FunctionModel& fkt);
+	void plot_fkt(const FunctionModel& fkt);
+	void plot_param(const FunctionModel_param& fkt);
 
 	void clear();
 	void clearfit();
