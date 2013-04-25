@@ -89,6 +89,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QAction *pFit = new QAction(this);
 	pFit->setText("Fit Function...");
+	pFit->setShortcut(Qt::CTRL + Qt::Key_F);
 	pMenuFit->addAction(pFit);
 
 	QMenu *pMenuQuickFit = new QMenu(pMenuFit);
@@ -96,15 +97,23 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QAction *pQFitMieze = new QAction(this);
 	pQFitMieze->setText("MIEZE Sine Signal");
+	pQFitMieze->setShortcut(Qt::ALT + Qt::Key_M);
 	pMenuQuickFit->addAction(pQFitMieze);
 
 	QAction *pQFitMiezeArea = new QAction(this);
 	pQFitMiezeArea->setText("MIEZE Sine Signal (pixel-wise)");
+	pQFitMiezeArea->setShortcut(Qt::ALT + Qt::Key_P);
 	pMenuQuickFit->addAction(pQFitMiezeArea);
 
 	QAction *pQFitGauss = new QAction(this);
 	pQFitGauss->setText("Gaussian");
+	pQFitGauss->setShortcut(Qt::ALT + Qt::Key_G);
 	pMenuQuickFit->addAction(pQFitGauss);
+
+	QAction *pQFitDGauss = new QAction(this);
+	pQFitDGauss->setText("Double Gaussian");
+	pQFitDGauss->setShortcut(Qt::ALT + Qt::Key_D);
+	pMenuQuickFit->addAction(pQFitDGauss);
 
 	pMenuFit->addMenu(pMenuQuickFit);
 
@@ -228,6 +237,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pQFitMieze, SIGNAL(triggered()), this, SLOT(QuickFitMIEZE()));
 	QObject::connect(pQFitMiezeArea, SIGNAL(triggered()), this, SLOT(QuickFitMIEZEpixel()));
 	QObject::connect(pQFitGauss, SIGNAL(triggered()), this, SLOT(QuickFitGauss()));
+	QObject::connect(pQFitDGauss, SIGNAL(triggered()), this, SLOT(QuickFitDoubleGauss()));
 
 	QObject::connect(pManageROI, SIGNAL(triggered()), this, SLOT(ROIManageTriggered()));
 	QObject::connect(pLoadROI, SIGNAL(triggered()), this, SLOT(ROILoadTriggered()));
@@ -843,6 +853,7 @@ void MiezeMainWnd::ShowFitDlg()
 
 void MiezeMainWnd::QuickFitMIEZE() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MIEZE_SINE); }
 void MiezeMainWnd::QuickFitGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_GAUSSIAN); }
+void MiezeMainWnd::QuickFitDoubleGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_DOUBLE_GAUSSIAN); }
 
 void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
 {

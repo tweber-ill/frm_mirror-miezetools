@@ -451,6 +451,12 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 		bOk = ::get_gauss(dat.GetLength(), px, py, pyerr, &pModel);
 		pFkt = pModel;
 	}
+	else if(iFkt == FIT_DOUBLE_GAUSSIAN)
+	{
+		MultiGaussModel *pModel = 0;
+		bOk = ::get_doublegauss(dat.GetLength(), px, py, pyerr, &pModel);
+		pFkt = pModel;
+	}
 
 	if(pFkt)
 	{

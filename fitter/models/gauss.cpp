@@ -2,7 +2,7 @@
  * A gauss fitter using Minuit
  *
  * Author: Tobias Weber
- * Date: April 2012
+ * Date: April 2012, 25-apr-2013
  */
 
 #include <math.h>
@@ -194,7 +194,6 @@ bool get_gauss(unsigned int iLen,
 		minis.push_back(mini);
 	}
 
-
 	{
 		// step 1.5: find amp & offs
 		params.Release("amp");
@@ -298,6 +297,270 @@ bool get_gauss(unsigned int iLen,
 
 	
 	*pmodel = new GaussModel(dAmp, dSpread, dx0, dAmpErr, dSpreadErr, dx0Err, bNormalized, doffs, doffserr);
+	(*pmodel)->Normalize();
+
+	return bValidFit;
+}
+
+
+
+
+
+//----------------------------------------------------------------------
+// multi gauss model
+
+MultiGaussModel::MultiGaussModel(unsigned int iNumGausses)
+			: m_bNormalized(0), m_offs(0.), m_offserr(0.)
+{
+	this->m_vecParams.resize(iNumGausses);
+}
+
+MultiGaussModel::MultiGaussModel(const MultiGaussModel& model)
+{
+	this->operator=(model);
+}
+
+const MultiGaussModel& MultiGaussModel::operator=(const MultiGaussModel& model)
+{
+	this->m_bNormalized = model.m_bNormalized;
+	this->m_vecParams = model.m_vecParams;
+	this->m_offs = model.m_offs;
+	this->m_offserr = model.m_offserr;
+
+	return *this;
+}
+
+MultiGaussModel::~MultiGaussModel() {}
+
+double MultiGaussModel::GetMean(unsigned int iIdx) const { return m_vecParams[iIdx].m_x0; }
+double MultiGaussModel::GetSigma(unsigned int iIdx) const { return m_vecParams[iIdx].m_spread; }
+double MultiGaussModel::GetFWHM(unsigned int iIdx) const { return SIGMA2FWHM * m_vecParams[iIdx].m_spread; }
+double MultiGaussModel::GetHWHM(unsigned int iIdx) const { return SIGMA2HWHM * m_vecParams[iIdx].m_spread; }
+double MultiGaussModel::GetOffs() const { return m_offs; }
+double MultiGaussModel::GetAmp(unsigned int iIdx) const
+{
+	if(!m_bNormalized)
+		return m_vecParams[iIdx].m_amp;
+	else
+		return m_vecParams[iIdx].m_amp/sqrt(2.*M_PI*fabs(GetSigma(iIdx)));
+}
+
+double MultiGaussModel::GetMeanErr(unsigned int iIdx) const { return m_vecParams[iIdx].m_x0err; }
+double MultiGaussModel::GetSigmaErr(unsigned int iIdx) const { return m_vecParams[iIdx].m_spreaderr; }
+double MultiGaussModel::GetFWHMErr(unsigned int iIdx) const { return SIGMA2FWHM * m_vecParams[iIdx].m_spreaderr; }
+double MultiGaussModel::GetHWHMErr(unsigned int iIdx) const { return SIGMA2HWHM * m_vecParams[iIdx].m_spreaderr; }
+double MultiGaussModel::GetOffsErr() const { return m_offserr; }
+double MultiGaussModel::GetAmpErr(unsigned int iIdx) const { return m_vecParams[iIdx].m_amperr; }
+
+
+std::string MultiGaussModel::print(bool bFillInSyms) const
+{
+	std::ostringstream ostr;
+	if(bFillInSyms)
+	{
+		for(unsigned int i=0; i<m_vecParams.size(); ++i)
+		{
+			ostr << m_vecParams[i].m_amp;
+			if(m_bNormalized)
+				ostr << "/sqrt(2*pi * " << m_vecParams[i].m_spread << ")";
+			ostr << " * exp(-0.5 * ((x-" << m_vecParams[i].m_x0 << ")/"
+				 << m_vecParams[i].m_spread << ")**2) + ";
+		}
+
+		ostr << m_offs;
+	}
+	else
+	{
+		for(unsigned int i=0; i<m_vecParams.size(); ++i)
+		{
+			ostr << "amp_" << i;
+			if(m_bNormalized)
+				ostr << "/sqrt(2*pi * sigma_"<<i<<")";
+			ostr << " * exp(-0.5 * ((x-x0_" <<i<<") / sigma_"<<i<<")**2) + ";
+		}
+
+		ostr << "offs";
+	}
+	return ostr.str();
+}
+
+bool MultiGaussModel::SetParams(const std::vector<double>& vecParams)
+{
+	for(unsigned int i=0; i<m_vecParams.size(); ++i)
+	{
+		m_vecParams[i].m_amp = vecParams[i + 0];
+		m_vecParams[i].m_spread = vecParams[i + 1];
+		m_vecParams[i].m_x0 = vecParams[i + 2];
+	}
+	m_offs = vecParams[vecParams.size()-1];
+
+	return true;
+}
+
+double MultiGaussModel::operator()(double x) const
+{
+	double *dNorm = new double[m_vecParams.size()];
+
+	if(m_bNormalized)
+	{
+		for(unsigned int i=0; i<m_vecParams.size(); ++i)
+			dNorm[i] = 1./(sqrt(2.*M_PI*fabs(m_vecParams[i].m_spread)));
+	}
+	else
+	{
+		for(unsigned int i=0; i<m_vecParams.size(); ++i)
+			dNorm[i] = 1.;
+	}
+
+	double dRes = 0.;
+
+	for(unsigned int i=0; i<m_vecParams.size(); ++i)
+		dRes += m_vecParams[i].m_amp * dNorm[i]
+		* exp(-0.5 * ((x-m_vecParams[i].m_x0)/m_vecParams[i].m_spread)*((x-m_vecParams[i].m_x0)/m_vecParams[i].m_spread));
+
+	dRes += m_offs;
+
+	delete[] dNorm;
+	return dRes;
+}
+
+FunctionModel* MultiGaussModel::copy() const
+{
+	return new MultiGaussModel(*this);
+}
+
+void MultiGaussModel::Normalize()
+{
+	if(!m_bNormalized)
+	{
+		// normalize
+		// a' = a*sqrt(2*pi*s)
+		// da' = da*sqrt(2*pi*s) + a*sqrt(2*pi) * dsqrt(s)
+		// da' = da*sqrt(2*pi*s) + a*sqrt(2*pi) * 0.5*s^(-1/2)*ds
+		for(unsigned int i=0; i<m_vecParams.size(); ++i)
+		{
+			m_vecParams[i].m_amperr = sqrt(pow(m_vecParams[i].m_amperr*sqrt(2.*M_PI*m_vecParams[i].m_spread), 2.) +
+					pow(m_vecParams[i].m_amp*sqrt(2.*M_PI) * 0.5 * 1./sqrt(m_vecParams[i].m_spread)*m_vecParams[i].m_spreaderr, 2.));
+			m_vecParams[i].m_amp *= sqrt(2.*M_PI*fabs(m_vecParams[i].m_spread));
+		}
+
+		m_bNormalized = true;
+	}
+}
+
+
+bool get_doublegauss(unsigned int iLen,
+					const double *px, const double *py, const double *pdy,
+					MultiGaussModel **pmodel)
+{
+	MultiGaussModel gmod(2);
+	Chi2Function fkt(&gmod, iLen, px, py, pdy);
+
+	typedef std::pair<const double*, const double*> t_minmax;
+	t_minmax minmax_x = boost::minmax_element(px, px+iLen);
+	t_minmax minmax_y = boost::minmax_element(py, py+iLen);
+
+	const double dXMin = *minmax_x.first;
+	const double dXMax = *minmax_x.second;
+
+	const double *pdMax = minmax_y.second;
+	const double dMin = *minmax_y.first;
+	double dMax = *pdMax;
+	int iMaxPos = int(pdMax-py);
+
+	if(dMax==dMin)
+	{
+		std::cerr << "Error: min == max, won't try fitting!" << std::endl;
+		return 0;
+	}
+
+	// TODO
+
+	ROOT::Minuit2::MnUserParameters params;
+	params.Add("amp_0", 1338.-747., 1338./10.);
+	params.Add("spread_0", 1., 1./10.);
+	params.Add("x0_0", 102.3, 102.3/10.);
+
+	params.Add("amp_1", 900.-747., 900./10.);
+	params.Add("spread_1", 1.5, 1.5/10.);
+	params.Add("x0_1", 110., 110./10.);
+
+	params.Add("offs", 747., 747./10.);
+
+	//params.Fix("amp_0");
+	//params.Fix("spread_0");
+	//params.Fix("x0_0");
+
+	params.Fix("amp_1");
+	params.Fix("spread_1");
+	params.Fix("x0_1");
+
+	bool bValidFit=false;
+	std::vector<ROOT::Minuit2::FunctionMinimum> minis;
+
+	{
+		ROOT::Minuit2::MnMigrad migrad3(fkt, params, /*MINUIT_STRATEGY*/2);
+		ROOT::Minuit2::FunctionMinimum mini3 = migrad3();
+		bValidFit = mini3.IsValid() && mini3.HasValidParameters();
+
+		minis.push_back(mini3);
+	}
+
+
+	const ROOT::Minuit2::FunctionMinimum& lastmini = *minis.rbegin();
+
+
+	std::vector<MultiGaussParams> vecMultiParams;
+	vecMultiParams.resize(2);
+
+	for(unsigned int iPara=0; iPara<vecMultiParams.size(); ++iPara)
+	{
+		std::ostringstream ostrPara;
+		ostrPara << iPara;
+		std::string strPara = ostrPara.str();
+
+		vecMultiParams[iPara].m_amp = lastmini.UserState().Value("amp_" + strPara);
+		vecMultiParams[iPara].m_spread = lastmini.UserState().Value("spread_" + strPara);
+		vecMultiParams[iPara].m_x0 = lastmini.UserState().Value("x0_" + strPara);
+
+		vecMultiParams[iPara].m_amperr = lastmini.UserState().Error("amp_" + strPara);
+		vecMultiParams[iPara].m_spreaderr = lastmini.UserState().Error("spread_" + strPara);
+		vecMultiParams[iPara].m_x0err = lastmini.UserState().Error("x0_" + strPara);
+
+
+
+		vecMultiParams[iPara].m_spread = fabs(vecMultiParams[iPara].m_spread);
+
+		vecMultiParams[iPara].m_amperr = fabs(vecMultiParams[iPara].m_amperr);
+		vecMultiParams[iPara].m_spreaderr = fabs(vecMultiParams[iPara].m_spreaderr);
+		vecMultiParams[iPara].m_x0err = fabs(vecMultiParams[iPara].m_x0err);
+	}
+
+	double doffs =lastmini.UserState().Value("offs");
+	double doffserr =lastmini.UserState().Error("offs");
+	bool bNormalized = gmod.IsNormalized();
+
+
+	{
+		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
+		unsigned int uiMini=0;
+		for(const auto& mini : minis)
+		{
+			std::cerr << "result of double-gauss fit step " << (++uiMini) << std::endl;
+			std::cerr << "==========================" << std::endl;
+			std::cerr << mini << std::endl;
+		}
+
+		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
+		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
+	}
+
+
+	*pmodel = new MultiGaussModel(gmod);
+	(*pmodel)->m_vecParams = vecMultiParams;
+	(*pmodel)->m_offs = doffs;
+	(*pmodel)->m_offserr = doffserr;
+	(*pmodel)->m_bNormalized = bNormalized;
 	(*pmodel)->Normalize();
 
 	return bValidFit;

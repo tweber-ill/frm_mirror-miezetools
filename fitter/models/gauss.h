@@ -50,8 +50,69 @@ class GaussModel : public FunctionModel
 		bool IsNormalized() const { return m_bNormalized; }
 };
 
+
+struct MultiGaussParams
+{
+	double m_amp, m_spread, m_x0;
+	double m_amperr, m_spreaderr, m_x0err;
+
+	MultiGaussParams()
+	{
+		m_amp = m_spread = m_x0 = 0.;
+		m_amperr = m_spreaderr = m_x0err = 0.;
+	}
+};
+
+// multi gauss model
+class MultiGaussModel : public FunctionModel
+{
+	protected:
+		bool m_bNormalized;
+		std::vector<MultiGaussParams> m_vecParams;
+		double m_offs, m_offserr;
+
+	public:
+		MultiGaussModel(unsigned int iNumGausses);
+		MultiGaussModel(const MultiGaussModel& gauss);
+		const MultiGaussModel& operator=(const MultiGaussModel& gauss);
+		virtual ~MultiGaussModel();
+
+		virtual bool SetParams(const std::vector<double>& vecParams);
+		virtual double operator()(double x) const;
+		virtual FunctionModel* copy() const;
+		virtual std::string print(bool bFillInSyms=true) const;
+
+		double GetMean(unsigned int iNum) const;
+		double GetSigma(unsigned int iNum) const;
+		double GetFWHM(unsigned int iNum) const;
+		double GetHWHM(unsigned int iNum) const;
+		double GetAmp(unsigned int iNum) const;
+		double GetOffs() const;
+
+		double GetMeanErr(unsigned int iNum) const;
+		double GetSigmaErr(unsigned int iNum) const;
+		double GetFWHMErr(unsigned int iNum) const;
+		double GetHWHMErr(unsigned int iNum) const;
+		double GetAmpErr(unsigned int iNum) const;
+		double GetOffsErr() const;
+
+		unsigned int GetNumGausses() const { return m_vecParams.size(); }
+
+		void Normalize();
+		bool IsNormalized() const { return m_bNormalized; }
+
+		friend bool get_doublegauss(unsigned int iLen,
+				const double *px, const double *py, const double *pdy,
+				MultiGaussModel **pmodel);
+};
+
+
 bool get_gauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
 					GaussModel **pmodel);
+
+bool get_doublegauss(unsigned int iLen,
+					const double *px, const double *py, const double *pdy,
+					MultiGaussModel **pmodel);
 
 #endif
