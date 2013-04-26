@@ -31,6 +31,13 @@ void SettingsDlg::accept()
 void SettingsDlg::LoadSettings()
 {
 	// --------------------------------------------------------------------------------
+	// General
+	checkSortX->setChecked(Settings::Get<int>("general/sort_x"));
+	spinSpline->setValue(Settings::Get<int>("interpolation/spline_degree"));
+	// --------------------------------------------------------------------------------
+
+
+	// --------------------------------------------------------------------------------
 	// MIEZE
 	spinNumOsc->setValue(Settings::Get<double>("mieze/num_osc"));
 	// --------------------------------------------------------------------------------
@@ -64,6 +71,13 @@ void SettingsDlg::LoadSettings()
 
 void SettingsDlg::SaveSettings()
 {
+	// --------------------------------------------------------------------------------
+	// General
+	Settings::Set<int>("general/sort_x", checkSortX->isChecked());
+	Settings::Set<int>("interpolation/spline_degree", spinSpline->value());
+	// --------------------------------------------------------------------------------
+
+
 	// --------------------------------------------------------------------------------
 	// MIEZE
 	Settings::Set<double>("mieze/num_osc", spinNumOsc->value());

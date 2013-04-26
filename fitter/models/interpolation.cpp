@@ -70,10 +70,10 @@ BSpline::BSpline(unsigned int N, const double *px, const double *py, unsigned in
 	//for(unsigned int i=0; i<iM; ++i)
 	//	m_vecKnots[i] = double(i) / double(iM-1);
 
-	std::cout << "knots: ";
+	/*std::cout << "knots: ";
 	for(double d: m_vecKnots)
 		std::cout << d << " ";
-	std::cout << std::endl;
+	std::cout << std::endl;*/
 }
 
 BSpline::~BSpline()

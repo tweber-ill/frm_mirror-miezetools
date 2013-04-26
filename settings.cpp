@@ -39,6 +39,13 @@ void Settings::SetDefaults()
 	QStringList keys = s_pGlobals->allKeys();
 
 	// --------------------------------------------------------------------------------
+	// General
+	if(!keys.contains("general/sort_x")) s_pGlobals->setValue("general/sort_x", 1);
+	if(!keys.contains("interpolation/spline_degree")) s_pGlobals->setValue("interpolation/spline_degree", 3);
+	// --------------------------------------------------------------------------------
+
+
+	// --------------------------------------------------------------------------------
 	// MIEZE
 	if(!keys.contains("mieze/num_osc")) s_pGlobals->setValue("mieze/num_osc", 2.);
 	// --------------------------------------------------------------------------------

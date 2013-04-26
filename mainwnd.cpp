@@ -452,6 +452,14 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 				const double *pdy = pdat1d->GetColumn(iY);
 				const double *pdyerr = pdat1d->GetColumn(iYErr);
 
+				if(Settings::Get<int>("general/sort_x"))
+				{
+					::sort_3<double>((double*)pdx,
+												(double*)pdx+pdat1d->GetDim(),
+												(double*)pdy,
+												(double*)pdyerr);
+				}
+
 				std::string strTitle = GetPlotTitle(strFileNoDir);
 
 				Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
@@ -601,6 +609,14 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			const double *pdy = pnicosdat->GetColumn(iY);
 			double *pdyerr = new double[pnicosdat->GetDim()];
 			::apply_fkt<double>(pdy, pdyerr, sqrt, pnicosdat->GetDim());
+
+			if(Settings::Get<int>("general/sort_x"))
+			{
+				::sort_3<double>((double*)pdx,
+											(double*)pdx+pnicosdat->GetDim(),
+											(double*)pdy,
+											pdyerr);
+			}
 
 			std::string strTitle = GetPlotTitle(strFileNoDir);
 
@@ -923,7 +939,9 @@ void MiezeMainWnd::Interpolation(SubWindowBase* pSWB, InterpFkt iFkt)
 	}
 	else if(iFkt == INTERP_BSPLINE)
 	{
-		BSpline spline(dat.GetLength(), px, py);
+		const int iDegree = Settings::Get<int>("interpolation/spline_degree");
+
+		BSpline spline(dat.GetLength(), px, py, iDegree);
 		pPlot->plot_param(spline);
 	}
 	else
