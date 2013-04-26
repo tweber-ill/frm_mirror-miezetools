@@ -128,6 +128,10 @@ MiezeMainWnd::MiezeMainWnd()
 	pInterpBezier->setText(QString::fromUtf8("Bézier Curve"));
 	pMenuInterp->addAction(pInterpBezier);
 
+	QAction *pInterpBSpline = new QAction(this);
+	pInterpBSpline->setText(QString::fromUtf8("B-Spline"));
+	pMenuInterp->addAction(pInterpBSpline);
+
 	pMenuFit->addMenu(pMenuInterp);
 
 
@@ -251,7 +255,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pQFitGauss, SIGNAL(triggered()), this, SLOT(QuickFitGauss()));
 	QObject::connect(pQFitDGauss, SIGNAL(triggered()), this, SLOT(QuickFitDoubleGauss()));
 	QObject::connect(pInterpBezier, SIGNAL(triggered()), this, SLOT(BezierInterpolation()));
-
+	QObject::connect(pInterpBSpline, SIGNAL(triggered()), this, SLOT(BSplineInterpolation()));
 
 	QObject::connect(pManageROI, SIGNAL(triggered()), this, SLOT(ROIManageTriggered()));
 	QObject::connect(pLoadROI, SIGNAL(triggered()), this, SLOT(ROILoadTriggered()));
@@ -892,9 +896,8 @@ void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
 	}
 }
 
-void MiezeMainWnd::BezierInterpolation()
+void MiezeMainWnd::Interpolation(SubWindowBase* pSWB, InterpFkt iFkt)
 {
-	SubWindowBase* pSWB = GetActivePlot();
 	if(!pSWB)
 	{
 		QMessageBox::critical(this, "Error", "No active plot.");
@@ -908,20 +911,35 @@ void MiezeMainWnd::BezierInterpolation()
 	}
 
 	Plot *pPlot = (Plot*)pSWB;
-	const PlotObj& obj = pPlot->GetData(0);
-	const Data1& dat = obj.dat;
+	const Data1& dat = pPlot->GetData(0).dat;
 
 	const double *px = ::vec_to_array(dat.GetX());
 	const double *py = ::vec_to_array(dat.GetY());
 
-	Bezier bezier(dat.GetLength(), px, py);
-	pPlot->plot_param(bezier);
+	if(iFkt == INTERP_BEZIER)
+	{
+		Bezier bezier(dat.GetLength(), px, py);
+		pPlot->plot_param(bezier);
+	}
+	else if(iFkt == INTERP_BSPLINE)
+	{
+		BSpline spline(dat.GetLength(), px, py);
+		pPlot->plot_param(spline);
+	}
+	else
+	{
+		QMessageBox::critical(this, "Error", "Unknown interpolation function.");
+	}
 
 	delete[] px;
 	delete[] py;
 
 	pPlot->repaint();
 }
+
+void MiezeMainWnd::BSplineInterpolation() { Interpolation(GetActivePlot(), INTERP_BSPLINE); }
+void MiezeMainWnd::BezierInterpolation() { Interpolation(GetActivePlot(), INTERP_BEZIER); }
+
 
 void MiezeMainWnd::QuickFitMIEZEpixel()
 {

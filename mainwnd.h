@@ -5,6 +5,9 @@
  * @date 04-mar-2013
  */
 
+#ifndef __MAINWND_H__
+#define __MAINWND_H__
+
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
 #include <QtGui/QLabel>
@@ -21,9 +24,11 @@
 #include "dialogs/RoiDlg.h"
 #include "dialogs/FitDlg.h"
 
-
-#ifndef __MAINWND_H__
-#define __MAINWND_H__
+enum InterpFkt
+{
+	INTERP_BEZIER = 0,
+	INTERP_BSPLINE
+};
 
 class MiezeMainWnd : public QMainWindow
 { Q_OBJECT
@@ -72,7 +77,10 @@ protected slots:
 	void QuickFitMIEZEpixel();
 	void QuickFitGauss();
 	void QuickFitDoubleGauss();
+
+	void Interpolation(SubWindowBase* pSWB, InterpFkt iFkt);
 	void BezierInterpolation();
+	void BSplineInterpolation();
 
 	void ShowAbout();
 	void ShowBrowser();
