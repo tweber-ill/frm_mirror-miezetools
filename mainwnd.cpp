@@ -14,6 +14,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStatusBar>
+#include <QtCore/QSignalMapper>
 
 #include <iostream>
 #include <fstream>
@@ -62,6 +63,10 @@ MiezeMainWnd::MiezeMainWnd()
 	pLoad->setIcon(QIcon::fromTheme("document-open"));
 	pLoad->setShortcut(Qt::CTRL + Qt::Key_L);
 	pMenuFile->addAction(pLoad);
+
+	m_pMenuLoadRecent = new QMenu(this);
+	m_pMenuLoadRecent->setTitle("Open Recent");
+	pMenuFile->addMenu(m_pMenuLoadRecent);
 
 	QAction *pCloseAll = new QAction(this);
 	pCloseAll->setText("Close All");
@@ -275,6 +280,8 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QObject::connect(m_proidlg, SIGNAL(NewRoiAvailable(const Roi*)), this, SLOT(NewRoiAvailable(const Roi*)));
 	//--------------------------------------------------------------------------------
+
+	LoadRecentFileList();
 }
 
 MiezeMainWnd::~MiezeMainWnd()
@@ -639,10 +646,13 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			strErr += strFile.c_str();
 			strErr += "\".";
 			QMessageBox::critical(this, "Error", "Unknown data format.");
+			delete pdat;
+			return;
 		}
-
 		delete pdat;
 	}
+
+	AddRecentFile(QString(strFile.c_str()));
 }
 
 std::string MiezeMainWnd::GetPlotTitle(const std::string& strFile)
@@ -1022,6 +1032,53 @@ void MiezeMainWnd::ShowBrowser()
 #else
 	QMessageBox::information(this, "Unsupported", "This is not the right operating system\nfor such nonsense.");
 #endif
+}
+
+void MiezeMainWnd::AddRecentFile(const QString& strFile)
+{
+	m_lstRecentFiles.push_front(strFile);
+	m_lstRecentFiles.removeDuplicates();
+
+	if(m_lstRecentFiles.size() > MAX_RECENT_FILES)
+	{
+		QStringList::iterator iter = m_lstRecentFiles.begin();
+		for(unsigned int i=0; i<MAX_RECENT_FILES; ++i) ++iter;
+		m_lstRecentFiles.erase(iter, m_lstRecentFiles.end());
+	}
+
+	Settings::Set<QStringList>("general/recent_files", m_lstRecentFiles);
+	UpdateRecentFileMenu();
+}
+
+void MiezeMainWnd::UpdateRecentFileMenu()
+{
+	m_pMenuLoadRecent->clear();
+
+	for(QStringList::iterator iter=m_lstRecentFiles.begin(); iter!=m_lstRecentFiles.end(); ++iter)
+	{
+		QAction *pRec = new QAction(this);
+		pRec->setText(*iter);
+		m_pMenuLoadRecent->addAction(pRec);
+
+		QSignalMapper *pSigs = new QSignalMapper(this);
+		pSigs->setMapping(pRec, pRec->text());
+		QObject::connect(pRec, SIGNAL(triggered()), pSigs, SLOT(map()));
+		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), this, SLOT(LoadFile(const QString&)));
+	}
+}
+
+void MiezeMainWnd::LoadRecentFileList()
+{
+	m_lstRecentFiles = Settings::Get<QStringList>("general/recent_files");
+	m_lstRecentFiles.removeDuplicates();
+
+	UpdateRecentFileMenu();
+}
+
+void MiezeMainWnd::LoadFile(const QString& strFile)
+{
+	m_strLastXColumn = "";
+	LoadFile(strFile.toStdString());
 }
 
 #include "mainwnd.moc"

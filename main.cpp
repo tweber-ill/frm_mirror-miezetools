@@ -14,7 +14,7 @@
 static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 {
 	for(int iFile=0; iFile<iNum; ++iFile)
-		wnd.LoadFile(pcFiles[iFile]);
+		wnd.LoadFile(std::string(pcFiles[iFile]));
 }
 
 int main(int argc, char **argv)

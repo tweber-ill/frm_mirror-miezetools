@@ -24,6 +24,8 @@
 #include "dialogs/RoiDlg.h"
 #include "dialogs/FitDlg.h"
 
+#define MAX_RECENT_FILES 16
+
 enum InterpFkt
 {
 	INTERP_BEZIER = 0,
@@ -56,6 +58,12 @@ protected:
 	Roi m_mainROI;
 
 	std::string m_strLastXColumn;
+
+	QStringList m_lstRecentFiles;
+	QMenu *m_pMenuLoadRecent;
+	void LoadRecentFileList();
+	void UpdateRecentFileMenu();
+	void AddRecentFile(const QString& strFile);
 
 protected slots:
 	void SubWindowChanged();
@@ -97,6 +105,7 @@ public:
 public slots:
 	void SetStatusMsg(const char* pcMsg, int iPos);
 	void AddSubWindow(SubWindowBase* pWnd);
+	void LoadFile(const QString& strFile);
 };
 
 #endif
