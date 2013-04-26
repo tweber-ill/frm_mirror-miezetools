@@ -468,7 +468,6 @@ bool get_doublegauss(unsigned int iLen,
 	const double *pdMax = minmax_y.second;
 	const double dMin = *minmax_y.first;
 	double dMax = *pdMax;
-	int iMaxPos = int(pdMax-py);
 
 	if(dMax==dMin)
 	{
@@ -476,38 +475,160 @@ bool get_doublegauss(unsigned int iLen,
 		return 0;
 	}
 
-	// TODO
-
 	ROOT::Minuit2::MnUserParameters params;
-	params.Add("amp_0", 1338.-747., 1338./10.);
-	params.Add("spread_0", 1., 1./10.);
-	params.Add("x0_0", 102.3, 102.3/10.);
+	params.Add("amp_0", 322.-80., 50.);
+	params.Add("spread_0", FWHM2SIGMA*0.08, FWHM2SIGMA*0.01);
+	params.Add("x0_0", 0.01, 0.01);
 
-	params.Add("amp_1", 900.-747., 900./10.);
-	params.Add("spread_1", 1.5, 1.5/10.);
-	params.Add("x0_1", 110., 110./10.);
+	params.Add("amp_1", 275.-80., 50.);
+	params.Add("spread_1", FWHM2SIGMA*0.04, FWHM2SIGMA*0.01);
+	params.Add("x0_1", 0.13, 0.01);
 
-	params.Add("offs", 747., 747./10.);
+	params.Add("offs", 78., 78./10.);
 
-	//params.Fix("amp_0");
-	//params.Fix("spread_0");
-	//params.Fix("x0_0");
 
-	params.Fix("amp_1");
-	params.Fix("spread_1");
-	params.Fix("x0_1");
+	params.SetLimits("offs", dMin, dMax);
+	params.SetLimits("amp_0", dMin, dMax);
+	params.SetLimits("amp_1", dMin, dMax);
+	params.SetLowerLimit("spread_0", 0.);
+	params.SetLowerLimit("spread_1", 0.);
+
 
 	bool bValidFit=false;
 	std::vector<ROOT::Minuit2::FunctionMinimum> minis;
 
 	{
-		ROOT::Minuit2::MnMigrad migrad3(fkt, params, /*MINUIT_STRATEGY*/2);
-		ROOT::Minuit2::FunctionMinimum mini3 = migrad3();
-		bValidFit = mini3.IsValid() && mini3.HasValidParameters();
+		params.Fix("amp_1");
+		params.Fix("spread_1");
+		params.Fix("x0_1");
 
-		minis.push_back(mini3);
+		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
+		ROOT::Minuit2::FunctionMinimum mini = migrad();
+		bValidFit = mini.IsValid() && mini.HasValidParameters();
+
+		params.SetValue("amp_0", mini.UserState().Value("amp_0"));
+		params.SetError("amp_0", mini.UserState().Error("amp_0"));
+
+		params.SetValue("spread_0", mini.UserState().Value("spread_0"));
+		params.SetError("spread_0", mini.UserState().Error("spread_0"));
+
+		params.SetValue("x0_0", mini.UserState().Value("x0_0"));
+		params.SetError("x0_0", mini.UserState().Error("x0_0"));
+
+		params.SetValue("offs", mini.UserState().Value("offs"));
+		params.SetError("offs", mini.UserState().Error("offs"));
+
+		minis.push_back(mini);
 	}
 
+
+	{
+		params.Fix("amp_0");
+		params.Fix("spread_0");
+		params.Fix("x0_0");
+		params.Fix("offs");
+
+		params.Release("amp_1");
+		params.Release("spread_1");
+		params.Release("x0_1");
+
+		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
+		ROOT::Minuit2::FunctionMinimum mini = migrad();
+		bValidFit = mini.IsValid() && mini.HasValidParameters();
+
+		params.SetValue("amp_1", mini.UserState().Value("amp_1"));
+		params.SetError("amp_1", mini.UserState().Error("amp_1"));
+
+		params.SetValue("spread_1", mini.UserState().Value("spread_1"));
+		params.SetError("spread_1", mini.UserState().Error("spread_1"));
+
+		params.SetValue("x0_1", mini.UserState().Value("x0_1"));
+		params.SetError("x0_1", mini.UserState().Error("x0_1"));
+
+		minis.push_back(mini);
+	}
+
+
+	{
+		params.Release("amp_0");
+		params.Release("spread_0");
+		params.Release("x0_0");
+
+		params.Release("amp_1");
+		params.Release("spread_1");
+		params.Release("x0_1");
+
+		params.Release("offs");
+
+
+		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
+		ROOT::Minuit2::FunctionMinimum mini = migrad();
+		bValidFit = mini.IsValid() && mini.HasValidParameters();
+
+		params.SetValue("amp_0", mini.UserState().Value("amp_0"));
+		params.SetError("amp_0", mini.UserState().Error("amp_0"));
+
+		params.SetValue("spread_0", mini.UserState().Value("spread_0"));
+		params.SetError("spread_0", mini.UserState().Error("spread_0"));
+
+		params.SetValue("x0_0", mini.UserState().Value("x0_0"));
+		params.SetError("x0_0", mini.UserState().Error("x0_0"));
+
+		params.SetValue("amp_1", mini.UserState().Value("amp_1"));
+		params.SetError("amp_1", mini.UserState().Error("amp_1"));
+
+		params.SetValue("spread_1", mini.UserState().Value("spread_1"));
+		params.SetError("spread_1", mini.UserState().Error("spread_1"));
+
+		params.SetValue("x0_1", mini.UserState().Value("x0_1"));
+		params.SetError("x0_1", mini.UserState().Error("x0_1"));
+
+		params.SetValue("offs", mini.UserState().Value("offs"));
+		params.SetError("offs", mini.UserState().Error("offs"));
+
+		minis.push_back(mini);
+	}
+
+
+	{
+		params.RemoveLimits("amp_0");
+		params.RemoveLimits("spread_0");
+		params.RemoveLimits("x0_0");
+
+		params.RemoveLimits("amp_1");
+		params.RemoveLimits("spread_1");
+		params.RemoveLimits("x0_1");
+
+		params.RemoveLimits("offs");
+
+
+		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
+		ROOT::Minuit2::FunctionMinimum mini = migrad();
+		bValidFit = mini.IsValid() && mini.HasValidParameters();
+
+		params.SetValue("amp_0", mini.UserState().Value("amp_0"));
+		params.SetError("amp_0", mini.UserState().Error("amp_0"));
+
+		params.SetValue("spread_0", mini.UserState().Value("spread_0"));
+		params.SetError("spread_0", mini.UserState().Error("spread_0"));
+
+		params.SetValue("x0_0", mini.UserState().Value("x0_0"));
+		params.SetError("x0_0", mini.UserState().Error("x0_0"));
+
+		params.SetValue("amp_1", mini.UserState().Value("amp_1"));
+		params.SetError("amp_1", mini.UserState().Error("amp_1"));
+
+		params.SetValue("spread_1", mini.UserState().Value("spread_1"));
+		params.SetError("spread_1", mini.UserState().Error("spread_1"));
+
+		params.SetValue("x0_1", mini.UserState().Value("x0_1"));
+		params.SetError("x0_1", mini.UserState().Error("x0_1"));
+
+		params.SetValue("offs", mini.UserState().Value("offs"));
+		params.SetError("offs", mini.UserState().Error("offs"));
+
+		minis.push_back(mini);
+	}
 
 	const ROOT::Minuit2::FunctionMinimum& lastmini = *minis.rbegin();
 
