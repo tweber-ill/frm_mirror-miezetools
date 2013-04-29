@@ -390,9 +390,9 @@ bool MultiGaussModel::SetParams(const std::vector<double>& vecParams)
 {
 	for(unsigned int i=0; i<m_vecParams.size(); ++i)
 	{
-		m_vecParams[i].m_amp = vecParams[i + 0];
-		m_vecParams[i].m_spread = vecParams[i + 1];
-		m_vecParams[i].m_x0 = vecParams[i + 2];
+		m_vecParams[i].m_amp = vecParams[i*3 + 0];
+		m_vecParams[i].m_spread = vecParams[i*3 + 1];
+		m_vecParams[i].m_x0 = vecParams[i*3 + 2];
 	}
 	m_offs = vecParams[vecParams.size()-1];
 
@@ -418,7 +418,7 @@ double MultiGaussModel::operator()(double x) const
 
 	for(unsigned int i=0; i<m_vecParams.size(); ++i)
 		dRes += m_vecParams[i].m_amp * dNorm[i]
-		* exp(-0.5 * ((x-m_vecParams[i].m_x0)/m_vecParams[i].m_spread)*((x-m_vecParams[i].m_x0)/m_vecParams[i].m_spread));
+		                 * exp(-0.5 * ((x-m_vecParams[i].m_x0)/m_vecParams[i].m_spread)*((x-m_vecParams[i].m_x0)/m_vecParams[i].m_spread));
 
 	dRes += m_offs;
 
@@ -476,15 +476,15 @@ bool get_doublegauss(unsigned int iLen,
 	}
 
 	ROOT::Minuit2::MnUserParameters params;
-	params.Add("amp_0", 322.-80., 50.);
-	params.Add("spread_0", FWHM2SIGMA*0.08, FWHM2SIGMA*0.01);
-	params.Add("x0_0", 0.01, 0.01);
+	params.Add("amp_0", 400.-105., 50.);
+	params.Add("spread_0", FWHM2SIGMA*0.07, FWHM2SIGMA*0.01);
+	params.Add("x0_0", 0.01, 0.001);
 
-	params.Add("amp_1", 275.-80., 50.);
-	params.Add("spread_1", FWHM2SIGMA*0.04, FWHM2SIGMA*0.01);
-	params.Add("x0_1", 0.13, 0.01);
+	params.Add("amp_1", 275.-105., 50.);
+	params.Add("spread_1", FWHM2SIGMA*0.06, FWHM2SIGMA*0.01);
+	params.Add("x0_1", 0.139, 0.005);
 
-	params.Add("offs", 78., 78./10.);
+	params.Add("offs", 105., 10.);
 
 
 	params.SetLimits("offs", dMin, dMax);
@@ -501,6 +501,7 @@ bool get_doublegauss(unsigned int iLen,
 		params.Fix("amp_1");
 		params.Fix("spread_1");
 		params.Fix("x0_1");
+		//params.Fix("offs");
 
 		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
 		ROOT::Minuit2::FunctionMinimum mini = migrad();
@@ -526,7 +527,7 @@ bool get_doublegauss(unsigned int iLen,
 		params.Fix("amp_0");
 		params.Fix("spread_0");
 		params.Fix("x0_0");
-		params.Fix("offs");
+		//params.Fix("offs");
 
 		params.Release("amp_1");
 		params.Release("spread_1");
@@ -544,6 +545,9 @@ bool get_doublegauss(unsigned int iLen,
 
 		params.SetValue("x0_1", mini.UserState().Value("x0_1"));
 		params.SetError("x0_1", mini.UserState().Error("x0_1"));
+
+		params.SetValue("offs", mini.UserState().Value("offs"));
+		params.SetError("offs", mini.UserState().Error("offs"));
 
 		minis.push_back(mini);
 	}
@@ -631,6 +635,8 @@ bool get_doublegauss(unsigned int iLen,
 	}
 
 	const ROOT::Minuit2::FunctionMinimum& lastmini = *minis.rbegin();
+
+	test:
 
 
 	std::vector<MultiGaussParams> vecMultiParams;
