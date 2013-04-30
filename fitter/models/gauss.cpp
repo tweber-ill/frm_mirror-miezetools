@@ -22,6 +22,9 @@
 #include "../../helper/math.h"
 #include "interpolation.h"
 
+#include "../../settings.h"
+
+
 //----------------------------------------------------------------------
 // see: http://mathworld.wolfram.com/GaussianFunction.html
 static const double SIGMA2FWHM = 2.*sqrt(2.*log(2.));
@@ -135,6 +138,25 @@ bool get_gauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
 					GaussModel **pmodel)
 {
+	std::vector<double> vecMaximaX;
+	std::vector<double> vecMaximaSize;
+	std::vector<double> vecMaximaWidth;
+
+	const int iDegree = Settings::Get<int>("interpolation/spline_degree");
+	find_peaks(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
+
+	bool bPrefitOk = 1;
+	if(vecMaximaX.size() < 1)
+	{
+		bPrefitOk = 0;
+		vecMaximaX.resize(1);
+	}
+	if(vecMaximaSize.size() < 1)
+		vecMaximaSize.resize(1);
+	if(vecMaximaWidth.size() < 1)
+		vecMaximaWidth.resize(1);
+
+
 	GaussModel gmod;
 	Chi2Function fkt(&gmod, iLen, px, py, pdy);
 
@@ -157,12 +179,27 @@ bool get_gauss(unsigned int iLen,
 	}
 
 	double dSpread = dXMax-dXMin;
-	double dAmp = dMax;
+	double dSpreadErr = 0.5*dSpread;
+
+	double dAmp = dMax-dMin;
+	double dAmpErr = 0.5*dAmp;
+
 	double dx0 = px[iMaxPos];
 
+	if(bPrefitOk)
+	{
+		dSpread = HWHM2SIGMA*vecMaximaWidth[0];
+		dSpreadErr = 0.1*dSpread;
+
+		dAmp = vecMaximaSize[0];
+		dAmpErr = 0.1*dAmp;
+
+		dx0 = vecMaximaX[0];
+	}
+
 	ROOT::Minuit2::MnUserParameters params;
-	params.Add("amp", dAmp, 0.5*dAmp);
-	params.Add("spread", dSpread, (dXMax-dXMin)*0.5);
+	params.Add("amp", dAmp, dAmpErr);
+	params.Add("spread", dSpread, dSpreadErr);
 	params.Add("x0", dx0, 0.1*dx0);
 	params.Add("offs", dMin, 0.1*dMin);
 
@@ -270,8 +307,8 @@ bool get_gauss(unsigned int iLen,
 	dx0 = lastmini.UserState().Value("x0");
 	double doffs =lastmini.UserState().Value("offs");
 
-	double dAmpErr = lastmini.UserState().Error("amp");
-	double dSpreadErr = lastmini.UserState().Error("spread");
+	dAmpErr = lastmini.UserState().Error("amp");
+	dSpreadErr = lastmini.UserState().Error("spread");
 	double dx0Err = lastmini.UserState().Error("x0");
 	double doffserr =lastmini.UserState().Error("offs");
 
@@ -453,6 +490,7 @@ void MultiGaussModel::Normalize()
 }
 
 
+
 bool get_doublegauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
 					MultiGaussModel **pmodel)
@@ -461,9 +499,8 @@ bool get_doublegauss(unsigned int iLen,
 	std::vector<double> vecMaximaSize;
 	std::vector<double> vecMaximaWidth;
 
-	find_peaks(iLen, px, py, 5, vecMaximaX, vecMaximaSize, vecMaximaWidth);
-
-
+	const int iDegree = Settings::Get<int>("interpolation/spline_degree");
+	find_peaks(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
 
 	if(vecMaximaX.size() < 2)
 		vecMaximaX.resize(2);
@@ -472,25 +509,12 @@ bool get_doublegauss(unsigned int iLen,
 	if(vecMaximaWidth.size() < 2)
 		vecMaximaWidth.resize(2);
 
-	/*
-	for(unsigned int i=0; i<vecMaximaX.size(); ++i)
-	{
-		std::cout << "max x: " << vecMaximaX[i] << ", ";
-		std::cout << "max height: " << vecMaximaSize[i] << ", ";
-		std::cout << "max width: " << vecMaximaWidth[i] << std::endl;
-	}*/
-
-
-
 	MultiGaussModel gmod(2);
 	Chi2Function fkt(&gmod, iLen, px, py, pdy);
 
 	typedef std::pair<const double*, const double*> t_minmax;
-	t_minmax minmax_x = boost::minmax_element(px, px+iLen);
+	//t_minmax minmax_x = boost::minmax_element(px, px+iLen);
 	t_minmax minmax_y = boost::minmax_element(py, py+iLen);
-
-	const double dXMin = *minmax_x.first;
-	const double dXMax = *minmax_x.second;
 
 	const double *pdMax = minmax_y.second;
 	const double dMin = *minmax_y.first;
@@ -695,7 +719,7 @@ bool get_doublegauss(unsigned int iLen,
 	bool bNormalized = gmod.IsNormalized();
 
 
-	{
+	/*{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
@@ -707,7 +731,7 @@ bool get_doublegauss(unsigned int iLen,
 
 		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
-	}
+	}*/
 
 
 	*pmodel = new MultiGaussModel(gmod);

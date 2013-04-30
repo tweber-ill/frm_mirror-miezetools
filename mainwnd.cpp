@@ -461,7 +461,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 				if(Settings::Get<int>("general/sort_x"))
 				{
-					::sort_3<double>((double*)pdx,
+					::sort_3<double*, double>((double*)pdx,
 												(double*)pdx+pdat1d->GetDim(),
 												(double*)pdy,
 												(double*)pdyerr);
@@ -619,7 +619,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 			if(Settings::Get<int>("general/sort_x"))
 			{
-				::sort_3<double>((double*)pdx,
+				::sort_3<double*, double>((double*)pdx,
 											(double*)pdx+pnicosdat->GetDim(),
 											(double*)pdy,
 											pdyerr);
