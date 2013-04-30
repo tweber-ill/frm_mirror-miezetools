@@ -19,6 +19,8 @@
 #include "gauss.h"
 #include "../chi2.h"
 #include "../../helper/misc.h"
+#include "../../helper/math.h"
+#include "interpolation.h"
 
 //----------------------------------------------------------------------
 // see: http://mathworld.wolfram.com/GaussianFunction.html
@@ -455,6 +457,103 @@ bool get_doublegauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
 					MultiGaussModel **pmodel)
 {
+	BSpline spline(iLen, px, py, 5);
+	const unsigned int iNumSpline = 256;
+	double *pSplineX = new double[iNumSpline];
+	double *pSplineY = new double[iNumSpline];
+	double *pSplineDiff = new double[iNumSpline];
+	double *pSplineDiff2 = new double[iNumSpline];
+
+	for(unsigned int iSpline=0; iSpline<iNumSpline; ++iSpline)
+	{
+		const double dT = double(iSpline) / double(iNumSpline-1);
+		boost::numeric::ublas::vector<double> vec = spline(dT);
+
+		pSplineX[iSpline] = vec[0];
+		pSplineY[iSpline] = vec[1];
+	}
+
+	::diff(iNumSpline, pSplineX, pSplineY, pSplineDiff);
+	::diff(iNumSpline, pSplineX, pSplineDiff, pSplineDiff2);
+	std::vector<unsigned int> vecZeroes = ::find_zeroes<double>(iNumSpline, pSplineDiff);
+
+	/*
+	std::cout << "Prefitter found maxima at: ";
+	for(unsigned int iZero : vecZeroes)
+		if(pSplineDiff2[iZero] < 0.)
+			std::cout  << pSplineX[iZero] << ", ";
+	std::cout << std::endl;
+	*/
+	std::vector<double> vecMaximaX;
+	std::vector<double> vecMaximaSize;
+	std::vector<double> vecMaximaWidth;
+
+	for(unsigned int iZeroIdx = 0; iZeroIdx<vecZeroes.size(); ++iZeroIdx)
+	{
+		const unsigned int iZero = vecZeroes[iZeroIdx];
+
+		// minima / saddle points
+		if(pSplineDiff2[iZero] >= 0.)
+			continue;
+
+		vecMaximaX.push_back(pSplineX[iZero]);
+
+		int iMinIdxLeft = -1;
+		int iMinIdxRight = -1;
+		if(iZeroIdx > 0)
+			iMinIdxLeft = vecZeroes[iZeroIdx-1];
+		if(iZeroIdx+1 < vecZeroes.size())
+			iMinIdxRight = vecZeroes[iZeroIdx+1];
+
+		double dHeight = 0.;
+		double dWidth = 0.;
+		double dDiv = 0.;
+		if(iMinIdxLeft>=0)
+		{
+			dHeight += (pSplineY[iZero]-pSplineY[iMinIdxLeft]);
+			dWidth += fabs((pSplineX[iZero]-pSplineX[iMinIdxLeft]));
+			dDiv += 1.;
+		}
+		if(iMinIdxRight>=0)
+		{
+			dHeight += (pSplineY[iZero]-pSplineY[iMinIdxRight]);
+			dWidth += fabs((pSplineX[iZero]-pSplineX[iMinIdxRight]));
+			dDiv += 1.;
+		}
+		if(dDiv != 0.)
+		{
+			dHeight /= dDiv;
+			dWidth /= dDiv;
+		}
+
+		vecMaximaSize.push_back(dHeight);
+		vecMaximaWidth.push_back(dWidth);
+	}
+
+	delete[] pSplineX;
+	delete[] pSplineY;
+	delete[] pSplineDiff;
+	delete[] pSplineDiff2;
+
+
+
+	if(vecMaximaX.size() < 2)
+		vecMaximaX.resize(2);
+	if(vecMaximaSize.size() < 2)
+		vecMaximaSize.resize(2);
+	if(vecMaximaWidth.size() < 2)
+		vecMaximaWidth.resize(2);
+
+	/*
+	for(unsigned int i=0; i<vecMaximaX.size(); ++i)
+	{
+		std::cout << "max x: " << vecMaximaX[i] << ", ";
+		std::cout << "max height: " << vecMaximaSize[i] << ", ";
+		std::cout << "max width: " << vecMaximaWidth[i] << std::endl;
+	}*/
+
+
+
 	MultiGaussModel gmod(2);
 	Chi2Function fkt(&gmod, iLen, px, py, pdy);
 
@@ -476,15 +575,15 @@ bool get_doublegauss(unsigned int iLen,
 	}
 
 	ROOT::Minuit2::MnUserParameters params;
-	params.Add("amp_0", 400.-105., 50.);
-	params.Add("spread_0", FWHM2SIGMA*0.07, FWHM2SIGMA*0.01);
-	params.Add("x0_0", 0.01, 0.001);
+	params.Add("amp_0", vecMaximaSize[0], vecMaximaSize[0]/10.);
+	params.Add("spread_0", HWHM2SIGMA*vecMaximaWidth[0], HWHM2SIGMA*vecMaximaWidth[0]/10.);
+	params.Add("x0_0", vecMaximaX[0], vecMaximaX[0]/10.);
 
-	params.Add("amp_1", 275.-105., 50.);
-	params.Add("spread_1", FWHM2SIGMA*0.06, FWHM2SIGMA*0.01);
-	params.Add("x0_1", 0.139, 0.005);
+	params.Add("amp_1", vecMaximaSize[1], vecMaximaSize[1]/10.);
+	params.Add("spread_1", HWHM2SIGMA*vecMaximaWidth[1], HWHM2SIGMA*vecMaximaWidth[1]/10.);
+	params.Add("x0_1", vecMaximaX[1], vecMaximaX[1]/10.);
 
-	params.Add("offs", 105., 10.);
+	params.Add("offs", dMin, (dMax-dMin)/10.);
 
 
 	params.SetLimits("offs", dMin, dMax);
@@ -635,8 +734,6 @@ bool get_doublegauss(unsigned int iLen,
 	}
 
 	const ROOT::Minuit2::FunctionMinimum& lastmini = *minis.rbegin();
-
-	test:
 
 
 	std::vector<MultiGaussParams> vecMultiParams;
