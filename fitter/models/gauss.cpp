@@ -457,83 +457,11 @@ bool get_doublegauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
 					MultiGaussModel **pmodel)
 {
-	BSpline spline(iLen, px, py, 5);
-	const unsigned int iNumSpline = 256;
-	double *pSplineX = new double[iNumSpline];
-	double *pSplineY = new double[iNumSpline];
-	double *pSplineDiff = new double[iNumSpline];
-	double *pSplineDiff2 = new double[iNumSpline];
-
-	for(unsigned int iSpline=0; iSpline<iNumSpline; ++iSpline)
-	{
-		const double dT = double(iSpline) / double(iNumSpline-1);
-		boost::numeric::ublas::vector<double> vec = spline(dT);
-
-		pSplineX[iSpline] = vec[0];
-		pSplineY[iSpline] = vec[1];
-	}
-
-	::diff(iNumSpline, pSplineX, pSplineY, pSplineDiff);
-	::diff(iNumSpline, pSplineX, pSplineDiff, pSplineDiff2);
-	std::vector<unsigned int> vecZeroes = ::find_zeroes<double>(iNumSpline, pSplineDiff);
-
-	/*
-	std::cout << "Prefitter found maxima at: ";
-	for(unsigned int iZero : vecZeroes)
-		if(pSplineDiff2[iZero] < 0.)
-			std::cout  << pSplineX[iZero] << ", ";
-	std::cout << std::endl;
-	*/
 	std::vector<double> vecMaximaX;
 	std::vector<double> vecMaximaSize;
 	std::vector<double> vecMaximaWidth;
 
-	for(unsigned int iZeroIdx = 0; iZeroIdx<vecZeroes.size(); ++iZeroIdx)
-	{
-		const unsigned int iZero = vecZeroes[iZeroIdx];
-
-		// minima / saddle points
-		if(pSplineDiff2[iZero] >= 0.)
-			continue;
-
-		vecMaximaX.push_back(pSplineX[iZero]);
-
-		int iMinIdxLeft = -1;
-		int iMinIdxRight = -1;
-		if(iZeroIdx > 0)
-			iMinIdxLeft = vecZeroes[iZeroIdx-1];
-		if(iZeroIdx+1 < vecZeroes.size())
-			iMinIdxRight = vecZeroes[iZeroIdx+1];
-
-		double dHeight = 0.;
-		double dWidth = 0.;
-		double dDiv = 0.;
-		if(iMinIdxLeft>=0)
-		{
-			dHeight += (pSplineY[iZero]-pSplineY[iMinIdxLeft]);
-			dWidth += fabs((pSplineX[iZero]-pSplineX[iMinIdxLeft]));
-			dDiv += 1.;
-		}
-		if(iMinIdxRight>=0)
-		{
-			dHeight += (pSplineY[iZero]-pSplineY[iMinIdxRight]);
-			dWidth += fabs((pSplineX[iZero]-pSplineX[iMinIdxRight]));
-			dDiv += 1.;
-		}
-		if(dDiv != 0.)
-		{
-			dHeight /= dDiv;
-			dWidth /= dDiv;
-		}
-
-		vecMaximaSize.push_back(dHeight);
-		vecMaximaWidth.push_back(dWidth);
-	}
-
-	delete[] pSplineX;
-	delete[] pSplineY;
-	delete[] pSplineDiff;
-	delete[] pSplineDiff2;
+	find_peaks(iLen, px, py, 5, vecMaximaX, vecMaximaSize, vecMaximaWidth);
 
 
 

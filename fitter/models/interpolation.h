@@ -12,6 +12,7 @@
 #include <math.h>
 #include <boost/math/special_functions/binomial.hpp>
 #include <vector>
+#include "../../helper/math.h"
 
 // see:
 // http://mathworld.wolfram.com/BernsteinPolynomial.html
@@ -110,5 +111,90 @@ class BSpline : public FunctionModel_param
 
 		virtual boost::numeric::ublas::vector<double> operator()(double t) const;
 };
+
+
+
+template<typename T>
+void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder,
+						std::vector<T>& vecMaximaX, std::vector<T>& vecMaximaSize, std::vector<T>& vecMaximaWidth)
+{
+
+	BSpline spline(iLen, px, py, iOrder);
+	const unsigned int iNumSpline = 256;
+	T *pSplineX = new T[iNumSpline];
+	T *pSplineY = new T[iNumSpline];
+	T *pSplineDiff = new T[iNumSpline];
+	T *pSplineDiff2 = new T[iNumSpline];
+
+	for(unsigned int iSpline=0; iSpline<iNumSpline; ++iSpline)
+	{
+		const T dT = T(iSpline) / T(iNumSpline-1);
+		boost::numeric::ublas::vector<T> vec = spline(dT);
+
+		pSplineX[iSpline] = vec[0];
+		pSplineY[iSpline] = vec[1];
+	}
+
+	::diff(iNumSpline, pSplineX, pSplineY, pSplineDiff);
+	::diff(iNumSpline, pSplineX, pSplineDiff, pSplineDiff2);
+	std::vector<unsigned int> vecZeroes = ::find_zeroes<T>(iNumSpline, pSplineDiff);
+
+	/*
+	std::cout << "Prefitter found maxima at: ";
+	for(unsigned int iZero : vecZeroes)
+		if(pSplineDiff2[iZero] < 0.)
+			std::cout  << pSplineX[iZero] << ", ";
+	std::cout << std::endl;
+	*/
+
+	for(unsigned int iZeroIdx = 0; iZeroIdx<vecZeroes.size(); ++iZeroIdx)
+	{
+		const unsigned int iZero = vecZeroes[iZeroIdx];
+
+		// minima / saddle points
+		if(pSplineDiff2[iZero] >= 0.)
+			continue;
+
+		vecMaximaX.push_back(pSplineX[iZero]);
+
+		int iMinIdxLeft = -1;
+		int iMinIdxRight = -1;
+		if(iZeroIdx > 0)
+			iMinIdxLeft = vecZeroes[iZeroIdx-1];
+		if(iZeroIdx+1 < vecZeroes.size())
+			iMinIdxRight = vecZeroes[iZeroIdx+1];
+
+		T dHeight = 0.;
+		T dWidth = 0.;
+		T dDiv = 0.;
+		if(iMinIdxLeft>=0)
+		{
+			dHeight += (pSplineY[iZero]-pSplineY[iMinIdxLeft]);
+			dWidth += fabs((pSplineX[iZero]-pSplineX[iMinIdxLeft]));
+			dDiv += 1.;
+		}
+		if(iMinIdxRight>=0)
+		{
+			dHeight += (pSplineY[iZero]-pSplineY[iMinIdxRight]);
+			dWidth += fabs((pSplineX[iZero]-pSplineX[iMinIdxRight]));
+			dDiv += 1.;
+		}
+		if(dDiv != 0.)
+		{
+			dHeight /= dDiv;
+			dWidth /= dDiv;
+		}
+
+		vecMaximaSize.push_back(dHeight);
+		vecMaximaWidth.push_back(dWidth);
+	}
+
+	// TODO: sort for peak size
+
+	delete[] pSplineX;
+	delete[] pSplineY;
+	delete[] pSplineDiff;
+	delete[] pSplineDiff2;
+}
 
 #endif
