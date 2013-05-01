@@ -23,6 +23,7 @@
 
 #include "dialogs/RoiDlg.h"
 #include "dialogs/FitDlg.h"
+#include "dialogs/ResoDlg.h"
 
 #define MAX_RECENT_FILES 16
 
@@ -38,6 +39,7 @@ protected:
 	QMdiArea *m_pmdi;
 	FitDlg *m_pfitdlg;
 	RoiDlg *m_proidlg;
+	ResoDlg *m_presdlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -89,6 +91,8 @@ protected slots:
 	void Interpolation(SubWindowBase* pSWB, InterpFkt iFkt);
 	void BezierInterpolation();
 	void BSplineInterpolation();
+
+	void ShowReso();
 
 	void ShowAbout();
 	void ShowBrowser();

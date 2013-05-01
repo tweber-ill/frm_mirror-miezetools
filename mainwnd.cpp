@@ -43,7 +43,8 @@
 
 MiezeMainWnd::MiezeMainWnd()
 					: m_iPlotCnt(1), m_pfitdlg(0),
-					  m_proidlg(new RoiDlg(this)), m_bmainROIActive(0)
+					  m_proidlg(new RoiDlg(this)), m_bmainROIActive(0),
+					  m_presdlg(0)
 {
 	this->setWindowTitle("Cattus, a MIEZE toolset");
 
@@ -202,6 +203,16 @@ MiezeMainWnd::MiezeMainWnd()
 
 
 
+	// Calc
+	QMenu *pMenuCalc = new QMenu(this);
+	pMenuCalc->setTitle("Calculations");
+
+	QAction *pReso = new QAction(this);
+	pReso->setText("Resolution...");
+	pMenuCalc->addAction(pReso);
+
+
+
 	// Help
 	QMenu* pMenuHelp = new QMenu(this);
 	pMenuHelp->setTitle("Help");
@@ -226,6 +237,7 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuBar->addMenu(pMenuTools);
 	pMenuBar->addMenu(pMenuROI);
 	pMenuBar->addMenu(pMenuWindows);
+	pMenuBar->addMenu(pMenuCalc);
 	pMenuBar->addMenu(pMenuHelp);
 	this->setMenuBar(pMenuBar);
 	//--------------------------------------------------------------------------------
@@ -272,6 +284,8 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
 	QObject::connect(pCloseAll, SIGNAL(triggered()), m_pmdi, SLOT(closeAllSubWindows()));
 
+	QObject::connect(pReso, SIGNAL(triggered()), this, SLOT(ShowReso()));
+
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
 	QObject::connect(pBrowser, SIGNAL(triggered()), this, SLOT(ShowBrowser()));
 
@@ -288,6 +302,7 @@ MiezeMainWnd::~MiezeMainWnd()
 {
 	if(m_pfitdlg) delete m_pfitdlg;
 	if(m_proidlg) delete m_proidlg;
+	if(m_presdlg) delete m_presdlg;
 }
 
 void MiezeMainWnd::UpdateSubWndList()
@@ -1079,6 +1094,16 @@ void MiezeMainWnd::LoadFile(const QString& strFile)
 {
 	m_strLastXColumn = "";
 	LoadFile(strFile.toStdString());
+}
+
+
+void MiezeMainWnd::ShowReso()
+{
+	if(!m_presdlg)
+		m_presdlg = new ResoDlg(this);
+
+	m_presdlg->show();
+	m_presdlg->activateWindow();
 }
 
 #include "mainwnd.moc"
