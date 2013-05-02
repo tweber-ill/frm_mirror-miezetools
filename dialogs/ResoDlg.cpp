@@ -17,17 +17,23 @@ ResoDlg::ResoDlg(QWidget *pParent) : QDialog(pParent)
 															spinAnaMosaic, spinSampleMosaic, spinkfix,
 															spinE, spinQ, spinHCollMono, spinHCollBSample,
 															spinHCollASample, spinHCollAna, spinVCollMono,
-															spinVCollBSample, spinVCollASample, spinVCollAna};
+															spinVCollBSample, spinVCollASample, spinVCollAna,
+															spinMonoRefl, spinAnaEffic};
 	m_vecSpinNames = {"reso/mono_d", "reso/mono_mosaic", "reso/ana_d",
 														"reso/ana_mosaic", "reso/sample_mosaic", "reso/k_fix",
 														"reso/E", "reso/Q", "reso/h_coll_mono", "reso/h_coll_before_sample",
 														"reso/h_coll_after_sample", "reso/h_coll_ana",
 														"reso/v_coll_mono", "reso/v_coll_before_sample",
-														"reso/v_coll_after_sample", "reso/v_coll_ana"};
+														"reso/v_coll_after_sample", "reso/v_coll_ana",
+														"reso/mono_refl", "reso/ana_effic"};
 
-	m_vecRadioPlus = {radioFixedki, radioMonoScatterPlus, radioAnaScatterPlus, radioSampleScatterPlus};
-	m_vecRadioMinus = {radioFixedkf, radioMonoScatterMinus, radioAnaScatterMinus, radioSampleScatterMinus};
-	m_vecRadioNames = {"reso/check_fixed_ki", "reso/mono_scatter_sense", "reso/ana_scatter_sense", "reso/sample_scatter_sense"};
+	m_vecRadioPlus = {radioFixedki, radioMonoScatterPlus, radioAnaScatterPlus,
+								radioSampleScatterPlus, radioConstMon, radioCN};
+	m_vecRadioMinus = {radioFixedkf, radioMonoScatterMinus, radioAnaScatterMinus,
+								radioSampleScatterMinus, radioConstTime, radioPop};
+	m_vecRadioNames = {"reso/check_fixed_ki", "reso/mono_scatter_sense", "reso/ana_scatter_sense",
+									"reso/sample_scatter_sense", "reso/meas_const_mon",
+									"reso/algo"};
 
 
 	UpdateUI();
@@ -104,17 +110,38 @@ void ResoDlg::Calc()
 	cn.coll_v_post_sample = spinVCollASample->value() / (180.*60.) * M_PI * units::si::radians;
 	cn.coll_v_post_ana = spinVCollAna->value() / (180.*60.) * M_PI * units::si::radians;
 
-	cn.dmono_refl = 1.;
-	cn.dana_effic = 1.;
-	cn.bConstMon = 1;
+	cn.dmono_refl = spinMonoRefl->value();
+	cn.dana_effic = spinAnaEffic->value();
+	cn.bConstMon = radioConstMon->isChecked();
+
+	bool bUseCN = radioCN->isChecked();
+	// TODO
 
 	CNResults res = calc_cn(cn);
 
 	if(res.bOk)
 	{
+		std::ostringstream ostrRes;
+
+		//ostrRes << std::scientific;
+		ostrRes.precision(8);
+		ostrRes << "Resolution Volume: " << res.dR0 << " meV Å^(-3)";
+		ostrRes << "\n\n\n";
+		ostrRes << "Resolution Matrix: \n\n";
+
+		for(unsigned int i=0; i<res.reso.size1(); ++i)
+		{
+			for(unsigned int j=0; j<res.reso.size2(); ++j)
+				ostrRes << std::setw(20) << res.reso(i,j);
+
+			if(i!=res.reso.size1()-1)
+				ostrRes << "\n";
+		}
+
 		labelStatus->setText("Calculation successful.");
-		std::cout << "res = " << res.reso << std::endl;
-		std::cout << "vol = " << res.dR0 << std::endl;
+		this->labelResult->setText(QString::fromUtf8(ostrRes.str().c_str()));
+		//std::cout << "res = " << res.reso << std::endl;
+		//std::cout << "vol = " << res.dR0 << std::endl;
 	}
 	else
 	{
@@ -136,10 +163,17 @@ void ResoDlg::WriteLastConfig()
 void ResoDlg::ReadLastConfig()
 {
 	for(unsigned int iSpinBox=0; iSpinBox<m_vecSpinBoxes.size(); ++iSpinBox)
+	{
+		if(!Settings::HasKey(m_vecSpinNames[iSpinBox].c_str()))
+			continue;
 		m_vecSpinBoxes[iSpinBox]->setValue(Settings::Get<double>(m_vecSpinNames[iSpinBox].c_str()));
+	}
 
 	for(unsigned int iRadio=0; iRadio<m_vecRadioPlus.size(); ++iRadio)
 	{
+		if(!Settings::HasKey(m_vecRadioNames[iRadio].c_str()))
+			continue;
+
 		bool bChecked = Settings::Get<bool>(m_vecRadioNames[iRadio].c_str());
 		if(bChecked)
 		{

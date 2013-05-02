@@ -28,6 +28,12 @@ class Settings
 			return pSett->value(pcKey).value<T>();
 		}
 
+		static bool HasKey(const char* pcKey)
+		{
+			const QSettings *pSett = GetGlobals();
+			return pSett->contains(pcKey);
+		}
+
 		template<typename T>
 		static void Set(const char* pcKey, const T& t)
 		{
