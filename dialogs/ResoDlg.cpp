@@ -6,12 +6,30 @@
 
 #include "ResoDlg.h"
 #include <iostream>
+#include "../settings.h"
 
 #include "../tools/res/cn.h"
 
 ResoDlg::ResoDlg(QWidget *pParent) : QDialog(pParent)
 {
 	setupUi(this);
+	m_vecSpinBoxes = {spinMonod, spinMonoMosaic, spinAnad,
+															spinAnaMosaic, spinSampleMosaic, spinkfix,
+															spinE, spinQ, spinHCollMono, spinHCollBSample,
+															spinHCollASample, spinHCollAna, spinVCollMono,
+															spinVCollBSample, spinVCollASample, spinVCollAna};
+	m_vecSpinNames = {"reso/mono_d", "reso/mono_mosaic", "reso/ana_d",
+														"reso/ana_mosaic", "reso/sample_mosaic", "reso/k_fix",
+														"reso/E", "reso/Q", "reso/h_coll_mono", "reso/h_coll_before_sample",
+														"reso/h_coll_after_sample", "reso/h_coll_ana",
+														"reso/v_coll_mono", "reso/v_coll_before_sample",
+														"reso/v_coll_after_sample", "reso/v_coll_ana"};
+
+	m_vecRadioPlus = {radioFixedki, radioMonoScatterPlus, radioAnaScatterPlus, radioSampleScatterPlus};
+	m_vecRadioMinus = {radioFixedkf, radioMonoScatterMinus, radioAnaScatterMinus, radioSampleScatterMinus};
+	m_vecRadioNames = {"reso/check_fixed_ki", "reso/mono_scatter_sense", "reso/ana_scatter_sense", "reso/sample_scatter_sense"};
+
+
 	UpdateUI();
 
 	QObject::connect(radioFixedki, SIGNAL(toggled(bool)), this, SLOT(UpdateUI()));
@@ -37,6 +55,11 @@ ResoDlg::ResoDlg(QWidget *pParent) : QDialog(pParent)
 	QObject::connect(radioAnaScatterPlus, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 	QObject::connect(radioSampleScatterPlus, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 	QObject::connect(radioFixedki, SIGNAL(toggled(bool)), this, SLOT(Calc()));
+
+	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
+
+	ReadLastConfig();
+	Calc();
 }
 
 ResoDlg::~ResoDlg()
@@ -85,13 +108,63 @@ void ResoDlg::Calc()
 
 	if(res.bOk)
 	{
+		labelStatus->setText("Calculation successful.");
 		std::cout << res.reso << std::endl;
 	}
 	else
 	{
-		std::cerr << "Error: " << res.strErr << std::endl;
+		QString strErr = "Error: ";
+		strErr += res.strErr.c_str();
+		labelStatus->setText(strErr);
 	}
 }
 
+void ResoDlg::WriteLastConfig()
+{
+	for(unsigned int iSpinBox=0; iSpinBox<m_vecSpinBoxes.size(); ++iSpinBox)
+		Settings::Set<double>(m_vecSpinNames[iSpinBox].c_str(), m_vecSpinBoxes[iSpinBox]->value());
+
+	for(unsigned int iRadio=0; iRadio<m_vecRadioPlus.size(); ++iRadio)
+		Settings::Set<bool>(m_vecRadioNames[iRadio].c_str(), m_vecRadioPlus[iRadio]->isChecked());
+}
+
+void ResoDlg::ReadLastConfig()
+{
+	for(unsigned int iSpinBox=0; iSpinBox<m_vecSpinBoxes.size(); ++iSpinBox)
+		m_vecSpinBoxes[iSpinBox]->setValue(Settings::Get<double>(m_vecSpinNames[iSpinBox].c_str()));
+
+	for(unsigned int iRadio=0; iRadio<m_vecRadioPlus.size(); ++iRadio)
+	{
+		bool bChecked = Settings::Get<bool>(m_vecRadioNames[iRadio].c_str());
+		if(bChecked)
+		{
+			m_vecRadioPlus[iRadio]->setChecked(1);
+			m_vecRadioMinus[iRadio]->setChecked(0);;
+		}
+		else
+		{
+			m_vecRadioPlus[iRadio]->setChecked(0);
+			m_vecRadioMinus[iRadio]->setChecked(1);;
+		}
+	}
+}
+
+void ResoDlg::ButtonBoxClicked(QAbstractButton* pBtn)
+{
+	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::ApplyRole ||
+	   buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
+	{
+		WriteLastConfig();
+	}
+	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::RejectRole)
+	{
+		reject();
+	}
+
+	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
+	{
+		QDialog::accept();
+	}
+}
 
 #include "ResoDlg.moc"
