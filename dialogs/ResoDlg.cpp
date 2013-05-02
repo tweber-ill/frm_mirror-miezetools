@@ -104,12 +104,17 @@ void ResoDlg::Calc()
 	cn.coll_v_post_sample = spinVCollASample->value() / (180.*60.) * M_PI * units::si::radians;
 	cn.coll_v_post_ana = spinVCollAna->value() / (180.*60.) * M_PI * units::si::radians;
 
+	cn.dmono_refl = 1.;
+	cn.dana_effic = 1.;
+	cn.bConstMon = 1;
+
 	CNResults res = calc_cn(cn);
 
 	if(res.bOk)
 	{
 		labelStatus->setText("Calculation successful.");
-		std::cout << res.reso << std::endl;
+		std::cout << "res = " << res.reso << std::endl;
+		std::cout << "vol = " << res.dR0 << std::endl;
 	}
 	else
 	{
@@ -139,11 +144,11 @@ void ResoDlg::ReadLastConfig()
 		if(bChecked)
 		{
 			m_vecRadioPlus[iRadio]->setChecked(1);
-			m_vecRadioMinus[iRadio]->setChecked(0);;
+			//m_vecRadioMinus[iRadio]->setChecked(0);;
 		}
 		else
 		{
-			m_vecRadioPlus[iRadio]->setChecked(0);
+			//m_vecRadioPlus[iRadio]->setChecked(0);
 			m_vecRadioMinus[iRadio]->setChecked(1);;
 		}
 	}

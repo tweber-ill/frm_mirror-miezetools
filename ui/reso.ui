@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>482</height>
+    <height>503</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,7 +45,11 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="spinkfix"/>
+       <widget class="QDoubleSpinBox" name="spinkfix">
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_7">
@@ -100,7 +104,14 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="spinSampleMosaic"/>
+       <widget class="QDoubleSpinBox" name="spinSampleMosaic">
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>50.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0" colspan="2">
        <widget class="QRadioButton" name="radioSampleScatterPlus">
@@ -136,7 +147,17 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="spinAnad"/>
+       <widget class="QDoubleSpinBox" name="spinAnad">
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>3.355000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_4">
@@ -146,7 +167,14 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="spinAnaMosaic"/>
+       <widget class="QDoubleSpinBox" name="spinAnaMosaic">
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>50.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0" colspan="2">
        <widget class="QRadioButton" name="radioAnaScatterPlus">
@@ -154,7 +182,7 @@
          <string>Positive scattering sense</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -162,6 +190,9 @@
        <widget class="QRadioButton" name="radioAnaScatterMinus">
         <property name="text">
          <string>Negative scattering sense</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -182,7 +213,17 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="spinMonod"/>
+       <widget class="QDoubleSpinBox" name="spinMonod">
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>3.355000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
@@ -192,7 +233,14 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="spinMonoMosaic"/>
+       <widget class="QDoubleSpinBox" name="spinMonoMosaic">
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>50.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0" colspan="2">
        <widget class="QRadioButton" name="radioMonoScatterPlus">
@@ -200,7 +248,7 @@
          <string>Positive scattering sense</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -208,6 +256,9 @@
        <widget class="QRadioButton" name="radioMonoScatterMinus">
         <property name="text">
          <string>Negative scattering sense</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -228,7 +279,14 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="spinHCollMono"/>
+       <widget class="QDoubleSpinBox" name="spinHCollMono">
+        <property name="maximum">
+         <double>99990000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>30.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_10">
@@ -238,7 +296,14 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="spinHCollBSample"/>
+       <widget class="QDoubleSpinBox" name="spinHCollBSample">
+        <property name="maximum">
+         <double>99990000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>30.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_11">
@@ -248,7 +313,14 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="spinHCollASample"/>
+       <widget class="QDoubleSpinBox" name="spinHCollASample">
+        <property name="maximum">
+         <double>99990000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>30.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_12">
@@ -258,7 +330,14 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="spinHCollAna"/>
+       <widget class="QDoubleSpinBox" name="spinHCollAna">
+        <property name="maximum">
+         <double>99990000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>30.000000000000000</double>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -277,7 +356,14 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="spinVCollMono"/>
+       <widget class="QDoubleSpinBox" name="spinVCollMono">
+        <property name="maximum">
+         <double>9999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>9999.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label_17">
@@ -287,7 +373,14 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="spinVCollBSample"/>
+       <widget class="QDoubleSpinBox" name="spinVCollBSample">
+        <property name="maximum">
+         <double>9999.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>9999.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_18">
@@ -297,7 +390,14 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="spinVCollASample"/>
+       <widget class="QDoubleSpinBox" name="spinVCollASample">
+        <property name="maximum">
+         <double>99990000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>9999.000000000000000</double>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_19">
@@ -307,7 +407,14 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="spinVCollAna"/>
+       <widget class="QDoubleSpinBox" name="spinVCollAna">
+        <property name="maximum">
+         <double>99990000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>9999.000000000000000</double>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -337,6 +444,33 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>spinMonod</tabstop>
+  <tabstop>spinMonoMosaic</tabstop>
+  <tabstop>radioMonoScatterPlus</tabstop>
+  <tabstop>radioMonoScatterMinus</tabstop>
+  <tabstop>spinAnad</tabstop>
+  <tabstop>spinAnaMosaic</tabstop>
+  <tabstop>radioAnaScatterPlus</tabstop>
+  <tabstop>radioAnaScatterMinus</tabstop>
+  <tabstop>spinSampleMosaic</tabstop>
+  <tabstop>radioSampleScatterPlus</tabstop>
+  <tabstop>radioSampleScatterMinus</tabstop>
+  <tabstop>radioFixedki</tabstop>
+  <tabstop>radioFixedkf</tabstop>
+  <tabstop>spinkfix</tabstop>
+  <tabstop>spinQ</tabstop>
+  <tabstop>spinE</tabstop>
+  <tabstop>spinHCollMono</tabstop>
+  <tabstop>spinHCollBSample</tabstop>
+  <tabstop>spinHCollASample</tabstop>
+  <tabstop>spinHCollAna</tabstop>
+  <tabstop>spinVCollMono</tabstop>
+  <tabstop>spinVCollBSample</tabstop>
+  <tabstop>spinVCollASample</tabstop>
+  <tabstop>spinVCollAna</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
