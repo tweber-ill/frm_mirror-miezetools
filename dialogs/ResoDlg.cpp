@@ -57,10 +57,16 @@ ResoDlg::ResoDlg(QWidget *pParent) : QDialog(pParent)
 	QObject::connect(spinVCollASample, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
 	QObject::connect(spinVCollAna, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
 
+	QObject::connect(spinMonoRefl, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
+	QObject::connect(spinAnaEffic, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
+
 	QObject::connect(radioMonoScatterPlus, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 	QObject::connect(radioAnaScatterPlus, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 	QObject::connect(radioSampleScatterPlus, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 	QObject::connect(radioFixedki, SIGNAL(toggled(bool)), this, SLOT(Calc()));
+
+	QObject::connect(radioConstMon, SIGNAL(toggled(bool)), this, SLOT(Calc()));
+	QObject::connect(radioCN, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 
 	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
 
