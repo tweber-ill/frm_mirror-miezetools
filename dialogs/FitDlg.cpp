@@ -48,6 +48,9 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 	tableLimits->setColumnWidth(2,50);
 	tableHints->setColumnWidth(2,50);
 
+	tableLimits->verticalHeader()->setDefaultSectionSize(tableLimits->verticalHeader()->minimumSectionSize()+2);
+	tableHints->verticalHeader()->setDefaultSectionSize(tableHints->verticalHeader()->minimumSectionSize()+2);
+
 	spinFoil->setMaximum(Settings::Get<unsigned int>("casc/foil_cnt")-1);
 }
 
