@@ -261,7 +261,7 @@ void ScatterTriagDlg::paintEvent(QPaintEvent *pEvent)
 
 ResoDlg::ResoDlg(QWidget *pParent)
 				: QDialog(pParent),
-				  m_bDontCalc(0),
+				  m_bDontCalc(1),
 				  m_pInstDlg(new InstLayoutDlg(this)),
 				  m_pScatterDlg(new ScatterTriagDlg(this))
 {
@@ -337,6 +337,7 @@ ResoDlg::ResoDlg(QWidget *pParent)
 	connect(btnLoad, SIGNAL(clicked(bool)), this, SLOT(LoadFile()));
 	connect(btnSave, SIGNAL(clicked(bool)), this, SLOT(SaveFile()));
 
+	m_bDontCalc = 0;
 	Calc();
 }
 
@@ -497,6 +498,7 @@ void ResoDlg::WriteLastConfig()
 
 void ResoDlg::ReadLastConfig()
 {
+	bool bOldDontCalc = m_bDontCalc;
 	m_bDontCalc = 1;
 
 	for(unsigned int iSpinBox=0; iSpinBox<m_vecSpinBoxes.size(); ++iSpinBox)
@@ -533,7 +535,7 @@ void ResoDlg::ReadLastConfig()
 
 	groupGuide->setChecked(Settings::Get<bool>("reso/use_guide"));
 
-	m_bDontCalc = 0;
+	m_bDontCalc = bOldDontCalc;
 	Calc();
 }
 
@@ -583,6 +585,7 @@ void ResoDlg::SaveFile()
 
 void ResoDlg::LoadFile()
 {
+	bool bOldDontCalc = m_bDontCalc;
 	m_bDontCalc = 1;
 
 	QSettings *pGlobals = Settings::GetGlobals();
@@ -630,7 +633,7 @@ void ResoDlg::LoadFile()
 	setWindowTitle(QString("Resolution - ") + strFileName.c_str());
 	pGlobals->setValue("reso/lastdir", QString(::get_dir(strFile1).c_str()));
 
-	m_bDontCalc = 0;
+	m_bDontCalc = bOldDontCalc;
 	Calc();
 }
 
