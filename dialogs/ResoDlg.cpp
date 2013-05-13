@@ -310,6 +310,10 @@ ResoDlg::ResoDlg(QWidget *pParent)
 
 	QObject::connect(groupGuide, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 
+	QCheckBox* pCheckBoxes[] = {checkAnaCurvH, checkAnaCurvV, checkMonoCurvH, checkMonoCurvV};
+	for(QCheckBox* pbox : pCheckBoxes)
+		QObject::connect(pbox, SIGNAL(toggled(bool)), this, SLOT(Calc()));
+
 	for(QDoubleSpinBox* pSpinBox : m_vecSpinBoxes)
 		QObject::connect(pSpinBox, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
 	for(QRadioButton* pRadio : m_vecRadioPlus)
@@ -448,8 +452,6 @@ void ResoDlg::Calc()
 
 		labelStatus->setText("Calculation successful.");
 		labelResult->setText(QString::fromUtf8(ostrRes.str().c_str()));
-		//std::cout << "res = " << res.reso << std::endl;
-		//std::cout << "vol = " << res.dR0 << std::endl;
 
 		std::ostringstream ostrkvar;
 
@@ -462,7 +464,7 @@ void ResoDlg::Calc()
 	{
 		QString strErr = "Error: ";
 		strErr += res.strErr.c_str();
-		labelStatus->setText(strErr);
+		labelStatus->setText(QString("<font color='red'>") + strErr + QString("</font>"));
 
 		labelkvar_val->setText("<error>");
 	}
