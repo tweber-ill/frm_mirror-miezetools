@@ -261,6 +261,7 @@ void ScatterTriagDlg::paintEvent(QPaintEvent *pEvent)
 
 ResoDlg::ResoDlg(QWidget *pParent)
 				: QDialog(pParent),
+				  m_bDontCalc(0),
 				  m_pInstDlg(new InstLayoutDlg(this)),
 				  m_pScatterDlg(new ScatterTriagDlg(this))
 {
@@ -362,8 +363,10 @@ void ResoDlg::UpdateUI()
 
 void ResoDlg::Calc()
 {
-	const units::quantity<units::si::length> angstrom = 1e-10 * units::si::meter;
+	if(m_bDontCalc)
+		return;
 
+	const units::quantity<units::si::length> angstrom = 1e-10 * units::si::meter;
 	PopParams cn;
 
 	// CN
@@ -449,7 +452,7 @@ void ResoDlg::Calc()
 		ostrRes.precision(8);
 		ostrRes << "Resolution Volume: " << res.dR0 << " meV Å^(-3)";
 		ostrRes << "\n\n\n";
-		ostrRes << "Resolution Matrix: \n\n";
+		ostrRes << "Resolution Matrix (Q_para, Q_ortho, Q_z, E): \n\n";
 
 		for(unsigned int i=0; i<res.reso.size1(); ++i)
 		{
@@ -494,6 +497,8 @@ void ResoDlg::WriteLastConfig()
 
 void ResoDlg::ReadLastConfig()
 {
+	m_bDontCalc = 1;
+
 	for(unsigned int iSpinBox=0; iSpinBox<m_vecSpinBoxes.size(); ++iSpinBox)
 	{
 		if(!Settings::HasKey(m_vecSpinNames[iSpinBox].c_str()))
@@ -505,7 +510,7 @@ void ResoDlg::ReadLastConfig()
 	{
 		if(!Settings::HasKey(m_vecCheckNames[iCheckBox].c_str()))
 			continue;
-		m_vecCheckBoxes[iCheckBox]->setChecked(Settings::Get<double>(m_vecCheckNames[iCheckBox].c_str()));
+		m_vecCheckBoxes[iCheckBox]->setChecked(Settings::Get<bool>(m_vecCheckNames[iCheckBox].c_str()));
 	}
 
 	for(unsigned int iRadio=0; iRadio<m_vecRadioPlus.size(); ++iRadio)
@@ -527,6 +532,9 @@ void ResoDlg::ReadLastConfig()
 	}
 
 	groupGuide->setChecked(Settings::Get<bool>("reso/use_guide"));
+
+	m_bDontCalc = 0;
+	Calc();
 }
 
 void ResoDlg::SaveFile()
@@ -575,6 +583,8 @@ void ResoDlg::SaveFile()
 
 void ResoDlg::LoadFile()
 {
+	m_bDontCalc = 1;
+
 	QSettings *pGlobals = Settings::GetGlobals();
 	QString strLastDir = pGlobals->value("reso/lastdir", ".").toString();
 
@@ -619,6 +629,9 @@ void ResoDlg::LoadFile()
 
 	setWindowTitle(QString("Resolution - ") + strFileName.c_str());
 	pGlobals->setValue("reso/lastdir", QString(::get_dir(strFile1).c_str()));
+
+	m_bDontCalc = 0;
+	Calc();
 }
 
 

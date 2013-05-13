@@ -86,6 +86,8 @@ protected:
 	void WriteLastConfig();
 	void ReadLastConfig();
 
+	bool m_bDontCalc;
+
 
 	InstLayoutDlg *m_pInstDlg;
 	ScatterTriagDlg *m_pScatterDlg;
