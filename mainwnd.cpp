@@ -148,6 +148,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pCombineGraphs = new QAction(this);
 	pCombineGraphs->setText("Plot Counts/Contrasts...");
 	pMenuTools->addAction(pCombineGraphs);
+	pMenuTools->addSeparator();
 
 
 	// ROI

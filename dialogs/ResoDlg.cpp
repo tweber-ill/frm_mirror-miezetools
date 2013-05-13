@@ -165,6 +165,9 @@ void ScatterTriagDlg::SetParams(const PopParams& pop, const CNResults& res)
 	m_d2Theta = res.twotheta / units::si::radians;
 	m_dKiQ = res.angle_ki_Q / units::si::radians;
 
+	if(m_d2Theta<0.)	// neg. scattering sense
+		m_dKiQ=-m_dKiQ;
+
 	ublas::matrix<double> rot_kikf = rotation_matrix_2d(m_d2Theta);
 	ublas::matrix<double> rot_kiQ = rotation_matrix_2d(M_PI-m_dKiQ);
 
@@ -202,6 +205,8 @@ void ScatterTriagDlg::paintEvent(QPaintEvent *pEvent)
 	ublas::vector<double> vecOffs(2);
 	vecOffs[0] = 50.;
 	vecOffs[1] = 50.;
+	if(m_d2Theta<0.)
+		vecOffs[1] = dHeight-75.;
 
 	QTransform T;
 	T.translate(0, size.height());

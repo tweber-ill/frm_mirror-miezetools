@@ -47,7 +47,6 @@
 									<listOptionValue builtIn="false" value="gomp"/>
 									<listOptionValue builtIn="false" value="Minuit2"/>
 									<listOptionValue builtIn="false" value="QtCore"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="iomp5"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2083585386" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -113,7 +112,6 @@
 									<listOptionValue builtIn="false" value="gomp"/>
 									<listOptionValue builtIn="false" value="Minuit2"/>
 									<listOptionValue builtIn="false" value="QtCore"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="iomp5"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1692054219" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
