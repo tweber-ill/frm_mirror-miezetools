@@ -75,6 +75,10 @@ class ResoDlg : public QDialog, Ui::ResoDlg
 protected:
 	std::vector<QDoubleSpinBox*> m_vecSpinBoxes;
 	std::vector<std::string> m_vecSpinNames;
+
+	std::vector<QCheckBox*> m_vecCheckBoxes;
+	std::vector<std::string> m_vecCheckNames;
+
 	std::vector<QRadioButton*> m_vecRadioPlus;
 	std::vector<QRadioButton*> m_vecRadioMinus;
 	std::vector<std::string> m_vecRadioNames;

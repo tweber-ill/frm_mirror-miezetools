@@ -637,7 +637,7 @@
              <bool>false</bool>
             </property>
             <property name="maximum">
-             <double>999.000000000000000</double>
+             <double>99999.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
@@ -653,7 +653,7 @@
              <bool>false</bool>
             </property>
             <property name="maximum">
-             <double>999.000000000000000</double>
+             <double>99999.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
@@ -723,7 +723,7 @@
              <bool>true</bool>
             </property>
             <property name="maximum">
-             <double>999.000000000000000</double>
+             <double>99999.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -743,7 +743,7 @@
              <bool>true</bool>
             </property>
             <property name="maximum">
-             <double>999.000000000000000</double>
+             <double>99999.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -909,6 +909,9 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
+            </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
             </property>
@@ -925,6 +928,9 @@
            <widget class="QDoubleSpinBox" name="spinMonoCurvV">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.010000000000000</double>

@@ -296,6 +296,11 @@ ResoDlg::ResoDlg(QWidget *pParent)
 					"reso/pop_det_w", "reso/pop_det_h",
 					"reso/pop_dist_mono_sample", "reso/pop_dist_sample_ana", "reso/pop_dist_ana_det", "reso/pop_dist_src_mono"};
 
+
+	m_vecCheckBoxes = {checkAnaCurvH, checkAnaCurvV, checkMonoCurvH, checkMonoCurvV};
+	m_vecCheckNames = {"reso/pop_ana_use_curvh", "reso/pop_ana_use_curvv", "reso/pop_mono_use_curvh", "reso/pop_mono_use_curvv"};
+
+
 	m_vecRadioPlus = {radioFixedki, radioMonoScatterPlus, radioAnaScatterPlus,
 						radioSampleScatterPlus, radioConstMon, radioCN,
 						radioSampleCub, radioSrcRect, radioDetRect};
@@ -479,9 +484,10 @@ void ResoDlg::WriteLastConfig()
 {
 	for(unsigned int iSpinBox=0; iSpinBox<m_vecSpinBoxes.size(); ++iSpinBox)
 		Settings::Set<double>(m_vecSpinNames[iSpinBox].c_str(), m_vecSpinBoxes[iSpinBox]->value());
-
 	for(unsigned int iRadio=0; iRadio<m_vecRadioPlus.size(); ++iRadio)
 		Settings::Set<bool>(m_vecRadioNames[iRadio].c_str(), m_vecRadioPlus[iRadio]->isChecked());
+	for(unsigned int iCheck=0; iCheck<m_vecCheckBoxes.size(); ++iCheck)
+		Settings::Set<bool>(m_vecCheckNames[iCheck].c_str(), m_vecCheckBoxes[iCheck]->isChecked());
 
 	Settings::Set<bool>("reso/use_guide", groupGuide->isChecked());
 }
@@ -493,6 +499,13 @@ void ResoDlg::ReadLastConfig()
 		if(!Settings::HasKey(m_vecSpinNames[iSpinBox].c_str()))
 			continue;
 		m_vecSpinBoxes[iSpinBox]->setValue(Settings::Get<double>(m_vecSpinNames[iSpinBox].c_str()));
+	}
+
+	for(unsigned int iCheckBox=0; iCheckBox<m_vecCheckBoxes.size(); ++iCheckBox)
+	{
+		if(!Settings::HasKey(m_vecCheckNames[iCheckBox].c_str()))
+			continue;
+		m_vecCheckBoxes[iCheckBox]->setChecked(Settings::Get<double>(m_vecCheckNames[iCheckBox].c_str()));
 	}
 
 	for(unsigned int iRadio=0; iRadio<m_vecRadioPlus.size(); ++iRadio)
@@ -540,6 +553,9 @@ void ResoDlg::SaveFile()
 		mapConf[m_vecSpinNames[iSpinBox]] = ostrVal.str();
 	}
 
+	for(unsigned int iCheckBox=0; iCheckBox<m_vecCheckBoxes.size(); ++iCheckBox)
+		mapConf[m_vecCheckNames[iCheckBox]] = (m_vecCheckBoxes[iCheckBox]->isChecked() ? "1" : "0");
+
 	for(unsigned int iRadio=0; iRadio<m_vecRadioPlus.size(); ++iRadio)
 		mapConf[m_vecRadioNames[iRadio]] = (m_vecRadioPlus[iRadio]->isChecked() ? "1" : "0");
 
@@ -582,6 +598,12 @@ void ResoDlg::LoadFile()
 	bool bOk=0;
 	for(unsigned int iSpinBox=0; iSpinBox<m_vecSpinBoxes.size(); ++iSpinBox)
 		m_vecSpinBoxes[iSpinBox]->setValue(xml.Query<double>(m_vecSpinNames[iSpinBox].c_str(), 0., &bOk));
+
+	for(unsigned int iCheck=0; iCheck<m_vecCheckBoxes.size(); ++iCheck)
+	{
+		int bChecked = xml.Query<int>(m_vecCheckNames[iCheck].c_str(), 0, &bOk);
+		m_vecCheckBoxes[iCheck]->setChecked(bChecked);
+	}
 
 	for(unsigned int iRadio=0; iRadio<m_vecRadioPlus.size(); ++iRadio)
 	{
