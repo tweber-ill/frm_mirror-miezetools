@@ -32,7 +32,8 @@ protected:
 
 	double m_dMonoW, m_dMonoD;
 	double m_dAnaW, m_dAnaD;
-	double m_dDetW;
+	double m_dDetW, m_dDetD;
+	double m_dSamp_Q, m_dSamp_perpQ;
 
 	double m_dWidth, m_dHeight;
 

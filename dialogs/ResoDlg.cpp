@@ -8,6 +8,8 @@
 #include <iostream>
 #include <map>
 
+#include "../tools/res/ellipse.h"
+
 #include "../settings.h"
 #include "../helper/string.h"
 #include "../helper/xml.h"
@@ -53,7 +55,7 @@ void InstLayoutDlg::paintEvent(QPaintEvent *pEvent)
 
 
 	QPen penBlue(QColor::fromRgbF(0.,0.,1.,1.));
-	penBlue.setWidthF(1);
+	penBlue.setWidthF(m_dWidth/150.);
 	QPen penBlack(QColor::fromRgbF(0.,0.,0.,1.));
 
 
@@ -82,7 +84,7 @@ void InstLayoutDlg::paintEvent(QPaintEvent *pEvent)
 	painter.save();
 	painter.rotate(-m_dSample2Theta+m_dSampleTheta);
 	// Sample
-	painter.fillRect(QRectF(-1.5,-1.5,3.,3.), QColor::fromRgbF(0.,0.,0.,1.));
+	painter.fillRect(QRectF(-m_dSamp_Q/2.,-m_dSamp_perpQ/2.,m_dSamp_Q,m_dSamp_perpQ), QColor::fromRgbF(0.,0.,0.,1.));
 	painter.restore();
 	painter.translate(0, m_dDistSampleAna);
 
@@ -97,7 +99,7 @@ void InstLayoutDlg::paintEvent(QPaintEvent *pEvent)
 	painter.restore();
 	painter.translate(0, m_dDistAnaDet);
 	// Detector
-	painter.fillRect(QRectF(-m_dDetW/2.,-0.75,m_dDetW,1.5), QColor::fromRgbF(0.,0.,0.,1.));
+	painter.fillRect(QRectF(-m_dDetW/2.,-m_dDetD/2.,m_dDetW, m_dDetD), QColor::fromRgbF(0.,0.,0.,1.));
 
 	painter.restore();
 }
@@ -114,18 +116,22 @@ void InstLayoutDlg::SetParams(const PopParams& pop, const CNResults& res)
 
 	//std::cout << (res.angle_ki_Q/units::si::radians / M_PI*180.) << ", " << (res.angle_kf_Q/units::si::radians / M_PI*180.) << std::endl;
 
-	m_dDistMonoSample = 30.; //pop.dist_mono_sample / (units::si::meters*0.01);
-	m_dDistSampleAna = 30.; //pop.dist_sample_ana / (units::si::meters*0.01);
-	m_dDistAnaDet = 30.; //pop.dist_ana_det / (units::si::meters*0.01);
-
-	m_dMonoW = 10.; //pop.mono_w / (units::si::meters*0.01);
-	m_dMonoD = 1.5; //pop.mono_thick / (units::si::meters*0.01);
-	m_dAnaW = 10.; //pop.ana_w / (units::si::meters*0.01);
-	m_dAnaD = 1.5; //pop.ana_thick / (units::si::meters*0.01);
-	m_dDetW = 10.; //pop.det_w / (units::si::meters*0.01);
+	m_dDistMonoSample = pop.dist_mono_sample / (units::si::meters*0.01);
+	m_dDistSampleAna = pop.dist_sample_ana / (units::si::meters*0.01);
+	m_dDistAnaDet = pop.dist_ana_det / (units::si::meters*0.01);
 
 	m_dWidth = m_dDistMonoSample+m_dDistSampleAna+m_dDistAnaDet;
 	m_dHeight = m_dDistMonoSample+m_dDistSampleAna+m_dDistAnaDet;
+
+	m_dMonoW = m_dWidth/15.; //pop.mono_w / (units::si::meters*0.01);
+	m_dMonoD = m_dWidth/75.; //pop.mono_thick / (units::si::meters*0.01);
+	m_dAnaW = m_dWidth/15.; //pop.ana_w / (units::si::meters*0.01);
+	m_dAnaD = m_dWidth/75.; //pop.ana_thick / (units::si::meters*0.01);
+	m_dDetW = m_dWidth/15.; //pop.det_w / (units::si::meters*0.01);
+	m_dDetD = m_dWidth/75.;
+
+	m_dSamp_Q = m_dWidth/40.; //pop.sample_w_q / (units::si::meters*0.01);
+	m_dSamp_perpQ = m_dWidth/40.; //pop.sample_w_perpq / (units::si::meters*0.01);
 
 	if(pop.dmono_sense > 0.)
 		m_dPosMonoX = m_dWidth;
@@ -223,6 +229,7 @@ void ScatterTriagDlg::paintEvent(QPaintEvent *pEvent)
 	font.setPixelSize(dFontSize);
 	font.setBold(1);
 	painter.setFont(font);
+
 	painter.save();
 	painter.translate(QPointF(vecOffs[0]+m_vec_ki[0]/2.-dFontSize/2., vecOffs[1]+m_vec_ki[1]/2.-dFontSize));
 	painter.scale(1.,-1.);
@@ -245,11 +252,15 @@ void ScatterTriagDlg::paintEvent(QPaintEvent *pEvent)
 	painter.drawText(QPointF(0., 0.), "Q");
 	painter.restore();
 
+	font.setPixelSize(8);
+	painter.setFont(font);
 	painter.translate(QPointF(dWidth/10., dHeight*9./10.));
 	painter.scale(1.,-1.);
 	std::ostringstream ostr2t;
 	ostr2t.precision(4);
-	ostr2t << "2th = " << m_d2Theta/M_PI*180. << " deg, ki q = " << m_dKiQ/M_PI*180. << " deg";
+	ostr2t << "2theta = " << m_d2Theta/M_PI*180. << " deg, ";
+	ostr2t << "ki_q = " << m_dKiQ/M_PI*180. << " deg";
+	//ostr2t << "kf_q = " << 180.-(m_dKiQ/M_PI*180.) << " deg";
 	painter.drawText(QPointF(0., 0.), ostr2t.str().c_str());
 }
 
@@ -473,6 +484,21 @@ void ResoDlg::Calc()
 		//ostrkvar.precision(4);
 		ostrkvar << dKVar;
 		labelkvar_val->setText(ostrkvar.str().c_str());
+
+
+		Ellipse q0_e_proj = ::calc_res_ellipse(res.reso, 0, 3, 1, 2, -1);
+		Ellipse q0_e_slice = ::calc_res_ellipse(res.reso, 0, 3, -1, 2, 1);
+
+		Ellipse q1_e_proj = ::calc_res_ellipse(res.reso, 1, 3, 0, 2, -1);
+		Ellipse q1_e_slice = ::calc_res_ellipse(res.reso, 1, 3, -1, 2, 0);
+
+		Ellipse q2_e_proj = ::calc_res_ellipse(res.reso, 2, 3, 0, 1, -1);
+		Ellipse q2_e_slice = ::calc_res_ellipse(res.reso, 2, 3, -1, 1, 0);
+
+		Ellipse q0_q1_proj = ::calc_res_ellipse(res.reso, 0, 1, 3, 2, -1);
+		Ellipse q0_q1_slice = ::calc_res_ellipse(res.reso, 0, 1, -1, 2, 3);
+
+		//std::cout << q0_e_proj << "\n" << q0_e_slice << std::endl;
 	}
 	else
 	{
