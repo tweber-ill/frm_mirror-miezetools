@@ -790,4 +790,32 @@ void ResoDlg::showEvent(QShowEvent *event)
 {
 	restoreGeometry(Settings::GetGlobals()->value("reso/wnd_geo").toByteArray());
 }
+
+
+#ifdef STANDALONE_RESO
+	int main(int argc, char **argv)
+	{
+		try
+		{
+			QSettings *pGlobals = Settings::GetGlobals();
+			QApplication a(argc, argv);
+
+			ResoDlg wnd(0);
+			wnd.exec();
+		}
+		catch(const std::exception& ex)
+		{
+			std::cerr << "\n********************************************************************************\n"
+						 << "CRITICAL ERROR: " << ex.what()
+						 << "\n********************************************************************************\n"
+						 << std::endl;
+		}
+
+		Settings::free();
+		return 0;
+	}
+
+	#include "../subwnd.moc"
+#endif
+
 #include "ResoDlg.moc"

@@ -69,7 +69,7 @@ void Plot::estimate_minmax()
 	m_dymax += dPadY;
 }
 
-QColor Plot::GetColor(unsigned int iPlotObj)
+QColor Plot::GetColor(unsigned int iPlotObj) const
 {
 	static const std::vector<QColor> cols =
 	{
@@ -212,7 +212,7 @@ void Plot::plot(unsigned int iNum, const double *px, const double *py, const dou
 
 void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 {
-	const uint iCnt = 512;
+	const uint iCnt = 1024;
 
 	PlotObj pltobj;
 	pltobj.plttype = PLOT_FKT;
@@ -246,7 +246,7 @@ void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 void Plot::plot_fkt(const FunctionModel& fkt)
 {
 	clearfkt();
-	const uint iCnt = 512;
+	const uint iCnt = 1024;
 
 	PlotObj pltobj;
 	pltobj.plttype = PLOT_FKT;

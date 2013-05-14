@@ -47,7 +47,7 @@ protected:
 
 	QString m_strXAxis, m_strYAxis, m_strTitle;
 
-	QColor GetColor(unsigned int iPlotObj);
+	QColor GetColor(unsigned int iPlotObj) const;
 
 public:
 	Plot(QWidget* pParent=0, const char* pcTitle=0);

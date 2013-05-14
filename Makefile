@@ -4,9 +4,13 @@ FLAGS = ${INC} -O2 -march=native -std=c++11
 LIBS = -L/usr/lib64/qt4 -lstdc++ -lm -lgomp -lMinuit2 -lfftw3 -lQtCore -lQtGui -lQtXml -lQtXmlPatterns
 
 
-cattus: main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o
-	${CC} ${FLAGS} ${LIBS} -o cattus main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o
+cattus: main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o
+	${CC} ${FLAGS} ${LIBS} -o cattus main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o
 	strip cattus
+
+reso: settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o
+	${CC} ${FLAGS} ${LIBS} -o reso settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o
+	strip reso
 
 
 main.o: main.cpp
@@ -39,6 +43,9 @@ ListDlg.o: dialogs/ListDlg.cpp dialogs/ListDlg.h
 
 ResoDlg.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
 	${CC} ${FLAGS} -c -o ResoDlg.o dialogs/ResoDlg.cpp
+
+ResoDlg_prog.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
+	${CC} ${FLAGS} -c -DSTANDALONE_RESO -o ResoDlg_prog.o dialogs/ResoDlg.cpp
 
 RoiDlg.o: dialogs/RoiDlg.cpp dialogs/RoiDlg.h
 	${CC} ${FLAGS} -c -o RoiDlg.o dialogs/RoiDlg.cpp
@@ -99,7 +106,8 @@ cn.o: tools/res/cn.cpp tools/res/cn.h
 pop.o: tools/res/pop.cpp tools/res/pop.h
 	${CC} ${FLAGS} -c -o pop.o tools/res/pop.cpp
 
-
+ellipse.o: tools/res/ellipse.cpp tools/res/ellipse.h
+	${CC} ${FLAGS} -c -o ellipse.o tools/res/ellipse.cpp
 
 
 
@@ -141,6 +149,7 @@ interpolation.o: fitter/models/interpolation.cpp fitter/models/interpolation.h
 clean:
 	rm -f *.o
 	rm -f cattus
+	rm -f reso
 	
 	rm -f ui/*.h
 	rm -f *.moc
