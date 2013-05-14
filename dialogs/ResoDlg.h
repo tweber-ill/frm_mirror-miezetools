@@ -8,15 +8,41 @@
 #define __RESO_DLG_H__
 
 #include <QtGui/QDialog>
+#include <QtGui/QLabel>
 #include <vector>
 #include <string>
 
 #include "../ui/ui_reso.h"
-
 #include "../tools/res/cn.h"
 #include "../tools/res/pop.h"
-
 #include "../helper/linalg.h"
+#include "../plot/plot.h"
+#include "../tools/res/ellipse.h"
+
+
+class EllipseDlg : public QDialog
+{Q_OBJECT
+protected:
+	std::vector<Plot*> m_pPlots;
+	std::vector<Ellipse> m_elliProj;
+	std::vector<Ellipse> m_elliSlice;
+
+	QLabel *m_pLabelStatus;
+
+	virtual void paintEvent (QPaintEvent *pEvent);
+
+public:
+	EllipseDlg(QWidget* pParent);
+	virtual ~EllipseDlg();
+
+	void SetParams(const PopParams& pop, const CNResults& res);
+
+protected slots:
+	void hideEvent (QHideEvent *event);
+	void showEvent(QShowEvent *event);
+
+	void SetStatusMsg(const char* pcMsg, int iPos);
+};
 
 
 class InstLayoutDlg : public QDialog
@@ -90,6 +116,7 @@ protected:
 	bool m_bDontCalc;
 
 
+	EllipseDlg *m_pElliDlg;
 	InstLayoutDlg *m_pInstDlg;
 	ScatterTriagDlg *m_pScatterDlg;
 
@@ -100,6 +127,8 @@ public:
 protected slots:
 	void UpdateUI();
 	void Calc();
+
+	void ShowEllipses();
 	void ShowInstrLayout();
 	void ShowScatterTriag();
 

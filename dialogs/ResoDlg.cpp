@@ -8,8 +8,6 @@
 #include <iostream>
 #include <map>
 
-#include "../tools/res/ellipse.h"
-
 #include "../settings.h"
 #include "../helper/string.h"
 #include "../helper/xml.h"
@@ -17,6 +15,92 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
+#include <QtGui/QGridLayout>
+
+
+EllipseDlg::EllipseDlg(QWidget* pParent) : QDialog(pParent), m_pLabelStatus(0)
+{
+	setWindowFlags(Qt::Tool);
+	setWindowTitle("Resolution Ellipses");
+
+	QGridLayout *gridLayout = new QGridLayout(this);
+
+	unsigned int iPos0[] = {0,0,1,1};
+	unsigned int iPos1[] = {0,1,0,1};
+	for(unsigned int i=0; i<4; ++i)
+	{
+		Plot* pPlot = new Plot(this);
+		pPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+		gridLayout->addWidget(pPlot, iPos0[i], iPos1[i], 1, 1);
+		QObject::connect(pPlot, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
+
+		m_pPlots.push_back(pPlot);
+	}
+	m_elliProj.resize(4);
+	m_elliSlice.resize(4);
+
+	m_pLabelStatus = new QLabel(this);
+	m_pLabelStatus->setFrameShape(QFrame::Panel);
+	m_pLabelStatus->setFrameShadow(QFrame::Sunken);
+    gridLayout->addWidget(m_pLabelStatus, 2, 0, 1, 2);
+
+	resize(320,320);
+}
+
+EllipseDlg::~EllipseDlg()
+{
+	for(Plot* pPlot : m_pPlots)
+		delete pPlot;
+	m_pPlots.clear();
+}
+
+void EllipseDlg::paintEvent (QPaintEvent *pEvent)
+{}
+
+void EllipseDlg::hideEvent (QHideEvent *event)
+{
+	Settings::GetGlobals()->setValue("reso/wnd_ellipses_geo", saveGeometry());
+}
+void EllipseDlg::showEvent(QShowEvent *event)
+{
+	restoreGeometry(Settings::GetGlobals()->value("reso/wnd_ellipses_geo").toByteArray());
+}
+
+void EllipseDlg::SetStatusMsg(const char* pcMsg, int iPos)
+{
+	if(!m_pLabelStatus) return;
+
+	if(iPos==2 && m_pLabelStatus->text()!=QString(pcMsg))
+		m_pLabelStatus->setText(pcMsg);
+}
+
+void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
+{
+	m_elliProj[0] = ::calc_res_ellipse(res.reso, 0, 3, 1, 2, -1);
+	m_elliSlice[0] = ::calc_res_ellipse(res.reso, 0, 3, -1, 2, 1);
+
+	m_elliProj[1] = ::calc_res_ellipse(res.reso, 1, 3, 0, 2, -1);
+	m_elliSlice[1] = ::calc_res_ellipse(res.reso, 1, 3, -1, 2, 0);
+
+	m_elliProj[2] = ::calc_res_ellipse(res.reso, 2, 3, 0, 1, -1);
+	m_elliSlice[2] = ::calc_res_ellipse(res.reso, 2, 3, -1, 1, 0);
+
+	m_elliProj[3] = ::calc_res_ellipse(res.reso, 0, 1, 3, 2, -1);
+	m_elliSlice[3] = ::calc_res_ellipse(res.reso, 0, 1, -1, 2, 3);
+
+	for(unsigned int i=0; i<m_pPlots.size(); ++i)
+	{
+		m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str());
+		m_pPlots[i]->plot_param(m_elliProj[i],0);
+		m_pPlots[i]->plot_param(m_elliSlice[i],1);
+	}
+
+	for(Plot* pPlot : m_pPlots)
+		pPlot->repaint();
+}
+
+//----------------------------------------------------------------------------------------
+
 
 
 InstLayoutDlg::InstLayoutDlg(QWidget* pParent) : QDialog(pParent)
@@ -273,6 +357,7 @@ void ScatterTriagDlg::paintEvent(QPaintEvent *pEvent)
 ResoDlg::ResoDlg(QWidget *pParent)
 				: QDialog(pParent),
 				  m_bDontCalc(1),
+				  m_pElliDlg(new EllipseDlg(this)),
 				  m_pInstDlg(new InstLayoutDlg(this)),
 				  m_pScatterDlg(new ScatterTriagDlg(this))
 {
@@ -341,8 +426,10 @@ ResoDlg::ResoDlg(QWidget *pParent)
 	for(QRadioButton* pRadio : m_vecRadioPlus)
 		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 
+	connect(btnGraphics, SIGNAL(clicked(bool)), this, SLOT(ShowEllipses()));
 	connect(btnShowInstr, SIGNAL(clicked(bool)), this, SLOT(ShowInstrLayout()));
 	connect(btnShowTriangle, SIGNAL(clicked(bool)), this, SLOT(ShowScatterTriag()));
+
 	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
 
 	connect(btnLoad, SIGNAL(clicked(bool)), this, SLOT(LoadFile()));
@@ -354,6 +441,7 @@ ResoDlg::ResoDlg(QWidget *pParent)
 
 ResoDlg::~ResoDlg()
 {
+	delete m_pElliDlg;
 	delete m_pInstDlg;
 	delete m_pScatterDlg;
 }
@@ -485,20 +573,7 @@ void ResoDlg::Calc()
 		ostrkvar << dKVar;
 		labelkvar_val->setText(ostrkvar.str().c_str());
 
-
-		Ellipse q0_e_proj = ::calc_res_ellipse(res.reso, 0, 3, 1, 2, -1);
-		Ellipse q0_e_slice = ::calc_res_ellipse(res.reso, 0, 3, -1, 2, 1);
-
-		Ellipse q1_e_proj = ::calc_res_ellipse(res.reso, 1, 3, 0, 2, -1);
-		Ellipse q1_e_slice = ::calc_res_ellipse(res.reso, 1, 3, -1, 2, 0);
-
-		Ellipse q2_e_proj = ::calc_res_ellipse(res.reso, 2, 3, 0, 1, -1);
-		Ellipse q2_e_slice = ::calc_res_ellipse(res.reso, 2, 3, -1, 1, 0);
-
-		Ellipse q0_q1_proj = ::calc_res_ellipse(res.reso, 0, 1, 3, 2, -1);
-		Ellipse q0_q1_slice = ::calc_res_ellipse(res.reso, 0, 1, -1, 2, 3);
-
-		//std::cout << q0_e_proj << "\n" << q0_e_slice << std::endl;
+		m_pElliDlg->SetParams(cn, res);
 	}
 	else
 	{
@@ -682,6 +757,13 @@ void ResoDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	}
 }
 
+void ResoDlg::ShowEllipses()
+{
+	if(!m_pElliDlg->isVisible())
+		m_pElliDlg->show();
+	m_pElliDlg->activateWindow();
+}
+
 void ResoDlg::ShowInstrLayout()
 {
 	if(!m_pInstDlg->isVisible())
@@ -699,6 +781,7 @@ void ResoDlg::ShowScatterTriag()
 void ResoDlg::hideEvent(QHideEvent *event)
 {
 	Settings::GetGlobals()->setValue("reso/wnd_geo", saveGeometry());
+	m_pElliDlg->hide();
 	m_pInstDlg->hide();
 	m_pScatterDlg->hide();
 }

@@ -20,7 +20,7 @@
 enum PlotType
 {
 	PLOT_DATA,
-	PLOT_FIT,
+	PLOT_FKT,
 };
 
 struct PlotObj
@@ -55,10 +55,10 @@ public:
 
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
 	void plot_fkt(const FunctionModel& fkt);
-	void plot_param(const FunctionModel_param& fkt);
+	void plot_param(const FunctionModel_param& fkt, int iObj=-1);
 
 	void clear();
-	void clearfit();
+	void clearfkt();
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }
@@ -75,6 +75,9 @@ public:
 
 	void SetXIsLog(bool bLogX) { m_bXIsLog = bLogX; }
 	void SetYIsLog(bool bLogY) { m_bYIsLog = bLogY; }
+
+	void SetXLimits(double dXMin, double dXMax) { m_dxmin=dXMin; m_dxmax=dXMax; }
+	void SetYLimits(double dYMin, double dYMax) { m_dymin=dYMin; m_dymax=dYMax; }
 
 	virtual SubWindowType GetType() { return PLOT_1D; }
 	virtual double GetTotalCounts() const { return 0.; }

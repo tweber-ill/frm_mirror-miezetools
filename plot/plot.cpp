@@ -71,8 +71,15 @@ void Plot::estimate_minmax()
 
 QColor Plot::GetColor(unsigned int iPlotObj)
 {
-	QColor col = QColor::fromRgbF(0., 0., 0., 1.);
-	return col;
+	static const std::vector<QColor> cols =
+	{
+			QColor::fromRgbF(0., 0., 1., 1.),
+			QColor::fromRgbF(0., 0.5, 0., 1.),
+			QColor::fromRgbF(1., 0., 0., 1.),
+			QColor::fromRgbF(0., 0., 0., 1.)
+	};
+
+	return cols[iPlotObj % cols.size()];
 }
 
 void Plot::paintEvent (QPaintEvent *pEvent)
@@ -171,9 +178,9 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 				}
 			}
 		}
-		else if(pltobj.plttype == PLOT_FIT)
+		else if(pltobj.plttype == PLOT_FKT)
 		{
-			painter.setPen(QColor::fromRgb(0,0,255,255));
+			painter.setPen(/*QColor::fromRgb(0,0,255,255)*/col);
 
 			for(unsigned int uiPt=0; uiPt<obj.GetLength()-1; ++uiPt)
 			{
@@ -203,13 +210,12 @@ void Plot::plot(unsigned int iNum, const double *px, const double *py, const dou
 	RefreshStatusMsgs();
 }
 
-void Plot::plot_param(const FunctionModel_param& fkt)
+void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 {
-	clearfit();
 	const uint iCnt = 512;
 
 	PlotObj pltobj;
-	pltobj.plttype = PLOT_FIT;
+	pltobj.plttype = PLOT_FKT;
 	pltobj.strName = "interpolation";
 	Data1& dat = pltobj.dat;
 
@@ -223,16 +229,27 @@ void Plot::plot_param(const FunctionModel_param& fkt)
 		dat.SetY(iX, vec[1]);
 	}
 
-	m_vecObjs.push_back(pltobj);
+	if(iObj<0)
+	{
+		clearfkt();
+		m_vecObjs.push_back(pltobj);
+	}
+	else
+	{
+		if(m_vecObjs.size() < iObj+1)
+			m_vecObjs.resize(iObj+1);
+		m_vecObjs[iObj] = pltobj;
+	}
+	estimate_minmax();
 }
 
 void Plot::plot_fkt(const FunctionModel& fkt)
 {
-	clearfit();
+	clearfkt();
 	const uint iCnt = 512;
 
 	PlotObj pltobj;
-	pltobj.plttype = PLOT_FIT;
+	pltobj.plttype = PLOT_FKT;
 	pltobj.strName = fkt.print(0);
 	Data1& dat = pltobj.dat;
 
@@ -251,13 +268,14 @@ void Plot::plot_fkt(const FunctionModel& fkt)
 	}
 
 	m_vecObjs.push_back(pltobj);
+	estimate_minmax();
 }
 
-void Plot::clearfit()
+void Plot::clearfkt()
 {
 	for(uint i=0; i<m_vecObjs.size(); ++i)
 	{
-		if(m_vecObjs[i].plttype == PLOT_FIT)
+		if(m_vecObjs[i].plttype == PLOT_FKT)
 		{
 			m_vecObjs.erase(m_vecObjs.begin()+i);
 			--i;
