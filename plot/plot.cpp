@@ -193,6 +193,7 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	}
 
 	painter.restore();
+	mouseMoveEvent(0);
 }
 
 void Plot::plot(unsigned int iNum, const double *px, const double *py, const double *pyerr, const double *pxerr,
@@ -243,9 +244,8 @@ void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 	estimate_minmax();
 }
 
-void Plot::plot_fkt(const FunctionModel& fkt)
+void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 {
-	clearfkt();
 	const uint iCnt = 1024;
 
 	PlotObj pltobj;
@@ -267,7 +267,18 @@ void Plot::plot_fkt(const FunctionModel& fkt)
 		dat.SetY(iX, fkt(dX));
 	}
 
-	m_vecObjs.push_back(pltobj);
+	if(iObj<0)
+	{
+		clearfkt();
+		m_vecObjs.push_back(pltobj);
+	}
+	else
+	{
+		if(m_vecObjs.size() < iObj+1)
+			m_vecObjs.resize(iObj+1);
+		m_vecObjs[iObj] = pltobj;
+	}
+
 	estimate_minmax();
 }
 
@@ -298,20 +309,36 @@ void Plot::RefreshStatusMsgs()
 
 void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 {
-	const QPoint& pt = pEvent->pos();
+	QPoint curPt;
+	const QPoint* pt;
 	const QSize size = this->size();
+
+	if(pEvent)
+	{
+		pt = &pEvent->pos();
+	}
+	else
+	{
+		curPt = mapFromGlobal(QCursor::pos());
+		pt = &curPt;
+	}
 
 	const double dw = m_dxmax-m_dxmin;
 	const double dh = m_dymax-m_dymin;
 
 	// map between [0..1]
-	double dX = double(pt.x()-PAD_X) / double(size.width()-2*PAD_X);
-	double dY = 1. - double(pt.y()-PAD_Y) / double(size.height()-2*PAD_Y);
+	double dX = double(pt->x()-PAD_X) / double(size.width()-2*PAD_X);
+	double dY = 1. - double(pt->y()-PAD_Y) / double(size.height()-2*PAD_Y);
 
 	if(dX>=0. && dX<=1. && dY>=0. && dY<=1.)
 		this->setCursor(Qt::CrossCursor);
 	else
+	{
+		if(pEvent==0)  // here, we are not even in the correct plot window if called externally
+			return;
+
 		this->setCursor(Qt::ArrowCursor);
+	}
 
 	if(m_bXIsLog)
 	{

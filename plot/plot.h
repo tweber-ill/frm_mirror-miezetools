@@ -44,7 +44,6 @@ protected:
 	void estimate_minmax();
 
 	bool m_bXIsLog, m_bYIsLog;
-
 	QString m_strXAxis, m_strYAxis, m_strTitle;
 
 	QColor GetColor(unsigned int iPlotObj) const;
@@ -54,7 +53,7 @@ public:
 	virtual ~Plot();
 
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
-	void plot_fkt(const FunctionModel& fkt);
+	void plot_fkt(const FunctionModel& fkt, int iObj=-1);
 	void plot_param(const FunctionModel_param& fkt, int iObj=-1);
 
 	void clear();
