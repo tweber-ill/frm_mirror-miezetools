@@ -241,7 +241,9 @@ void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 			m_vecObjs.resize(iObj+1);
 		m_vecObjs[iObj] = pltobj;
 	}
+
 	estimate_minmax();
+	RefreshStatusMsgs();
 }
 
 void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
@@ -280,6 +282,7 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 	}
 
 	estimate_minmax();
+	RefreshStatusMsgs();
 }
 
 void Plot::clearfkt()
@@ -330,11 +333,13 @@ void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 	double dX = double(pt->x()-PAD_X) / double(size.width()-2*PAD_X);
 	double dY = 1. - double(pt->y()-PAD_Y) / double(size.height()-2*PAD_Y);
 
+	//std::cout << dX << ", " << dY << std::endl;
+
 	if(dX>=0. && dX<=1. && dY>=0. && dY<=1.)
 		this->setCursor(Qt::CrossCursor);
 	else
 	{
-		if(pEvent==0)  // here, we are not even in the correct plot window if called externally
+		if(pEvent==0)  // here, we may not even be in the correct plot window if called externally
 			return;
 
 		this->setCursor(Qt::ArrowCursor);
