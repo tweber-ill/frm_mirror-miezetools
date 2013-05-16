@@ -1,8 +1,10 @@
 CC = gcc
 INC = -I/usr/include/qt4
 FLAGS = ${INC} -O2 -march=native -std=c++11 -DNDEBUG
-LIBS_RESO = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lstdc++ -lm -lQtCore -lQtGui -lQtXml -lQtXmlPatterns
-LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lstdc++ -lm -fopenmp -lMinuit2 -lfftw3 -lQtCore -lQtGui -lQtXml -lQtXmlPatterns
+LAPACK_LIBS = -llapack -llapacke
+QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lQtCore -lQtGui -lQtXml -lQtXmlPatterns
+LIBS_RESO = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lstdc++ -lm ${QT_LIBS} ${LAPACK_LIBS}
+LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lstdc++ -lm -fopenmp -lMinuit2 -lfftw3 ${QT_LIBS} ${LAPACK_LIBS}
 
 
 cattus: main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o
