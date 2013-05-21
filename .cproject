@@ -44,6 +44,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.848003280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="QtGui"/>
+									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="QtOpenGL"/>
 									<listOptionValue builtIn="false" value="GLU"/>
 									<listOptionValue builtIn="false" value="QtOpenGL"/>
@@ -116,6 +117,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.1439036568" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="QtGui"/>
+									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="QtOpenGL"/>
 									<listOptionValue builtIn="false" value="GLU"/>
 									<listOptionValue builtIn="false" value="QtOpenGL"/>

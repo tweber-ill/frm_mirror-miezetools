@@ -132,8 +132,9 @@ protected:
 	void WriteLastConfig();
 	void ReadLastConfig();
 
+	PopParams m_pop;
+	CNResults m_res;
 	bool m_bDontCalc;
-
 
 	EllipseDlg *m_pElliDlg;
 	EllipseDlg3D *m_pElli3dDlg;

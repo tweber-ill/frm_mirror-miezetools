@@ -4,9 +4,13 @@
  * @date 04-mar-2013
  */
 
+#include <QtCore/QMetaType>
 #include <QtGui/QApplication>
 #include <iostream>
 #include <string>
+
+//#include <X11/Xlib.h>
+extern "C" int XInitThreads();
 
 #include "mainwnd.h"
 #include "settings.h"
@@ -20,6 +24,7 @@ static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 int main(int argc, char **argv)
 {
 	int iRet = -1;
+	XInitThreads();
 
 	try
 	{

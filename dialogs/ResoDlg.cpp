@@ -119,10 +119,10 @@ EllipseDlg3D::EllipseDlg3D(QWidget* pParent) : QDialog(pParent)
 
 		m_pPlots.push_back(pPlot);
 	}
-	m_elliProj.resize(3);
-	m_elliSlice.resize(3);
+	m_elliProj.resize(2);
+	m_elliSlice.resize(2);
 
-	resize(800,600);
+	resize(640,480);
 }
 
 EllipseDlg3D::~EllipseDlg3D()
@@ -435,10 +435,7 @@ void ScatterTriagDlg::paintEvent(QPaintEvent *pEvent)
 ResoDlg::ResoDlg(QWidget *pParent)
 				: QDialog(pParent),
 				  m_bDontCalc(1),
-				  m_pElliDlg(new EllipseDlg(this)),
-				  m_pElli3dDlg(new EllipseDlg3D(this)),
-				  m_pInstDlg(new InstLayoutDlg(this)),
-				  m_pScatterDlg(new ScatterTriagDlg(this))
+				  m_pElliDlg(0), m_pElli3dDlg(0), m_pInstDlg(0), m_pScatterDlg(0)
 {
 	setupUi(this);
 	m_vecSpinBoxes = {spinMonod, spinMonoMosaic, spinAnad,
@@ -521,10 +518,10 @@ ResoDlg::ResoDlg(QWidget *pParent)
 
 ResoDlg::~ResoDlg()
 {
-	delete m_pElliDlg;
-	delete m_pElli3dDlg;
-	delete m_pInstDlg;
-	delete m_pScatterDlg;
+	if(m_pElliDlg) delete m_pElliDlg;
+	if(m_pElli3dDlg) delete m_pElli3dDlg;
+	if(m_pInstDlg) delete m_pInstDlg;
+	if(m_pScatterDlg) delete m_pScatterDlg;
 }
 
 
@@ -548,7 +545,9 @@ void ResoDlg::Calc()
 		return;
 
 	const units::quantity<units::si::length> angstrom = 1e-10 * units::si::meter;
-	PopParams cn;
+
+	PopParams& cn = m_pop;
+	CNResults &res = m_res;
 
 	// CN
 	cn.mono_d = spinMonod->value() * angstrom;
@@ -620,10 +619,10 @@ void ResoDlg::Calc()
 	cn.dist_src_mono = spinDistSrcMono->value()*0.01*units::si::meter;
 
 	const bool bUseCN = radioCN->isChecked();
-	CNResults res = (bUseCN ? calc_cn(cn) : calc_pop(cn));
+	res = (bUseCN ? calc_cn(cn) : calc_pop(cn));
 
-	m_pInstDlg->SetParams(cn, res);
-	m_pScatterDlg->SetParams(cn, res);
+	if(m_pInstDlg) m_pInstDlg->SetParams(cn, res);
+	if(m_pScatterDlg) m_pScatterDlg->SetParams(cn, res);
 
 	if(res.bOk)
 	{
@@ -654,8 +653,8 @@ void ResoDlg::Calc()
 		ostrkvar << dKVar;
 		labelkvar_val->setText(ostrkvar.str().c_str());
 
-		m_pElliDlg->SetParams(cn, res);
-		m_pElli3dDlg->SetParams(cn, res);
+		if(m_pElliDlg) m_pElliDlg->SetParams(cn, res);
+		if(m_pElli3dDlg) m_pElli3dDlg->SetParams(cn, res);
 	}
 	else
 	{
@@ -841,6 +840,12 @@ void ResoDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 
 void ResoDlg::ShowEllipses()
 {
+	if(!m_pElliDlg)
+	{
+		m_pElliDlg = new EllipseDlg(this);
+		m_pElliDlg->SetParams(m_pop, m_res);
+	}
+
 	if(!m_pElliDlg->isVisible())
 		m_pElliDlg->show();
 	m_pElliDlg->activateWindow();
@@ -848,6 +853,12 @@ void ResoDlg::ShowEllipses()
 
 void ResoDlg::ShowEllipses3d()
 {
+	if(!m_pElli3dDlg)
+	{
+		m_pElli3dDlg = new EllipseDlg3D(this);
+		m_pElli3dDlg->SetParams(m_pop, m_res);
+	}
+
 	if(!m_pElli3dDlg->isVisible())
 		m_pElli3dDlg->show();
 	m_pElli3dDlg->activateWindow();
@@ -855,6 +866,12 @@ void ResoDlg::ShowEllipses3d()
 
 void ResoDlg::ShowInstrLayout()
 {
+	if(!m_pInstDlg)
+	{
+		m_pInstDlg = new InstLayoutDlg(this);
+		m_pInstDlg->SetParams(m_pop, m_res);
+	}
+
 	if(!m_pInstDlg->isVisible())
 		m_pInstDlg->show();
 	m_pInstDlg->activateWindow();
@@ -862,6 +879,12 @@ void ResoDlg::ShowInstrLayout()
 
 void ResoDlg::ShowScatterTriag()
 {
+	if(!m_pScatterDlg)
+	{
+		m_pScatterDlg = new ScatterTriagDlg(this);
+		m_pScatterDlg->SetParams(m_pop, m_res);
+	}
+
 	if(!m_pScatterDlg->isVisible())
 		m_pScatterDlg->show();
 	m_pScatterDlg->activateWindow();
@@ -870,10 +893,10 @@ void ResoDlg::ShowScatterTriag()
 void ResoDlg::hideEvent(QHideEvent *event)
 {
 	Settings::GetGlobals()->setValue("reso/wnd_geo", saveGeometry());
-	m_pElliDlg->hide();
-	m_pElli3dDlg->hide();
-	m_pInstDlg->hide();
-	m_pScatterDlg->hide();
+	if(m_pElliDlg) m_pElliDlg->hide();
+	if(m_pElli3dDlg) m_pElli3dDlg->hide();
+	if(m_pInstDlg) m_pInstDlg->hide();
+	if(m_pScatterDlg) m_pScatterDlg->hide();
 }
 
 void ResoDlg::showEvent(QShowEvent *event)
