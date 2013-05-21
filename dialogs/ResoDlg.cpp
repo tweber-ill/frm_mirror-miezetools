@@ -141,6 +141,40 @@ void EllipseDlg3D::showEvent(QShowEvent *event)
 	restoreGeometry(Settings::GetGlobals()->value("reso/wnd_ellipses3d_geo").toByteArray());
 }
 
+
+template<typename T=double>
+T max3(T t1, T t2, T t3)
+{
+	T tmax = t1;
+	tmax = std::max(tmax, t2);
+	tmax = std::max(tmax, t3);
+	return tmax;
+}
+
+ublas::vector<double>
+EllipseDlg3D::ProjRotatedVec(const ublas::matrix<double>& rot,
+														const ublas::vector<double>& vec)
+{
+	ublas::vector<double> vecCoord(3);
+
+	ublas::vector<double> x = ublas::zero_vector<double>(3);
+	x[0] = 1.;
+	ublas::vector<double> y = ublas::zero_vector<double>(3);
+	y[1] = 1.;
+	ublas::vector<double> z = ublas::zero_vector<double>(3);
+	z[2] = 1.;
+
+	const ublas::vector<double> vecrot_x = ublas::prod(rot, x*vec[0]);
+	const ublas::vector<double> vecrot_y = ublas::prod(rot, y*vec[1]);
+	const ublas::vector<double> vecrot_z = ublas::prod(rot, z*vec[2]);
+
+	vecCoord[0] = std::fabs(vecrot_x[0]) + std::fabs(vecrot_y[0]) + std::fabs(vecrot_z[0]);
+	vecCoord[1] = std::fabs(vecrot_x[1]) + std::fabs(vecrot_y[1]) + std::fabs(vecrot_z[1]);
+	vecCoord[2] = std::fabs(vecrot_x[2]) + std::fabs(vecrot_y[2]) + std::fabs(vecrot_z[2]);
+
+	return vecCoord;
+}
+
 void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
 {
 	m_elliProj[0] = ::calc_res_ellipsoid(res.reso, 0, 1, 3, 2, -1);
@@ -173,7 +207,8 @@ void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
 		m_pPlots[i]->PlotEllipsoid(vecWProj, vecOffsProj, m_elliProj[i].rot, 0);
 		m_pPlots[i]->PlotEllipsoid(vecWSlice, vecOffsSlice, m_elliSlice[i].rot, 1);
 
-		//m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str());
+		m_pPlots[i]->SetMinMax(ProjRotatedVec(m_elliProj[i].rot, vecWProj));
+		m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str(), m_elliProj[i].z_lab.c_str());
 	}
 }
 

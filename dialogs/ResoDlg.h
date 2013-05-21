@@ -52,6 +52,10 @@ protected:
 	std::vector<Ellipsoid> m_elliProj;
 	std::vector<Ellipsoid> m_elliSlice;
 
+	ublas::vector<double>
+	ProjRotatedVec(const ublas::matrix<double>& rot,
+							const ublas::vector<double>& vec);
+
 public:
 	EllipseDlg3D(QWidget* pParent);
 	virtual ~EllipseDlg3D();

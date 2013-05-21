@@ -25,6 +25,7 @@ int main(int argc, char **argv)
 {
 	int iRet = -1;
 	XInitThreads();
+	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
 	try
 	{
