@@ -169,10 +169,13 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 		for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 		{
 			Data1 dat = dat4.GetXYSum(iFoil);
+			const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
+			dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
+			// TODO: case for dat4.GetDepth() != pvecDatX->size() (ROI)
 
-			const std::vector<double>& vecX = dat.GetX();
-			const std::vector<double>& vecY = dat.GetY();
-			const std::vector<double>& vecYErr = dat.GetYErr();
+			const std::vector<double> &vecX = *pvecDatX,
+									&vecY = *pvecDatY,
+									&vecYErr = *pvecDatYErr;
 
 			double *pdxFoil = new double[dat4.GetDepth()];
 			double *pdyFoil = new double[dat4.GetDepth()];
@@ -253,10 +256,13 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 		strTitle += std::string(" -> t channels");
 
 		Data1 dat = pPlot4d->GetData().GetXYSum(iFoil);
+		const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
+		dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
+		// TODO
 
-		double *pdx = vec_to_array<double>(dat.GetX());
-		double *pdy = vec_to_array<double>(dat.GetY());
-		double *pdyerr = vec_to_array<double>(dat.GetYErr());
+		double *pdx = vec_to_array<double>(*pvecDatX);
+		double *pdy = vec_to_array<double>(*pvecDatY);
+		double *pdyerr = vec_to_array<double>(*pvecDatYErr);
 		autodeleter<double> _a0(pdx, 1);
 		autodeleter<double> _a1(pdy, 1);
 		autodeleter<double> _a2(pdyerr, 1);

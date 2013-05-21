@@ -26,6 +26,7 @@
 								<option id="gnu.cpp.compiler.option.other.other.982403098" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1776715981" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/qt4"/>
+									<listOptionValue builtIn="false" value="/usr/local/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.123384736" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -38,17 +39,21 @@
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.paths.729619655" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/lib64/qt4/lib"/>
+									<listOptionValue builtIn="false" value="/usr/local/lib64"/>
 									<listOptionValue builtIn="false" value="/usr/lib64/qt4"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.848003280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="QtGui"/>
+									<listOptionValue builtIn="false" value="QtOpenGL"/>
+									<listOptionValue builtIn="false" value="GLU"/>
+									<listOptionValue builtIn="false" value="QtOpenGL"/>
 									<listOptionValue builtIn="false" value="QtXmlPatterns"/>
 									<listOptionValue builtIn="false" value="fftw3"/>
 									<listOptionValue builtIn="false" value="gomp"/>
 									<listOptionValue builtIn="false" value="Minuit2"/>
 									<listOptionValue builtIn="false" value="QtCore"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="lapack"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="lapacke"/>
+									<listOptionValue builtIn="false" value="lapack"/>
+									<listOptionValue builtIn="false" value="lapacke"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2083585386" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -58,16 +63,6 @@
 							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.440427117" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
-						</toolChain>
-					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.321083479.1737901957" name="/" resourcePath="test">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1095426285" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1416546844" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1734708344"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1580201416" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1953792264" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.781248332" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.145692831"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.417108622" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.785879618" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
@@ -103,6 +98,7 @@
 								<option id="gnu.cpp.compiler.option.other.other.1556194018" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.26320680" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/qt4"/>
+									<listOptionValue builtIn="false" value="/usr/local/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.248660483" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -115,17 +111,21 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.346119555" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
 								<option id="gnu.cpp.link.option.paths.1624595974" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/lib64/qt4/lib"/>
+									<listOptionValue builtIn="false" value="/usr/local/lib64"/>
 									<listOptionValue builtIn="false" value="/usr/lib64/qt4"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1439036568" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="QtGui"/>
+									<listOptionValue builtIn="false" value="QtOpenGL"/>
+									<listOptionValue builtIn="false" value="GLU"/>
+									<listOptionValue builtIn="false" value="QtOpenGL"/>
 									<listOptionValue builtIn="false" value="QtXmlPatterns"/>
 									<listOptionValue builtIn="false" value="fftw3"/>
 									<listOptionValue builtIn="false" value="gomp"/>
 									<listOptionValue builtIn="false" value="Minuit2"/>
 									<listOptionValue builtIn="false" value="QtCore"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="lapack"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="lapacke"/>
+									<listOptionValue builtIn="false" value="lapack"/>
+									<listOptionValue builtIn="false" value="lapacke"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1692054219" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -135,16 +135,6 @@
 							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1979032693" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
-						</toolChain>
-					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.1616845256.1803722080" name="/" resourcePath="test">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.749548536" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1272569536" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1060114624"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.944248606" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1580836919" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.15962491" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release.2100629918"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.943015187" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.346119555"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.144851965" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
@@ -158,21 +148,6 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="mieze.cdt.managedbuild.target.gnu.exe.1127181179" name="Executable" projectType="cdt.managedbuild.target.gnu.exe"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.321083479;cdt.managedbuild.config.gnu.exe.debug.321083479.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685;cdt.managedbuild.tool.gnu.cpp.compiler.input.123384736">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.321083479;cdt.managedbuild.config.gnu.exe.debug.321083479.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108;cdt.managedbuild.tool.gnu.c.compiler.input.2037163054">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.1616845256;cdt.managedbuild.config.gnu.exe.release.1616845256.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783;cdt.managedbuild.tool.gnu.cpp.compiler.input.248660483">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.1616845256;cdt.managedbuild.config.gnu.exe.release.1616845256.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261;cdt.managedbuild.tool.gnu.c.compiler.input.351879852">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Release">
@@ -183,4 +158,19 @@
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.321083479;cdt.managedbuild.config.gnu.exe.debug.321083479.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685;cdt.managedbuild.tool.gnu.cpp.compiler.input.123384736">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.1616845256;cdt.managedbuild.config.gnu.exe.release.1616845256.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783;cdt.managedbuild.tool.gnu.cpp.compiler.input.248660483">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.1616845256;cdt.managedbuild.config.gnu.exe.release.1616845256.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261;cdt.managedbuild.tool.gnu.c.compiler.input.351879852">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.321083479;cdt.managedbuild.config.gnu.exe.debug.321083479.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108;cdt.managedbuild.tool.gnu.c.compiler.input.2037163054">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
 </cproject>

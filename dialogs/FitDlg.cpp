@@ -400,7 +400,10 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 	res.pPlot = (Plot*)pSWB->ConvertTo1d();
 	res.bCreatedNewPlot = (res.pPlot != pSWB);
 	if(!res.pPlot)
+	{
+		res.strErr = "Unable to convert data.";
 		return res;
+	}
 
 	if(res.pPlot->GetDataCount() == 0)
 	{
@@ -409,17 +412,22 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 	}
 
 	Data1& dat = res.pPlot->GetData(0).dat;
-	double *px = vec_to_array<double>(dat.GetX());
-	double *py = vec_to_array<double>(dat.GetY());
-	double *pyerr = vec_to_array<double>(dat.GetYErr());
+	const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
+	dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
+
+	double *px = vec_to_array<double>(*pvecDatX);
+	double *py = vec_to_array<double>(*pvecDatY);
+	double *pyerr = vec_to_array<double>(*pvecDatYErr);
 	autodeleter<double> _a0(px, 1);
 	autodeleter<double> _a1(py, 1);
 	autodeleter<double> _a2(pyerr, 1);
+	const unsigned int iLen = pvecDatX->size();
+
 
 	if(bAssumeErrorIfZero)
 	{
-		double dMaxY = *std::max_element(py, py+dat.GetLength());
-		for(unsigned int iErr=0; iErr<dat.GetLength(); ++iErr)
+		double dMaxY = *std::max_element(py, py+iLen);
+		for(unsigned int iErr=0; iErr<iLen; ++iErr)
 		{
 			if(pyerr[iErr] < std::numeric_limits<double>::min())
 				pyerr[iErr] = dMaxY * 0.1;
@@ -431,7 +439,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 	bool bOk = 0;
 	if(iFkt == FIT_MIEZE_SINE) 				// MIEZE sine
 	{
-		if(dat.GetLength() < 2)
+		if(iLen < 2)
 		{
 			res.strErr = "Too few data points for MIEZE sine fit.";
 			return res;
@@ -441,7 +449,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));;
 
 		MiezeSinModel *pModel = 0;
-		bOk = ::get_mieze_contrast(dFreq, dNumOsc, dat.GetLength(), px, py, pyerr, &pModel);
+		bOk = ::get_mieze_contrast(dFreq, dNumOsc, iLen, px, py, pyerr, &pModel);
 
 		std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
 						<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
@@ -451,20 +459,22 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 	else if(iFkt == FIT_GAUSSIAN) 		// Gaussian
 	{
 		GaussModel *pModel = 0;
-		bOk = ::get_gauss(dat.GetLength(), px, py, pyerr, &pModel);
+		bOk = ::get_gauss(iLen, px, py, pyerr, &pModel);
 		pFkt = pModel;
 	}
 	else if(iFkt == FIT_DOUBLE_GAUSSIAN)
 	{
 		MultiGaussModel *pModel = 0;
-		bOk = ::get_doublegauss(dat.GetLength(), px, py, pyerr, &pModel);
+		bOk = ::get_doublegauss(iLen, px, py, pyerr, &pModel);
 		pFkt = pModel;
 	}
 
 	if(pFkt)
 	{
+		std::cout << "Fit: " << *pFkt << std::endl;
+
 		res.pPlot->plot_fkt(*pFkt);
-		res.pPlot->repaint();
+		res.pPlot->RefreshPaint();
 		res.bOk = 1;
 
 		delete pFkt;
@@ -666,18 +676,21 @@ void FitDlg::DoFit()
 			}
 
 			Data1& dat = pPlot->GetData(0).dat;
+			const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
+			dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
 
-			double *px = vec_to_array<double>(dat.GetX());
-			double *py = vec_to_array<double>(dat.GetY());
-			double *pyerr = vec_to_array<double>(dat.GetYErr());
+			double *px = vec_to_array<double>(*pvecDatX);
+			double *py = vec_to_array<double>(*pvecDatY);
+			double *pyerr = vec_to_array<double>(*pvecDatYErr);
 			autodeleter<double> _a0(px, 1);
 			autodeleter<double> _a1(py, 1);
 			autodeleter<double> _a2(pyerr, 1);
+			const unsigned int iLen = pvecDatX->size();
 
 			if(bAssumeErrorIfZero)
 			{
-				double dMaxY = *std::max_element(py, py+dat.GetLength());
-				for(unsigned int iErr=0; iErr<dat.GetLength(); ++iErr)
+				double dMaxY = *std::max_element(py, py+iLen);
+				for(unsigned int iErr=0; iErr<iLen; ++iErr)
 				{
 					if(pyerr[iErr] < std::numeric_limits<double>::min())
 						pyerr[iErr] = dMaxY * 0.1;
@@ -689,7 +702,7 @@ void FitDlg::DoFit()
 			std::vector<double> vecFittedErrs;
 
 			FreeFktModel *pModel;
-			bool bOk = ::get_freefit(dat.GetLength(), px, py, pyerr,
+			bool bOk = ::get_freefit(iLen, px, py, pyerr,
 									strFkt.c_str(), bLimits?strLimits.c_str():0, bHints?strHints.c_str():0,
 									vecFittedNames, vecFittedParams, vecFittedErrs,
 									&pModel);
@@ -703,7 +716,7 @@ void FitDlg::DoFit()
 				 }
 
 				pPlot->plot_fkt(*pModel);
-				pPlot->repaint();
+				pPlot->RefreshPaint();
 
 				delete pModel;
 			 }

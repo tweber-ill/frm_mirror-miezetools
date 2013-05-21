@@ -73,7 +73,9 @@ protected slots:
 
 	void UpdateSubWndList();
 	void ShowListWindowsDlg();
+
 	void ShowCombineGraphsDlg();
+	void IntAlongY();
 
 	void SettingsTriggered();
 
@@ -99,12 +101,14 @@ protected slots:
 
 	void NewRoiAvailable(const Roi* pROI);
 	void SetGlobalROI(bool bSet);
+	void RefreshGlobalROI();
 
 public:
 	MiezeMainWnd();
 	virtual ~MiezeMainWnd();
 
 	void LoadFile(const std::string& strFile);
+	void MakePlot(const Data1& dat, const std::string& strTitle);
 
 public slots:
 	void SetStatusMsg(const char* pcMsg, int iPos);

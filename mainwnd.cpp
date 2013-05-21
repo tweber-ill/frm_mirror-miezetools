@@ -131,7 +131,7 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuInterp->setTitle("Interpolation");
 
 	QAction *pInterpBezier = new QAction(this);
-	pInterpBezier->setText(QString::fromUtf8("Bézier Curve"));
+	pInterpBezier->setText(QString::fromUtf8("B��zier Curve"));
 	pMenuInterp->addAction(pInterpBezier);
 
 	QAction *pInterpBSpline = new QAction(this);
@@ -149,6 +149,15 @@ MiezeMainWnd::MiezeMainWnd()
 	pCombineGraphs->setText("Plot Counts/Contrasts...");
 	pMenuTools->addAction(pCombineGraphs);
 	pMenuTools->addSeparator();
+
+	QMenu *pMenuIntegrate = new QMenu(pMenuTools);
+	pMenuIntegrate->setTitle("Integrate");
+
+	QAction *pIntAlongY = new QAction(this);
+	pIntAlongY->setText("Integrate Y");
+	pMenuIntegrate->addAction(pIntAlongY);
+
+	pMenuTools->addMenu(pMenuIntegrate);
 
 
 	// ROI
@@ -267,6 +276,8 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
+	QObject::connect(pIntAlongY, SIGNAL(triggered()), this, SLOT(IntAlongY()));
+
 	QObject::connect(pFit, SIGNAL(triggered()), this, SLOT(ShowFitDlg()));
 	QObject::connect(pQFitMieze, SIGNAL(triggered()), this, SLOT(QuickFitMIEZE()));
 	QObject::connect(pQFitMiezeArea, SIGNAL(triggered()), this, SLOT(QuickFitMIEZEpixel()));
@@ -353,6 +364,14 @@ void MiezeMainWnd::SubWindowChanged()
 	}
 
 	// ...
+}
+
+void MiezeMainWnd::MakePlot(const Data1& dat, const std::string& strTitle)
+{
+	Plot *pPlot = new Plot(m_pmdi);
+	pPlot->plot(dat);
+	pPlot->setWindowTitle(strTitle.c_str());
+	AddSubWindow(pPlot);
 }
 
 void MiezeMainWnd::LoadFile(const std::string& strFile)
@@ -486,6 +505,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 				std::string strTitle = GetPlotTitle(strFileNoDir);
 
 				Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
+				pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 				pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
 
 				std::string strLabX, strLabY, strPlotTitle;
@@ -779,9 +799,25 @@ void MiezeMainWnd::NewRoiAvailable(const Roi* pROI)
 	m_mainROI = *pROI;
 }
 
+void MiezeMainWnd::RefreshGlobalROI()
+{
+	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
+	for(QMdiSubWindow *pItem : lst)
+	{
+		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
+		pWnd = pWnd->GetActualWidget();
+		pWnd->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
+	}
+}
+
 void MiezeMainWnd::SetGlobalROI(bool bSet)
 {
-	m_bmainROIActive = bSet;
+	if(bSet!=m_bmainROIActive)
+	{
+		m_bmainROIActive = bSet;
+		if(m_bmainROIActive)
+			RefreshGlobalROI();
+	}
 }
 
 void MiezeMainWnd::SettingsTriggered()
@@ -884,6 +920,27 @@ void MiezeMainWnd::ShowCombineGraphsDlg()
 	}
 }
 
+void MiezeMainWnd::IntAlongY()
+{
+	SubWindowBase* pSWB = GetActivePlot();
+	if(!pSWB)
+	{
+		QMessageBox::critical(this, "Error", "No active plot.");
+		return;
+	}
+
+	if(pSWB->GetType() != PLOT_2D)
+	{
+		QMessageBox::critical(this, "Error", "Plot type mismatch.");
+		return;
+	}
+
+	Plot2d* pPlot = (Plot2d*)pSWB;
+	Data1 dat1 = pPlot->GetData2().SumY();
+
+	MakePlot(dat1, pSWB->windowTitle().toStdString()+std::string(" -> y int"));
+}
+
 SubWindowBase* MiezeMainWnd::GetActivePlot()
 {
 	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
@@ -953,21 +1010,24 @@ void MiezeMainWnd::Interpolation(SubWindowBase* pSWB, InterpFkt iFkt)
 	}
 
 	Plot *pPlot = (Plot*)pSWB;
-	const Data1& dat = pPlot->GetData(0).dat;
+	Data1& dat = pPlot->GetData(0).dat;
 
-	const double *px = ::vec_to_array(dat.GetX());
-	const double *py = ::vec_to_array(dat.GetY());
+	const std::vector<double> *pvecDatX, *pvecDatY;
+	dat.GetData(&pvecDatX, &pvecDatY);
+	const double *px = ::vec_to_array(*pvecDatX);
+	const double *py = ::vec_to_array(*pvecDatY);
+	const unsigned int iLen = pvecDatX->size();
 
 	if(iFkt == INTERP_BEZIER)
 	{
-		Bezier bezier(dat.GetLength(), px, py);
+		Bezier bezier(iLen, px, py);
 		pPlot->plot_param(bezier);
 	}
 	else if(iFkt == INTERP_BSPLINE)
 	{
 		const int iDegree = Settings::Get<int>("interpolation/spline_degree");
 
-		BSpline spline(dat.GetLength(), px, py, iDegree);
+		BSpline spline(iLen, px, py, iDegree);
 		pPlot->plot_param(spline);
 	}
 	else
@@ -978,7 +1038,7 @@ void MiezeMainWnd::Interpolation(SubWindowBase* pSWB, InterpFkt iFkt)
 	delete[] px;
 	delete[] py;
 
-	pPlot->repaint();
+	pPlot->RefreshPaint();
 }
 
 void MiezeMainWnd::BSplineInterpolation() { Interpolation(GetActivePlot(), INTERP_BSPLINE); }

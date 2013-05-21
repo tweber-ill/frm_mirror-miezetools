@@ -40,6 +40,9 @@ public:
 		strLibs += "Uses Minuit version 2 (http://root.cern.ch).";
 		strLibs += "\n";
 		strLibs += "Uses FFTW version 3 (http://www.fftw.org).";
+		strLibs += "\n";
+		strLibs += "Uses Lapack/e version 3 (http://www.netlib.org/lapack).";
+		strLibs += "\n";
 
 		this->labelTitle->setText("Cattus");
 		this->labelVersion->setText("Version 0.1");

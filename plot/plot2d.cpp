@@ -360,5 +360,13 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 	}
 }
 
+void Plot2d::SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
+{
+	DataInterface* pDat = GetInternalData();
+	if(!pDat) return;
+
+	pDat->SetGlobalROI(pROI, pbROIActive);
+	GetData2().SetGlobalROI(pROI, pbROIActive);
+}
 
 #include "plot2d.moc"

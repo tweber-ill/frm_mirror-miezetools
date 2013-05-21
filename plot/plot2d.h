@@ -73,18 +73,12 @@ public:
 	virtual SubWindowType GetType() { return PLOT_2D; }
 	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
 
+
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat; }
 
 public:
-	void SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
-	{
-		DataInterface* pDat = GetInternalData();
-		if(!pDat) return;
-
-		pDat->SetGlobalROI(pROI, pbROIActive);
-		GetData2().SetGlobalROI(pROI, pbROIActive);
-	}
+	void SetGlobalROI(const Roi* pROI, const bool* pbROIActive);
 };
 
 #endif

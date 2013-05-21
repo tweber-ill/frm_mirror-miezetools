@@ -14,7 +14,7 @@
 #define PAD_X 18
 #define PAD_Y 18
 
-Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent),
+Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pPixmap(0),
 									m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.),
 									m_bXIsLog(0), m_bYIsLog(0)
 {
@@ -26,6 +26,7 @@ Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent),
 Plot::~Plot()
 {
 	clear();
+	if(m_pPixmap) delete m_pPixmap;
 }
 
 QSize Plot::minimumSizeHint() const
@@ -61,8 +62,8 @@ void Plot::estimate_minmax()
 		}
 	}
 
-	const double dPadX = (m_dxmax-m_dxmin) / 16.;
-	const double dPadY = (m_dymax-m_dymin) / 16.;
+	const double dPadX = (m_dxmax-m_dxmin) / 12.;
+	const double dPadY = (m_dymax-m_dymin) / 12.;
 	m_dxmin -= dPadX;
 	m_dxmax += dPadX;
 	m_dymin -= dPadY;
@@ -82,27 +83,55 @@ QColor Plot::GetColor(unsigned int iPlotObj) const
 	return cols[iPlotObj % cols.size()];
 }
 
-void Plot::paintEvent (QPaintEvent *pEvent)
+void Plot::resizeEvent(QResizeEvent *pEvent)
+{
+	paint();
+}
+
+void Plot::RefreshPaint()
+{
+	paint();
+	repaint();
+}
+
+void Plot::paint()
 {
 	QSize size = this->size();
+
+	if(m_pPixmap)
+	{
+		if(size.width()!=m_pPixmap->width() || size.height()!=m_pPixmap->height())
+		{
+			delete m_pPixmap;
+			m_pPixmap=0;
+		}
+	}
+	if(!m_pPixmap)
+		m_pPixmap = new QPixmap(size);
+
+	m_pPixmap->fill(Qt::white);
+
 	double dStartX = PAD_X;
 	double dStartY = PAD_Y;
 	double dCurH = size.height() - PAD_Y*2;
 	double dCurW = size.width() - PAD_X*2;
 
 
-	QPainter painter(this);
+	QPainter painter(m_pPixmap);
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
 
-	painter.setFont(QFont("Nimbus Sans L", 10));
+	QFont fontMain("Nimbus Sans L", 10);
+	painter.setFont(fontMain);
 	painter.drawText(QRect(0, 0, size.width(), PAD_Y), Qt::AlignCenter, m_strTitle);
 	painter.drawText(QRect(0, size.height()-PAD_Y+2, size.width(), PAD_Y-2), Qt::AlignCenter, m_strXAxis);
 
 	painter.save();
-	painter.rotate(-90);
-	painter.drawText(QRect(0, 0, -size.height(), PAD_X-4), Qt::AlignCenter, m_strYAxis);
+	painter.translate(QPoint(PAD_X-2,0));
+	painter.rotate(90.);
+	painter.drawText(QRect(0, 0, size.height(), PAD_X-4), Qt::AlignCenter, m_strYAxis);
 	painter.restore();
+
 
 	QPen pen = QColor::fromRgb(0,0,0,255);
 	pen.setStyle(Qt::SolidLine);
@@ -111,22 +140,39 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 	painter.fillRect(dStartX, dStartY, dCurW, dCurH, QColor::fromRgbF(1.,1.,1.,1.));
 	painter.drawRect(dStartX, dStartY, dCurW, dCurH);
 
+
 	// grid
 	pen.setColor(QColor::fromRgbF(0., 0., 0., 0.5));
 	pen.setStyle(Qt::DotLine);
 	painter.setPen(pen);
 
-	const unsigned int iNumGridLines = 10;
+	QFont fontAxis("DejaVu Sans", 7);
+	fontAxis.setBold(1);
+	painter.setFont(fontAxis);
+
+	const unsigned int iNumGridLines = 8;
 	for(unsigned int iGrid=1; iGrid<iNumGridLines+1; ++iGrid)
 	{
-		// x line
-		painter.drawLine(QLineF(dStartX, dStartY+iGrid*dCurH/double(iNumGridLines+1),
-											dStartX+dCurW, dStartY+iGrid*dCurH/double(iNumGridLines+1)));
+		double dLineX = dStartX+iGrid*dCurW/double(iNumGridLines+1);
+		double dLineY = dStartY+iGrid*dCurH/double(iNumGridLines+1);
 
-		// y line
-		painter.drawLine(QLineF(dStartX+iGrid*dCurW/double(iNumGridLines+1), dStartY,
-											dStartX+iGrid*dCurW/double(iNumGridLines+1), dStartY+dCurH));
+		painter.drawLine(QLineF(dStartX, dLineY, dStartX+dCurW, dLineY));
+		painter.drawLine(QLineF(dLineX, dStartY, dLineX, dStartY+dCurH));
+
+		if((iGrid-1)%2)
+		{
+			double dX, dY;
+			MapToCoordSys(dLineX, dLineY, dX, dY);
+			std::ostringstream ostrX, ostrY;
+			ostrX.precision(1); ostrY.precision(1);
+			ostrX << std::scientific << dX; ostrY << std::scientific << dY;
+
+			painter.drawText(QPoint(dLineX-24, dStartY+dCurH-2), ostrX.str().c_str());
+			painter.drawText(QPoint(dStartX+2, dLineY-1), ostrY.str().c_str());
+		}
 	}
+	painter.setFont(fontMain);
+
 
 	double dScaleX = dCurW/(m_dxmax-m_dxmin) * 1.0;
 	double dScaleY = dCurH/(m_dymax-m_dymin) * 1.0;
@@ -182,25 +228,43 @@ void Plot::paintEvent (QPaintEvent *pEvent)
 		{
 			painter.setPen(/*QColor::fromRgb(0,0,255,255)*/col);
 
+			QVector<QPointF> vecCoords;
+			vecCoords.reserve(obj.GetLength()*2);
 			for(unsigned int uiPt=0; uiPt<obj.GetLength()-1; ++uiPt)
 			{
 				const QPointF coord(obj.GetX(uiPt), obj.GetY(uiPt));
 				const QPointF coordNext(obj.GetX(uiPt+1), obj.GetY(uiPt+1));
 
-				painter.drawLine(coord, coordNext);
+				vecCoords.push_back(coord);
+				vecCoords.push_back(coordNext);
 			}
+			painter.drawLines(vecCoords);
 		}
 	}
 
 	painter.restore();
+}
+
+void Plot::paintEvent (QPaintEvent *pEvent)
+{
+	if(!m_pPixmap)
+		paint();
+
+	QPainter painter(this);
+	painter.drawPixmap(0,0,*m_pPixmap);
 	mouseMoveEvent(0);
 }
 
 void Plot::plot(unsigned int iNum, const double *px, const double *py, const double *pyerr, const double *pxerr,
 							PlotType plttype, const char* pcLegend)
 {
+	plot(Data1(iNum, px, py, pyerr, pxerr), plttype, pcLegend);
+}
+
+void Plot::plot(const Data1& dat, PlotType plttype, const char* pcLegend)
+{
 	PlotObj pltobj;
-	pltobj.dat = Data1(iNum, px, py, pyerr, pxerr);
+	pltobj.dat = dat;
 	pltobj.plttype = plttype;
 	if(pcLegend)
 		pltobj.strName = std::string(pcLegend);
@@ -213,7 +277,7 @@ void Plot::plot(unsigned int iNum, const double *px, const double *py, const dou
 
 void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 {
-	const uint iCnt = 1024;
+	const uint iCnt = 512;
 
 	PlotObj pltobj;
 	pltobj.plttype = PLOT_FKT;
@@ -248,17 +312,39 @@ void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 
 void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 {
-	const uint iCnt = 1024;
+	const uint iCnt = 512;
 
 	PlotObj pltobj;
 	pltobj.plttype = PLOT_FKT;
 	pltobj.strName = fkt.print(0);
 	Data1& dat = pltobj.dat;
 
-	const double dPadX = (m_dxmax-m_dxmin) / 128.;
 
-	double dxmin = m_dxmin + dPadX;
-	double dxmax = m_dxmax - dPadX;
+	double dxmin=m_dxmin, dxmax=m_dxmax;
+	bool bFirstLoop = 1;
+	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
+	{
+		const PlotObj& obj1 = GetData(iDat);
+		const Data1& dat1 = obj1.dat;
+		if(dat1.GetType() == DATA_1D)
+		{
+			double dxmin1, dxmax1;
+			dat1.GetXMinMax(dxmin1, dxmax1);
+
+			if(bFirstLoop)
+			{
+				dxmin = dxmin1;
+				dxmax = dxmax1;
+				bFirstLoop = 0;
+			}
+			else
+			{
+				dxmin = std::min(dxmin, dxmin1);
+				dxmax = std::max(dxmax, dxmax1);
+			}
+		}
+	}
+
 
 	dat.SetLength(iCnt);
 	for(uint iX=0; iX<iCnt; ++iX)
@@ -310,40 +396,24 @@ void Plot::RefreshStatusMsgs()
 	emit SetStatusMsg("", 1);
 }
 
-void Plot::mouseMoveEvent(QMouseEvent* pEvent)
+void Plot::MapToCoordSys(double dPixelX, double dPixelY, double &dX, double &dY, bool *pbInside)
 {
-	QPoint curPt;
-	const QPoint* pt;
 	const QSize size = this->size();
-
-	if(pEvent)
-	{
-		pt = &pEvent->pos();
-	}
-	else
-	{
-		curPt = mapFromGlobal(QCursor::pos());
-		pt = &curPt;
-	}
 
 	const double dw = m_dxmax-m_dxmin;
 	const double dh = m_dymax-m_dymin;
 
 	// map between [0..1]
-	double dX = double(pt->x()-PAD_X) / double(size.width()-2*PAD_X);
-	double dY = 1. - double(pt->y()-PAD_Y) / double(size.height()-2*PAD_Y);
+	dX = double(dPixelX-PAD_X) / double(size.width()-2*PAD_X);
+	dY = 1. - double(dPixelY-PAD_Y) / double(size.height()-2*PAD_Y);
 
-	//std::cout << dX << ", " << dY << std::endl;
-
+	bool bInside = 0;
 	if(dX>=0. && dX<=1. && dY>=0. && dY<=1.)
-		this->setCursor(Qt::CrossCursor);
+		bInside = 1;
 	else
-	{
-		if(pEvent==0)  // here, we may not even be in the correct plot window if called externally
-			return;
+		bInside = 0;
 
-		this->setCursor(Qt::ArrowCursor);
-	}
+	if(pbInside) *pbInside = bInside;
 
 	if(m_bXIsLog)
 	{
@@ -370,13 +440,54 @@ void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 		if(dY < m_dymin) dY = m_dymin;
 		if(dY > m_dymax) dY = m_dymax;
 	}
+}
 
+void Plot::mouseMoveEvent(QMouseEvent* pEvent)
+{
+	QPoint curPt;
+	const QPoint* pt;
+
+	if(pEvent)
+	{
+		pt = &pEvent->pos();
+	}
+	else
+	{
+		curPt = mapFromGlobal(QCursor::pos());
+		pt = &curPt;
+	}
+
+	double dX, dY;
+	bool bInside;
+	MapToCoordSys(pt->x(), pt->y(), dX, dY, &bInside);
+
+	if(bInside)
+		this->setCursor(Qt::CrossCursor);
+	else
+	{
+		if(pEvent==0)  // here, we may not even be in the correct plot window if called externally
+			return;
+
+		this->setCursor(Qt::ArrowCursor);
+	}
 
 	std::ostringstream ostr;
 	ostr << "(" << dX << ", " << dY << ")";
 
 	emit SetStatusMsg(ostr.str().c_str(), 2);
 	RefreshStatusMsgs();
+}
+
+void Plot::SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
+{
+	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
+	{
+		PlotObj& obj = GetData(iDat);
+		DataInterface* pDat = &obj.dat;
+		if(!pDat) return;
+
+		pDat->SetGlobalROI(pROI, pbROIActive);
+	}
 }
 
 #include "plot.moc"

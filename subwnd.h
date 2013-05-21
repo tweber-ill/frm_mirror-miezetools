@@ -10,6 +10,7 @@
 
 #include <QtGui/QWidget>
 #include <string>
+#include "roi/roi.h"
 
 class Plot;
 class Plot2d;
@@ -37,9 +38,11 @@ public:
 	virtual Plot* ConvertTo1d(int iParam=-1) { return 0; }
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return 0; }
 
+	virtual void SetGlobalROI(const Roi* pROI, const bool* pbROIActive) {}
+
 signals:
-		void SetStatusMsg(const char* pcMsg, int iPos);
-		void DataLoaded();
+	void SetStatusMsg(const char* pcMsg, int iPos);
+	void DataLoaded();
 };
 
 #endif

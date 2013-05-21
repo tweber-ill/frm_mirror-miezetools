@@ -128,10 +128,12 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 	strTitle += std::string(" -> t channels");
 
 	Data1 dat = pPlot3d->GetData().GetXYSum();
+	const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
+	dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
 
-	double *pdx = vec_to_array<double>(dat.GetX());
-	double *pdy = vec_to_array<double>(dat.GetY());
-	double *pdyerr = vec_to_array<double>(dat.GetYErr());
+	double *pdx = vec_to_array<double>(*pvecDatX);
+	double *pdy = vec_to_array<double>(*pvecDatY);
+	double *pdyerr = vec_to_array<double>(*pvecDatYErr);
 	autodeleter<double> _a0(pdx, 1);
 	autodeleter<double> _a1(pdy, 1);
 	autodeleter<double> _a2(pdyerr, 1);

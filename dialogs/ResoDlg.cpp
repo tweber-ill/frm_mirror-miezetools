@@ -96,7 +96,85 @@ void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
 	}
 
 	for(Plot* pPlot : m_pPlots)
-		pPlot->repaint();
+		pPlot->RefreshPaint();
+}
+
+//----------------------------------------------------------------------------------------
+
+
+EllipseDlg3D::EllipseDlg3D(QWidget* pParent) : QDialog(pParent)
+{
+	setWindowFlags(Qt::Tool);
+	setWindowTitle("Resolution Ellipsoids");
+
+	QGridLayout *gridLayout = new QGridLayout(this);
+
+	unsigned int iPos0[] = {0,0,1,1};
+	unsigned int iPos1[] = {0,1,0,1};
+	for(unsigned int i=0; i<2; ++i)
+	{
+		PlotGl* pPlot = new PlotGl(this);
+		pPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+		gridLayout->addWidget(pPlot, iPos0[i], iPos1[i], 1, 1);
+
+		m_pPlots.push_back(pPlot);
+	}
+	m_elliProj.resize(3);
+	m_elliSlice.resize(3);
+
+	resize(800,600);
+}
+
+EllipseDlg3D::~EllipseDlg3D()
+{
+	for(PlotGl* pPlot : m_pPlots)
+		delete pPlot;
+	m_pPlots.clear();
+}
+
+void EllipseDlg3D::hideEvent (QHideEvent *event)
+{
+	Settings::GetGlobals()->setValue("reso/wnd_ellipses3d_geo", saveGeometry());
+}
+void EllipseDlg3D::showEvent(QShowEvent *event)
+{
+	restoreGeometry(Settings::GetGlobals()->value("reso/wnd_ellipses3d_geo").toByteArray());
+}
+
+void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
+{
+	m_elliProj[0] = ::calc_res_ellipsoid(res.reso, 0, 1, 3, 2, -1);
+	m_elliSlice[0] = ::calc_res_ellipsoid(res.reso, 0, 1, 3, -1, 2);
+
+	m_elliProj[1] = ::calc_res_ellipsoid(res.reso, 0, 1, 2, 3, -1);
+	m_elliSlice[1] = ::calc_res_ellipsoid(res.reso, 0, 1, 2, -1, 3);
+
+	for(unsigned int i=0; i<m_pPlots.size(); ++i)
+	{
+		ublas::vector<double> vecWProj(3), vecWSlice(3);
+		ublas::vector<double> vecOffsProj(3), vecOffsSlice(3);
+
+		vecWProj[0] = m_elliProj[i].x_hwhm;
+		vecWProj[1] = m_elliProj[i].y_hwhm;
+		vecWProj[2] = m_elliProj[i].z_hwhm;
+
+		vecWSlice[0] = m_elliSlice[i].x_hwhm;
+		vecWSlice[1] = m_elliSlice[i].y_hwhm;
+		vecWSlice[2] = m_elliSlice[i].z_hwhm;
+
+		vecOffsProj[0] = m_elliProj[i].x_offs;
+		vecOffsProj[1] = m_elliProj[i].y_offs;
+		vecOffsProj[2] = m_elliProj[i].z_offs;
+
+		vecOffsSlice[0] = m_elliSlice[i].x_offs;
+		vecOffsSlice[1] = m_elliSlice[i].y_offs;
+		vecOffsSlice[2] = m_elliSlice[i].z_offs;
+
+		m_pPlots[i]->PlotEllipsoid(vecWProj, vecOffsProj, m_elliProj[i].rot, 0);
+		m_pPlots[i]->PlotEllipsoid(vecWSlice, vecOffsSlice, m_elliSlice[i].rot, 1);
+
+		//m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str());
+	}
 }
 
 //----------------------------------------------------------------------------------------
@@ -358,6 +436,7 @@ ResoDlg::ResoDlg(QWidget *pParent)
 				: QDialog(pParent),
 				  m_bDontCalc(1),
 				  m_pElliDlg(new EllipseDlg(this)),
+				  m_pElli3dDlg(new EllipseDlg3D(this)),
 				  m_pInstDlg(new InstLayoutDlg(this)),
 				  m_pScatterDlg(new ScatterTriagDlg(this))
 {
@@ -427,6 +506,7 @@ ResoDlg::ResoDlg(QWidget *pParent)
 		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(Calc()));
 
 	connect(btnGraphics, SIGNAL(clicked(bool)), this, SLOT(ShowEllipses()));
+	connect(btnGraphics3D, SIGNAL(clicked(bool)), this, SLOT(ShowEllipses3d()));
 	connect(btnShowInstr, SIGNAL(clicked(bool)), this, SLOT(ShowInstrLayout()));
 	connect(btnShowTriangle, SIGNAL(clicked(bool)), this, SLOT(ShowScatterTriag()));
 
@@ -442,6 +522,7 @@ ResoDlg::ResoDlg(QWidget *pParent)
 ResoDlg::~ResoDlg()
 {
 	delete m_pElliDlg;
+	delete m_pElli3dDlg;
 	delete m_pInstDlg;
 	delete m_pScatterDlg;
 }
@@ -574,6 +655,7 @@ void ResoDlg::Calc()
 		labelkvar_val->setText(ostrkvar.str().c_str());
 
 		m_pElliDlg->SetParams(cn, res);
+		m_pElli3dDlg->SetParams(cn, res);
 	}
 	else
 	{
@@ -764,6 +846,13 @@ void ResoDlg::ShowEllipses()
 	m_pElliDlg->activateWindow();
 }
 
+void ResoDlg::ShowEllipses3d()
+{
+	if(!m_pElli3dDlg->isVisible())
+		m_pElli3dDlg->show();
+	m_pElli3dDlg->activateWindow();
+}
+
 void ResoDlg::ShowInstrLayout()
 {
 	if(!m_pInstDlg->isVisible())
@@ -782,6 +871,7 @@ void ResoDlg::hideEvent(QHideEvent *event)
 {
 	Settings::GetGlobals()->setValue("reso/wnd_geo", saveGeometry());
 	m_pElliDlg->hide();
+	m_pElli3dDlg->hide();
 	m_pInstDlg->hide();
 	m_pScatterDlg->hide();
 }

@@ -11,6 +11,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QColor>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QPixmap>
 #include <vector>
 
 #include "../subwnd.h"
@@ -33,10 +34,13 @@ struct PlotObj
 class Plot : public SubWindowBase
 { Q_OBJECT
 protected:
-	virtual QSize	minimumSizeHint () const;
-	virtual void paintEvent (QPaintEvent *pEvent);
+	virtual QSize minimumSizeHint() const;
+	virtual void paintEvent(QPaintEvent *pEvent);
+	virtual void resizeEvent(QResizeEvent *pEvent);
 	virtual void mouseMoveEvent(QMouseEvent* pEvent);
 	virtual void RefreshStatusMsgs();
+
+	QPixmap *m_pPixmap;
 
 	std::vector<PlotObj> m_vecObjs;
 
@@ -47,17 +51,22 @@ protected:
 	QString m_strXAxis, m_strYAxis, m_strTitle;
 
 	QColor GetColor(unsigned int iPlotObj) const;
+	void MapToCoordSys(double dPixelX, double dPixelY, double &dX, double &dY, bool *pbInside=0);
 
 public:
 	Plot(QWidget* pParent=0, const char* pcTitle=0);
 	virtual ~Plot();
 
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
+	void plot(const Data1& dat, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
 	void plot_fkt(const FunctionModel& fkt, int iObj=-1);
 	void plot_param(const FunctionModel_param& fkt, int iObj=-1);
 
 	void clear();
 	void clearfkt();
+
+	void paint();
+	void RefreshPaint();
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }
@@ -81,6 +90,8 @@ public:
 	virtual SubWindowType GetType() { return PLOT_1D; }
 	virtual double GetTotalCounts() const { return 0.; }
 	virtual Plot* ConvertTo1d(int iParam=0) { return (Plot*)this; }
+
+	virtual void SetGlobalROI(const Roi* pROI, const bool* pbROIActive);
 };
 
 

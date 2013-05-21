@@ -17,6 +17,7 @@
 #include "../tools/res/pop.h"
 #include "../helper/linalg.h"
 #include "../plot/plot.h"
+#include "../plot/plotgl.h"
 #include "../tools/res/ellipse.h"
 
 
@@ -42,6 +43,24 @@ protected slots:
 	void showEvent(QShowEvent *event);
 
 	void SetStatusMsg(const char* pcMsg, int iPos);
+};
+
+class EllipseDlg3D : public QDialog
+{Q_OBJECT
+protected:
+	std::vector<PlotGl*> m_pPlots;
+	std::vector<Ellipsoid> m_elliProj;
+	std::vector<Ellipsoid> m_elliSlice;
+
+public:
+	EllipseDlg3D(QWidget* pParent);
+	virtual ~EllipseDlg3D();
+
+	void SetParams(const PopParams& pop, const CNResults& res);
+
+protected slots:
+	void hideEvent(QHideEvent *event);
+	void showEvent(QShowEvent *event);
 };
 
 
@@ -117,6 +136,7 @@ protected:
 
 
 	EllipseDlg *m_pElliDlg;
+	EllipseDlg3D *m_pElli3dDlg;
 	InstLayoutDlg *m_pInstDlg;
 	ScatterTriagDlg *m_pScatterDlg;
 
@@ -129,6 +149,7 @@ protected slots:
 	void Calc();
 
 	void ShowEllipses();
+	void ShowEllipses3d();
 	void ShowInstrLayout();
 	void ShowScatterTriag();
 
