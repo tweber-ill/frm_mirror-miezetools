@@ -10,6 +10,7 @@
 
 #include "../settings.h"
 #include "../helper/string.h"
+#include "../helper/misc.h"
 #include "../helper/xml.h"
 
 #include <QtGui/QPainter>
@@ -76,17 +77,17 @@ void EllipseDlg::SetStatusMsg(const char* pcMsg, int iPos)
 
 void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
 {
-	m_elliProj[0] = ::calc_res_ellipse(res.reso, 0, 3, 1, 2, -1);
-	m_elliSlice[0] = ::calc_res_ellipse(res.reso, 0, 3, -1, 2, 1);
+	m_elliProj[0] = ::calc_res_ellipse(res.reso, res.Q_avg, 0, 3, 1, 2, -1);
+	m_elliSlice[0] = ::calc_res_ellipse(res.reso, res.Q_avg, 0, 3, -1, 2, 1);
 
-	m_elliProj[1] = ::calc_res_ellipse(res.reso, 1, 3, 0, 2, -1);
-	m_elliSlice[1] = ::calc_res_ellipse(res.reso, 1, 3, -1, 2, 0);
+	m_elliProj[1] = ::calc_res_ellipse(res.reso, res.Q_avg, 1, 3, 0, 2, -1);
+	m_elliSlice[1] = ::calc_res_ellipse(res.reso, res.Q_avg, 1, 3, -1, 2, 0);
 
-	m_elliProj[2] = ::calc_res_ellipse(res.reso, 2, 3, 0, 1, -1);
-	m_elliSlice[2] = ::calc_res_ellipse(res.reso, 2, 3, -1, 1, 0);
+	m_elliProj[2] = ::calc_res_ellipse(res.reso, res.Q_avg, 2, 3, 0, 1, -1);
+	m_elliSlice[2] = ::calc_res_ellipse(res.reso, res.Q_avg, 2, 3, -1, 1, 0);
 
-	m_elliProj[3] = ::calc_res_ellipse(res.reso, 0, 1, 3, 2, -1);
-	m_elliSlice[3] = ::calc_res_ellipse(res.reso, 0, 1, -1, 2, 3);
+	m_elliProj[3] = ::calc_res_ellipse(res.reso, res.Q_avg, 0, 1, 3, 2, -1);
+	m_elliSlice[3] = ::calc_res_ellipse(res.reso, res.Q_avg, 0, 1, -1, 2, 3);
 
 	for(unsigned int i=0; i<m_pPlots.size(); ++i)
 	{
@@ -142,15 +143,6 @@ void EllipseDlg3D::showEvent(QShowEvent *event)
 }
 
 
-template<typename T=double>
-T max3(T t1, T t2, T t3)
-{
-	T tmax = t1;
-	tmax = std::max(tmax, t2);
-	tmax = std::max(tmax, t3);
-	return tmax;
-}
-
 ublas::vector<double>
 EllipseDlg3D::ProjRotatedVec(const ublas::matrix<double>& rot,
 														const ublas::vector<double>& vec)
@@ -177,11 +169,11 @@ EllipseDlg3D::ProjRotatedVec(const ublas::matrix<double>& rot,
 
 void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
 {
-	m_elliProj[0] = ::calc_res_ellipsoid(res.reso, 0, 1, 3, 2, -1);
-	m_elliSlice[0] = ::calc_res_ellipsoid(res.reso, 0, 1, 3, -1, 2);
+	m_elliProj[0] = ::calc_res_ellipsoid(res.reso, res.Q_avg, 0, 1, 3, 2, -1);
+	m_elliSlice[0] = ::calc_res_ellipsoid(res.reso, res.Q_avg, 0, 1, 3, -1, 2);
 
-	m_elliProj[1] = ::calc_res_ellipsoid(res.reso, 0, 1, 2, 3, -1);
-	m_elliSlice[1] = ::calc_res_ellipsoid(res.reso, 0, 1, 2, -1, 3);
+	m_elliProj[1] = ::calc_res_ellipsoid(res.reso, res.Q_avg, 0, 1, 2, 3, -1);
+	m_elliSlice[1] = ::calc_res_ellipsoid(res.reso, res.Q_avg, 0, 1, 2, -1, 3);
 
 	for(unsigned int i=0; i<m_pPlots.size(); ++i)
 	{
@@ -207,7 +199,7 @@ void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
 		m_pPlots[i]->PlotEllipsoid(vecWProj, vecOffsProj, m_elliProj[i].rot, 0);
 		m_pPlots[i]->PlotEllipsoid(vecWSlice, vecOffsSlice, m_elliSlice[i].rot, 1);
 
-		m_pPlots[i]->SetMinMax(ProjRotatedVec(m_elliProj[i].rot, vecWProj));
+		m_pPlots[i]->SetMinMax(ProjRotatedVec(m_elliProj[i].rot, vecWProj), &vecOffsProj);
 		m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str(), m_elliProj[i].z_lab.c_str());
 	}
 }
@@ -377,6 +369,8 @@ void ScatterTriagDlg::SetParams(const PopParams& pop, const CNResults& res)
 	m_vec_kf = ublas::prod(rot_kikf, m_vec_ki) * (pop.kf/pop.ki);
 	m_vec_Q = ublas::prod(rot_kiQ, m_vec_ki) * (pop.Q/pop.ki);
 
+	//std::cout << m_vec_Q << std::endl;
+	//std::cout << m_vec_kf-m_vec_ki << std::endl;
 	repaint();
 }
 

@@ -9,8 +9,10 @@
 #include <iostream>
 #include <string>
 
+#ifdef Q_WS_X11
 //#include <X11/Xlib.h>
 extern "C" int XInitThreads();
+#endif
 
 #include "mainwnd.h"
 #include "settings.h"
@@ -23,10 +25,12 @@ static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 
 int main(int argc, char **argv)
 {
-	int iRet = -1;
+#ifdef Q_WS_X11
 	XInitThreads();
+#endif
 	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
+	int iRet = -1;
 	try
 	{
 		QSettings *pGlobals = Settings::GetGlobals();
