@@ -935,10 +935,22 @@ void ResoDlg::showEvent(QShowEvent *event)
 
 
 #ifdef STANDALONE_RESO
+	#include <QtGui/QApplication>
+
+	#ifdef Q_WS_X11
+		extern "C" int XInitThreads();
+	#endif
+
 	int main(int argc, char **argv)
 	{
 		try
 		{
+			#ifdef Q_WS_X11
+				XInitThreads();
+			#endif
+			QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
+
+
 			QSettings *pGlobals = Settings::GetGlobals();
 			QApplication a(argc, argv);
 
