@@ -44,6 +44,21 @@ public:
 
 	const Roi* GetRoi() const { return m_pGlobalROI; }
 
+	bool IsInsideRoi(double dX, double dY) const
+	{
+		if(!IsRoiActive())
+			return 1;
+
+		bool bInGlobalRoi = 0;
+		if(m_pbGlobalROIActive && *m_pbGlobalROIActive)
+			bInGlobalRoi = m_pGlobalROI->IsInside(dX, dY);
+
+		bool bInLocalRoi = 0;
+		// TODO
+
+		return bInGlobalRoi || bInLocalRoi;
+	}
+
 	void CopyRoiFlagsFrom(const RoiFlags* pDat)
 	{
 		this->m_pbGlobalROIActive = pDat->m_pbGlobalROIActive;
@@ -81,48 +96,20 @@ public:
 				m_bHasRange(0)
 	{}
 
-	void SetXRange(double dXMin, double dXMax)
-	{
-		m_dXMin = dXMin;
-		m_dXMax = dXMax;
-
-		m_bHasRange = 1;
-	}
-
-	void SetYRange(double dYMin, double dYMax)
-	{
-		m_dYMin = dYMin;
-		m_dYMax = dYMax;
-
-		m_bHasRange = 1;
-	}
+	void SetXRange(double dXMin, double dXMax);
+	void SetYRange(double dYMin, double dYMax);;
 
 	bool HasRange() const { return m_bHasRange; }
 
 	// pixel -> range point
-	double GetRangeXPos(uint iX) const
-	{ return m_dXMin + (m_dXMax-m_dXMin)*double(iX)/double(m_iWidth-1);}
-	double GetRangeYPos(uint iY) const
-	{ return m_dYMin + (m_dYMax-m_dYMin)*double(iY)/double(m_iHeight-1);}
+	double GetRangeXPos(uint iX) const;
+	double GetRangeYPos(uint iY) const;
 
 	// range point -> pixel
-	uint GetPixelXPos(double dRangeX) const
-	{
-		int iX = (dRangeX-m_dXMin)/(m_dXMax-m_dXMin) * double(m_iWidth-1);
-		if(iX >= m_iWidth) iX = m_iWidth-1;
-		if(iX < 0) iX = 0;
-		return iX;
-	}
-	uint GetPixelYPos(double dRangeY) const
-	{
-		int iY = (dRangeY-m_dYMin)/(m_dYMax-m_dYMin) * double(m_iHeight-1);
-		if(iY >= m_iHeight) iY = m_iHeight-1;
-		if(iY < 0) iY = 0;
-		return iY;
-	}
+	uint GetPixelXPos(double dRangeX) const;
+	uint GetPixelYPos(double dRangeY) const;
 
-	void CopyXYRangeFrom(const XYRange* pRan)
-	{ *this = *pRan; }
+	void CopyXYRangeFrom(const XYRange* pRan);
 };
 
 
@@ -159,29 +146,15 @@ public:
 	const std::vector<double>& GetXErrRaw() const { return m_vecErrsX; }
 	const std::vector<double>& GetYErrRaw() const { return m_vecErrsY; }
 
-	// only points in roi, all points of no roi active
+	// only points in roi, all points if no roi active
 	void GetData(const std::vector<double> **pvecX, const std::vector<double> **pvecY,
 				const std::vector<double> **pvecYErr=0, const std::vector<double> **pvecXErr=0);
 
 	void GetXMinMax(double& dXMin, double& dXMax) const;
 	void GetYMinMax(double& dYMin, double& dYMax) const;
 
-	void clear()
-	{
-		m_vecValsX.clear();
-		m_vecValsY.clear();
-		m_vecErrsX.clear();
-		m_vecErrsY.clear();
-	}
-
-	void SetLength(uint uiLen)
-	{
-		m_vecValsX.resize(uiLen);
-		m_vecValsY.resize(uiLen);
-
-		m_vecErrsX.resize(uiLen);
-		m_vecErrsY.resize(uiLen);
-	}
+	void clear();
+	void SetLength(uint uiLen);
 
 	template<typename T=double>
 	void ToArray(T* pX, T* pY, T *pYErr, T *pXErr=0)
@@ -195,13 +168,7 @@ public:
 		}
 	}
 
-	double SumY() const
-	{
-		double dTotal = 0.;
-		for(uint i=0; i<GetLength(); ++i)
-			dTotal += GetY(i);
-		return dTotal;
-	}
+	double SumY() const;
 };
 
 
@@ -224,31 +191,16 @@ public:
 	uint GetWidth() const { return m_iWidth; }
 	uint GetHeight() const { return m_iHeight; }
 
-	void SetSize(uint iWidth, uint iHeight)
-	{
-		if(m_iWidth==iWidth && m_iHeight==iHeight)
-			return;
+	void SetSize(uint iWidth, uint iHeight);
 
-		m_iWidth = iWidth;
-		m_iHeight = iHeight;
+	double GetValRaw(uint iX, uint iY) const;
+	double GetErrRaw(uint iX, uint iY) const;
 
-		m_vecVals.resize(m_iWidth * m_iHeight);
-		m_vecErrs.resize(m_iWidth * m_iHeight);
-	}
+	double GetVal(uint iX, uint iY) const;
+	double GetErr(uint iX, uint iY) const;
 
-	double GetVal(uint iX, uint iY) const
-	{ return m_vecVals[iY*m_iWidth + iX]; }
-	double GetErr(uint iX, uint iY) const
-	{ return m_vecErrs[iY*m_iWidth + iX]; }
-
-	void SetVal(uint iX, uint iY, double dVal)
-	{
-		m_vecVals[iY*m_iWidth + iX] = dVal;
-		m_dMin = std::min(m_dMin, dVal);
-		m_dMax = std::max(m_dMax, dVal);
-	}
-	void SetErr(uint iX, uint iY, double dVal)
-	{ m_vecErrs[iY*m_iWidth + iX] = dVal; }
+	void SetVal(uint iX, uint iY, double dVal);
+	void SetErr(uint iX, uint iY, double dVal);
 	void SetVals(const double *pDat, const double *pErr=0);
 
 	double GetMin() const { return m_dMin; }
@@ -283,32 +235,15 @@ public:
 
 	void SetZero();
 
-	void SetSize(uint iWidth, uint iHeight, uint iDepth)
-	{
-		if(m_iWidth==iWidth && m_iHeight==iHeight && m_iDepth==iDepth)
-			return;
+	void SetSize(uint iWidth, uint iHeight, uint iDepth);
 
-		m_iWidth = iWidth;
-		m_iHeight = iHeight;
-		m_iDepth = iDepth;
+	double GetValRaw(uint iX, uint iY, uint iT) const;
+	double GetErrRaw(uint iX, uint iY, uint iT) const;
 
-		m_vecVals.resize(m_iWidth * m_iHeight * m_iDepth);
-		m_vecErrs.resize(m_iWidth * m_iHeight * m_iDepth);
-	}
-
-	double GetVal(uint iX, uint iY, uint iT) const
-	{ return m_vecVals[iT*m_iWidth*m_iHeight + iY*m_iWidth + iX]; }
-	double GetErr(uint iX, uint iY, uint iT) const
-	{ return m_vecErrs[iT*m_iWidth*m_iHeight + iY*m_iWidth + iX]; }
-
-	void SetVal(uint iX, uint iY, uint iT, double dVal)
-	{
-		m_vecVals[iT*m_iWidth*m_iHeight + iY*m_iWidth + iX] = dVal;
-		m_dMin = std::min(m_dMin, dVal);
-		m_dMax = std::max(m_dMax, dVal);
-	}
-	void SetErr(uint iX, uint iY, uint iT, double dVal)
-	{ m_vecErrs[iT*m_iWidth*m_iHeight + iY*m_iWidth + iX] = dVal; }
+	double GetVal(uint iX, uint iY, uint iT) const;
+	double GetErr(uint iX, uint iY, uint iT) const;
+	void SetVal(uint iX, uint iY, uint iT, double dVal);
+	void SetErr(uint iX, uint iY, uint iT, double dVal);
 	void SetVals(const double *pDat, const double *pErr=0);
 
 	double GetMin() const { return m_dMin; }
@@ -344,28 +279,16 @@ public:
 	uint GetDepth() const { return m_iDepth; }
 	uint GetDepth2() const { return m_iDepth2; }
 
-	void SetSize(uint iWidth, uint iHeight, uint iDepth, uint iDepth2)
-	{
-		if(m_iWidth==iWidth && m_iHeight==iHeight && m_iDepth==iDepth && m_iDepth2==iDepth2)
-			return;
+	void SetSize(uint iWidth, uint iHeight, uint iDepth, uint iDepth2);
 
-		m_iWidth = iWidth;
-		m_iHeight = iHeight;
-		m_iDepth = iDepth;
-		m_iDepth2 = iDepth2;
+	double GetValRaw(uint iX, uint iY, uint iD, uint iD2) const;
+	double GetErrRaw(uint iX, uint iY, uint iD, uint iD2) const;
 
-		m_vecVals.resize(m_iWidth * m_iHeight * m_iDepth * m_iDepth2);
-		m_vecErrs.resize(m_iWidth * m_iHeight * m_iDepth * m_iDepth2);
-	}
-
-	double GetVal(uint iX, uint iY, uint iD, uint iD2) const
-	{ return m_vecVals[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX]; }
-	double GetErr(uint iX, uint iY, uint iD, uint iD2) const
-	{ return m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX]; }
+	double GetVal(uint iX, uint iY, uint iD, uint iD2) const;
+	double GetErr(uint iX, uint iY, uint iD, uint iD2) const;
 
 	void SetVal(uint iX, uint iY, uint iD, uint iD2, double dVal);
-	void SetErr(uint iX, uint iY, uint iD, uint iD2, double dVal)
-	{ m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight + iD*m_iWidth*m_iHeight + iY*m_iWidth + iX] = dVal; }
+	void SetErr(uint iX, uint iY, uint iD, uint iD2, double dVal);
 	void SetVals(const double *pDat, const double *pErr=0);
 	void SetVals(uint iD2, const double *pDat, const double *pErr=0);
 

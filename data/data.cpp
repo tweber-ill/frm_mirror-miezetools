@@ -26,6 +26,31 @@ Data1::Data1(uint uiNum, const double* pValsX, const double* pValsY,
 	}
 }
 
+void Data1::clear()
+{
+	m_vecValsX.clear();
+	m_vecValsY.clear();
+	m_vecErrsX.clear();
+	m_vecErrsY.clear();
+}
+
+void Data1::SetLength(uint uiLen)
+{
+	m_vecValsX.resize(uiLen);
+	m_vecValsY.resize(uiLen);
+
+	m_vecErrsX.resize(uiLen);
+	m_vecErrsY.resize(uiLen);
+}
+
+double Data1::SumY() const
+{
+	double dTotal = 0.;
+	for(uint i=0; i<GetLength(); ++i)
+		dTotal += GetY(i);
+	return dTotal;
+}
+
 void Data1::GetData(const std::vector<double> **pvecX, const std::vector<double> **pvecY,
 			const std::vector<double> **pvecYErr, const std::vector<double> **pvecXErr)
 {
@@ -41,7 +66,7 @@ void Data1::GetData(const std::vector<double> **pvecX, const std::vector<double>
 			double dX = m_vecValsX[iVal];
 			double dY = m_vecValsY[iVal];
 
-			if(GetRoi()->IsInside(dX, dY))
+			if(IsInsideRoi(dX, dY))
 			{
 				m_vecValsXRoiTmp.push_back(dX);
 				m_vecValsYRoiTmp.push_back(dY);
@@ -98,6 +123,9 @@ Data2::Data2(uint iW, uint iH, const double* pDat, const double *pErr)
 
 	if(pDat)
 		this->SetVals(pDat, pErr);
+
+	SetXRange(0., m_iWidth-1);
+	SetYRange(0., m_iHeight-1);
 }
 
 void Data2::SetZero()
@@ -110,6 +138,53 @@ void Data2::SetZero()
 			}
 
 	m_dMin = m_dMax = m_dTotal = 0.;
+}
+
+void Data2::SetSize(uint iWidth, uint iHeight)
+{
+	if(m_iWidth==iWidth && m_iHeight==iHeight)
+		return;
+
+	m_iWidth = iWidth;
+	m_iHeight = iHeight;
+
+	m_vecVals.resize(m_iWidth * m_iHeight);
+	m_vecErrs.resize(m_iWidth * m_iHeight);
+}
+
+double Data2::GetValRaw(uint iX, uint iY) const
+{
+	return m_vecVals[iY*m_iWidth + iX];
+}
+
+double Data2::GetErrRaw(uint iX, uint iY) const
+{
+	return m_vecErrs[iY*m_iWidth + iX];
+}
+
+double Data2::GetVal(uint iX, uint iY) const
+{
+	if(IsInsideRoi(GetRangeXPos(iX), GetRangeYPos(iY)))
+		return GetValRaw(iX, iY);
+	return 0.;
+}
+double Data2::GetErr(uint iX, uint iY) const
+{
+	if(IsInsideRoi(GetRangeXPos(iX), GetRangeYPos(iY)))
+		return GetErrRaw(iX, iY);
+	return 0.;
+}
+
+void Data2::SetVal(uint iX, uint iY, double dVal)
+{
+	m_vecVals[iY*m_iWidth + iX] = dVal;
+	m_dMin = std::min(m_dMin, dVal);
+	m_dMax = std::max(m_dMax, dVal);
+}
+
+void Data2::SetErr(uint iX, uint iY, double dVal)
+{
+	m_vecErrs[iY*m_iWidth + iX] = dVal;
 }
 
 void Data2::SetVals(const double* pDat, const double *pErr)
@@ -170,6 +245,9 @@ Data3::Data3(uint iW, uint iH, uint iT, const double* pDat, const double *pErr)
 
 	if(pDat)
 		this->SetVals(pDat, pErr);
+
+	SetXRange(0., m_iWidth-1);
+	SetYRange(0., m_iHeight-1);
 }
 
 void Data3::SetZero()
@@ -203,6 +281,55 @@ void Data3::Add(const Data3& dat)
 
 				m_dTotal += dNewVal;
 			}
+}
+
+void Data3::SetSize(uint iWidth, uint iHeight, uint iDepth)
+{
+	if(m_iWidth==iWidth && m_iHeight==iHeight && m_iDepth==iDepth)
+		return;
+
+	m_iWidth = iWidth;
+	m_iHeight = iHeight;
+	m_iDepth = iDepth;
+
+	m_vecVals.resize(m_iWidth * m_iHeight * m_iDepth);
+	m_vecErrs.resize(m_iWidth * m_iHeight * m_iDepth);
+}
+
+double Data3::GetValRaw(uint iX, uint iY, uint iT) const
+{
+	return m_vecVals[iT*m_iWidth*m_iHeight +
+	                 	 	 iY*m_iWidth + iX];
+}
+double Data3::GetErrRaw(uint iX, uint iY, uint iT) const
+{
+	return m_vecErrs[iT*m_iWidth*m_iHeight +
+	                 	 	 iY*m_iWidth + iX];
+}
+
+double Data3::GetVal(uint iX, uint iY, uint iT) const
+{
+	if(IsInsideRoi(GetRangeXPos(iX), GetRangeYPos(iY)))
+		return GetValRaw(iX, iY, iT);
+	return 0.;
+}
+double Data3::GetErr(uint iX, uint iY, uint iT) const
+{
+	if(IsInsideRoi(GetRangeXPos(iX), GetRangeYPos(iY)))
+		return GetErrRaw(iX, iY, iT);
+	return 0.;
+}
+
+void Data3::SetVal(uint iX, uint iY, uint iT, double dVal)
+{
+	m_vecVals[iT*m_iWidth*m_iHeight + iY*m_iWidth + iX] = dVal;
+	m_dMin = std::min(m_dMin, dVal);
+	m_dMax = std::max(m_dMax, dVal);
+}
+void Data3::SetErr(uint iX, uint iY, uint iT, double dVal)
+{
+	m_vecErrs[iT*m_iWidth*m_iHeight +
+	          	  	  iY*m_iWidth + iX] = dVal;
 }
 
 void Data3::SetVals(const double* pDat, const double *pErr)
@@ -310,7 +437,54 @@ Data4::Data4(uint iW, uint iH, uint iD, uint iD2, const double* pDat, const doub
 
 	if(pDat)
 		this->SetVals(pDat, pErr);
+
+	SetXRange(0., m_iWidth-1);
+	SetYRange(0., m_iHeight-1);
 }
+
+void Data4::SetSize(uint iWidth, uint iHeight, uint iDepth, uint iDepth2)
+{
+	if(m_iWidth==iWidth && m_iHeight==iHeight &&
+		m_iDepth==iDepth && m_iDepth2==iDepth2)
+		return;
+
+	m_iWidth = iWidth;
+	m_iHeight = iHeight;
+	m_iDepth = iDepth;
+	m_iDepth2 = iDepth2;
+
+	m_vecVals.resize(m_iWidth * m_iHeight * m_iDepth * m_iDepth2);
+	m_vecErrs.resize(m_iWidth * m_iHeight * m_iDepth * m_iDepth2);
+}
+
+double Data4::GetValRaw(uint iX, uint iY, uint iD, uint iD2) const
+{
+	return m_vecVals[iD2*m_iDepth*m_iWidth*m_iHeight +
+	                 	 	 iD*m_iWidth*m_iHeight +
+	                 	 	 iY*m_iWidth + iX];
+}
+
+double Data4::GetErrRaw(uint iX, uint iY, uint iD, uint iD2) const
+{
+	return m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight +
+	                 	 	 iD*m_iWidth*m_iHeight +
+	                 	 	 iY*m_iWidth + iX];
+}
+
+double Data4::GetVal(uint iX, uint iY, uint iD, uint iD2) const
+{
+	if(IsInsideRoi(GetRangeXPos(iX), GetRangeYPos(iY)))
+		return GetValRaw(iX, iY, iD, iD2);
+	return 0.;
+}
+
+double Data4::GetErr(uint iX, uint iY, uint iD, uint iD2) const
+{
+	if(IsInsideRoi(GetRangeXPos(iX), GetRangeYPos(iY)))
+		return GetErrRaw(iX, iY, iD, iD2);
+	return 0.;
+}
+
 
 void Data4::SetVal(uint iX, uint iY, uint iD, uint iD2, double dVal)
 {
@@ -344,6 +518,14 @@ void Data4::SetVals(uint iD2, const double *pDat, const double *pErr)
 				m_dTotal += dVal;
 			}
 }
+
+void Data4::SetErr(uint iX, uint iY, uint iD, uint iD2, double dVal)
+{
+	m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight +
+	          	  	  iD*m_iWidth*m_iHeight +
+	          	  	  iY*m_iWidth + iX] = dVal;
+}
+
 
 Data3 Data4::GetVal(uint iD2) const
 {
@@ -413,4 +595,55 @@ Data1 Data4::GetXYSum(uint iD2) const
 	}
 
 	return dat;
+}
+
+
+
+//------------------------------------------------------------------------
+
+
+
+void XYRange::SetXRange(double dXMin, double dXMax)
+{
+	m_dXMin = dXMin;
+	m_dXMax = dXMax;
+	m_bHasRange = 1;
+}
+
+void XYRange::SetYRange(double dYMin, double dYMax)
+{
+	m_dYMin = dYMin;
+	m_dYMax = dYMax;
+	m_bHasRange = 1;
+}
+
+// pixel -> range point
+double XYRange::GetRangeXPos(uint iX) const
+{
+	return m_dXMin + (m_dXMax-m_dXMin)*double(iX)/double(m_iWidth-1);
+}
+double XYRange::GetRangeYPos(uint iY) const
+{
+	return m_dYMin + (m_dYMax-m_dYMin)*double(iY)/double(m_iHeight-1);
+}
+
+// range point -> pixel
+uint XYRange::GetPixelXPos(double dRangeX) const
+{
+	int iX = (dRangeX-m_dXMin)/(m_dXMax-m_dXMin) * double(m_iWidth-1);
+	if(iX >= m_iWidth) iX = m_iWidth-1;
+	if(iX < 0) iX = 0;
+	return iX;
+}
+uint XYRange::GetPixelYPos(double dRangeY) const
+{
+	int iY = (dRangeY-m_dYMin)/(m_dYMax-m_dYMin) * double(m_iHeight-1);
+	if(iY >= m_iHeight) iY = m_iHeight-1;
+	if(iY < 0) iY = 0;
+	return iY;
+}
+
+void XYRange::CopyXYRangeFrom(const XYRange* pRan)
+{
+	*this = *pRan;
 }
