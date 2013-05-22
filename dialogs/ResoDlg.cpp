@@ -92,8 +92,8 @@ void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
 	for(unsigned int i=0; i<m_pPlots.size(); ++i)
 	{
 		m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str());
-		m_pPlots[i]->plot_param(m_elliProj[i],0);
-		m_pPlots[i]->plot_param(m_elliSlice[i],1);
+		m_pPlots[i]->plot_param(m_elliProj[i],1);
+		m_pPlots[i]->plot_param(m_elliSlice[i],0);
 	}
 
 	for(Plot* pPlot : m_pPlots)
@@ -169,14 +169,16 @@ EllipseDlg3D::ProjRotatedVec(const ublas::matrix<double>& rot,
 
 void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
 {
-	m_elliProj[0] = ::calc_res_ellipsoid(res.reso, res.Q_avg, 0, 1, 3, 2, -1);
-	m_elliSlice[0] = ::calc_res_ellipsoid(res.reso, res.Q_avg, 0, 1, 3, -1, 2);
-
-	m_elliProj[1] = ::calc_res_ellipsoid(res.reso, res.Q_avg, 0, 1, 2, 3, -1);
-	m_elliSlice[1] = ::calc_res_ellipsoid(res.reso, res.Q_avg, 0, 1, 2, -1, 3);
+	const int iX[] = {0, 0};
+	const int iY[] = {1, 1};
+	const int iZ[] = {3, 2};
+	const int iIntOrRem[] = {2, 3};
 
 	for(unsigned int i=0; i<m_pPlots.size(); ++i)
 	{
+		m_elliProj[i] = ::calc_res_ellipsoid(res.reso, res.Q_avg, iX[i], iY[i], iZ[i], iIntOrRem[i], -1);
+		m_elliSlice[i] = ::calc_res_ellipsoid(res.reso, res.Q_avg, iX[i], iY[i], iZ[i], -1, iIntOrRem[i]);
+
 		ublas::vector<double> vecWProj(3), vecWSlice(3);
 		ublas::vector<double> vecOffsProj(3), vecOffsSlice(3);
 
@@ -196,8 +198,8 @@ void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
 		vecOffsSlice[1] = m_elliSlice[i].y_offs;
 		vecOffsSlice[2] = m_elliSlice[i].z_offs;
 
-		m_pPlots[i]->PlotEllipsoid(vecWProj, vecOffsProj, m_elliProj[i].rot, 0);
-		m_pPlots[i]->PlotEllipsoid(vecWSlice, vecOffsSlice, m_elliSlice[i].rot, 1);
+		m_pPlots[i]->PlotEllipsoid(vecWProj, vecOffsProj, m_elliProj[i].rot, 1);
+		m_pPlots[i]->PlotEllipsoid(vecWSlice, vecOffsSlice, m_elliSlice[i].rot, 0);
 
 		m_pPlots[i]->SetMinMax(ProjRotatedVec(m_elliProj[i].rot, vecWProj), &vecOffsProj);
 		m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str(), m_elliProj[i].z_lab.c_str());
