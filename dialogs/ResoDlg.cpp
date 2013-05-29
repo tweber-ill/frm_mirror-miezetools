@@ -657,13 +657,21 @@ void ResoDlg::Calc()
 
 	if(res.bOk)
 	{
+		Ellipse ell = calc_res_ellipse(res.reso, res.Q_avg, 0, 3, 1, 2, -1);
+		double dVanadiumFWHM = ell.y_hwhm*2.;
+
 		std::ostringstream ostrRes;
 
 		//ostrRes << std::scientific;
 		ostrRes.precision(8);
-		ostrRes << "Resolution Volume: " << res.dR0 << " meV Å^(-3)";
-		ostrRes << "\n\n\n";
-		ostrRes << "Resolution Matrix (Q_para, Q_ortho, Q_z, E): \n\n";
+		ostrRes << "Resolution Volume: " << res.dR0 << " meV \342\204\253^(-3)";
+		ostrRes << "\nBragg FWHMs: " << res.dBraggFWHMs[0] << " \342\204\253^(-1), "
+		                                          << res.dBraggFWHMs[1] << " \342\204\253^(-1), "
+		                                          << res.dBraggFWHMs[2] << " \342\204\253^(-1), "
+		                                          << res.dBraggFWHMs[3] << " meV ";
+		ostrRes << "\nVanadium FWHM: " << dVanadiumFWHM << " meV";
+		ostrRes << "\n";
+		ostrRes << "\nResolution Matrix (Q_para, Q_ortho, Q_z, E): \n\n";
 
 		for(unsigned int i=0; i<res.reso.size1(); ++i)
 		{

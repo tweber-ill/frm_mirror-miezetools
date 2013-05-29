@@ -131,7 +131,7 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuInterp->setTitle("Interpolation");
 
 	QAction *pInterpBezier = new QAction(this);
-	pInterpBezier->setText(QString::fromUtf8("B��zier Curve"));
+	pInterpBezier->setText(QString::fromUtf8("B\303\251zier Curve"));
 	pMenuInterp->addAction(pInterpBezier);
 
 	QAction *pInterpBSpline = new QAction(this);
