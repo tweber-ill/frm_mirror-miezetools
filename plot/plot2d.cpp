@@ -20,8 +20,7 @@
 Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData, bool bCyclicData)
 			: SubWindowBase(pParent),
 			  m_pImg(0),
-			  m_bLog(bCountData), m_bCountData(bCountData), m_bCyclicData(bCyclicData),
-			  m_bHasXYMinMax(0), m_bXIsLog(0), m_bYIsLog(0)
+			  m_bLog(bCountData), m_bCountData(bCountData), m_bCyclicData(bCyclicData)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
@@ -40,15 +39,6 @@ void Plot2d::clear()
 	}
 }
 
-void Plot2d::SetXYMinMax(double dXMin, double dXMax, double dYMin, double dYMax)
-{
-	this->m_bHasXYMinMax = 1;
-	this->m_dXMin = dXMin;
-	this->m_dXMax = dXMax;
-	this->m_dYMin = dYMin;
-	this->m_dYMax = dYMax;
-}
-
 uint Plot2d::GetSpectroColor01(double dVal) const
 {
 	const uint blue = 0xff0000ff;
@@ -58,14 +48,27 @@ uint Plot2d::GetSpectroColor01(double dVal) const
 
 	const uint col1[] = {blue, cyan, yellow};
 	const uint col2[] = {cyan, yellow, red};
+	const uint col1_cyc[] = {blue, cyan, yellow, red};
+	const uint col2_cyc[] = {cyan, yellow, red, blue};
 
-	const uint iNumCols = sizeof(col1)/sizeof(col1[0]);
+	const uint iNumCols = (m_bCyclicData ? sizeof(col1_cyc)/sizeof(col1_cyc[0])  : sizeof(col1)/sizeof(col1[0]));
 	const double dNumCols = double(iNumCols);
 	uint iIdx = uint(dVal*dNumCols);
 
+	const uint *pcol1 = (m_bCyclicData ? col1_cyc : col1);
+	const uint *pcol2 = (m_bCyclicData ? col2_cyc : col2);
+
 	if(iIdx >= iNumCols)
 		iIdx = iNumCols-1;
-	uint col = lerprgb(col1[iIdx], col2[iIdx], fmod(dVal, 1./dNumCols)*dNumCols);
+
+	double dLerpVal = fmod(dVal, 1./dNumCols)*dNumCols;
+	if(dVal == 0.) dLerpVal = 0.;
+	if(dVal == 1.) dLerpVal = 1.;
+
+	if(dLerpVal < 0.) dLerpVal = 0.;
+	if(dLerpVal > 1.) dLerpVal = 1.;
+	uint col = lerprgb(pcol1[iIdx], pcol2[iIdx], dLerpVal);
+
 	return col;
 }
 
@@ -87,13 +90,8 @@ uint Plot2d::GetSpectroColor(double dVal) const
 		}
 	}
 
-	const uint blue = 0xff0000ff;
-	const uint red = 0xffff0000;
-
-	if(dVal <= dMin)
-		return blue;
-	else if(dVal >= dMax)
-		return red;
+	if(dVal < dMin) dVal=dMin;
+	else if(dVal > dMax) dVal=dMax;
 
 	double dSpec = (dVal-dMin) / (dMax-dMin);
 	return GetSpectroColor01(dSpec);
@@ -264,29 +262,10 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 		bool bPixelVal = 0;
 
 		double dX_Val = 0., dY_Val = 0.;
-		if(m_bHasXYMinMax)
+		if(m_dat.HasRange())
 		{
-			// range 0..1
-			dX_Val = dX / double(m_dat.GetWidth()-1);
-			dY_Val = dY / double(m_dat.GetHeight()-1);
-
-			if(m_bXIsLog)
-			{
-				double dXMin = log10(m_dXMin);
-				double dXMax = log10(m_dXMax);
-				dX_Val = pow(10., dXMin + dX_Val*(dXMax-dXMin));
-			}
-			else
-				dX_Val = dX_Val * (m_dXMax-m_dXMin) + m_dXMin;
-
-			if(m_bYIsLog)
-			{
-				double dYMin = log10(m_dYMin);
-				double dYMax = log10(m_dYMax);
-				dY_Val = pow(10., dYMin + dY_Val*(dYMax-dYMin));
-			}
-			else
-				dY_Val = dY_Val * (m_dYMax-m_dYMin) + m_dYMin;
+			dX_Val = m_dat.GetRangeXPos(iX);
+			dY_Val = m_dat.GetRangeYPos(iY);
 
 			ostr << "(" << dX_Val << ", " << dY_Val << "): ";
 			bPixelVal = 0;

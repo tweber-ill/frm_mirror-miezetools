@@ -639,11 +639,35 @@ void XYRange::SetYRange(double dYMin, double dYMax)
 // pixel -> range point
 double XYRange::GetRangeXPos(uint iX) const
 {
-	return m_dXMin + (m_dXMax-m_dXMin)*double(iX)/double(m_iWidth-1);
+	// range 0..1
+	double dX_Val = double(iX) / double(m_iWidth-1);
+
+	if(m_bXIsLog)
+	{
+		double dXMin = log10(m_dXMin);
+		double dXMax = log10(m_dXMax);
+		dX_Val = pow(10., dXMin + dX_Val*(dXMax-dXMin));
+	}
+	else
+		dX_Val = dX_Val * (m_dXMax-m_dXMin) + m_dXMin;
+
+	return dX_Val;
 }
 double XYRange::GetRangeYPos(uint iY) const
 {
-	return m_dYMin + (m_dYMax-m_dYMin)*double(iY)/double(m_iHeight-1);
+	// range 0..1
+	double dY_Val = double(iY) / double(m_iHeight-1);
+
+	if(m_bYIsLog)
+	{
+		double dYMin = log10(m_dYMin);
+		double dYMax = log10(m_dYMax);
+		dY_Val = pow(10., dYMin + dY_Val*(dYMax-dYMin));
+	}
+	else
+		dY_Val = dY_Val * (m_dYMax-m_dYMin) + m_dYMin;
+
+	return dY_Val;
 }
 
 // range point -> pixel

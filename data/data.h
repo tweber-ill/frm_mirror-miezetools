@@ -92,15 +92,18 @@ protected:
 	double m_dXMin, m_dXMax;
 	double m_dYMin, m_dYMax;
 	bool m_bHasRange;
+	bool m_bXIsLog, m_bYIsLog;
 
 public:
 	XYRange() : m_iWidth(0), m_iHeight(0),
 				m_dXMin(0.), m_dXMax(1.), m_dYMin(0.), m_dYMax(1.),
-				m_bHasRange(0)
+				m_bHasRange(0), m_bXIsLog(0), m_bYIsLog(0)
 	{}
 
 	void SetXRange(double dXMin, double dXMax);
 	void SetYRange(double dYMin, double dYMax);;
+
+	void SetXYLog(bool bLogX, bool bLogY) { m_bXIsLog=bLogX; m_bYIsLog=bLogY; }
 
 	bool HasRange() const { return m_bHasRange; }
 
@@ -208,6 +211,8 @@ public:
 
 	double GetMin() const { return m_dMin; }
 	double GetMax() const { return m_dMax; }
+
+	void SetMinMax(double dMin, double dMax)  { m_dMin=dMin; m_dMax=dMax; }
 
 	double GetTotal() const { return m_dTotal; }
 	void SetTotal(double dTot) { m_dTotal = dTot; }

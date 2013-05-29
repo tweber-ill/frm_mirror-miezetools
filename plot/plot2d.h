@@ -27,11 +27,9 @@ protected:
 
 	Data2 m_dat;
 	QImage *m_pImg;
-	bool m_bLog, m_bXIsLog, m_bYIsLog;
+	bool m_bLog;
 	bool m_bCountData;
 	bool m_bCyclicData;
-	bool m_bHasXYMinMax;
-	double m_dXMin, m_dXMax, m_dYMin, m_dYMax;
 
 	QRect m_rectImage, m_rectCB;
 	QString m_strXAxis, m_strYAxis, m_strZAxis, m_strTitle;
@@ -51,13 +49,8 @@ public:
 	void clear();
 	virtual void RefreshPlot();
 
-	void SetXYMinMax(double dXMin, double dXMax, double dYMin, double dYMax);
-
 	void SetLog(bool bLog);
 	bool GetLog() const;
-
-	void SetXIsLog(bool bLogX) { m_bXIsLog = bLogX; }
-	void SetYIsLog(bool bLogY) { m_bYIsLog = bLogY; }
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }

@@ -553,6 +553,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 				pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 
 				pPlot->plot(iW, iH, pDat, pErr);
+				Data2& dat2 = pPlot->GetData2();
 
 				std::string strLabX, strLabY, strLabZ, strPlotTitle;
 				pdat2d->GetLabels(strLabX, strLabY, strLabZ);
@@ -562,12 +563,14 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 				double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
 				if(pdat2d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
-					pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
+				{
+					dat2.SetXRange(dXMin, dXMax);
+					dat2.SetYRange(dYMin, dYMax);
+				}
 
 				bool bXLog=0, bYLog=0;
 				pdat2d->GetLogScale(bXLog, bYLog);
-				pPlot->SetXIsLog(bXLog);
-				pPlot->SetYIsLog(bYLog);
+				dat2.SetXYLog(bXLog, bYLog);
 
 				delete[] pDat;
 				delete[] pErr;
@@ -600,6 +603,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 				Plot3d *pPlot = (Plot3d*)pPlotWrapper->GetActualWidget();
 				pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 				pPlot->plot(iW, iH, iT, pDat, pErr);
+				Data3& dat3 = pPlot->GetData();
 
 				std::string strLabX, strLabY, strLabZ, strPlotTitle;
 				pdat3d->GetLabels(strLabX, strLabY, strLabZ);
@@ -609,12 +613,14 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 				double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
 				if(pdat3d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
-					pPlot->SetXYMinMax(dXMin, dXMax, dYMin, dYMax);
+				{
+					dat3.SetXRange(dXMin, dXMax);
+					dat3.SetYRange(dYMin, dYMax);
+				}
 
 				bool bXLog=0, bYLog=0;
 				pdat3d->GetLogScale(bXLog, bYLog);
-				pPlot->SetXIsLog(bXLog);
-				pPlot->SetYIsLog(bYLog);
+				dat3.SetXYLog(bXLog, bYLog);
 
 				delete[] pDat;
 				delete[] pErr;
@@ -1193,9 +1199,10 @@ void MiezeMainWnd::CalcPSDPhases()
 	Data2 dat;
 	dat.FromMatrix(matPhases);
 	dat.SetXRange(-lx/2./cm, lx/2./cm);
-	dat.SetXRange(-ly/2./cm, ly/2./cm);
+	dat.SetYRange(-ly/2./cm, ly/2./cm);
+	dat.SetMinMax(0., 2.*M_PI);
 
-	Plot2d* plt = new Plot2d(m_pmdi, "PSD phases", 0);
+	Plot2d* plt = new Plot2d(m_pmdi, "PSD phases", 0, 1);
 	plt->SetLabels("x Position (cm)", "y Position (cm)", "Phase (rad)");
 	plt->plot(dat);
 
