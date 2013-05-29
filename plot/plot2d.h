@@ -29,6 +29,7 @@ protected:
 	QImage *m_pImg;
 	bool m_bLog, m_bXIsLog, m_bYIsLog;
 	bool m_bCountData;
+	bool m_bCyclicData;
 	bool m_bHasXYMinMax;
 	double m_dXMin, m_dXMax, m_dYMin, m_dYMax;
 
@@ -39,7 +40,7 @@ protected:
 	uint GetSpectroColor01(double dVal) const;
 
 public:
-	Plot2d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
+	Plot2d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1, bool bCyclicData=0);
 	virtual ~Plot2d();
 
 	const Data2& GetData2() const { return m_dat; }
@@ -72,7 +73,6 @@ public:
 
 	virtual SubWindowType GetType() { return PLOT_2D; }
 	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
-
 
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat; }

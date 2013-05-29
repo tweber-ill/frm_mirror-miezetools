@@ -228,6 +228,25 @@ Data1 Data2::SumY() const
 }
 
 
+void Data2::FromMatrix(const ublas::matrix<double>& mat)
+{
+	this->SetSize(mat.size1(), mat.size2());
+
+	m_dMin = std::numeric_limits<double>::max();
+	m_dMax = -m_dMin;
+	m_dTotal = 0.;
+
+	for(uint iY=0; iY<m_iHeight; ++iY)
+		for(uint iX=0; iX<m_iWidth; ++iX)
+		{
+			double dVal = mat(iX, iY);
+			this->SetVal(iX, iY, dVal);
+			this->SetErr(iX, iY, 0.);
+
+			m_dTotal += dVal;
+		}
+}
+
 
 //------------------------------------------------------------------------
 

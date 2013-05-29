@@ -95,6 +95,7 @@ protected slots:
 	void BSplineInterpolation();
 
 	void ShowReso();
+	void CalcPSDPhases();
 
 	void ShowAbout();
 	void ShowBrowser();

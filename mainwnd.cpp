@@ -25,6 +25,7 @@
 #include "helper/string.h"
 #include "helper/file.h"
 #include "helper/misc.h"
+#include "helper/mieze.hpp"
 
 #include "loader/loadtxt.h"
 #include "loader/loadnicos.h"
@@ -219,7 +220,13 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QAction *pReso = new QAction(this);
 	pReso->setText("Resolution...");
+
+	QAction *pPSDPhase = new QAction(this);
+	pPSDPhase->setText("PSD Phase Image...");
+
 	pMenuCalc->addAction(pReso);
+	pMenuCalc->addSeparator();
+	pMenuCalc->addAction(pPSDPhase);
 
 
 
@@ -297,6 +304,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pCloseAll, SIGNAL(triggered()), m_pmdi, SLOT(closeAllSubWindows()));
 
 	QObject::connect(pReso, SIGNAL(triggered()), this, SLOT(ShowReso()));
+	QObject::connect(pPSDPhase, SIGNAL(triggered()), this, SLOT(CalcPSDPhases()));
 
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
 	QObject::connect(pBrowser, SIGNAL(triggered()), this, SLOT(ShowBrowser()));
@@ -1165,6 +1173,33 @@ void MiezeMainWnd::ShowReso()
 
 	m_presdlg->show();
 	m_presdlg->activateWindow();
+}
+
+void MiezeMainWnd::CalcPSDPhases()
+{
+	const units::quantity<units::si::length> cm = units::si::meter/100.;
+
+	units::quantity<units::si::length> lx = 20.*cm;
+	units::quantity<units::si::length> ly = 20.*cm;
+	units::quantity<units::si::length> Ls = 80.*cm;
+	units::quantity<units::si::time> tau = 50.*units::si::second/1e12;
+	units::quantity<units::si::length> lam = 5.*angstrom;
+	unsigned int iXPixels = 128;
+	unsigned int iYPixels = 128;
+
+	ublas::matrix<double> matPhases;
+	mieze_reduction_det(lx, ly, Ls, tau, lam, iXPixels, iYPixels, &matPhases);
+
+	Data2 dat;
+	dat.FromMatrix(matPhases);
+	dat.SetXRange(-lx/2./cm, lx/2./cm);
+	dat.SetXRange(-ly/2./cm, ly/2./cm);
+
+	Plot2d* plt = new Plot2d(m_pmdi, "PSD phases", 0);
+	plt->SetLabels("x Position (cm)", "y Position (cm)", "Phase (rad)");
+	plt->plot(dat);
+
+	AddSubWindow(plt);
 }
 
 #include "mainwnd.moc"

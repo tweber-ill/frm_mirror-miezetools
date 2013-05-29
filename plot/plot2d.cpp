@@ -17,9 +17,10 @@
 #define PAD_X 24
 #define PAD_Y 24
 
-Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData)
+Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData, bool bCyclicData)
 			: SubWindowBase(pParent),
-			  m_pImg(0), m_bLog(bCountData), m_bCountData(bCountData),
+			  m_pImg(0),
+			  m_bLog(bCountData), m_bCountData(bCountData), m_bCyclicData(bCyclicData),
 			  m_bHasXYMinMax(0), m_bXIsLog(0), m_bYIsLog(0)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);

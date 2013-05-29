@@ -14,6 +14,9 @@ typedef unsigned char uchar;
 #include<vector>
 #include<algorithm>
 
+#include <boost/numeric/ublas/matrix.hpp>
+namespace ublas = boost::numeric::ublas;
+
 #include "../roi/roi.h"
 
 enum DataType
@@ -208,6 +211,8 @@ public:
 
 	double GetTotal() const { return m_dTotal; }
 	void SetTotal(double dTot) { m_dTotal = dTot; }
+
+	void FromMatrix(const ublas::matrix<double>& mat);
 
 	Data1 SumY() const;
 };
