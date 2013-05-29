@@ -39,6 +39,7 @@ protected:
 
 public:
 	Plot2d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1, bool bCyclicData=0);
+	Plot2d(const Plot2d& plot);
 	virtual ~Plot2d();
 
 	const Data2& GetData2() const { return m_dat; }

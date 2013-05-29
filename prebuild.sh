@@ -37,5 +37,6 @@ moc dialogs/AboutDlg.h -o dialogs/AboutDlg.moc
 moc dialogs/RoiDlg.h -o dialogs/RoiDlg.moc
 moc dialogs/ComboDlg.h -o dialogs/ComboDlg.moc
 moc dialogs/ResoDlg.h -o dialogs/ResoDlg.moc
+moc dialogs/PsdPhaseDlg.h -o dialogs/PsdPhaseDlg.moc
 
 echo -e "\n"

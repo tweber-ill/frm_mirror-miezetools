@@ -23,8 +23,22 @@ Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData, bool bCyc
 			  m_bLog(bCountData), m_bCountData(bCountData), m_bCyclicData(bCyclicData)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
-	this->setWindowTitle(QString(pcTitle));
+	if(pcTitle) this->setWindowTitle(QString(pcTitle));
 	this->setMouseTracking(true);
+}
+
+Plot2d::Plot2d(const Plot2d& plot)
+{
+	this->m_bLog = plot.m_bLog;
+	this->m_bCountData = plot.m_bCountData;
+	this->m_bCyclicData = plot.m_bCyclicData;
+
+	this->m_strXAxis = plot.m_strXAxis;
+	this->m_strYAxis = plot.m_strYAxis;
+	this->m_strZAxis = plot.m_strZAxis;
+	this->m_strTitle = plot.m_strTitle;
+
+	this->plot(plot.GetData2());
 }
 
 Plot2d::~Plot2d()
