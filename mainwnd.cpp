@@ -223,7 +223,7 @@ MiezeMainWnd::MiezeMainWnd()
 	pReso->setText("Resolution...");
 
 	QAction *pPSDPhase = new QAction(this);
-	pPSDPhase->setText("PSD Phase Image...");
+	pPSDPhase->setText("Flat PSD Phases...");
 
 	pMenuCalc->addAction(pReso);
 	pMenuCalc->addSeparator();
@@ -1187,7 +1187,9 @@ void MiezeMainWnd::CalcPSDPhases()
 	PsdPhaseDlg dlg(this);
 	if(dlg.exec() == QDialog::Accepted)
 	{
-		Plot2d *pPlot = new Plot2d(this, "PSD Phase", 0, 1);
+		std::ostringstream ostr;
+		ostr << "PSD Phases for tau=" << dlg.GetTau() << "ps";
+		Plot2d *pPlot = new Plot2d(this, ostr.str().c_str(), 0, 1);
 		pPlot->SetLabels("x Position (cm)", "y Position (cm)", "Phase (rad)");
 		pPlot->plot(dlg.GetData());
 		AddSubWindow(pPlot);

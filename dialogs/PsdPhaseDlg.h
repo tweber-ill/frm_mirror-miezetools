@@ -27,6 +27,7 @@ public:
 	virtual ~PsdPhaseDlg();
 
 	const Data2& GetData() const { return m_dat; }
+	double GetTau() const { return spinTau->value(); }
 };
 
 #endif
