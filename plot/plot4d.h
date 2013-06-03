@@ -36,7 +36,7 @@ public:
 	uint GetCurT() const { return m_iCurT; }
 	uint GetCurF() const { return m_iCurF; }
 
-	virtual SubWindowType GetType() { return PLOT_4D; }
+	virtual SubWindowType GetType() const { return PLOT_4D; }
 	virtual double GetTotalCounts() const { return m_dat4.GetTotal(); }
 
 	virtual Plot* ConvertTo1d(int iFoil);
@@ -60,7 +60,7 @@ public:
 
 	//operator Plot4d*() { return (Plot4d*)GetActualWidget(); }
 
-	virtual SubWindowType GetType() { return PLOT_4D; }
+	virtual SubWindowType GetType() const { return PLOT_4D; }
 	virtual SubWindowBase* GetActualWidget() { return m_pPlot; }
 	virtual std::string GetTitle() const { return m_pPlot->GetTitle(); }
 	virtual double GetTotalCounts() const { return m_pPlot->GetTotalCounts(); }

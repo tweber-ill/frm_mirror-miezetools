@@ -54,7 +54,6 @@ struct FitParams
  protected:
 	 QMdiArea *m_pmdi;
 
-
 	 typedef std::map<std::string, FitParams> t_mapParams;
 	 t_mapParams m_mapParams;
 	 void SaveLastParams();

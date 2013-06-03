@@ -24,6 +24,7 @@
 #include "dialogs/RoiDlg.h"
 #include "dialogs/FitDlg.h"
 #include "dialogs/ResoDlg.h"
+#include "dialogs/PsdPhaseDlg.h"
 
 #define MAX_RECENT_FILES 16
 
@@ -40,6 +41,7 @@ protected:
 	FitDlg *m_pfitdlg;
 	RoiDlg *m_proidlg;
 	ResoDlg *m_presdlg;
+	PsdPhaseCorrDlg *m_pphasecorrdlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -95,6 +97,7 @@ protected slots:
 	void BSplineInterpolation();
 
 	void ShowReso();
+	void ShowPSDPhaseCorr();
 	void CalcPSDPhases();
 
 	void ShowAbout();
@@ -115,6 +118,13 @@ public slots:
 	void SetStatusMsg(const char* pcMsg, int iPos);
 	void AddSubWindow(SubWindowBase* pWnd);
 	void LoadFile(const QString& strFile);
+
+protected slots:
+	void SubWindowDestroyed(SubWindowBase *pSWB);
+
+signals:
+	void SubWindowRemoved(SubWindowBase *pSWB);
+	void SubWindowAdded(SubWindowBase *pSWB);
 };
 
 #endif

@@ -87,7 +87,7 @@ public:
 	void SetXLimits(double dXMin, double dXMax) { m_dxmin=dXMin; m_dxmax=dXMax; }
 	void SetYLimits(double dYMin, double dYMax) { m_dymin=dYMin; m_dymax=dYMax; }
 
-	virtual SubWindowType GetType() { return PLOT_1D; }
+	virtual SubWindowType GetType() const { return PLOT_1D; }
 	virtual double GetTotalCounts() const { return 0.; }
 	virtual Plot* ConvertTo1d(int iParam=0) { return (Plot*)this; }
 

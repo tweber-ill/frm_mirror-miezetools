@@ -35,7 +35,7 @@ public:
 	Data3& GetData() { return m_dat3; }
 	uint GetCurT() const { return m_iCurT; }
 
-	virtual SubWindowType GetType() { return PLOT_3D; }
+	virtual SubWindowType GetType() const { return PLOT_3D; }
 	virtual double GetTotalCounts() const { return m_dat3.GetTotal(); }
 
 	virtual Plot* ConvertTo1d(int iParam=0);
@@ -59,7 +59,7 @@ public:
 
 	//operator Plot3d*() { return (Plot3d*)GetActualWidget(); }
 
-	virtual SubWindowType GetType() { return PLOT_3D; }
+	virtual SubWindowType GetType() const { return PLOT_3D; }
 	virtual SubWindowBase* GetActualWidget() { return m_pPlot; }
 
 	virtual std::string GetTitle() const { return m_pPlot->GetTitle(); }

@@ -27,9 +27,18 @@ enum SubWindowType
 class SubWindowBase : public QWidget
 {
 Q_OBJECT
+
+signals:
+	void SetStatusMsg(const char* pcMsg, int iPos);
+	void DataLoaded();
+
+	void WndDestroyed(SubWindowBase *pThis);
+
 public:
 	SubWindowBase(QWidget* pParent=0) : QWidget(pParent) {}
-	virtual SubWindowType GetType() = 0;
+	virtual ~SubWindowBase() { emit WndDestroyed(this); }
+
+	virtual SubWindowType GetType() const = 0;
 	virtual SubWindowBase* GetActualWidget() { return this; }
 
 	//virtual std::string GetTitle() const = 0;
@@ -39,10 +48,6 @@ public:
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return 0; }
 
 	virtual void SetGlobalROI(const Roi* pROI, const bool* pbROIActive) {}
-
-signals:
-	void SetStatusMsg(const char* pcMsg, int iPos);
-	void DataLoaded();
 };
 
 #endif

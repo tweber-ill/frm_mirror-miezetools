@@ -7,12 +7,12 @@ LIBS_RESO = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS} ${LAPACK_LIBS}
 LIBS = -L/usr/lib64 -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lstdc++ -lm -fopenmp -lMinuit2 -lfftw3 ${QT_LIBS} ${LAPACK_LIBS}
 
 
-cattus: main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o
-	${CC} ${FLAGS} -o cattus main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o ${LIBS}
+cattus: main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o
+	${CC} ${FLAGS} -o cattus main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o ${LIBS}
 	strip cattus
 
-reso: settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o roi.o plotgl.o
-	${CC} ${FLAGS} -o reso settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o roi.o plotgl.o ${LIBS_RESO}
+reso: settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o
+	${CC} ${FLAGS} -o reso settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o ${LIBS_RESO}
 	strip reso
 
 
@@ -50,6 +50,9 @@ ResoDlg.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
 ResoDlg_prog.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
 	${CC} ${FLAGS} -c -DSTANDALONE_RESO -o ResoDlg_prog.o dialogs/ResoDlg.cpp
 
+PsdPhaseDlg.o: dialogs/PsdPhaseDlg.cpp dialogs/PsdPhaseDlg.h
+	${CC} ${FLAGS} -c -o PsdPhaseDlg.o dialogs/PsdPhaseDlg.cpp
+
 RoiDlg.o: dialogs/RoiDlg.cpp dialogs/RoiDlg.h
 	${CC} ${FLAGS} -c -o RoiDlg.o dialogs/RoiDlg.cpp
 
@@ -67,6 +70,8 @@ string.o: helper/string.cpp helper/string.h
 xml.o: helper/xml.cpp helper/xml.h
 	${CC} ${FLAGS} -c -o xml.o helper/xml.cpp
 
+linalg.o: helper/linalg.cpp helper/linalg.h
+	${CC} ${FLAGS} -c -o linalg.o helper/linalg.cpp
 
 
 

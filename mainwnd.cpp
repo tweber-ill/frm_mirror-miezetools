@@ -36,7 +36,6 @@
 #include "dialogs/SettingsDlg.h"
 #include "dialogs/AboutDlg.h"
 #include "dialogs/ComboDlg.h"
-#include "dialogs/PsdPhaseDlg.h"
 
 #include "fitter/models/msin.h"
 #include "fitter/models/gauss.h"
@@ -46,11 +45,17 @@
 MiezeMainWnd::MiezeMainWnd()
 					: m_iPlotCnt(1), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)), m_bmainROIActive(0),
-					  m_presdlg(0)
+					  m_presdlg(0), m_pphasecorrdlg(0)
 {
 	this->setWindowTitle("Cattus, a MIEZE toolset");
 
 	m_pmdi = new QMdiArea(this);
+	m_pmdi->setActivationOrder(QMdiArea::StackingOrder);
+	//m_pmdi->setViewMode(QMdiArea::TabbedView);
+	//m_pmdi->setDocumentMode(1);
+	//m_pmdi->setTabPosition(QTabWidget::South);
+	m_pmdi->setViewMode(QMdiArea::SubWindowView);
+	m_pmdi->setOption(QMdiArea::DontMaximizeSubWindowOnActivation, 1);
 	this->setCentralWidget(m_pmdi);
 
 
@@ -150,6 +155,11 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pCombineGraphs = new QAction(this);
 	pCombineGraphs->setText("Plot Counts/Contrasts...");
 	pMenuTools->addAction(pCombineGraphs);
+
+	QAction *pPhaseCorr = new QAction(this);
+	pPhaseCorr->setText("PSD Phase Correction...");
+	pMenuTools->addAction(pPhaseCorr);
+
 	pMenuTools->addSeparator();
 
 	QMenu *pMenuIntegrate = new QMenu(pMenuTools);
@@ -305,6 +315,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pCloseAll, SIGNAL(triggered()), m_pmdi, SLOT(closeAllSubWindows()));
 
 	QObject::connect(pReso, SIGNAL(triggered()), this, SLOT(ShowReso()));
+	QObject::connect(pPhaseCorr, SIGNAL(triggered()), this, SLOT(ShowPSDPhaseCorr()));
 	QObject::connect(pPSDPhase, SIGNAL(triggered()), this, SLOT(CalcPSDPhases()));
 
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
@@ -324,6 +335,7 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pfitdlg) delete m_pfitdlg;
 	if(m_proidlg) delete m_proidlg;
 	if(m_presdlg) delete m_presdlg;
+	if(m_pphasecorrdlg) delete m_pphasecorrdlg;
 }
 
 void MiezeMainWnd::UpdateSubWndList()
@@ -371,8 +383,27 @@ void MiezeMainWnd::SubWindowChanged()
 
 		}
 	}
-
 	// ...
+}
+
+void MiezeMainWnd::SubWindowDestroyed(SubWindowBase *pSWB)
+{
+	emit SubWindowRemoved(pSWB);
+}
+
+void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
+{
+	if(!pWnd) return;
+
+	pWnd->setParent(m_pmdi);
+	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
+	QObject::connect(pWnd, SIGNAL(WndDestroyed(SubWindowBase*)), this, SLOT(SubWindowDestroyed(SubWindowBase*)));
+	QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
+
+	m_pmdi->addSubWindow(pWnd);
+	emit SubWindowAdded(pWnd);
+
+	pWnd->show();
 }
 
 void MiezeMainWnd::MakePlot(const Data1& dat, const std::string& strTitle)
@@ -434,7 +465,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 		AddSubWindow(pPlotWrapper);
 	}
-	else 	if(is_equal(strExt, "pad"))
+	else if(is_equal(strExt, "pad"))
 	{
 		PadFile pad(strFile.c_str());
 		if(!pad.IsOpen())
@@ -505,10 +536,15 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 				if(Settings::Get<int>("general/sort_x"))
 				{
-					::sort_3<double*, double>((double*)pdx,
+					if(pdyerr)
+						::sort_3<double*, double>((double*)pdx,
 												(double*)pdx+pdat1d->GetDim(),
 												(double*)pdy,
 												(double*)pdyerr);
+					else
+						::sort_2<double*, double>((double*)pdx,
+												(double*)pdx+pdat1d->GetDim(),
+												(double*)pdy);
 				}
 
 				std::string strTitle = GetPlotTitle(strFileNoDir);
@@ -670,10 +706,15 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 			if(Settings::Get<int>("general/sort_x"))
 			{
-				::sort_3<double*, double>((double*)pdx,
+				if(pdyerr)
+					::sort_3<double*, double>((double*)pdx,
 											(double*)pdx+pnicosdat->GetDim(),
 											(double*)pdy,
 											pdyerr);
+				else
+					::sort_2<double*, double>((double*)pdx,
+											(double*)pdx+pnicosdat->GetDim(),
+											(double*)pdy);
 			}
 
 			std::string strTitle = GetPlotTitle(strFileNoDir);
@@ -842,16 +883,6 @@ void MiezeMainWnd::SettingsTriggered()
 	{
 
 	}
-}
-
-void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
-{
-	pWnd->setParent(m_pmdi);
-	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
-	QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
-
-	m_pmdi->addSubWindow(pWnd);
-	pWnd->show();
 }
 
 void MiezeMainWnd::keyPressEvent (QKeyEvent * event)
@@ -1194,6 +1225,21 @@ void MiezeMainWnd::CalcPSDPhases()
 		pPlot->plot(dlg.GetData());
 		AddSubWindow(pPlot);
 	}
+}
+
+void MiezeMainWnd::ShowPSDPhaseCorr()
+{
+	if(!m_pphasecorrdlg)
+	{
+		m_pphasecorrdlg = new PsdPhaseCorrDlg(this, m_pmdi);
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pphasecorrdlg, SLOT(RefreshPhaseCombo()));
+		QObject::connect(this, SIGNAL(SubWindowAdded(SubWindowBase*)), m_pphasecorrdlg, SLOT(RefreshPhaseCombo()));
+
+		QObject::connect(m_pphasecorrdlg, SIGNAL(AddNewPlot(SubWindowBase*)), this, SLOT(AddSubWindow(SubWindowBase*)));
+	}
+
+	m_pphasecorrdlg->show();
+	m_pphasecorrdlg->activateWindow();
 }
 
 #include "mainwnd.moc"

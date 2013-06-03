@@ -65,7 +65,7 @@ public:
 
 	const QString& GetZStr() const { return m_strZAxis; }
 
-	virtual SubWindowType GetType() { return PLOT_2D; }
+	virtual SubWindowType GetType() const { return PLOT_2D; }
 	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
 
 protected:
