@@ -41,6 +41,8 @@ public:
 	virtual Plot* ConvertTo1d(int iParam=0);
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return this; }
 
+	virtual SubWindowBase* clone() const;
+
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat3; }
 };
@@ -55,7 +57,9 @@ protected:
 
 public:
 	Plot3dWrapper(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
+	Plot3dWrapper(Plot3d* pPlot);
 	virtual ~Plot3dWrapper();
+	void Init();
 
 	//operator Plot3d*() { return (Plot3d*)GetActualWidget(); }
 

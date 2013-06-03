@@ -11,7 +11,11 @@
 
 #include "PsdPhaseDlg.h"
 #include "ListDlg.h"
+#include "../settings.h"
+
 #include "../helper/mieze.hpp"
+#include "../helper/fourier.h"
+#include "../helper/misc.h"
 
 PsdPhaseDlg::PsdPhaseDlg(QWidget* pParent)
 					: QDialog(pParent), m_bAllowUpdate(0),
@@ -233,15 +237,25 @@ void PsdPhaseCorrDlg::UsePhaseItemSelected()
 
 void PsdPhaseCorrDlg::DoPhaseCorr()
 {
-	int iPhaseIdx = comboPhaseImg->currentIndex();
-	if(iPhaseIdx<0 || iPhaseIdx>=m_vecPhaseImgs.size())
+	PsdPhaseMethod meth = METH_INVALID;
+	if(radioFFT->isChecked())
+		meth = METH_FFT;
+	else if(radioFit->isChecked())
+		meth = METH_FIT;
+	else if(radioImage->isChecked())
+		meth = METH_THEO;
+
+	const Plot2d* pPhases = 0;
+	if(meth == METH_THEO)
 	{
-		QMessageBox::critical(this, "Error", "No phase image selected.");
-		return;
+		int iPhaseIdx = comboPhaseImg->currentIndex();
+		if(iPhaseIdx<0 || iPhaseIdx>=m_vecPhaseImgs.size())
+		{
+			QMessageBox::critical(this, "Error", "No phase image selected.");
+			return;
+		}
+		pPhases = m_vecPhaseImgs[iPhaseIdx];
 	}
-
-	const Plot2d* pPhases = m_vecPhaseImgs[iPhaseIdx];
-
 
 	for(int iGraphs=0; iGraphs<listGraphs->count(); ++iGraphs)
 	{
@@ -252,9 +266,9 @@ void PsdPhaseCorrDlg::DoPhaseCorr()
 
 		pCurItem = pCurItem->GetActualWidget();
 		if(pCurItem->GetType() == PLOT_3D)
-			pCorrectedPlot = DoPhaseCorr(pPhases, (Plot3d*)pCurItem);
+			pCorrectedPlot = new Plot3dWrapper(DoPhaseCorr(pPhases, (Plot3d*)pCurItem, meth));
 		else if(pCurItem->GetType() == PLOT_4D)
-			pCorrectedPlot = DoPhaseCorr(pPhases, (Plot4d*)pCurItem);
+			pCorrectedPlot = DoPhaseCorr(pPhases, (Plot4d*)pCurItem, meth);
 
 		if(!pCorrectedPlot)
 			continue;
@@ -263,17 +277,72 @@ void PsdPhaseCorrDlg::DoPhaseCorr()
 	}
 }
 
-Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pDatPlot)
+Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pDatPlot, PsdPhaseMethod meth)
 {
-	const Data2* pPhases = &pPhasesPlot->GetData2();
+	Plot3d* pDatPlot_shifted = (Plot3d*)pDatPlot->clone();
+	bool bIsCountData = pDatPlot_shifted->IsCountData();
+	pDatPlot_shifted->setWindowTitle(pDatPlot_shifted->windowTitle() + " (psd corr)");
+
 	const Data3* pDat = &pDatPlot->GetData();
+	Data3* pDat_shifted = &pDatPlot_shifted->GetData();
+	const Data2* pPhases = 0;
+	if(meth == METH_THEO)
+		pPhases = &pPhasesPlot->GetData2();
 
-	// TODO adapt old code
+	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 
-	return 0;
+	Fourier fourier(pDat->GetDepth());
+	double *pdY = new double[pDat->GetDepth()];
+	double *pdY_shift = new double[pDat->GetDepth()];
+
+	double *pdYErr = new double[pDat->GetDepth()];
+	double *pdYErr_shift = new double[pDat->GetDepth()];
+
+
+	for(unsigned int iY=0; iY<pDat->GetHeight(); ++iY)
+		for(unsigned int iX=0; iX<pDat->GetWidth(); ++iX)
+		{
+			Data1 dat = pDat->GetXY(iX, iY);
+			for(unsigned int iT=0; iT<pDat->GetDepth(); ++iT)
+			{
+				pdY[iT] = dat.GetY(iT);
+				pdYErr[iT] = dat.GetYErr(iT);
+			}
+
+			double dPhase = 0.;
+
+			if(meth == METH_THEO)
+				dPhase = pPhases->GetVal(iX, iY);
+			else if(meth == METH_FFT)
+			{
+				double dC;
+				fourier.get_contrast(dNumOsc, pdY, dC, dPhase);
+				//dPhase *= dNumOsc;
+			}
+			else if(meth == METH_FIT)
+			{
+				// TODO: reuse existing code
+			}
+
+			fourier.phase_correction_0(pdY, pdY_shift, dPhase/dNumOsc);
+			fourier.phase_correction_0(pdYErr, pdYErr_shift, dPhase/dNumOsc);
+
+			for(unsigned int iT=0; iT<pDat->GetDepth(); ++iT)
+			{
+				pDat_shifted->SetVal(iX, iY, iT, pdY_shift[iT]);
+				pDat_shifted->SetErr(iX, iY, iT, pdYErr_shift[iT]);
+			}
+		}
+
+	delete[] pdY;
+	delete[] pdY_shift;
+	delete[] pdYErr;
+	delete[] pdYErr_shift;
+
+	return pDatPlot_shifted;
 }
 
-Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pDatPlot)
+Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pDatPlot, PsdPhaseMethod meth)
 {
 	const Data2* pPhases = &pPhasesPlot->GetData2();
 	const Data4* pDat = &pDatPlot->GetData();

@@ -38,6 +38,16 @@ public:
 	double GetTau() const { return spinTau->value(); }
 };
 
+
+enum PsdPhaseMethod
+{
+	METH_INVALID,
+
+	METH_FIT,
+	METH_FFT,
+	METH_THEO
+};
+
 class PsdPhaseCorrDlg : public QDialog, Ui::PsdPhaseCorrDlg
 {Q_OBJECT
 protected:
@@ -62,8 +72,8 @@ public:
 	PsdPhaseCorrDlg(QWidget* pParent, QMdiArea *pmdi);
 	virtual ~PsdPhaseCorrDlg();
 
-	static Plot3d* DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pDatPlot);
-	static Plot4d* DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pDatPlot);
+	static Plot3d* DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pDatPlot, PsdPhaseMethod meth=METH_THEO);
+	static Plot4d* DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pDatPlot, PsdPhaseMethod meth=METH_THEO);
 
 signals:
 	void AddNewPlot(SubWindowBase *pSWB);

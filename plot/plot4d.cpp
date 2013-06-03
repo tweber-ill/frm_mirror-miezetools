@@ -147,6 +147,7 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 	{	// total, corrected MIEZE signal
 		const Data4& dat4 = pPlot4d->GetData();
 		const unsigned int iNumFoils = dat4.GetDepth2();
+		Fourier fourier(dat4.GetDepth());
 
 		double *pdyTotal = new double[dat4.GetDepth()];
 		double *pdyerrTotal = new double[dat4.GetDepth()];
@@ -213,7 +214,6 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 		dMeanPhase = fmod(dMeanPhase, 2.*M_PI);
 
 
-		Fourier fourier(dat4.GetDepth());
 		for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 		{
 			double *pdxFoil = vecXFoil[iFoil];

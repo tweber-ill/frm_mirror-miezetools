@@ -41,6 +41,8 @@ public:
 	virtual SubWindowType GetType() const = 0;
 	virtual SubWindowBase* GetActualWidget() { return this; }
 
+	virtual SubWindowBase* clone() const { return 0; }
+
 	//virtual std::string GetTitle() const = 0;
 	virtual double GetTotalCounts() const = 0;
 

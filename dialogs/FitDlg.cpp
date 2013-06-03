@@ -510,7 +510,7 @@ void FitDlg::DoSpecialFit()
 SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, int iFkt)
 {
 	SpecialFitPixelResult res;
-	res.bOk = 0;
+	res.bOk = 1;
 	res.pPlot[0] = res.pPlot[1] = 0;
 
 	Plot3d* pPlot3d = pSWB->ConvertTo3d(iFoil);
@@ -541,8 +541,9 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 	{
 		for(unsigned int iX=0; iX<iW; ++iX)
 		{
+			bool bOk=0;
 			Data1 dat1 = dat3.GetXY(iX, iY);
-			if(dat1.SumY() < dMinCts)
+			if(pPlot3d->IsCountData() && dat1.SumY()<dMinCts)
 				continue;
 
 			dat1.ToArray<double>(px, py, pyerr);
@@ -555,7 +556,7 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 				double dFreq = dThisNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat1.GetLength()));;
 
 				MiezeSinModel *pModel = 0;
-				res.bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat1.GetLength(), px, py, pyerr, &pModel);
+				bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat1.GetLength(), px, py, pyerr, &pModel);
 
 				dC = pModel->GetContrast();
 				dCErr = pModel->GetContrastErr();
@@ -566,10 +567,10 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 			}
 			else if(iFkt == FIT_MIEZE_SINE_PIXELWISE_FFT)
 			{
-				res.bOk = pFFT->get_contrast(dNumOsc, py, dC, dPh);
+				bOk = pFFT->get_contrast(dNumOsc, py, dC, dPh);
 			}
 
-			if(res.bOk)
+			if(bOk)
 			{
 				if(isnan(dC) || isinf(dC)) dC = 0.;
 				if(isnan(dPh) || isinf(dPh)) dPh = 0.;

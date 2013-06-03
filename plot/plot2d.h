@@ -68,6 +68,8 @@ public:
 	virtual SubWindowType GetType() const { return PLOT_2D; }
 	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
 
+	bool IsCountData() const { return m_bCountData; }
+
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat; }
 
