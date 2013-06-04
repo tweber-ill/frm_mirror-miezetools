@@ -21,8 +21,6 @@ protected:
 	Data4 m_dat4;
 	uint m_iCurT, m_iCurF;
 
-	virtual void RefreshStatusMsgs();
-
 public:
 	Plot4d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
 	virtual ~Plot4d();
@@ -42,6 +40,9 @@ public:
 	virtual Plot* ConvertTo1d(int iFoil);
 	virtual Plot3d* ConvertTo3d(int iFoil=-1);
 
+	virtual SubWindowBase* clone() const;
+	virtual void RefreshStatusMsgs();
+
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat4; }
 };
@@ -56,7 +57,9 @@ protected:
 
 public:
 	Plot4dWrapper(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
+	Plot4dWrapper(Plot4d* pPlot);
 	virtual ~Plot4dWrapper();
+	void Init();
 
 	//operator Plot4d*() { return (Plot4d*)GetActualWidget(); }
 

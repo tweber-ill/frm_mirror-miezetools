@@ -91,6 +91,7 @@ protected slots:
 	void QuickFitMIEZEpixel();
 	void QuickFitGauss();
 	void QuickFitDoubleGauss();
+	void QuickFitTripleGauss();
 
 	void Interpolation(SubWindowBase* pSWB, InterpFkt iFkt);
 	void BezierInterpolation();

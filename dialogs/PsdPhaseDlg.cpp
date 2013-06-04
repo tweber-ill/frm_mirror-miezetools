@@ -271,7 +271,7 @@ void PsdPhaseCorrDlg::DoPhaseCorr()
 		if(pCurItem->GetType() == PLOT_3D)
 			pCorrectedPlot = new Plot3dWrapper(DoPhaseCorr(pPhases, (Plot3d*)pCurItem, meth));
 		else if(pCurItem->GetType() == PLOT_4D)
-			pCorrectedPlot = DoPhaseCorr(pPhases, (Plot4d*)pCurItem, meth);
+			pCorrectedPlot = new Plot4dWrapper(DoPhaseCorr(pPhases, (Plot4d*)pCurItem, meth));
 
 		if(!pCorrectedPlot)
 			continue;
@@ -350,6 +350,9 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 
 			for(unsigned int iT=0; iT<pDat->GetDepth(); ++iT)
 			{
+				if(pdY_shift[iT] < 0.) pdY_shift[iT] = 0.;
+				pdYErr_shift[iT] = std::fabs(pdYErr_shift[iT]);
+
 				pDat_shifted->SetVal(iX, iY, iT, pdY_shift[iT]);
 				pDat_shifted->SetErr(iX, iY, iT, pdYErr_shift[iT]);
 			}
@@ -362,17 +365,102 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 	}
 
 	delete[] pdMem;
+
+	pDat_shifted->RecalcMinMaxTotal();
+	pDatPlot_shifted->RefreshTSlice(0);
 	return pDatPlot_shifted;
 }
 
 Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pDatPlot, PsdPhaseMethod meth)
 {
-	const Data2* pPhases = &pPhasesPlot->GetData2();
+	Plot4d* pDatPlot_shifted = (Plot4d*)pDatPlot->clone();
+	bool bIsCountData = pDatPlot_shifted->IsCountData();
+	pDatPlot_shifted->setWindowTitle(pDatPlot_shifted->windowTitle() + " (psd corr)");
+
 	const Data4* pDat = &pDatPlot->GetData();
+	Data4* pDat_shifted = &pDatPlot_shifted->GetData();
+	const Data2* pPhases = 0;
+	if(meth == METH_THEO)
+	{
+		pPhases = &pPhasesPlot->GetData2();
+		if(pDat->GetWidth()!=pPhases->GetWidth() || pDat->GetHeight()!=pPhases->GetHeight())
+			std::cerr << "Warning: Pixel sizes of \"" << pDatPlot->windowTitle().toStdString()
+						  << "\" and \"" << pPhasesPlot->windowTitle().toStdString()
+						  << "\" do not match" << std::endl;
+	}
 
-	// TODO: adapt old code
+	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 
-	return 0;
+	Fourier fourier(pDat->GetDepth());
+	double *pdMem = new double[pDat->GetDepth()*5];
+	double *pdY = pdMem;
+	double *pdY_shift = pdMem + 1*pDat->GetDepth();
+	double *pdYErr = pdMem + 2*pDat->GetDepth();
+	double *pdYErr_shift = pdMem + 3*pDat->GetDepth();
+	double *pdX = pdMem + 4*pDat->GetDepth();
+
+	unsigned int iUnfittedPixels=0;
+	for(unsigned int iFoil=0; iFoil<pDat->GetDepth2(); ++iFoil)
+		for(unsigned int iY=0; iY<pDat->GetHeight(); ++iY)
+			for(unsigned int iX=0; iX<pDat->GetWidth(); ++iX)
+			{
+				Data1 dat = pDat->GetXYD2(iX, iY, iFoil);
+				for(unsigned int iT=0; iT<dat.GetLength(); ++iT)
+				{
+					pdY[iT] = dat.GetY(iT);
+					pdYErr[iT] = dat.GetYErr(iT);
+					pdX[iT] = dat.GetX(iT);
+				}
+
+				double dPhase = 0.;
+
+				if(meth == METH_THEO)
+					dPhase = pPhases->GetVal(iX, iY);
+				else if(meth == METH_FFT)
+				{
+					double dC;
+					fourier.get_contrast(dNumOsc, pdY, dC, dPhase);
+					//dPhase *= dNumOsc;
+				}
+				else if(meth == METH_FIT)
+				{
+					double dFreq = get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
+					double dThisNumOsc = dNumOsc;
+
+					MiezeSinModel* pModel = 0;
+					bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdX, pdY, pdYErr, &pModel);
+					if(bOk && pModel)
+						dPhase = pModel->GetPhase();
+					else
+						++iUnfittedPixels;
+
+					delete pModel;
+				}
+
+				fourier.phase_correction_0(pdY, pdY_shift, dPhase/dNumOsc);
+				fourier.phase_correction_0(pdYErr, pdYErr_shift, dPhase/dNumOsc);
+
+				for(unsigned int iT=0; iT<pDat->GetDepth(); ++iT)
+				{
+					if(pdY_shift[iT] < 0.) pdY_shift[iT] = 0.;
+					pdYErr_shift[iT] = std::fabs(pdYErr_shift[iT]);
+
+					pDat_shifted->SetVal(iX, iY, iT, iFoil, pdY_shift[iT]);
+					pDat_shifted->SetErr(iX, iY, iT, iFoil, pdYErr_shift[iT]);
+				}
+			}
+
+	if(iUnfittedPixels)
+	{
+		std::cerr << "Error: PSD phase correction: Could not fit "
+					<< iUnfittedPixels << " pixels." << std::endl;
+	}
+
+	delete[] pdMem;
+
+	pDat_shifted->RecalcMinMaxTotal();
+	pDatPlot_shifted->RefreshTFSlice(0,0);
+	return pDatPlot_shifted;
 }
 
 void PsdPhaseCorrDlg::ButtonBoxClicked(QAbstractButton* pBtn)

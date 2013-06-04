@@ -20,8 +20,6 @@ protected:
 	Data3 m_dat3;
 	uint m_iCurT;
 
-	virtual void RefreshStatusMsgs();
-
 public:
 	Plot3d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1);
 	virtual ~Plot3d();
@@ -42,6 +40,7 @@ public:
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return this; }
 
 	virtual SubWindowBase* clone() const;
+	virtual void RefreshStatusMsgs();
 
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat3; }

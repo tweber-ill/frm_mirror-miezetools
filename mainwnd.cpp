@@ -119,6 +119,8 @@ MiezeMainWnd::MiezeMainWnd()
 	pQFitMiezeArea->setShortcut(Qt::ALT + Qt::Key_P);
 	pMenuQuickFit->addAction(pQFitMiezeArea);
 
+	pMenuQuickFit->addSeparator();
+
 	QAction *pQFitGauss = new QAction(this);
 	pQFitGauss->setText("Gaussian");
 	pQFitGauss->setShortcut(Qt::ALT + Qt::Key_G);
@@ -128,6 +130,11 @@ MiezeMainWnd::MiezeMainWnd()
 	pQFitDGauss->setText("Double Gaussian");
 	pQFitDGauss->setShortcut(Qt::ALT + Qt::Key_D);
 	pMenuQuickFit->addAction(pQFitDGauss);
+
+	QAction *pQFitTGauss = new QAction(this);
+	pQFitTGauss->setText("Triple Gaussian");
+	pQFitTGauss->setShortcut(Qt::ALT + Qt::Key_T);
+	pMenuQuickFit->addAction(pQFitTGauss);
 
 	pMenuFit->addMenu(pMenuQuickFit);
 
@@ -301,6 +308,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pQFitMiezeArea, SIGNAL(triggered()), this, SLOT(QuickFitMIEZEpixel()));
 	QObject::connect(pQFitGauss, SIGNAL(triggered()), this, SLOT(QuickFitGauss()));
 	QObject::connect(pQFitDGauss, SIGNAL(triggered()), this, SLOT(QuickFitDoubleGauss()));
+	QObject::connect(pQFitTGauss, SIGNAL(triggered()), this, SLOT(QuickFitTripleGauss()));
 	QObject::connect(pInterpBezier, SIGNAL(triggered()), this, SLOT(BezierInterpolation()));
 	QObject::connect(pInterpBSpline, SIGNAL(triggered()), this, SLOT(BSplineInterpolation()));
 
@@ -1018,6 +1026,7 @@ void MiezeMainWnd::ShowFitDlg()
 void MiezeMainWnd::QuickFitMIEZE() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MIEZE_SINE); }
 void MiezeMainWnd::QuickFitGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_GAUSSIAN); }
 void MiezeMainWnd::QuickFitDoubleGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MULTI_GAUSSIAN, 2); }
+void MiezeMainWnd::QuickFitTripleGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MULTI_GAUSSIAN, 3); }
 
 void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt, int iParam)
 {

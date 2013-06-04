@@ -170,6 +170,9 @@ void Plot3dWrapper::DataLoaded()
 	if(strZ=="")
 		strZ =*/ "t: ";
 	m_pLabel->setText(strZ);
+
+	m_pPlot->RefreshPlot();
+	m_pPlot->RefreshStatusMsgs();
 }
 
 void Plot3dWrapper::SliderValueChanged()

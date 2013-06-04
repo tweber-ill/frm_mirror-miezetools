@@ -220,6 +220,8 @@ public:
 	void FromMatrix(const ublas::matrix<double>& mat);
 
 	Data1 SumY() const;
+
+	void RecalcMinMaxTotal();
 };
 
 
@@ -267,6 +269,8 @@ public:
 	Data1 GetXYSum() const;
 
 	void Add(const Data3& dat);
+
+	void RecalcMinMaxTotal();
 };
 
 class Data4 : public DataInterface, public XYRange
@@ -311,6 +315,9 @@ public:
 	Data3 GetVal(uint iD2) const;
 	Data2 GetVal(uint iD, uint iD2) const;
 	Data1 GetXYSum(uint iD2) const;
+	Data1 GetXYD2(uint iX, uint iY, uint iD2) const;
+
+	void RecalcMinMaxTotal();
 };
 
 #endif

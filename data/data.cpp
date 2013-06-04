@@ -206,6 +206,23 @@ void Data2::SetVals(const double* pDat, const double *pErr)
 		}
 }
 
+void Data2::RecalcMinMaxTotal()
+{
+	m_dMin = std::numeric_limits<double>::max();
+	m_dMax = -m_dMin;
+	m_dTotal = 0.;
+
+	for(uint iY=0; iY<m_iHeight; ++iY)
+		for(uint iX=0; iX<m_iWidth; ++iX)
+		{
+			double dVal = this->GetValRaw(iX, iY);
+			m_dTotal += dVal;
+
+			m_dMin = std::min(m_dMin, dVal);
+			m_dMax = std::max(m_dMax, dVal);
+		}
+}
+
 Data1 Data2::SumY() const
 {
 	Data1 dat1;
@@ -280,6 +297,24 @@ void Data3::SetZero()
 			}
 
 	m_dMin = m_dMax = m_dTotal = 0.;
+}
+
+void Data3::RecalcMinMaxTotal()
+{
+	m_dMin = std::numeric_limits<double>::max();
+	m_dMax = -m_dMin;
+	m_dTotal = 0.;
+
+	for(uint iD=0; iD<m_iDepth; ++iD)
+		for(uint iY=0; iY<m_iHeight; ++iY)
+			for(uint iX=0; iX<m_iWidth; ++iX)
+			{
+				double dVal = this->GetValRaw(iX, iY, iD);
+				m_dTotal += dVal;
+
+				m_dMin = std::min(m_dMin, dVal);
+				m_dMax = std::max(m_dMax, dVal);
+			}
 }
 
 void Data3::Add(const Data3& dat)
@@ -461,6 +496,25 @@ Data4::Data4(uint iW, uint iH, uint iD, uint iD2, const double* pDat, const doub
 	SetYRange(0., m_iHeight-1);
 }
 
+void Data4::RecalcMinMaxTotal()
+{
+	m_dMin = std::numeric_limits<double>::max();
+	m_dMax = -m_dMin;
+	m_dTotal = 0.;
+
+	for(uint iD2=0; iD2<m_iDepth2; ++iD2)
+		for(uint iD=0; iD<m_iDepth; ++iD)
+			for(uint iY=0; iY<m_iHeight; ++iY)
+				for(uint iX=0; iX<m_iWidth; ++iX)
+				{
+					double dVal = this->GetValRaw(iX, iY, iD, iD2);
+					m_dTotal += dVal;
+
+					m_dMin = std::min(m_dMin, dVal);
+					m_dMax = std::max(m_dMax, dVal);
+				}
+}
+
 void Data4::SetSize(uint iWidth, uint iHeight, uint iDepth, uint iDepth2)
 {
 	if(m_iWidth==iWidth && m_iHeight==iHeight &&
@@ -611,6 +665,25 @@ Data1 Data4::GetXYSum(uint iD2) const
 		dat.SetXErr(iT, 0.);
 		dat.SetY(iT, dSum);
 		dat.SetYErr(iT, dErrSum);
+	}
+
+	return dat;
+}
+
+Data1 Data4::GetXYD2(uint iX, uint iY, uint iD2) const
+{
+	Data1 dat;
+	dat.SetLength(this->GetDepth());
+
+	for(uint iT=0; iT<GetDepth(); ++iT)
+	{
+		double dVal = GetVal(iX, iY, iT, iD2);
+		double dErr = GetErr(iX, iY, iT, iD2);
+
+		dat.SetX(iT, iT);
+		dat.SetXErr(iT, 0.);
+		dat.SetY(iT, dVal);
+		dat.SetYErr(iT, dErr);
 	}
 
 	return dat;

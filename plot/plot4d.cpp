@@ -52,44 +52,19 @@ void Plot4d::RefreshTFSlice(uint iT, uint iF)
 }
 
 
-Plot4dWrapper::Plot4dWrapper(QWidget* pParent, const char* pcTitle, bool bCountData)
-	: SubWindowBase(pParent)
+SubWindowBase* Plot4d::clone() const
 {
-	this->setAttribute(Qt::WA_DeleteOnClose);
-	this->setWindowTitle(QString(pcTitle));
+	Plot4d* pPlot = new Plot4d(parentWidget(), windowTitle().toStdString().c_str(), m_bCountData);
+	pPlot->m_dat4 = this->m_dat4;
 
-	m_pPlot = new Plot4d(this, pcTitle, bCountData);
+	pPlot->m_strXAxis = this->m_strXAxis;
+	pPlot->m_strYAxis = this->m_strYAxis;
+	pPlot->m_strZAxis = this->m_strZAxis;
+	pPlot->m_strTitle = this->m_strTitle;
 
-	QGridLayout *pLayout = new QGridLayout(this);
-	pLayout->addWidget(m_pPlot, 0, 0, 1, 2);
+	pPlot->RefreshTFSlice(this->m_iCurT, this->m_iCurF);
 
-	m_pLabelF = new QLabel(this);
-	m_pLabelF->setText("foil: ");
-	pLayout->addWidget(m_pLabelF, 1,0,1,1);
-
-	m_pSliderF = new QSlider(this);
-	m_pSliderF->setOrientation(Qt::Horizontal);
-	m_pSliderF->setTracking(1);
-	pLayout->addWidget(m_pSliderF, 1,1,1,1);
-
-	m_pLabelT = new QLabel(this);
-	m_pLabelT->setText("t: ");
-	pLayout->addWidget(m_pLabelT, 2,0,1,1);
-
-	m_pSliderT = new QSlider(this);
-	m_pSliderT->setOrientation(Qt::Horizontal);
-	m_pSliderT->setTracking(1);
-	pLayout->addWidget(m_pSliderT, 2,1,1,1);
-
-
-	QObject::connect(m_pPlot, SIGNAL(DataLoaded()), this, SLOT(DataLoaded()));
-	QObject::connect(m_pSliderF, SIGNAL(valueChanged(int)), this, SLOT(SliderValueChanged()));
-	QObject::connect(m_pSliderT, SIGNAL(valueChanged(int)), this, SLOT(SliderValueChanged()));
-}
-
-Plot4dWrapper::~Plot4dWrapper()
-{
-	delete m_pPlot;
+	return pPlot;
 }
 
 void Plot4dWrapper::DataLoaded()
@@ -113,6 +88,9 @@ void Plot4dWrapper::DataLoaded()
 		strZ = "t: ";
 	m_pLabel->setText(strZ);
 	*/
+
+	m_pPlot->RefreshPlot();
+	m_pPlot->RefreshStatusMsgs();
 }
 
 void Plot4dWrapper::SliderValueChanged()
@@ -308,5 +286,64 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 
 	return pPlot;
 }
+
+
+
+Plot4dWrapper::Plot4dWrapper(QWidget* pParent, const char* pcTitle, bool bCountData)
+	: SubWindowBase(pParent)
+{
+	this->setWindowTitle(QString(pcTitle));
+	m_pPlot = new Plot4d(this, pcTitle, bCountData);
+
+	Init();
+}
+
+Plot4dWrapper::Plot4dWrapper(Plot4d* pPlot)
+{
+	m_pPlot = pPlot;
+	setWindowTitle(m_pPlot->windowTitle());
+
+	Init();
+	DataLoaded();
+}
+
+
+Plot4dWrapper::~Plot4dWrapper()
+{
+	delete m_pPlot;
+}
+
+void Plot4dWrapper::Init()
+{
+	this->setAttribute(Qt::WA_DeleteOnClose);
+
+
+	QGridLayout *pLayout = new QGridLayout(this);
+	pLayout->addWidget(m_pPlot, 0, 0, 1, 2);
+
+	m_pLabelF = new QLabel(this);
+	m_pLabelF->setText("foil: ");
+	pLayout->addWidget(m_pLabelF, 1,0,1,1);
+
+	m_pSliderF = new QSlider(this);
+	m_pSliderF->setOrientation(Qt::Horizontal);
+	m_pSliderF->setTracking(1);
+	pLayout->addWidget(m_pSliderF, 1,1,1,1);
+
+	m_pLabelT = new QLabel(this);
+	m_pLabelT->setText("t: ");
+	pLayout->addWidget(m_pLabelT, 2,0,1,1);
+
+	m_pSliderT = new QSlider(this);
+	m_pSliderT->setOrientation(Qt::Horizontal);
+	m_pSliderT->setTracking(1);
+	pLayout->addWidget(m_pSliderT, 2,1,1,1);
+
+
+	QObject::connect(m_pPlot, SIGNAL(DataLoaded()), this, SLOT(DataLoaded()));
+	QObject::connect(m_pSliderF, SIGNAL(valueChanged(int)), this, SLOT(SliderValueChanged()));
+	QObject::connect(m_pSliderT, SIGNAL(valueChanged(int)), this, SLOT(SliderValueChanged()));
+}
+
 
 #include "plot4d.moc"
