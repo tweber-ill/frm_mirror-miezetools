@@ -24,17 +24,10 @@
        <string>General</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="0" colspan="2">
-        <widget class="QCheckBox" name="checkSortX">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>Automatically sort x values</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>B-Spline degree:</string>
+          <string>Minimum number of counts:</string>
          </property>
         </widget>
        </item>
@@ -51,7 +44,31 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="0" column="0" colspan="2">
+        <widget class="QCheckBox" name="checkSortX">
+         <property name="text">
+          <string>Automatically sort x values</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QSpinBox" name="spinMinCts">
+         <property name="maximum">
+          <number>9999999</number>
+         </property>
+         <property name="value">
+          <number>25</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>B-Spline degree:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="2">
         <spacer name="verticalSpacer_4">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -63,6 +80,23 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Debug output level:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QSpinBox" name="spinDebug">
+         <property name="maximum">
+          <number>3</number>
+         </property>
+         <property name="value">
+          <number>1</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

@@ -34,6 +34,8 @@ void SettingsDlg::LoadSettings()
 	// General
 	checkSortX->setChecked(Settings::Get<int>("general/sort_x"));
 	spinSpline->setValue(Settings::Get<int>("interpolation/spline_degree"));
+	spinDebug->setValue(Settings::Get<int>("general/debug_level"));
+	spinMinCts->setValue(Settings::Get<int>("general/min_counts"));
 	// --------------------------------------------------------------------------------
 
 
@@ -75,6 +77,8 @@ void SettingsDlg::SaveSettings()
 	// General
 	Settings::Set<int>("general/sort_x", checkSortX->isChecked());
 	Settings::Set<int>("interpolation/spline_degree", spinSpline->value());
+	Settings::Set<int>("general/debug_level", spinDebug->value());
+	Settings::Set<int>("general/min_counts", spinMinCts->value());
 	// --------------------------------------------------------------------------------
 
 

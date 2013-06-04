@@ -287,6 +287,8 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 	pDatPlot_shifted->setWindowTitle(pDatPlot_shifted->windowTitle() + " (psd corr)");
 
 	const Data3* pDat = &pDatPlot->GetData();
+	const double dMinCounts = Settings::Get<int>("general/min_counts");
+
 	Data3* pDat_shifted = &pDatPlot_shifted->GetData();
 	const Data2* pPhases = 0;
 	if(meth == METH_THEO)
@@ -320,33 +322,44 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 				pdX[iT] = dat.GetX(iT);
 			}
 
-			double dPhase = 0.;
-
-			if(meth == METH_THEO)
-				dPhase = pPhases->GetVal(iX, iY);
-			else if(meth == METH_FFT)
+			if(pDatPlot->IsCountData() && dat.SumY()<dMinCounts)
 			{
-				double dC;
-				fourier.get_contrast(dNumOsc, pdY, dC, dPhase);
-				//dPhase *= dNumOsc;
+				for(unsigned int iT=0; iT<dat.GetLength(); ++iT)
+				{
+					pdY_shift[iT] = pdY[iT];
+					pdYErr_shift[iT] = pdYErr[iT];
+				}
 			}
-			else if(meth == METH_FIT)
+			else
 			{
-				double dFreq = get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
-				double dThisNumOsc = dNumOsc;
+				double dPhase = 0.;
 
-				MiezeSinModel* pModel = 0;
-				bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdX, pdY, pdYErr, &pModel);
-				if(bOk && pModel)
-					dPhase = pModel->GetPhase();
-				else
-					++iUnfittedPixels;
+				if(meth == METH_THEO)
+					dPhase = pPhases->GetVal(iX, iY);
+				else if(meth == METH_FFT)
+				{
+					double dC;
+					fourier.get_contrast(dNumOsc, pdY, dC, dPhase);
+					//dPhase *= dNumOsc;
+				}
+				else if(meth == METH_FIT)
+				{
+					double dFreq = get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
+					double dThisNumOsc = dNumOsc;
 
-				delete pModel;
+					MiezeSinModel* pModel = 0;
+					bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdX, pdY, pdYErr, &pModel);
+					if(bOk && pModel)
+						dPhase = pModel->GetPhase();
+					else
+						++iUnfittedPixels;
+
+					delete pModel;
+				}
+
+				fourier.phase_correction_0(pdY, pdY_shift, dPhase/dNumOsc);
+				fourier.phase_correction_0(pdYErr, pdYErr_shift, dPhase/dNumOsc);
 			}
-
-			fourier.phase_correction_0(pdY, pdY_shift, dPhase/dNumOsc);
-			fourier.phase_correction_0(pdYErr, pdYErr_shift, dPhase/dNumOsc);
 
 			for(unsigned int iT=0; iT<pDat->GetDepth(); ++iT)
 			{
@@ -376,6 +389,7 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 	Plot4d* pDatPlot_shifted = (Plot4d*)pDatPlot->clone();
 	bool bIsCountData = pDatPlot_shifted->IsCountData();
 	pDatPlot_shifted->setWindowTitle(pDatPlot_shifted->windowTitle() + " (psd corr)");
+	const double dMinCounts = Settings::Get<int>("general/min_counts");
 
 	const Data4* pDat = &pDatPlot->GetData();
 	Data4* pDat_shifted = &pDatPlot_shifted->GetData();
@@ -412,33 +426,44 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 					pdX[iT] = dat.GetX(iT);
 				}
 
-				double dPhase = 0.;
-
-				if(meth == METH_THEO)
-					dPhase = pPhases->GetVal(iX, iY);
-				else if(meth == METH_FFT)
+				if(pDatPlot->IsCountData() && dat.SumY()<dMinCounts)
 				{
-					double dC;
-					fourier.get_contrast(dNumOsc, pdY, dC, dPhase);
-					//dPhase *= dNumOsc;
+					for(unsigned int iT=0; iT<dat.GetLength(); ++iT)
+					{
+						pdY_shift[iT] = pdY[iT];
+						pdYErr_shift[iT] = pdYErr[iT];
+					}
 				}
-				else if(meth == METH_FIT)
+				else
 				{
-					double dFreq = get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
-					double dThisNumOsc = dNumOsc;
+					double dPhase = 0.;
 
-					MiezeSinModel* pModel = 0;
-					bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdX, pdY, pdYErr, &pModel);
-					if(bOk && pModel)
-						dPhase = pModel->GetPhase();
-					else
-						++iUnfittedPixels;
+					if(meth == METH_THEO)
+						dPhase = pPhases->GetVal(iX, iY);
+					else if(meth == METH_FFT)
+					{
+						double dC;
+						fourier.get_contrast(dNumOsc, pdY, dC, dPhase);
+						//dPhase *= dNumOsc;
+					}
+					else if(meth == METH_FIT)
+					{
+						double dFreq = get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
+						double dThisNumOsc = dNumOsc;
 
-					delete pModel;
+						MiezeSinModel* pModel = 0;
+						bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdX, pdY, pdYErr, &pModel);
+						if(bOk && pModel)
+							dPhase = pModel->GetPhase();
+						else
+							++iUnfittedPixels;
+
+						delete pModel;
+					}
+
+					fourier.phase_correction_0(pdY, pdY_shift, dPhase/dNumOsc);
+					fourier.phase_correction_0(pdYErr, pdYErr_shift, dPhase/dNumOsc);
 				}
-
-				fourier.phase_correction_0(pdY, pdY_shift, dPhase/dNumOsc);
-				fourier.phase_correction_0(pdYErr, pdYErr_shift, dPhase/dNumOsc);
 
 				for(unsigned int iT=0; iT<pDat->GetDepth(); ++iT)
 				{

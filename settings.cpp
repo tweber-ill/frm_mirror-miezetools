@@ -38,9 +38,12 @@ void Settings::SetDefaults()
 
 	QStringList keys = s_pGlobals->allKeys();
 
+
 	// --------------------------------------------------------------------------------
 	// General
 	if(!keys.contains("general/sort_x")) s_pGlobals->setValue("general/sort_x", 1);
+	if(!keys.contains("general/debug_level")) s_pGlobals->setValue("general/debug_level", 1);
+	if(!keys.contains("general/min_counts")) s_pGlobals->setValue("general/min_counts", 25);
 	if(!keys.contains("interpolation/spline_degree")) s_pGlobals->setValue("interpolation/spline_degree", 3);
 	// --------------------------------------------------------------------------------
 

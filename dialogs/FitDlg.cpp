@@ -551,7 +551,7 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 	double *pyerr = new double[iTCnt];
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
-	const double dMinCts = 25.;
+	const double dMinCts = Settings::Get<int>("general/min_counts");
 
 	Fourier *pFFT = 0;
 	if(iFkt == FIT_MIEZE_SINE_PIXELWISE_FFT)
