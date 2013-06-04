@@ -491,9 +491,9 @@ void MultiGaussModel::Normalize()
 
 
 
-bool get_doublegauss(unsigned int iLen,
+bool get_multigauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
-					MultiGaussModel **pmodel)
+					MultiGaussModel **pmodel, unsigned int iNumGauss)
 {
 	std::vector<double> vecMaximaX;
 	std::vector<double> vecMaximaSize;
@@ -502,14 +502,14 @@ bool get_doublegauss(unsigned int iLen,
 	const int iDegree = Settings::Get<int>("interpolation/spline_degree");
 	find_peaks(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
 
-	if(vecMaximaX.size() < 2)
-		vecMaximaX.resize(2);
-	if(vecMaximaSize.size() < 2)
-		vecMaximaSize.resize(2);
-	if(vecMaximaWidth.size() < 2)
-		vecMaximaWidth.resize(2);
+	if(vecMaximaX.size() < iNumGauss)
+		vecMaximaX.resize(iNumGauss);
+	if(vecMaximaSize.size() < iNumGauss)
+		vecMaximaSize.resize(iNumGauss);
+	if(vecMaximaWidth.size() < iNumGauss)
+		vecMaximaWidth.resize(iNumGauss);
 
-	MultiGaussModel gmod(2);
+	MultiGaussModel gmod(iNumGauss);
 	Chi2Function fkt(&gmod, iLen, px, py, pdy);
 
 	typedef std::pair<const double*, const double*> t_minmax;
@@ -527,45 +527,68 @@ bool get_doublegauss(unsigned int iLen,
 	}
 
 	ROOT::Minuit2::MnUserParameters params;
-	params.Add("amp_0", vecMaximaSize[0], vecMaximaSize[0]/10.);
-	params.Add("spread_0", HWHM2SIGMA*vecMaximaWidth[0], HWHM2SIGMA*vecMaximaWidth[0]/10.);
-	params.Add("x0_0", vecMaximaX[0], vecMaximaX[0]/10.);
 
-	params.Add("amp_1", vecMaximaSize[1], vecMaximaSize[1]/10.);
-	params.Add("spread_1", HWHM2SIGMA*vecMaximaWidth[1], HWHM2SIGMA*vecMaximaWidth[1]/10.);
-	params.Add("x0_1", vecMaximaX[1], vecMaximaX[1]/10.);
+	for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
+	{
+		std::ostringstream ostrAmp, ostrSpread, ostrX0;
+		ostrAmp << "amp_" << iGauss;
+		ostrSpread << "spread_" << iGauss;
+		ostrX0 << "x0_" << iGauss;
+
+		params.Add(ostrAmp.str(), vecMaximaSize[iGauss], vecMaximaSize[iGauss]/10.);
+		params.Add(ostrSpread.str(), HWHM2SIGMA*vecMaximaWidth[iGauss], HWHM2SIGMA*vecMaximaWidth[iGauss]/10.);
+		params.Add(ostrX0.str(), vecMaximaX[iGauss], vecMaximaX[iGauss]/10.);
+
+		params.SetLimits(ostrAmp.str(), dMin, dMax);
+		params.SetLowerLimit(ostrSpread.str(), 0.);
+	}
 
 	params.Add("offs", dMin, (dMax-dMin)/10.);
-
-
 	params.SetLimits("offs", dMin, dMax);
-	params.SetLimits("amp_0", dMin, dMax);
-	params.SetLimits("amp_1", dMin, dMax);
-	params.SetLowerLimit("spread_0", 0.);
-	params.SetLowerLimit("spread_1", 0.);
-
 
 	bool bValidFit=false;
 	std::vector<ROOT::Minuit2::FunctionMinimum> minis;
 
+	for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
 	{
-		params.Fix("amp_1");
-		params.Fix("spread_1");
-		params.Fix("x0_1");
+		std::ostringstream ostrAmp, ostrSpread, ostrX0;
+		ostrAmp << "amp_" << iGauss;
+		ostrSpread << "spread_" << iGauss;
+		ostrX0 << "x0_" << iGauss;
+
+		// fix all other peaks
+		for(unsigned int iGaussOther=0; iGaussOther<iNumGauss; ++iGaussOther)
+		{
+			if(iGaussOther == iGauss)
+				continue;
+
+			std::ostringstream ostrAmpO, ostrSpreadO, ostrX0O;
+			ostrAmpO << "amp_" << iGaussOther;
+			ostrSpreadO << "spread_" << iGaussOther;
+			ostrX0O << "x0_" << iGaussOther;
+
+			params.Fix(ostrAmpO.str());
+			params.Fix(ostrSpreadO.str());
+			params.Fix(ostrX0O.str());
+		}
+
+		params.Release(ostrAmp.str());
+		params.Release(ostrSpread.str());
+		params.Release(ostrX0.str());
 		//params.Fix("offs");
 
 		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
 		ROOT::Minuit2::FunctionMinimum mini = migrad();
 		bValidFit = mini.IsValid() && mini.HasValidParameters();
 
-		params.SetValue("amp_0", mini.UserState().Value("amp_0"));
-		params.SetError("amp_0", mini.UserState().Error("amp_0"));
+		params.SetValue(ostrAmp.str(), mini.UserState().Value(ostrAmp.str()));
+		params.SetError(ostrAmp.str(), mini.UserState().Error(ostrAmp.str()));
 
-		params.SetValue("spread_0", mini.UserState().Value("spread_0"));
-		params.SetError("spread_0", mini.UserState().Error("spread_0"));
+		params.SetValue(ostrSpread.str(), mini.UserState().Value(ostrSpread.str()));
+		params.SetError(ostrSpread.str(), mini.UserState().Error(ostrSpread.str()));
 
-		params.SetValue("x0_0", mini.UserState().Value("x0_0"));
-		params.SetError("x0_0", mini.UserState().Error("x0_0"));
+		params.SetValue(ostrX0.str(), mini.UserState().Value(ostrX0.str()));
+		params.SetError(ostrX0.str(), mini.UserState().Error(ostrX0.str()));
 
 		params.SetValue("offs", mini.UserState().Value("offs"));
 		params.SetError("offs", mini.UserState().Error("offs"));
@@ -574,69 +597,42 @@ bool get_doublegauss(unsigned int iLen,
 	}
 
 
+	// release all parameters
 	{
-		params.Fix("amp_0");
-		params.Fix("spread_0");
-		params.Fix("x0_0");
-		//params.Fix("offs");
+		for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
+		{
+			std::ostringstream ostrAmp, ostrSpread, ostrX0;
+			ostrAmp << "amp_" << iGauss;
+			ostrSpread << "spread_" << iGauss;
+			ostrX0 << "x0_" << iGauss;
 
-		params.Release("amp_1");
-		params.Release("spread_1");
-		params.Release("x0_1");
+			params.Release(ostrAmp.str());
+			params.Release(ostrSpread.str());
+			params.Release(ostrX0.str());
+
+			params.Release("offs");
+		}
 
 		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
 		ROOT::Minuit2::FunctionMinimum mini = migrad();
 		bValidFit = mini.IsValid() && mini.HasValidParameters();
 
-		params.SetValue("amp_1", mini.UserState().Value("amp_1"));
-		params.SetError("amp_1", mini.UserState().Error("amp_1"));
+		for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
+		{
+			std::ostringstream ostrAmp, ostrSpread, ostrX0;
+			ostrAmp << "amp_" << iGauss;
+			ostrSpread << "spread_" << iGauss;
+			ostrX0 << "x0_" << iGauss;
 
-		params.SetValue("spread_1", mini.UserState().Value("spread_1"));
-		params.SetError("spread_1", mini.UserState().Error("spread_1"));
+			params.SetValue(ostrAmp.str(), mini.UserState().Value(ostrAmp.str()));
+			params.SetError(ostrAmp.str(), mini.UserState().Error(ostrAmp.str()));
 
-		params.SetValue("x0_1", mini.UserState().Value("x0_1"));
-		params.SetError("x0_1", mini.UserState().Error("x0_1"));
+			params.SetValue(ostrSpread.str(), mini.UserState().Value(ostrSpread.str()));
+			params.SetError(ostrSpread.str(), mini.UserState().Error(ostrSpread.str()));
 
-		params.SetValue("offs", mini.UserState().Value("offs"));
-		params.SetError("offs", mini.UserState().Error("offs"));
-
-		minis.push_back(mini);
-	}
-
-
-	{
-		params.Release("amp_0");
-		params.Release("spread_0");
-		params.Release("x0_0");
-
-		params.Release("amp_1");
-		params.Release("spread_1");
-		params.Release("x0_1");
-
-		params.Release("offs");
-
-
-		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
-		ROOT::Minuit2::FunctionMinimum mini = migrad();
-		bValidFit = mini.IsValid() && mini.HasValidParameters();
-
-		params.SetValue("amp_0", mini.UserState().Value("amp_0"));
-		params.SetError("amp_0", mini.UserState().Error("amp_0"));
-
-		params.SetValue("spread_0", mini.UserState().Value("spread_0"));
-		params.SetError("spread_0", mini.UserState().Error("spread_0"));
-
-		params.SetValue("x0_0", mini.UserState().Value("x0_0"));
-		params.SetError("x0_0", mini.UserState().Error("x0_0"));
-
-		params.SetValue("amp_1", mini.UserState().Value("amp_1"));
-		params.SetError("amp_1", mini.UserState().Error("amp_1"));
-
-		params.SetValue("spread_1", mini.UserState().Value("spread_1"));
-		params.SetError("spread_1", mini.UserState().Error("spread_1"));
-
-		params.SetValue("x0_1", mini.UserState().Value("x0_1"));
-		params.SetError("x0_1", mini.UserState().Error("x0_1"));
+			params.SetValue(ostrX0.str(), mini.UserState().Value(ostrX0.str()));
+			params.SetError(ostrX0.str(), mini.UserState().Error(ostrX0.str()));
+		}
 
 		params.SetValue("offs", mini.UserState().Value("offs"));
 		params.SetError("offs", mini.UserState().Error("offs"));
@@ -645,15 +641,19 @@ bool get_doublegauss(unsigned int iLen,
 	}
 
 
+	// release all limits
 	{
-		params.RemoveLimits("amp_0");
-		params.RemoveLimits("spread_0");
-		params.RemoveLimits("x0_0");
+		for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
+		{
+			std::ostringstream ostrAmp, ostrSpread, ostrX0;
+			ostrAmp << "amp_" << iGauss;
+			ostrSpread << "spread_" << iGauss;
+			ostrX0 << "x0_" << iGauss;
 
-		params.RemoveLimits("amp_1");
-		params.RemoveLimits("spread_1");
-		params.RemoveLimits("x0_1");
-
+			params.RemoveLimits(ostrAmp.str());
+			params.RemoveLimits(ostrSpread.str());
+			params.RemoveLimits(ostrX0.str());
+		}
 		params.RemoveLimits("offs");
 
 
@@ -661,23 +661,22 @@ bool get_doublegauss(unsigned int iLen,
 		ROOT::Minuit2::FunctionMinimum mini = migrad();
 		bValidFit = mini.IsValid() && mini.HasValidParameters();
 
-		params.SetValue("amp_0", mini.UserState().Value("amp_0"));
-		params.SetError("amp_0", mini.UserState().Error("amp_0"));
+		for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
+		{
+			std::ostringstream ostrAmp, ostrSpread, ostrX0;
+			ostrAmp << "amp_" << iGauss;
+			ostrSpread << "spread_" << iGauss;
+			ostrX0 << "x0_" << iGauss;
 
-		params.SetValue("spread_0", mini.UserState().Value("spread_0"));
-		params.SetError("spread_0", mini.UserState().Error("spread_0"));
+			params.SetValue(ostrAmp.str(), mini.UserState().Value(ostrAmp.str()));
+			params.SetError(ostrAmp.str(), mini.UserState().Error(ostrAmp.str()));
 
-		params.SetValue("x0_0", mini.UserState().Value("x0_0"));
-		params.SetError("x0_0", mini.UserState().Error("x0_0"));
+			params.SetValue(ostrSpread.str(), mini.UserState().Value(ostrSpread.str()));
+			params.SetError(ostrSpread.str(), mini.UserState().Error(ostrSpread.str()));
 
-		params.SetValue("amp_1", mini.UserState().Value("amp_1"));
-		params.SetError("amp_1", mini.UserState().Error("amp_1"));
-
-		params.SetValue("spread_1", mini.UserState().Value("spread_1"));
-		params.SetError("spread_1", mini.UserState().Error("spread_1"));
-
-		params.SetValue("x0_1", mini.UserState().Value("x0_1"));
-		params.SetError("x0_1", mini.UserState().Error("x0_1"));
+			params.SetValue(ostrX0.str(), mini.UserState().Value(ostrX0.str()));
+			params.SetError(ostrX0.str(), mini.UserState().Error(ostrX0.str()));
+		}
 
 		params.SetValue("offs", mini.UserState().Value("offs"));
 		params.SetError("offs", mini.UserState().Error("offs"));
@@ -689,9 +688,9 @@ bool get_doublegauss(unsigned int iLen,
 
 
 	std::vector<MultiGaussParams> vecMultiParams;
-	vecMultiParams.resize(2);
+	vecMultiParams.resize(iNumGauss);
 
-	for(unsigned int iPara=0; iPara<vecMultiParams.size(); ++iPara)
+	for(unsigned int iPara=0; iPara<iNumGauss; ++iPara)
 	{
 		std::ostringstream ostrPara;
 		ostrPara << iPara;
@@ -704,7 +703,6 @@ bool get_doublegauss(unsigned int iLen,
 		vecMultiParams[iPara].m_amperr = lastmini.UserState().Error("amp_" + strPara);
 		vecMultiParams[iPara].m_spreaderr = lastmini.UserState().Error("spread_" + strPara);
 		vecMultiParams[iPara].m_x0err = lastmini.UserState().Error("x0_" + strPara);
-
 
 
 		vecMultiParams[iPara].m_spread = fabs(vecMultiParams[iPara].m_spread);

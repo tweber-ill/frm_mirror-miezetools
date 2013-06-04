@@ -42,6 +42,8 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 	connect(btnDel, SIGNAL(clicked(bool)), this, SLOT(RemoveItemSelected()));
 
 	connect(comboFitType, SIGNAL(currentIndexChanged(int)), this, SLOT(FunctionTypeChanged()));
+	connect(comboSpecialFkt, SIGNAL(currentIndexChanged(int)), this, SLOT(SpecialFktChanged(int)));
+
 	connect(editFkt, SIGNAL(textChanged(const QString&)), this, SLOT(FunctionChanged(const QString&)));
 
 	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
@@ -57,6 +59,22 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 
 FitDlg::~FitDlg()
 {}
+
+void FitDlg::SpecialFktChanged(int iFkt)
+{
+	if(iFkt == FIT_MULTI_GAUSSIAN)
+	{
+		this->labelParam->setText("Number of peaks: ");
+		this->labelParam->setEnabled(1);
+		this->spinParam->setEnabled(1);
+	}
+	else
+	{
+		this->labelParam->setText("Parameter: ");
+		this->labelParam->setEnabled(0);
+		this->spinParam->setEnabled(0);
+	}
+}
 
 void FitDlg::FunctionTypeChanged()
 {
@@ -392,7 +410,7 @@ void FitDlg::UpdateHint(const std::string& str, double dVal, double dErr)
 
 //-----------------------------------------------------------------------------------------------------------------------------
 
-SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
+SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 {
 	bool bAssumeErrorIfZero = 1;
 	SpecialFitResult res;
@@ -463,10 +481,11 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt)
 		bOk = ::get_gauss(iLen, px, py, pyerr, &pModel);
 		pFkt = pModel;
 	}
-	else if(iFkt == FIT_DOUBLE_GAUSSIAN)
+	else if(iFkt == FIT_MULTI_GAUSSIAN)
 	{
 		MultiGaussModel *pModel = 0;
-		bOk = ::get_doublegauss(iLen, px, py, pyerr, &pModel);
+		int iNumPeaks = iParam;
+		bOk = ::get_multigauss(iLen, px, py, pyerr, &pModel, iNumPeaks);
 		pFkt = pModel;
 	}
 
@@ -492,7 +511,7 @@ void FitDlg::DoSpecialFit()
 	for(int iWnd=0; iWnd<listGraphs->count(); ++iWnd)
 	{
 		SubWindowBase* pSWB = ((ListGraphsItem*)listGraphs->item(iWnd))->subWnd();
-		SpecialFitResult res = DoSpecialFit(pSWB, iFkt);
+		SpecialFitResult res = DoSpecialFit(pSWB, iFkt, spinParam->value());
 
 		if(!res.pPlot)
 		{

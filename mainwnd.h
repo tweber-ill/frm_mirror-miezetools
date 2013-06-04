@@ -86,7 +86,7 @@ protected slots:
 	void ROISaveTriggered();
 
 	void ShowFitDlg();
-	void QuickFit(SubWindowBase* pSWB, int iFkt);
+	void QuickFit(SubWindowBase* pSWB, int iFkt, int iParam=-1);
 	void QuickFitMIEZE();
 	void QuickFitMIEZEpixel();
 	void QuickFitGauss();

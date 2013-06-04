@@ -1017,9 +1017,9 @@ void MiezeMainWnd::ShowFitDlg()
 
 void MiezeMainWnd::QuickFitMIEZE() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MIEZE_SINE); }
 void MiezeMainWnd::QuickFitGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_GAUSSIAN); }
-void MiezeMainWnd::QuickFitDoubleGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_DOUBLE_GAUSSIAN); }
+void MiezeMainWnd::QuickFitDoubleGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MULTI_GAUSSIAN, 2); }
 
-void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
+void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt, int iParam)
 {
 	if(!pSWB)
 	{
@@ -1027,7 +1027,7 @@ void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt)
 		return;
 	}
 
-	SpecialFitResult res = FitDlg::DoSpecialFit(pSWB, iFkt);
+	SpecialFitResult res = FitDlg::DoSpecialFit(pSWB, iFkt, iParam);
 	if(!res.bOk)
 	{
 		QMessageBox::critical(this, "Error", res.strErr.c_str());

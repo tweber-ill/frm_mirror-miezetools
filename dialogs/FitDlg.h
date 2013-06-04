@@ -18,7 +18,7 @@
 
 #define FIT_MIEZE_SINE 					0
 #define FIT_GAUSSIAN 						1
-#define FIT_DOUBLE_GAUSSIAN 			2
+#define FIT_MULTI_GAUSSIAN 				2
 
 #define FIT_MIEZE_SINE_PIXELWISE 			0
 #define FIT_MIEZE_SINE_PIXELWISE_FFT 	1
@@ -73,6 +73,7 @@ struct FitParams
 	void AddActiveItemSelected();
 	void RemoveItemSelected();
 
+	void SpecialFktChanged(int);
 	void FunctionTypeChanged();
 	void FunctionChanged(const QString&);
 
@@ -82,7 +83,7 @@ struct FitParams
 	 FitDlg(QWidget* pParent, QMdiArea *pmdi);
 	 virtual ~FitDlg();
 
-	 static SpecialFitResult DoSpecialFit(SubWindowBase* pSWB, int iFkt);
+	 static SpecialFitResult DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam=-1);
 	 static SpecialFitPixelResult DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, int iFkt);
 
 public slots:

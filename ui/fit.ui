@@ -137,7 +137,20 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
+       <item row="7" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="6" column="2">
         <widget class="QSpinBox" name="spinFoil">
          <property name="enabled">
           <bool>false</bool>
@@ -157,7 +170,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1" colspan="2">
+       <item row="5" column="1" colspan="2">
         <widget class="QCheckBox" name="checkOnlyContrast">
          <property name="enabled">
           <bool>false</bool>
@@ -170,7 +183,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QLabel" name="labelFoil">
          <property name="enabled">
           <bool>false</bool>
@@ -180,7 +193,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QRadioButton" name="radio1DPixel">
          <property name="text">
           <string>1D Fit (pixel-wise)</string>
@@ -201,12 +214,12 @@
          </item>
          <item>
           <property name="text">
-           <string>Double Gaussian</string>
+           <string>Multi-Gaussian</string>
           </property>
          </item>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="labelPixel">
          <property name="enabled">
           <bool>false</bool>
@@ -216,7 +229,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1" colspan="2">
+       <item row="4" column="1" colspan="2">
         <widget class="QComboBox" name="comboBoxSpecialFktPixel">
          <property name="enabled">
           <bool>false</bool>
@@ -233,18 +246,28 @@
          </item>
         </widget>
        </item>
-       <item row="6" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="2" column="0">
+        <widget class="QLabel" name="labelParam">
+         <property name="enabled">
+          <bool>false</bool>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="text">
+          <string>Parameter:</string>
          </property>
-        </spacer>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="2">
+        <widget class="QSpinBox" name="spinParam">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="value">
+          <number>2</number>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -355,6 +378,25 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>comboFitType</tabstop>
+  <tabstop>editFkt</tabstop>
+  <tabstop>tableLimits</tabstop>
+  <tabstop>tableHints</tabstop>
+  <tabstop>radio1D</tabstop>
+  <tabstop>comboSpecialFkt</tabstop>
+  <tabstop>spinParam</tabstop>
+  <tabstop>radio1DPixel</tabstop>
+  <tabstop>comboBoxSpecialFktPixel</tabstop>
+  <tabstop>checkOnlyContrast</tabstop>
+  <tabstop>spinFoil</tabstop>
+  <tabstop>listGraphs</tabstop>
+  <tabstop>btnAdd</tabstop>
+  <tabstop>btnAddActive</tabstop>
+  <tabstop>btnDel</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>tabs</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

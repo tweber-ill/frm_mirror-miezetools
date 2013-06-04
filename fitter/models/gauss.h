@@ -101,9 +101,9 @@ class MultiGaussModel : public FunctionModel
 		void Normalize();
 		bool IsNormalized() const { return m_bNormalized; }
 
-		friend bool get_doublegauss(unsigned int iLen,
+		friend bool get_multigauss(unsigned int iLen,
 				const double *px, const double *py, const double *pdy,
-				MultiGaussModel **pmodel);
+				MultiGaussModel **pmodel, unsigned int iNumGauss);
 };
 
 
@@ -111,8 +111,8 @@ bool get_gauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
 					GaussModel **pmodel);
 
-bool get_doublegauss(unsigned int iLen,
+bool get_multigauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
-					MultiGaussModel **pmodel);
+					MultiGaussModel **pmodel, unsigned int iNumGauss=2);
 
 #endif
