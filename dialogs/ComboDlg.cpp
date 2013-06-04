@@ -6,6 +6,7 @@
 
 #include "ComboDlg.h"
 
+void ComboDlg::SetCurFile(const char* pcStr) { labelFile->setText(pcStr); }
 void ComboDlg::SetLabel(const char* pcStr) { this->labelValues->setText(pcStr); }
 void ComboDlg::SetTitle(const char* pcStr) { setWindowTitle(pcStr); }
 int ComboDlg::GetSelectedValue() const { return comboValues->currentIndex(); }

@@ -44,6 +44,8 @@ class MiezeSinModel : public FunctionModel
 		double GetOffsErr() const { return m_doffserr; }
 };
 
+
+
 bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 					const double* px, const double* py, const double *pdy,
 					MiezeSinModel** pmodel);

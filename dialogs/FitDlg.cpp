@@ -14,6 +14,7 @@
 #include "../helper/string.h"
 #include "../helper/misc.h"
 #include "../helper/fourier.h"
+#include "../helper/mieze.hpp"
 
 #include "../plot/plot.h"
 #include "../plot/plot2d.h"
@@ -553,9 +554,8 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 			if(iFkt == FIT_MIEZE_SINE_PIXELWISE)
 			{
 				double dThisNumOsc = dNumOsc;
-				double dFreq = dThisNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat1.GetLength()));;
-
 				MiezeSinModel *pModel = 0;
+				double dFreq = get_mieze_freq(px, dat1.GetLength(), dThisNumOsc);
 				bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat1.GetLength(), px, py, pyerr, &pModel);
 
 				dC = pModel->GetContrast();

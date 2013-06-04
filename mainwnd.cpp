@@ -686,6 +686,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			if(bSelectNewXColumn)
 			{
 				ComboDlg dlg(this);
+				dlg.SetCurFile(strFileNoDir.c_str());
 				dlg.SetValues(pnicosdat->GetColNames());
 				dlg.SetLabel("Select x value: ");
 

@@ -24,6 +24,7 @@ public:
 	virtual ~ComboDlg()
 	{}
 
+	void SetCurFile(const char* pcStr);
 	void SetLabel(const char* pcStr);
 	void SetTitle(const char* pcStr);
 	void SetValues(const std::vector<std::string>& vec);

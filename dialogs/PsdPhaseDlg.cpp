@@ -17,6 +17,9 @@
 #include "../helper/fourier.h"
 #include "../helper/misc.h"
 
+#include "../fitter/models/msin.h"
+
+
 PsdPhaseDlg::PsdPhaseDlg(QWidget* pParent)
 					: QDialog(pParent), m_bAllowUpdate(0),
 					  m_pPlot(new Plot2d(this, "PSD Phase", 0, 1))
@@ -287,26 +290,34 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 	Data3* pDat_shifted = &pDatPlot_shifted->GetData();
 	const Data2* pPhases = 0;
 	if(meth == METH_THEO)
+	{
 		pPhases = &pPhasesPlot->GetData2();
+		if(pDat->GetWidth()!=pPhases->GetWidth() || pDat->GetHeight()!=pPhases->GetHeight())
+			std::cerr << "Warning: Pixel sizes of \"" << pDatPlot->windowTitle().toStdString()
+						  << "\" and \"" << pPhasesPlot->windowTitle().toStdString()
+						  << "\" do not match" << std::endl;
+	}
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 
 	Fourier fourier(pDat->GetDepth());
-	double *pdY = new double[pDat->GetDepth()];
-	double *pdY_shift = new double[pDat->GetDepth()];
+	double *pdMem = new double[pDat->GetDepth()*5];
+	double *pdY = pdMem;
+	double *pdY_shift = pdMem + 1*pDat->GetDepth();
+	double *pdYErr = pdMem + 2*pDat->GetDepth();
+	double *pdYErr_shift = pdMem + 3*pDat->GetDepth();
+	double *pdX = pdMem + 4*pDat->GetDepth();
 
-	double *pdYErr = new double[pDat->GetDepth()];
-	double *pdYErr_shift = new double[pDat->GetDepth()];
-
-
+	unsigned int iUnfittedPixels=0;
 	for(unsigned int iY=0; iY<pDat->GetHeight(); ++iY)
 		for(unsigned int iX=0; iX<pDat->GetWidth(); ++iX)
 		{
 			Data1 dat = pDat->GetXY(iX, iY);
-			for(unsigned int iT=0; iT<pDat->GetDepth(); ++iT)
+			for(unsigned int iT=0; iT<dat.GetLength(); ++iT)
 			{
 				pdY[iT] = dat.GetY(iT);
 				pdYErr[iT] = dat.GetYErr(iT);
+				pdX[iT] = dat.GetX(iT);
 			}
 
 			double dPhase = 0.;
@@ -321,7 +332,17 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 			}
 			else if(meth == METH_FIT)
 			{
-				// TODO: reuse existing code
+				double dFreq = get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
+				double dThisNumOsc = dNumOsc;
+
+				MiezeSinModel* pModel = 0;
+				bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdX, pdY, pdYErr, &pModel);
+				if(bOk && pModel)
+					dPhase = pModel->GetPhase();
+				else
+					++iUnfittedPixels;
+
+				delete pModel;
 			}
 
 			fourier.phase_correction_0(pdY, pdY_shift, dPhase/dNumOsc);
@@ -334,11 +355,13 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 			}
 		}
 
-	delete[] pdY;
-	delete[] pdY_shift;
-	delete[] pdYErr;
-	delete[] pdYErr_shift;
+	if(iUnfittedPixels)
+	{
+		std::cerr << "Error: PSD phase correction: Could not fit "
+					<< iUnfittedPixels << " pixels." << std::endl;
+	}
 
+	delete[] pdMem;
 	return pDatPlot_shifted;
 }
 

@@ -17,17 +17,17 @@
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="QLabel" name="labelValues">
      <property name="text">
       <string>Select value:</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item row="1" column="1">
     <widget class="QComboBox" name="comboValues"/>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -37,7 +37,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="2" column="0" colspan="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -52,6 +52,20 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Current file:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="labelFile">
+     <property name="text">
+      <string>&lt;file&gt;</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

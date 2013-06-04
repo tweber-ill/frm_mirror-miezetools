@@ -14,6 +14,7 @@
 #include "../helper/string.h"
 #include "../helper/misc.h"
 #include "../helper/fourier.h"
+#include "../helper/mieze.hpp"
 
 #include "../fitter/models/msin.h"
 
@@ -191,10 +192,10 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 				pdyFoil[iTc] = vecY[iTc];
 				pdyerrFoil[iTc] = vecYErr[iTc];
 			}
-			double dFreq = dNumOsc * 2.*M_PI/((pdxFoil[1]-pdxFoil[0]) * double(dat.GetLength()));
 
 			MiezeSinModel *pModel = 0;
 			double dThisNumOsc = dNumOsc;
+			double dFreq = get_mieze_freq(pdxFoil, dat.GetLength(), dNumOsc);
 			bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdxFoil, pdyFoil, pdyerrFoil, &pModel);
 			pdPhases[iFoil] = pModel->GetPhase();
 
