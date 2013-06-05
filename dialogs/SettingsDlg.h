@@ -23,6 +23,8 @@ class SettingsDlg : public QDialog, Ui::SettingsDlg
 		SettingsDlg(QWidget* pParent);
 		virtual ~SettingsDlg();
 
+		static void set_global_defaults();
+
 	public slots:
 		virtual void accept();
 };

@@ -36,7 +36,7 @@ struct Symbol
 class Parser
 {
 	private:
-		bool m_bVerbose;
+		int m_iVerbosity;		// 0..3
 	
 	protected:
 		Node m_node;
@@ -77,7 +77,7 @@ class Parser
 		// get a string representation of the syntax tree's expression
 		std::string GetExpression(bool bFillInSyms=false, bool bGnuPlotSyntax=true) const;
 		
-		void SetVerbose(bool bVerbose);
+		void SetVerbosity(int iVerbosity);
 		bool IsOk() const;
 		
 		// print tree & symbol map
@@ -87,8 +87,6 @@ class Parser
 		static bool CheckValidLexemes(const std::string& str);
 };
 
-// global default
-void parser_set_verbose(bool bVerbose);
 
 //======================================================================
 
@@ -119,5 +117,7 @@ std::vector<ParameterHints> parse_parameter_hints(const std::string& str);
 //----------------------------------------------------------------------
 
 
+
+extern void parser_set_default_verbosity(int iVerbosity);
 
 #endif

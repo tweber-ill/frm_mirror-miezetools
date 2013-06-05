@@ -20,6 +20,7 @@ namespace fus = boost::fusion;
 
 #include <ctype.h>
 #include <iostream>
+#include <sstream>
 #include <map>
 #include "parser.h"
 #include "functions.h"
@@ -27,6 +28,10 @@ namespace fus = boost::fusion;
 
 //----------------------------------------------------------------------
 // old procedural interface
+
+static int iVerbosity = 1;	// 0..3
+
+extern void parser_set_default_verbosity(int iVerbosity) { ::iVerbosity = iVerbosity; }
 
 // there are two versions of these functions:
 // the first includes a vector of free parameters, e.g. x,y,z
@@ -179,8 +184,9 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 	{
 		if(node.vecChildren.size()!=2)
 		{
-			std::cerr << "Error: operation 'pow' needs exactly two operands."
-					  << std::endl;
+			if(iVerbosity >= 1)
+				std::cerr << "Error: operation 'pow' needs exactly two operands."
+							<< std::endl;
 			return 0.;
 		}
 
@@ -205,8 +211,9 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 		bool bSymInMap = is_symbol_in_map(syms, node.strIdent, vecFreeParams, &dVal);
 		if(!bSymInMap)
 		{
-			std::cerr << "Symbol \"" << node.strIdent << "\" is not in map!"
-					  << std::endl;
+			if(iVerbosity >= 1)
+				std::cerr << "Symbol \"" << node.strIdent << "\" is not in map!"
+					  	  	  << std::endl;
 		}
 		return dVal;
 	}
@@ -249,8 +256,9 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 			}
 		}
 
-		std::cerr << "No function \"" << strFkt << "\" taking " << iNumArgs
-				  << " arguments known." << std::endl;
+		if(iVerbosity >= 1)
+			std::cerr << "No function \"" << strFkt << "\" taking " << iNumArgs
+						<< " arguments known." << std::endl;
 		return 0.;
 	}
 	else if(node.iType == NODE_NOP)
@@ -259,11 +267,13 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 	}
 	else if(node.iType == NODE_INVALID)
 	{
-		std::cerr << "Error: Syntax tree is invalid." << std::endl;
+		if(iVerbosity >= 1)
+			std::cerr << "Error: Syntax tree is invalid." << std::endl;
 		return 0.;
 	}
 
-	std::cerr << "Unknown syntax node type " << node.iType << std::endl;
+	if(iVerbosity >= 1)
+		std::cerr << "Unknown syntax node type " << node.iType << std::endl;
 	return 0.;
 }
 
@@ -461,7 +471,8 @@ static std::string get_expression(const Node& node, const std::vector<Symbol>& s
 		return "0";
 	}
 
-	std::cerr << "Unknown syntax node type " << node.iType << std::endl;
+	if(iVerbosity >= 1)
+		std::cerr << "Unknown syntax node type " << node.iType << std::endl;
 	return "";
 }
 
@@ -652,6 +663,8 @@ struct expression_parser
 
 	qi::rule<Iter, std::string(), ascii::space_type> ident;
 
+	std::ostringstream ostrErr;
+
 
 	// grammar originally based on the LL(1) expression example in this document:
 	// http://cs.nyu.edu/courses/summer11/G22.2110-002/Parsing.pdf (page 13)
@@ -740,12 +753,11 @@ struct expression_parser
 		qi::on_error<qi::fail>
 		(
 			start,
-			std::cerr
-				<< ph::val("Error: Expected ") << qi::labels::_4
+			(std::ostream&) ostrErr
+				<< ph::val("Expected ") << qi::labels::_4
 				<< ph::val(" at token \"")
 				<< ph::construct<std::string>(qi::labels::_3, qi::labels::_2)
 				<< ph::val("\".")
-				<< std::endl
 		);
 	}
 };
@@ -922,13 +934,16 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 	bool bOk = qi::phrase_parse(str.begin(), str.end(), pars, ascii::space, node);
 	if(!bOk)
 	{
-		std::cerr << "Error parsing expression." << std::endl;
+		if(iVerbosity >= 1)
+			std::cerr << "Error parsing expression \"" << str << "\": "
+						<< pars.ostrErr.str() << std::endl;
 		return false;
 	}
 
 	if(!check_tree_sanity(node))
 	{
-		std::cerr << "Syntax tree is not sane." << std::endl;
+		if(iVerbosity >= 1)
+			std::cerr << "Syntax tree is not sane." << std::endl;
 		return false;
 	}
 
@@ -936,7 +951,8 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 
 	if(!check_tree_sanity(node))
 	{
-		std::cerr << "Optimized syntax tree is not sane." << std::endl;
+		if(iVerbosity >= 1)
+			std::cerr << "Optimized syntax tree is not sane." << std::endl;
 		return false;
 	}
 
@@ -958,11 +974,8 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 //======================================================================
 // class interface
 
-static bool g_bDefaultVerbose = true;
-void parser_set_verbose(bool bVerbose) { g_bDefaultVerbose = bVerbose; }
-
 Parser::Parser(const std::vector<Symbol>* pvecFreeParams)
-	: m_bVerbose(g_bDefaultVerbose), m_bOk(false)
+	: m_iVerbosity(::iVerbosity), m_bOk(false)
 {
 	// set "x" as default free param if no others given
 	if(!pvecFreeParams)
@@ -978,7 +991,7 @@ Parser::Parser(const Parser& parser) { this->operator=(parser); }
 	
 Parser& Parser::operator=(const Parser& parser)
 {
-	this->m_bVerbose = parser.m_bVerbose;
+	this->m_iVerbosity = parser.m_iVerbosity;
 	this->m_node = parser.m_node;
 	this->m_syms = parser.m_syms;
 	this->m_vecFreeParams = parser.m_vecFreeParams;
@@ -1025,7 +1038,7 @@ bool Parser::ParseExpression(const std::string& str)
 	clear(false);
 	m_bOk = ::parse_expression(m_node, m_syms, str, m_vecFreeParams);
 
-	if(m_bVerbose)
+	if(m_iVerbosity == 3)
 	{
 		std::cout << "\n--------------------------------------------------------------------------------\n";
 		std::cout << "Parsing " << (m_bOk ? "successful" : "failed") << ".\n";
@@ -1054,8 +1067,9 @@ double Parser::EvalTree(double x)
 {
 	if(m_vecFreeParams.size() != 1)
 	{
-		std::cerr << "Symbol table has more than one free parameter, but only one given!"
-		<< std::endl;
+		if(m_iVerbosity>=1)
+			std::cerr << "Symbol table has more than one free parameter, but only one given!"
+						<< std::endl;
 		return 0.;
 	}
 
@@ -1069,10 +1083,10 @@ std::string Parser::GetExpression(bool bFillInSyms, bool bGnuPlotSyntax) const
 	return ::get_expression(m_node, m_syms, m_vecFreeParams, bFillInSyms, bGnuPlotSyntax);
 }
 
-void Parser::SetVerbose(bool bVerbose)
+void Parser::SetVerbosity(int iVerbosity)
 {
-	m_bVerbose = bVerbose;
-	
+	m_iVerbosity = iVerbosity;
+	::iVerbosity = iVerbosity;
 }
 bool Parser::IsOk() const { return m_bOk; }
 
@@ -1130,6 +1144,8 @@ struct symbol_with_2values_parser
 	qi::rule<Iter, SymbolWith2Values(), ascii::space_type> onelimit;
 	qi::rule<Iter, std::vector<SymbolWith2Values>(), ascii::space_type> limits;
 
+	std::ostringstream ostrErr;
+
 	symbol_with_2values_parser() :
 		symbol_with_2values_parser::base_type(limits, "limits")
 	{
@@ -1158,12 +1174,11 @@ struct symbol_with_2values_parser
 		qi::on_error<qi::fail>
 		(
 			limits,
-			std::cerr
-				<< ph::val("Error: Expected ") << qi::labels::_4
+			(std::ostream&) ostrErr
+				<< ph::val("Expected ") << qi::labels::_4
 				<< ph::val(" at token \"")
 				<< ph::construct<std::string>(qi::labels::_3, qi::labels::_2)
 				<< ph::val("\".")
-				<< std::endl
 		);
 	}
 };
@@ -1182,14 +1197,16 @@ static void symbol_with_2values_fill_in(std::vector<SymbolWith2Values>& vec,
 
 		if(syms0.size()!=0 || syms1.size()!=0)
 		{
-			std::cerr << "Warning: Free parameters specified in " << strWhich
-					  << ", assuming value 0." << std::endl;
+			if(iVerbosity>=2)
+				std::cerr << "Warning: Free parameters specified in " << strWhich
+							<< ", assuming value 0." << std::endl;
 		}
 
 		if(!bOk0 || !bOk1)
 		{
-			std::cerr << "Error: Could not parse " << strWhich << " expression."
-					  << std::endl;
+			if(iVerbosity>=1)
+				std::cerr << "Error: Could not parse " << strWhich << " expression."
+							<< std::endl;
 		}
 
 		sym2.dVal0 = eval_tree(node0, syms0, 0);
@@ -1205,7 +1222,11 @@ static std::vector<SymbolWith2Values> parse_symbol_with_2values(const std::strin
 
 	bool bOk = qi::phrase_parse(str.begin(), str.end(), lp, ascii::space, params);
 	if(!bOk)
-		std::cerr << "Error parsing " << strWhich << "." << std::endl;
+	{
+		if(iVerbosity>=1)
+			std::cerr << "Error parsing " << strWhich << ": "
+					 	 << lp.ostrErr.str() << std::endl;
+	}
 
 	symbol_with_2values_fill_in(params, strWhich);
 

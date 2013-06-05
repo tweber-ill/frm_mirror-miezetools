@@ -94,8 +94,9 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 {
 	if(dNumOsc<0.)
 	{
-		std::cerr << "Warning: No number of oscillations given, assuming 2 oscillations."
-				  << std::endl;
+		if(iFitterVerbosity >= 2)
+			std::cerr << "Warning: No number of oscillations given, assuming 2 oscillations."
+						<< std::endl;
 		dNumOsc = 2.;
 	}
 
@@ -103,8 +104,10 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	if(dFreq < 0.)
 	{
 		dFreq = 2.*M_PI/double(iLen) * dNumOsc;
-		std::cerr << "Warning: No frequency given, calculating using number of bins."
-				  << std::endl;
+
+		if(iFitterVerbosity >= 2)
+			std::cerr << "Warning: No frequency given, calculating using number of bins."
+				  	  << std::endl;
 
 		px = 0;
 	}
@@ -117,8 +120,9 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 		px = pdx_predef;
 
-		std::cerr << "Warning: Using predefined x values."
-				  << std::endl;
+		if(iFitterVerbosity >= 2)
+			std::cerr << "Warning: Using predefined x values."
+				  	  	  << std::endl;
 	}
 
 	MiezeSinModel sinmod(dFreq);
@@ -133,7 +137,8 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		std::cerr << "Error: min == max, won't try fitting!" << std::endl;
+		if(iFitterVerbosity >= 1)
+			std::cerr << "Error: min == max, won't try fitting!" << std::endl;
 		return 0;
 	}
 
@@ -271,7 +276,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	if(dPhase<0.)
 		dPhase += 2.*M_PI;
 
-	/*
+	if(iFitterVerbosity >= 3)
 	{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		unsigned int uiMini=0;
@@ -284,7 +289,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
-	}*/
+	}
 
 	*pmodel = new MiezeSinModel(dFreq, dAmp, dPhase, dOffs,
 								0., dAmpErr, dPhaseErr, dOffsErr);

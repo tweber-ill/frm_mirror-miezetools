@@ -56,9 +56,10 @@ bool FreeFktModel::SetParams(const std::vector<double>& vecParams)
 	
 	if(syms.size() != vecParams.size())
 	{
-		std::cerr << syms.size() << " symbols in table, but "
-				  << vecParams.size() << " symbols supplied."
-				  << std::endl;
+		if(iFitterVerbosity >= 1)
+			std::cerr << syms.size() << " symbols in table, but "
+							<< vecParams.size() << " symbols supplied."
+							<< std::endl;
 
 		return false;
 	}
@@ -150,7 +151,8 @@ bool get_freefit(unsigned int iLen,
 	FreeFktModel freemod(pcExp);
 	if(!freemod.IsOk())
 	{
-		std::cerr << "Error: Free function model could not be created." << std::endl;
+		if(iFitterVerbosity >= 1)
+			std::cerr << "Error: Free function model could not be created." << std::endl;
 		return 0;
 	}
 	Chi2Function fkt(&freemod, iLen, px, py, pdy);
@@ -164,7 +166,8 @@ bool get_freefit(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		std::cerr << "Warning: min == max!" << std::endl;
+		if(iFitterVerbosity >= 2)
+			std::cerr << "Warning: min == max!" << std::endl;
 		//return 0;
 	}
 
@@ -258,6 +261,7 @@ bool get_freefit(unsigned int iLen,
 	
 	*pFinalModel = new FreeFktModel(freemod);
 
+	if(iFitterVerbosity >= 3)
 	{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 

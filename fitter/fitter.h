@@ -63,5 +63,8 @@ class FunctionModel_param
 };
 
 
+extern int iFitterVerbosity;
+extern void fitter_set_default_verbosity(int iVerbosity);
+
 //----------------------------------------------------------------------
 #endif	// __FITTER__H__

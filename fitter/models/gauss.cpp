@@ -174,7 +174,8 @@ bool get_gauss(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		std::cerr << "Error: min == max, won't try fitting!" << std::endl;
+		if(iFitterVerbosity >= 1)
+			std::cerr << "Error: min == max, won't try fitting!" << std::endl;
 		return 0;
 	}
 
@@ -321,7 +322,7 @@ bool get_gauss(unsigned int iLen,
 
 	bool bNormalized = gmod.IsNormalized();
 
-	/*
+	if(iFitterVerbosity >= 3)
 	{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		unsigned int uiMini=0;
@@ -334,7 +335,7 @@ bool get_gauss(unsigned int iLen,
 
 		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
-	}*/
+	}
 
 	
 	*pmodel = new GaussModel(dAmp, dSpread, dx0, dAmpErr, dSpreadErr, dx0Err, bNormalized, doffs, doffserr);
@@ -522,7 +523,8 @@ bool get_multigauss(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		std::cerr << "Error: min == max, won't try fitting!" << std::endl;
+		if(iFitterVerbosity >= 1)
+			std::cerr << "Error: min == max, won't try fitting!" << std::endl;
 		return 0;
 	}
 
@@ -717,7 +719,8 @@ bool get_multigauss(unsigned int iLen,
 	bool bNormalized = gmod.IsNormalized();
 
 
-	/*{
+	if(iFitterVerbosity >= 3)
+	{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
@@ -729,7 +732,7 @@ bool get_multigauss(unsigned int iLen,
 
 		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
-	}*/
+	}
 
 
 	*pmodel = new MultiGaussModel(gmod);

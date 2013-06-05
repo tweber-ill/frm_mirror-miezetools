@@ -91,9 +91,10 @@ bool FreeFktModel_nd::SetParams(const std::vector<double>& vecParams)
 	
 	if(syms.size() != vecParams.size())
 	{
-		std::cerr << syms.size() << " symbols in table, but "
-				  << vecParams.size() << " symbols supplied."
-				  << std::endl;
+		if(iFitterVerbosity >= 1)
+			std::cerr << syms.size() << " symbols in table, but "
+						<< vecParams.size() << " symbols supplied."
+						<< std::endl;
 
 		return false;
 	}
@@ -160,7 +161,8 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 	FreeFktModel_nd freemod(uiDim, pcExp);
 	if(!freemod.IsOk())
 	{
-		std::cerr << "Error: N-dim free function model could not be created." << std::endl;
+		if(iFitterVerbosity >= 1)
+			std::cerr << "Error: N-dim free function model could not be created." << std::endl;
 		return 0;
 	}
 	
@@ -231,7 +233,7 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 
 	*pFinalModel = new FreeFktModel_nd(freemod);
 
-	/*
+	if(iFitterVerbosity >= 3)
 	{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		std::cerr << "result of user-defined fit step 1" << std::endl;
@@ -241,7 +243,7 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 		std::cerr << "=================================" << std::endl;
 		std::cerr << mini2 << std::endl;
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
-	}*/
+	}
 
 	return bValidFit;
 }

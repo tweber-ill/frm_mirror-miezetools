@@ -17,6 +17,9 @@ extern "C" int XInitThreads();
 #include "mainwnd.h"
 #include "settings.h"
 
+#include "dialogs/SettingsDlg.h"
+
+
 static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 {
 	for(int iFile=0; iFile<iNum; ++iFile)
@@ -37,8 +40,9 @@ int main(int argc, char **argv)
 		QApplication a(argc, argv);
 
 		MiezeMainWnd wnd;
-		wnd.restoreGeometry(pGlobals->value("main/geo").toByteArray());
+		SettingsDlg::set_global_defaults();
 
+		wnd.restoreGeometry(pGlobals->value("main/geo").toByteArray());
 		wnd.show();
 
 		if(argc>1)

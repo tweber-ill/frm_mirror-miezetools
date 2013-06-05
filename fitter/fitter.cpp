@@ -35,3 +35,7 @@ FunctionModel::~FunctionModel() {}
 FunctionModel_nd::~FunctionModel_nd() {}
 
 //----------------------------------------------------------------------
+
+
+int iFitterVerbosity = 1;
+extern void fitter_set_default_verbosity(int iVerbosity) { iFitterVerbosity = iVerbosity; }

@@ -90,7 +90,6 @@ void FitDlg::FunctionChanged(const QString& strFkt)
 	tableHints->setRowCount(0);
 
 	Parser parser;
-	parser.SetVerbose(false);
 
 	std::vector<Symbol> vecFreeParams;
 	Symbol symFree;

@@ -291,8 +291,9 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 
 	bValidFit = mini->IsValid() && mini->HasValidParameters();
 
-	/*
-	if(bValidFit)
+
+	//if(bValidFit)
+	if(iFitterVerbosity >= 3)
 	{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		std::cerr << "result of fit" << std::endl;
@@ -308,7 +309,7 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 						<< err.first << ", " << err.second << std::endl;
 		}
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
-	}*/
+	}
 
 
 	dAmp = mini->UserState().Value("amp");

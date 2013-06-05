@@ -8,6 +8,9 @@
 #include "../settings.h"
 #include "../helper/string.h"
 
+#include "../fitter/parser.h"
+#include "../fitter/fitter.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -18,13 +21,22 @@ SettingsDlg::SettingsDlg(QWidget* pParent) : QDialog(pParent)
 }
 
 SettingsDlg::~SettingsDlg()
-{
-}
+{}
 
 void SettingsDlg::accept()
 {
 	SaveSettings();
+	set_global_defaults();
+
 	QDialog::accept();
+}
+
+void SettingsDlg::set_global_defaults()
+{
+	int iDebugLevel = Settings::Get<int>("general/debug_level");
+
+	::parser_set_default_verbosity(iDebugLevel);
+	::fitter_set_default_verbosity(iDebugLevel);
 }
 
 
