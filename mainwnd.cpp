@@ -69,7 +69,6 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pLoad = new QAction(this);
 	pLoad->setText("Open...");
 	pLoad->setIcon(QIcon::fromTheme("document-open"));
-	pLoad->setShortcut(Qt::CTRL + Qt::Key_L);
 	pMenuFile->addAction(pLoad);
 
 	m_pMenuLoadRecent = new QMenu(this);
@@ -80,6 +79,26 @@ MiezeMainWnd::MiezeMainWnd()
 	pCloseAll->setText("Close All");
 	pCloseAll->setIcon(QIcon::fromTheme("window-close"));
 	pMenuFile->addAction(pCloseAll);
+
+	pMenuFile->addSeparator();
+
+	QAction *pLoadSess = new QAction(this);
+	pLoadSess->setText("Open Session...");
+	pLoadSess->setShortcut(Qt::CTRL + Qt::Key_L);
+	pLoadSess->setIcon(QIcon::fromTheme("document-open"));
+	pMenuFile->addAction(pLoadSess);
+
+	QAction *pSaveSess = new QAction(this);
+	pSaveSess->setText("Save Session");
+	pSaveSess->setIcon(QIcon::fromTheme("document-save"));
+	pSaveSess->setShortcut(Qt::CTRL + Qt::Key_S);
+	pMenuFile->addAction(pSaveSess);
+
+	QAction *pSaveSessAs = new QAction(this);
+	pSaveSessAs->setText("Save Session As...");
+	pSaveSessAs->setIcon(QIcon::fromTheme("document-save-as"));
+	pMenuFile->addAction(pSaveSessAs);
+
 
 	pMenuFile->addSeparator();
 
@@ -203,7 +222,7 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuROI->addSeparator();
 
 	QAction *pActiveROI = new QAction(this);
-	pActiveROI->setText("Global ROI Active");
+	pActiveROI->setText("Set Global ROI Active");
 	pActiveROI->setCheckable(1);
 	pActiveROI->setChecked(m_bmainROIActive);
 	pMenuROI->addAction(pActiveROI);

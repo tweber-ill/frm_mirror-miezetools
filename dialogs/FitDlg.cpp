@@ -490,7 +490,8 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 
 	if(pFkt)
 	{
-		std::cout << "Fit: " << *pFkt << std::endl;
+		std::cout << "Fit " << (bOk ? "(ok)" : "(failed)" ) << ": "
+					<< *pFkt << std::endl;
 
 		res.pPlot->plot_fkt(*pFkt);
 		res.pPlot->RefreshPaint();

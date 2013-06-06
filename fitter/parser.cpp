@@ -1038,7 +1038,7 @@ bool Parser::ParseExpression(const std::string& str)
 	clear(false);
 	m_bOk = ::parse_expression(m_node, m_syms, str, m_vecFreeParams);
 
-	if(m_iVerbosity == 3)
+	if(m_iVerbosity >= 3)
 	{
 		std::cout << "\n--------------------------------------------------------------------------------\n";
 		std::cout << "Parsing " << (m_bOk ? "successful" : "failed") << ".\n";
