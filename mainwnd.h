@@ -73,6 +73,8 @@ protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
 
+	void FileExportPyTriggered();
+
 	void UpdateSubWndList();
 	void ShowListWindowsDlg();
 

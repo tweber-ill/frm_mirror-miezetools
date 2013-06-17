@@ -41,6 +41,8 @@
 #include "fitter/models/gauss.h"
 #include "fitter/models/interpolation.h"
 
+#include "data/export.h"
+
 
 MiezeMainWnd::MiezeMainWnd()
 					: m_iPlotCnt(1), m_pfitdlg(0),
@@ -74,6 +76,10 @@ MiezeMainWnd::MiezeMainWnd()
 	m_pMenuLoadRecent = new QMenu(this);
 	m_pMenuLoadRecent->setTitle("Open Recent");
 	pMenuFile->addMenu(m_pMenuLoadRecent);
+
+	QAction *pExportPy = new QAction(this);
+	pExportPy->setText("Export as Python Script...");
+	pMenuFile->addAction(pExportPy);
 
 	QAction *pCloseAll = new QAction(this);
 	pCloseAll->setText("Close All");
@@ -316,6 +322,7 @@ MiezeMainWnd::MiezeMainWnd()
 	//--------------------------------------------------------------------------------
 	// Connections
 	QObject::connect(pLoad, SIGNAL(triggered()), this, SLOT(FileLoadTriggered()));
+	QObject::connect(pExportPy, SIGNAL(triggered()), this, SLOT(FileExportPyTriggered()));
 	QObject::connect(pSettings, SIGNAL(triggered()), this, SLOT(SettingsTriggered()));
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -1269,6 +1276,35 @@ void MiezeMainWnd::ShowPSDPhaseCorr()
 
 	m_pphasecorrdlg->show();
 	m_pphasecorrdlg->activateWindow();
+}
+
+void MiezeMainWnd::FileExportPyTriggered()
+{
+	const SubWindowBase *pSWB = GetActivePlot();
+	if(!pSWB)
+	{
+		QMessageBox::critical(this, "Error", "No active plot.");
+		return;
+	}
+
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_py", ".").toString();
+
+	QString strFile = QFileDialog::getSaveFileName(this, "Save as Python file...", strLastDir,
+					"Python files (*.py)",
+					0, QFileDialog::DontUseNativeDialog);
+	if(strFile == "")
+		return;
+
+	std::string strFile1 = strFile.toStdString();
+	std::string strExt = get_fileext(strFile1);
+	if(strExt != "py")
+		strFile1 += ".py";
+
+	if(export_py(strFile1.c_str(), pSWB))
+		pGlobals->setValue("main/lastdir_py", QString(::get_dir(strFile1).c_str()));
+	else
+		QMessageBox::critical(this, "Error", "Export to Python failed.");
 }
 
 #include "mainwnd.moc"

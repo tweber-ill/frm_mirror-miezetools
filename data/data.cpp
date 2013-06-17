@@ -110,6 +110,26 @@ void Data1::GetYMinMax(double& dYMin, double& dYMax) const
 	dYMax = (pair.second==m_vecValsY.end()? 0.: *pair.second);
 }
 
+void Data1::GetXErrMinMax(double& dXMin, double& dXMax) const
+{
+	typedef std::vector<double>::const_iterator t_iter;
+	std::pair<t_iter, t_iter> pair =
+			boost::minmax_element(m_vecErrsX.begin(), m_vecErrsX.end());
+
+	dXMin = (pair.first==m_vecErrsX.end() ? 0. : *pair.first);
+	dXMax = (pair.second==m_vecErrsX.end() ? 0. : *pair.second);
+}
+
+void Data1::GetYErrMinMax(double& dYMin, double& dYMax) const
+{
+	typedef std::vector<double>::const_iterator t_iter;
+	std::pair<t_iter, t_iter> pair =
+			boost::minmax_element(m_vecErrsY.begin(), m_vecErrsY.end());
+
+	dYMin = (pair.first==m_vecErrsY.end()? 0.: *pair.first);
+	dYMax = (pair.second==m_vecErrsY.end()? 0.: *pair.second);
+}
+
 //------------------------------------------------------------------------
 
 

@@ -158,6 +158,8 @@ public:
 
 	void GetXMinMax(double& dXMin, double& dXMax) const;
 	void GetYMinMax(double& dYMin, double& dYMax) const;
+	void GetXErrMinMax(double& dXMin, double& dXMax) const;
+	void GetYErrMinMax(double& dYMin, double& dYMax) const;
 
 	void clear();
 	void SetLength(uint uiLen);

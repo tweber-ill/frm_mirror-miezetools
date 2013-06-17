@@ -80,6 +80,8 @@ public:
 		m_strXAxis = QString(pcX);
 		m_strYAxis = QString(pcY);
 	}
+	const std::string GetXLabel() const { return m_strXAxis.toStdString(); }
+	const std::string GetYLabel() const { return m_strYAxis.toStdString(); }
 
 	void SetXIsLog(bool bLogX) { m_bXIsLog = bLogX; }
 	void SetYIsLog(bool bLogY) { m_bYIsLog = bLogY; }
