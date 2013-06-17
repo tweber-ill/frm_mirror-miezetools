@@ -62,9 +62,11 @@ void PsdPhaseDlg::Update()
 	units::quantity<units::si::length> lam = spinLam->value()*angstrom;
 	unsigned int iXPixels = spinXPix->value();
 	unsigned int iYPixels = spinYPix->value();
+	units::quantity<units::si::length> xpos = spinXCenter->value()*cm;
+	units::quantity<units::si::length> ypos = spinYCenter->value()*cm;
 
 	ublas::matrix<double> matPhases;
-	mieze_reduction_det(lx, ly, Ls, tau, lam, iXPixels, iYPixels, &matPhases);
+	mieze_reduction_det(lx, ly, xpos, ypos, Ls, tau, lam, iXPixels, iYPixels, &matPhases);
 
 	m_dat.FromMatrix(matPhases);
 	m_dat.SetXRange(-lx/2./cm, lx/2./cm);
