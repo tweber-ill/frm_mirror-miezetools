@@ -490,4 +490,10 @@ void Plot::SetROI(const Roi* pROI)
 	}
 }
 
+Roi* Plot::GetROI()
+{
+	if(GetDataCount()==0) return 0;
+	return &GetData(0).dat.GetRoi();
+}
+
 #include "plot.moc"

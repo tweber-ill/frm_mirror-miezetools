@@ -41,6 +41,7 @@ public:
 	void SetRoiActive(bool bActive) { m_roi.SetRoiActive(bActive); }
 
 	const Roi& GetRoi() const { return m_roi; }
+	Roi& GetRoi() { return m_roi; }
 
 	bool IsInsideRoi(double dX, double dY) const
 	{

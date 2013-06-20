@@ -94,6 +94,7 @@ public:
 	virtual Plot* ConvertTo1d(int iParam=0) { return (Plot*)this; }
 
 	virtual void SetROI(const Roi* pROI);
+	virtual Roi* GetROI();
 };
 
 

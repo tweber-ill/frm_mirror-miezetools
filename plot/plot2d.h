@@ -75,6 +75,7 @@ protected:
 
 public:
 	virtual void SetROI(const Roi* pROI);
+	virtual Roi* GetROI();
 };
 
 #endif

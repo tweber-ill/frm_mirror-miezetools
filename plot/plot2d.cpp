@@ -363,4 +363,13 @@ void Plot2d::SetROI(const Roi* pROI)
 	GetData2().SetROI(pROI);
 }
 
+Roi* Plot2d::GetROI()
+{
+	DataInterface* pDat = GetInternalData();
+	if(!pDat) return 0;
+
+	return &pDat->GetRoi();
+}
+
+
 #include "plot2d.moc"
