@@ -5,12 +5,18 @@
  */
 
 #include "RoiDlg.h"
+#include "../settings.h"
+#include "../helper/string.h"
+
 #include <QtGui/QMenu>
+#include <QtGui/QFileDialog>
+#include <QtGui/QMessageBox>
 
 RoiDlg::RoiDlg(QWidget *pParent)
-			: QDialog(pParent), m_pRoi(0), m_iCurrentItem(0)
+			: QDialog(pParent), m_iCurrentItem(0)
 {
 	setupUi(this);
+	checkEnabled->setChecked(m_roi.IsRoiActive());
 
 	connect(listRois, SIGNAL(itemSelectionChanged()), this, SLOT(ItemSelected()));
 	connect(tableParams, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(ValueChanged(QTableWidgetItem *)));
@@ -30,6 +36,8 @@ RoiDlg::RoiDlg(QWidget *pParent)
 	pMenu->addAction(actionNewEllipse);
 	pMenu->addAction(actionNewCircleRing);
 	pMenu->addAction(actionNewCircleSeg);
+	btnAdd->setMenu(pMenu);
+
 
 	connect(actionNewRect, SIGNAL(triggered()), this, SLOT(NewRect()));
 	connect(actionNewCircle, SIGNAL(triggered()), this, SLOT(NewCircle()));
@@ -39,25 +47,27 @@ RoiDlg::RoiDlg(QWidget *pParent)
 
 	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
 
-	btnAdd->setMenu(pMenu);
+	connect(btnGetActive, SIGNAL(clicked()), this, SIGNAL(WantActiveRoi()));
+	connect(btnSetActive, SIGNAL(clicked()), this, SIGNAL(SetRoiForActive()));
+	connect(btnSetAll, SIGNAL(clicked()), this, SIGNAL(SetRoiForAll()));
+
+	connect(btnLoad, SIGNAL(clicked()), this, SLOT(LoadRoi()));
+	connect(btnSave, SIGNAL(clicked()), this, SLOT(SaveRoi()));
+
+	QObject::connect(checkEnabled, SIGNAL(toggled(bool)), this, SLOT(SetRoiActive(bool)));
 }
 
-RoiDlg::~RoiDlg()
-{
-	Deinit();
-}
+RoiDlg::~RoiDlg() {}
 
 // an item (e.g. "circle", "rectangle", ... has been selected)
 void RoiDlg::ItemSelected()
 {
-	if(!m_pRoi) return;
-
 	m_iCurrentItem = listRois->currentRow();
 
-	if(m_iCurrentItem<0 || m_iCurrentItem >= m_pRoi->GetNumElements())
+	if(m_iCurrentItem<0 || m_iCurrentItem >= m_roi.GetNumElements())
 		return;
 
-	RoiElement& elem = m_pRoi->GetElement(m_iCurrentItem);
+	RoiElement& elem = m_roi.GetElement(m_iCurrentItem);
 
 	tableParams->setRowCount(elem.GetParamCount());
 	tableParams->setColumnCount(2);
@@ -89,15 +99,13 @@ void RoiDlg::ItemSelected()
 // a property of the selected item has changed
 void RoiDlg::ValueChanged(QTableWidgetItem* pItem)
 {
-	if(!m_pRoi) return;
-
 	// only edit if this flag is set
 	if(pItem->data(Qt::UserRole+1).value<int>() != 1)
 		return;
 
-	if(m_iCurrentItem<0 || m_iCurrentItem >= m_pRoi->GetNumElements())
+	if(m_iCurrentItem<0 || m_iCurrentItem >= m_roi.GetNumElements())
 		return;
-	RoiElement& elem = m_pRoi->GetElement(m_iCurrentItem);
+	RoiElement& elem = m_roi.GetElement(m_iCurrentItem);
 
 	QVariant var = pItem->data(Qt::UserRole);
 	int iParam = var.value<int>();
@@ -118,22 +126,17 @@ void RoiDlg::ValueChanged(QTableWidgetItem* pItem)
 
 void RoiDlg::CopyItem()
 {
-	if(!m_pRoi) return;
-
-	if(m_iCurrentItem<0 || m_iCurrentItem >= m_pRoi->GetNumElements())
+	if(m_iCurrentItem<0 || m_iCurrentItem >= m_roi.GetNumElements())
 		return;
 
-	RoiElement& elem = m_pRoi->GetElement(m_iCurrentItem);
+	RoiElement& elem = m_roi.GetElement(m_iCurrentItem);
 	NewElement(elem.copy());
 }
 
 void RoiDlg::NewElement(RoiElement* pNewElem)
 {
-	if(!m_pRoi)
-		m_pRoi = new Roi;
-
-	int iPos = m_pRoi->add(pNewElem);
-	new QListWidgetItem(m_pRoi->GetElement(iPos).GetName().c_str(), listRois);
+	int iPos = m_roi.add(pNewElem);
+	new QListWidgetItem(m_roi.GetElement(iPos).GetName().c_str(), listRois);
 
 	listRois->setCurrentRow(iPos);
 }
@@ -146,9 +149,7 @@ void RoiDlg::NewRect() { NewElement(new RoiRect); }
 
 void RoiDlg::DeleteItem()
 {
-	if(!m_pRoi) return;
-
-	if(m_iCurrentItem<0 || m_iCurrentItem >= m_pRoi->GetNumElements())
+	if(m_iCurrentItem<0 || m_iCurrentItem >= m_roi.GetNumElements())
 		return;
 
 	int iCurItem = m_iCurrentItem;
@@ -159,7 +160,7 @@ void RoiDlg::DeleteItem()
 		tableParams->setRowCount(0);
 
 		delete pItem;
-		m_pRoi->DeleteElement(iCurItem);
+		m_roi.DeleteElement(iCurItem);
 
 		m_iCurrentItem = listRois->currentRow();
 	}
@@ -173,41 +174,29 @@ void RoiDlg::ClearList()
 void RoiDlg::SetRoi(const Roi* pRoi)
 {
 	ClearList();
-
-	if(m_pRoi)
-		delete m_pRoi;
-
-	m_pRoi = new Roi(*pRoi);
+	m_roi = *pRoi;
+	checkEnabled->setChecked(m_roi.IsRoiActive());
 
 	// add all roi elements to list
-	for(int i=0; i<m_pRoi->GetNumElements(); ++i)
-		new QListWidgetItem(m_pRoi->GetElement(i).GetName().c_str(), listRois);
+	for(int i=0; i<m_roi.GetNumElements(); ++i)
+		new QListWidgetItem(m_roi.GetElement(i).GetName().c_str(), listRois);
 
-	if(m_pRoi->GetNumElements() > 0)
+	if(m_roi.GetNumElements() > 0)
 		listRois->setCurrentRow(0);
 }
 
-const Roi* RoiDlg::GetRoi(void) const
-{
-	return m_pRoi;
-}
-
-void RoiDlg::Deinit()
-{
-	if(m_pRoi)
-		delete m_pRoi;
-}
+const Roi* RoiDlg::GetRoi(void) const { return &m_roi; }
 
 void RoiDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 {
 	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::ApplyRole ||
 		buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
 	{
-		if(m_pRoi)
-			emit NewRoiAvailable(this->m_pRoi);
+		m_roi_last = m_roi;
 	}
 	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::RejectRole)
 	{
+		m_roi = m_roi_last;
 		reject();
 	}
 
@@ -217,5 +206,63 @@ void RoiDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	}
 }
 
+void RoiDlg::SetRoiActive(bool bActive) { m_roi.SetRoiActive(bActive); }
+
+void RoiDlg::LoadRoi()
+{
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_roi", ".").toString();
+
+	QString strFile = QFileDialog::getOpenFileName(this, "Open ROI file...", strLastDir,
+					"ROI files (*.roi *.ROI);;All files (*.*)",
+					0, QFileDialog::DontUseNativeDialog);
+	if(strFile.length() == 0)
+		return;
+
+
+	bool bDirSet=false;
+	std::string strFile1 = strFile.toStdString();
+
+	if(!bDirSet)
+	{
+		pGlobals->setValue("main/lastdir_roi", QString(::get_dir(strFile1).c_str()));
+		bDirSet = true;
+	}
+
+	Roi roi;
+	if(!roi.Load(strFile1.c_str()))
+	{
+		QMessageBox::critical(this, "Error", "Could not load ROI.");
+		return;
+	}
+
+	SetRoi(&roi);
+}
+
+void RoiDlg::SaveRoi()
+{
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_roi", ".").toString();
+
+	QString strFile = QFileDialog::getSaveFileName(this, "Save ROI file...", strLastDir,
+					"ROI files (*.roi *.ROI);;All files (*.*)",
+					0, QFileDialog::DontUseNativeDialog);
+	if(strFile.length() == 0)
+		return;
+
+
+	bool bDirSet=false;
+	std::string strFile1 = strFile.toStdString();
+
+	if(!bDirSet)
+	{
+		pGlobals->setValue("main/lastdir_roi", QString(::get_dir(strFile1).c_str()));
+		bDirSet = true;
+	}
+
+	const Roi* pRoi = GetRoi();
+	if(!pRoi->Save(strFile1.c_str()))
+		QMessageBox::critical(this, "Error", "Could not save ROI.");
+}
 
 #include "RoiDlg.moc"

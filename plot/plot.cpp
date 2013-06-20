@@ -478,15 +478,15 @@ void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 	RefreshStatusMsgs();
 }
 
-void Plot::SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
+void Plot::SetROI(const Roi* pROI)
 {
 	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
 	{
 		PlotObj& obj = GetData(iDat);
 		DataInterface* pDat = &obj.dat;
-		if(!pDat) return;
+		if(!pDat) continue;
 
-		pDat->SetGlobalROI(pROI, pbROIActive);
+		pDat->SetROI(pROI);
 	}
 }
 

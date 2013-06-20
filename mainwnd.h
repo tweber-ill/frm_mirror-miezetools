@@ -58,9 +58,6 @@ protected:
 	Plot* Convert3d1d(Plot3d* pPlot3d);
 	Plot* Convert4d1d(Plot4d* pPlot4d, int iFoil=-1);
 
-	bool m_bmainROIActive;
-	Roi m_mainROI;
-
 	std::string m_strLastXColumn;
 
 	QStringList m_lstRecentFiles;
@@ -82,10 +79,7 @@ protected slots:
 	void IntAlongY();
 
 	void SettingsTriggered();
-
 	void ROIManageTriggered();
-	void ROILoadTriggered();
-	void ROISaveTriggered();
 
 	void ShowFitDlg();
 	void QuickFit(SubWindowBase* pSWB, int iFkt, int iParam=-1);
@@ -106,9 +100,9 @@ protected slots:
 	void ShowAbout();
 	void ShowBrowser();
 
-	void NewRoiAvailable(const Roi* pROI);
-	void SetGlobalROI(bool bSet);
-	void RefreshGlobalROI();
+	void GetActiveROI();
+	void SetGlobalROIForAll();
+	void SetGlobalROIForActive();
 
 public:
 	MiezeMainWnd();

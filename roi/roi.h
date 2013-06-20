@@ -279,6 +279,7 @@ class Roi
 {
 	protected:
 		std::vector<RoiElement*> m_vecRoi;
+		bool m_bActive;
 
 	public:
 		Roi();
@@ -306,7 +307,10 @@ class Roi
 		BoundingRect GetBoundingRect() const;
 
 		bool Load(const char* pcFile);
-		bool Save(const char* pcFile);
+		bool Save(const char* pcFile) const;
+
+		bool IsRoiActive() const { return m_bActive; }
+		void SetRoiActive(bool bActive) { m_bActive = bActive; }
 };
 
 #endif

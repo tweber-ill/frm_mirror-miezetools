@@ -1006,7 +1006,7 @@ RoiElement* RoiPolygon::copy() const
 //------------------------------------------------------------------------------
 // roi
 
-Roi::Roi()
+Roi::Roi() : m_bActive(0)
 {}
 
 Roi::Roi(const Roi& roi)
@@ -1024,6 +1024,8 @@ Roi& Roi::operator=(const Roi& roi)
 		RoiElement* pNewElem = elem.copy();
 		add(pNewElem);
 	}
+
+	this->m_bActive = roi.m_bActive;
 	return *this;
 }
 
@@ -1049,10 +1051,13 @@ void Roi::clear()
 		}
 	}
 	m_vecRoi.clear();
+	m_bActive = 0;
 }
 
 bool Roi::IsInside(double dX, double dY) const
 {
+	if(!m_bActive) return 1;
+
 	// check bounding rects
 	bool bInBoundingRect = false;
 	for(unsigned int i=0; i<m_vecRoi.size(); ++i)
@@ -1079,6 +1084,8 @@ bool Roi::IsInside(double dX, double dY) const
 // TODO: consider overlapping roi elements
 double Roi::HowMuchInside(int iX, int iY) const
 {
+	if(!m_bActive) return 1.;
+
 	double dFraction = 0.;
 	for(unsigned int i=0; i<m_vecRoi.size(); ++i)
 	{
@@ -1138,68 +1145,78 @@ bool Roi::Load(const char* pcFile)
 		return false;
 	}
 
-	for(int iElem=0; true; ++iElem)
+	bool bOKActive=false;
+	SetRoiActive(xml.Query<bool>("/roi/active", 0, &bOKActive));
+
+	const std::string strPaths[] =
 	{
-		std::ostringstream ostr;
-		ostr << "/roi_elements/element_";
-		ostr << iElem;
-		ostr << "/";
+			"/roi_elements/element_",		// old format
+			"/roi/elements/element_"			// new format
+	};
 
-		std::string strQueryBase = ostr.str();
-		std::string strQueryType = strQueryBase + std::string("type");
-
-		bool bOK=false;
-		std::string strType = xml.QueryString(strQueryType.c_str(), "", &bOK);
-		if(!bOK)
-			break;
-
-		bool bUndeterminedParamCount=false;
-
-		RoiElement *pElem = 0;
-		if(strType == std::string("rectangle"))
-			pElem = new RoiRect;
-		else if(strType == std::string("circle"))
-			pElem = new RoiCircle;
-		else if(strType == std::string("circle_ring"))
-			pElem = new RoiCircleRing;
-		else if(strType == std::string("circle_segment"))
-			pElem = new RoiCircleSegment;
-		else if(strType == std::string("ellipse"))
-			pElem = new RoiEllipse;
-		else if(strType == std::string("polygon"))
+	for(const std::string& strPath : strPaths)
+		for(int iElem=0; true; ++iElem)
 		{
-			bUndeterminedParamCount = true;
-			pElem = new RoiPolygon;
-		}
-		else
-		{
-			std::cerr << "Roi: Unknown element \"" << strType << "\"." << std::endl;
-			continue;
-		}
+			std::ostringstream ostr;
+			ostr << strPath;
+			ostr << iElem;
+			ostr << "/";
 
-		int iParamCount = pElem->GetParamCount();
-		if(bUndeterminedParamCount)
-			iParamCount = std::numeric_limits<int>::max();
+			std::string strQueryBase = ostr.str();
+			std::string strQueryType = strQueryBase + std::string("type");
 
-		for(int iParam=0; iParam<iParamCount; ++iParam)
-		{
-			bool bOk=false;
-
-			std::string strQueryParam = pElem->GetParamName(iParam);
-			double dVal = xml.Query<double>((strQueryBase + strQueryParam).c_str(),
-											0., &bOk);
-			if(!bOk)
+			bool bOK=false;
+			std::string strType = xml.QueryString(strQueryType.c_str(), "", &bOK);
+			if(!bOK)
 				break;
-			pElem->SetParam(iParam, dVal);
-		}
 
-		add(pElem);
-	}
+			bool bUndeterminedParamCount=false;
+
+			RoiElement *pElem = 0;
+			if(strType == std::string("rectangle"))
+				pElem = new RoiRect;
+			else if(strType == std::string("circle"))
+				pElem = new RoiCircle;
+			else if(strType == std::string("circle_ring"))
+				pElem = new RoiCircleRing;
+			else if(strType == std::string("circle_segment"))
+				pElem = new RoiCircleSegment;
+			else if(strType == std::string("ellipse"))
+				pElem = new RoiEllipse;
+			else if(strType == std::string("polygon"))
+			{
+				bUndeterminedParamCount = true;
+				pElem = new RoiPolygon;
+			}
+			else
+			{
+				std::cerr << "Roi: Unknown element \"" << strType << "\"." << std::endl;
+				continue;
+			}
+
+			int iParamCount = pElem->GetParamCount();
+			if(bUndeterminedParamCount)
+				iParamCount = std::numeric_limits<int>::max();
+
+			for(int iParam=0; iParam<iParamCount; ++iParam)
+			{
+				bool bOk=false;
+
+				std::string strQueryParam = pElem->GetParamName(iParam);
+				double dVal = xml.Query<double>((strQueryBase + strQueryParam).c_str(),
+												0., &bOk);
+				if(!bOk)
+					break;
+				pElem->SetParam(iParam, dVal);
+			}
+
+			add(pElem);
+		}
 
 	return true;
 }
 
-bool Roi::Save(const char* pcFile)
+bool Roi::Save(const char* pcFile) const
 {
 	std::ofstream ofstr(pcFile);
 	if(!ofstr.is_open())
@@ -1210,11 +1227,14 @@ bool Roi::Save(const char* pcFile)
 
 	ofstr << "<?xml version=\"1.0\"?>\n\n";
 	ofstr << "<!-- ROI element configuration for Cattus -->\n\n";
-	ofstr << "<roi_elements>\n\n";
+
+	ofstr << "<roi>\n\n";
+	ofstr << "<active> " << IsRoiActive() << " </active>\n\n";
+	ofstr << "<elements>\n\n";
 
 	for(int i=0; i<GetNumElements(); ++i)
 	{
-		RoiElement& elem = GetElement(i);
+		const RoiElement& elem = GetElement(i);
 		ofstr << "\t<element_" << i << ">\n";
 		ofstr << "\t\t<type> " << elem.GetName() << " </type>\n";
 
@@ -1231,7 +1251,8 @@ bool Roi::Save(const char* pcFile)
 		ofstr << "\t</element_" << i << ">\n\n";
 	}
 
-	ofstr << "</roi_elements>\n";
+	ofstr << "</elements>\n\n";
+	ofstr << "</roi>\n";
 	ofstr.close();
 
 	return true;

@@ -111,6 +111,9 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 
 
 
+
+
+
 Plot3dWrapper::Plot3dWrapper(QWidget* pParent, const char* pcTitle, bool bCountData)
 	: SubWindowBase(pParent)
 {

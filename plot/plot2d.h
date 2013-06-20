@@ -74,7 +74,7 @@ protected:
 	virtual DataInterface* GetInternalData() { return &m_dat; }
 
 public:
-	void SetGlobalROI(const Roi* pROI, const bool* pbROIActive);
+	virtual void SetROI(const Roi* pROI);
 };
 
 #endif

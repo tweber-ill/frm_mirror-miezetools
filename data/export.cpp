@@ -39,7 +39,7 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 	ofstr << "import numpy as np\n";
 	ofstr << "import matplotlib.pyplot as plt\n\n";
 
-	ofstr << "plt.figure()\n";
+	ofstr << "plt.figure()\n\n";
 
 	double dXLim[2];
 	double dYLim[2];
@@ -66,7 +66,7 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 			ofstr << "y_" << iLine << " = [";
 			for(unsigned int iLen=0; iLen<dat.GetLength(); ++iLen)
 				ofstr << dat.GetY(iLen) << ", ";
-			ofstr << "]\n";
+			ofstr << "]\n\n";
 
 			if(obj.plttype == PLOT_DATA)
 			{
@@ -78,8 +78,7 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 				ofstr << "yerr_" << iLine << " = [";
 				for(unsigned int iLen=0; iLen<dat.GetLength(); ++iLen)
 					ofstr << dat.GetYErr(iLen) << ", ";
-				ofstr << "]\n";
-				ofstr << "\n";
+				ofstr << "]\n\n";
 			}
 
 			if(obj.plttype == PLOT_DATA)
@@ -101,7 +100,7 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 			}
 
 			ofstr << "plt.xlabel(\"" << plt->GetXLabel() << "\")\n";
-			ofstr << "plt.ylabel(\"" << plt->GetYLabel() << "\")\n";
+			ofstr << "plt.ylabel(\"" << plt->GetYLabel() << "\")\n\n";
 
 			double dXMin, dXMax, dXErrMin, dXErrMax;
 			double dYMin, dYMax, dYErrMin, dYErrMax;
@@ -114,14 +113,10 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 			dXLim[1] = std::max(dXLim[1], dXMax+dXErrMax);
 			dYLim[0] = std::min(dYLim[0], dYMin-dYErrMax);
 			dYLim[1] = std::max(dYLim[1], dYMax+dYErrMax);
-
-			ofstr << "\n\n";
 		}
 
 		ofstr << "plt.xlim(" << dXLim[0] << ", " << dXLim[1] << ")\n";
-		ofstr << "plt.ylim(" << dYLim[0] << ", " << dYLim[1] << ")\n";
-
-		ofstr << "plt.grid(True)\n";
+		ofstr << "plt.ylim(" << dYLim[0] << ", " << dYLim[1] << ")\n\n";
 	}
 	else if(pSWB->GetType() == PLOT_2D)
 	{
@@ -139,21 +134,19 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 			}
 			ofstr << "], ";
 		}
-		ofstr << "])\n";
+		ofstr << "])\n\n";
 
 		ofstr << "x = np.linspace(0, " << dat.GetWidth()-1 << ", " << dat.GetWidth() << ")\n";
-		ofstr << "y = np.linspace(0, " << dat.GetHeight()-1 << ", " << dat.GetHeight() << ")\n";
+		ofstr << "y = np.linspace(0, " << dat.GetHeight()-1 << ", " << dat.GetHeight() << ")\n\n";
 
 		ofstr << "plt.pcolor(x, y, vals)\n";
-		ofstr << "plt.colorbar()\n";
+		ofstr << "plt.colorbar()\n\n";
 
 		ofstr << "plt.xlabel(\"x pixels\")\n";
-		ofstr << "plt.ylabel(\"y pixels\")\n";
+		ofstr << "plt.ylabel(\"y pixels\")\n\n";
 
 		ofstr << "plt.xlim(0, " << dat.GetWidth()-1 << ")\n";
-		ofstr << "plt.ylim(0, " << dat.GetHeight()-1 << ")\n";
-
-		ofstr << "plt.grid(True)\n";
+		ofstr << "plt.ylim(0, " << dat.GetHeight()-1 << ")\n\n";
 	}
 	else
 	{
@@ -161,6 +154,7 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 		return false;
 	}
 
+	ofstr << "plt.grid(True)\n";
 	ofstr << "plt.show()\n";
 	return true;
 }

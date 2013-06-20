@@ -17,11 +17,10 @@ class RoiDlg : public QDialog, Ui::RoiDlg
 {Q_OBJECT
 
 protected:
-	Roi *m_pRoi;
+	Roi m_roi, m_roi_last;
 	int m_iCurrentItem;
 
 	void NewElement(RoiElement* pNewElem);
-	void Deinit();
 
 public:
 	RoiDlg(QWidget* pParent);
@@ -44,10 +43,16 @@ public slots:
 	void DeleteItem();
 	void CopyItem();
 
+	void SetRoiActive(bool);
 	void ButtonBoxClicked(QAbstractButton*);
 
+	void LoadRoi();
+	void SaveRoi();
+
 signals:
-	void NewRoiAvailable(const Roi* pROI);
+	void SetRoiForActive();
+	void SetRoiForAll();
+	void WantActiveRoi();
 };
 
 #endif

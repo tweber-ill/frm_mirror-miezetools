@@ -46,7 +46,7 @@
 
 MiezeMainWnd::MiezeMainWnd()
 					: m_iPlotCnt(1), m_pfitdlg(0),
-					  m_proidlg(new RoiDlg(this)), m_bmainROIActive(0),
+					  m_proidlg(new RoiDlg(this)),
 					  m_presdlg(0), m_pphasecorrdlg(0)
 {
 	this->setWindowTitle("Cattus, a MIEZE toolset");
@@ -213,26 +213,6 @@ MiezeMainWnd::MiezeMainWnd()
 	pManageROI->setIcon(QIcon::fromTheme("list-add"));
 	pMenuROI->addAction(pManageROI);
 
-	pMenuROI->addSeparator();
-
-	QAction *pLoadROI = new QAction(this);
-	pLoadROI->setText("Load ROI...");
-	pLoadROI->setIcon(QIcon::fromTheme("document-open"));
-	pMenuROI->addAction(pLoadROI);
-
-	QAction *pSaveROI = new QAction(this);
-	pSaveROI->setText("Save ROI...");
-	pSaveROI->setIcon(QIcon::fromTheme("document-save-as"));
-	pMenuROI->addAction(pSaveROI);
-
-	pMenuROI->addSeparator();
-
-	QAction *pActiveROI = new QAction(this);
-	pActiveROI->setText("Set Global ROI Active");
-	pActiveROI->setCheckable(1);
-	pActiveROI->setChecked(m_bmainROIActive);
-	pMenuROI->addAction(pActiveROI);
-
 
 
 	// Windows
@@ -339,9 +319,9 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pInterpBSpline, SIGNAL(triggered()), this, SLOT(BSplineInterpolation()));
 
 	QObject::connect(pManageROI, SIGNAL(triggered()), this, SLOT(ROIManageTriggered()));
-	QObject::connect(pLoadROI, SIGNAL(triggered()), this, SLOT(ROILoadTriggered()));
-	QObject::connect(pSaveROI, SIGNAL(triggered()), this, SLOT(ROISaveTriggered()));
-	QObject::connect(pActiveROI, SIGNAL(toggled(bool)), this, SLOT(SetGlobalROI(bool)));
+	QObject::connect(m_proidlg, SIGNAL(WantActiveRoi()), this, SLOT(GetActiveROI()));
+	QObject::connect(m_proidlg, SIGNAL(SetRoiForActive()), this, SLOT(SetGlobalROIForActive()));
+	QObject::connect(m_proidlg, SIGNAL(SetRoiForAll()), this, SLOT(SetGlobalROIForAll()));
 
 	QObject::connect(pWndList, SIGNAL(triggered()), this, SLOT(ShowListWindowsDlg()));
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
@@ -357,8 +337,6 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QObject::connect(pMenuWindows, SIGNAL(aboutToShow()), this, SLOT(UpdateSubWndList()));
 	QObject::connect(m_pmdi, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(SubWindowChanged()));
-
-	QObject::connect(m_proidlg, SIGNAL(NewRoiAvailable(const Roi*)), this, SLOT(NewRoiAvailable(const Roi*)));
 	//--------------------------------------------------------------------------------
 
 	LoadRecentFileList();
@@ -471,7 +449,6 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		std::string strTitle = GetPlotTitle(strFileNoDir);
 		Plot4dWrapper *pPlotWrapper = new Plot4dWrapper(m_pmdi, strTitle.c_str(), true);
 		Plot4d *pPlot = (Plot4d*)pPlotWrapper->GetActualWidget();
-		pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 		Data4& dat4 = pPlot->GetData();
 		dat4.SetSize(iW, iH, iTcCnt, iFoilCnt);
 
@@ -517,7 +494,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 		std::string strTitle = GetPlotTitle(strFileNoDir);
 		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), true);
-		pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
+
 		pPlot->plot(iW, iH, pdDat);
 		pPlot->SetLabels("x pixels", "y pixels", "");
 
@@ -584,7 +561,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 				std::string strTitle = GetPlotTitle(strFileNoDir);
 
 				Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-				pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
+
 				pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
 
 				std::string strLabX, strLabY, strPlotTitle;
@@ -621,7 +598,6 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 				std::string strTitle = GetPlotTitle(strFileNoDir);
 				Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), false);
-				pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
 
 				pPlot->plot(iW, iH, pDat, pErr);
 				Data2& dat2 = pPlot->GetData2();
@@ -672,7 +648,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 				std::string strTitle = GetPlotTitle(strFileNoDir);
 				Plot3dWrapper *pPlotWrapper = new Plot3dWrapper(m_pmdi, strTitle.c_str(), false);
 				Plot3d *pPlot = (Plot3d*)pPlotWrapper->GetActualWidget();
-				pPlot->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
+
 				pPlot->plot(iW, iH, iT, pDat, pErr);
 				Data3& dat3 = pPlot->GetData();
 
@@ -823,92 +799,55 @@ void MiezeMainWnd::FileLoadTriggered()
 void MiezeMainWnd::ROIManageTriggered()
 {
 	if(!m_proidlg->isVisible())
-	{
-		m_proidlg->SetRoi(&m_mainROI);
 		m_proidlg->show();
-	}
 	m_proidlg->activateWindow();
 }
 
-void MiezeMainWnd::ROILoadTriggered()
+void MiezeMainWnd::GetActiveROI()
 {
-	QSettings *pGlobals = Settings::GetGlobals();
-	QString strLastDir = pGlobals->value("main/lastdir_roi", ".").toString();
-
-	QString strFile = QFileDialog::getOpenFileName(this, "Open ROI file...", strLastDir,
-					"ROI files (*.roi *.ROI);;All files (*.*)",
-					0, QFileDialog::DontUseNativeDialog);
-	if(strFile.length() == 0)
-		return;
-
-
-	bool bDirSet=false;
-	std::string strFile1 = strFile.toStdString();
-
-	if(!bDirSet)
+	SubWindowBase *pWnd = GetActivePlot();
+	if(!pWnd)
 	{
-		pGlobals->setValue("main/lastdir_roi", QString(::get_dir(strFile1).c_str()));
-		bDirSet = true;
-	}
-
-	if(!m_mainROI.Load(strFile1.c_str()))
-	{
-		QMessageBox::critical(this, "Error", "Could not load ROI.");
+		QMessageBox::critical(this, "Error", "No active plot.");
 		return;
 	}
 
-	m_proidlg->SetRoi(&m_mainROI);
-}
-
-void MiezeMainWnd::ROISaveTriggered()
-{
-	QSettings *pGlobals = Settings::GetGlobals();
-	QString strLastDir = pGlobals->value("main/lastdir_roi", ".").toString();
-
-	QString strFile = QFileDialog::getSaveFileName(this, "Save ROI file...", strLastDir,
-					"ROI files (*.roi *.ROI);;All files (*.*)",
-					0, QFileDialog::DontUseNativeDialog);
-	if(strFile.length() == 0)
-		return;
-
-
-	bool bDirSet=false;
-	std::string strFile1 = strFile.toStdString();
-
-	if(!bDirSet)
+	pWnd = pWnd->GetActualWidget();
+	Roi* pRoi = pWnd->GetROI();
+	if(!pRoi)
 	{
-		pGlobals->setValue("main/lastdir_roi", QString(::get_dir(strFile1).c_str()));
-		bDirSet = true;
+		QMessageBox::critical(this, "Error", "No active roi defined.");
+		return;
 	}
-
-	if(!m_mainROI.Save(strFile1.c_str()))
-		QMessageBox::critical(this, "Error", "Could not save ROI.");
+	m_proidlg->SetRoi(pRoi);
 }
 
-void MiezeMainWnd::NewRoiAvailable(const Roi* pROI)
+void MiezeMainWnd::SetGlobalROIForAll()
 {
-	m_mainROI = *pROI;
-}
+	const Roi* pRoi = m_proidlg->GetRoi();
 
-void MiezeMainWnd::RefreshGlobalROI()
-{
 	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
 	for(QMdiSubWindow *pItem : lst)
 	{
 		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
 		pWnd = pWnd->GetActualWidget();
-		pWnd->SetGlobalROI(&m_mainROI, &m_bmainROIActive);
+		pWnd->SetROI(pRoi);
 	}
 }
 
-void MiezeMainWnd::SetGlobalROI(bool bSet)
+void MiezeMainWnd::SetGlobalROIForActive()
 {
-	if(bSet!=m_bmainROIActive)
+	const Roi* pRoi = m_proidlg->GetRoi();
+
+	SubWindowBase *pWnd = GetActivePlot();
+	if(!pWnd)
 	{
-		m_bmainROIActive = bSet;
-		if(m_bmainROIActive)
-			RefreshGlobalROI();
+		QMessageBox::critical(this, "Error", "No active plot.");
+		return;
 	}
+
+	pWnd = pWnd->GetActualWidget();
+	pWnd->SetROI(pRoi);
 }
 
 void MiezeMainWnd::SettingsTriggered()

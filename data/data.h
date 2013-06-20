@@ -31,47 +31,32 @@ enum DataType
 class RoiFlags
 {
 protected:
-	const bool *m_pbGlobalROIActive;
-	const Roi *m_pGlobalROI;
+	Roi m_roi;
 
 public:
-	RoiFlags() : m_pbGlobalROIActive(0), m_pGlobalROI(0) {}
+	RoiFlags() {}
 	virtual ~RoiFlags() {}
 
-	bool IsRoiActive() const
-	{
-		if(m_pbGlobalROIActive)
-			return *m_pbGlobalROIActive;
-		return 0;
-	}
+	bool IsRoiActive() const { return m_roi.IsRoiActive(); }
+	void SetRoiActive(bool bActive) { m_roi.SetRoiActive(bActive); }
 
-	const Roi* GetRoi() const { return m_pGlobalROI; }
+	const Roi& GetRoi() const { return m_roi; }
 
 	bool IsInsideRoi(double dX, double dY) const
 	{
-		if(!IsRoiActive())
-			return 1;
-
-		bool bInGlobalRoi = 0;
-		if(m_pbGlobalROIActive && *m_pbGlobalROIActive)
-			bInGlobalRoi = m_pGlobalROI->IsInside(dX, dY);
-
-		bool bInLocalRoi = 0;
-		// TODO
-
-		return bInGlobalRoi || bInLocalRoi;
+		return m_roi.IsInside(dX, dY);
 	}
 
 	void CopyRoiFlagsFrom(const RoiFlags* pDat)
 	{
-		this->m_pbGlobalROIActive = pDat->m_pbGlobalROIActive;
-		this->m_pGlobalROI = pDat->m_pGlobalROI;
+		this->m_roi = pDat->m_roi;
 	}
 
-	void SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
+	void SetROI(const Roi* pROI)
 	{
-		m_pGlobalROI = pROI;
-		m_pbGlobalROIActive = pbROIActive;
+		if(!pROI) return;
+		m_roi = *pROI;
+		//m_roi.SetRoiActive(1);
 	}
 };
 

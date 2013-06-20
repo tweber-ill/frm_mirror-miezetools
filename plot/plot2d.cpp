@@ -299,7 +299,7 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 		if(m_dat.IsRoiActive())
 		{
 			bool bInsideRoi = 0;
-			const Roi *pRoi = m_dat.GetRoi();
+			const Roi *pRoi = &m_dat.GetRoi();
 
 			if(bPixelVal)
 				bInsideRoi = pRoi->IsInside(iX, iY);
@@ -354,13 +354,13 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 	}
 }
 
-void Plot2d::SetGlobalROI(const Roi* pROI, const bool* pbROIActive)
+void Plot2d::SetROI(const Roi* pROI)
 {
 	DataInterface* pDat = GetInternalData();
 	if(!pDat) return;
 
-	pDat->SetGlobalROI(pROI, pbROIActive);
-	GetData2().SetGlobalROI(pROI, pbROIActive);
+	pDat->SetROI(pROI);
+	GetData2().SetROI(pROI);
 }
 
 #include "plot2d.moc"

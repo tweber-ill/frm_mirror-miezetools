@@ -49,7 +49,8 @@ public:
 	virtual Plot* ConvertTo1d(int iParam=-1) { return 0; }
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return 0; }
 
-	virtual void SetGlobalROI(const Roi* pROI, const bool* pbROIActive) {}
+	virtual void SetROI(const Roi* pROI) {}
+	virtual Roi* GetROI() { return 0; }
 };
 
 #endif
