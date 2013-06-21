@@ -64,7 +64,7 @@ void RoiDlg::ItemSelected()
 {
 	m_iCurrentItem = listRois->currentRow();
 
-	if(m_iCurrentItem<0 || m_iCurrentItem >= m_roi.GetNumElements())
+	if(m_iCurrentItem<0 || m_iCurrentItem>=int(m_roi.GetNumElements()))
 		return;
 
 	RoiElement& elem = m_roi.GetElement(m_iCurrentItem);
@@ -103,7 +103,7 @@ void RoiDlg::ValueChanged(QTableWidgetItem* pItem)
 	if(pItem->data(Qt::UserRole+1).value<int>() != 1)
 		return;
 
-	if(m_iCurrentItem<0 || m_iCurrentItem >= m_roi.GetNumElements())
+	if(m_iCurrentItem<0 || m_iCurrentItem>=int(m_roi.GetNumElements()))
 		return;
 	RoiElement& elem = m_roi.GetElement(m_iCurrentItem);
 
@@ -126,7 +126,7 @@ void RoiDlg::ValueChanged(QTableWidgetItem* pItem)
 
 void RoiDlg::CopyItem()
 {
-	if(m_iCurrentItem<0 || m_iCurrentItem >= m_roi.GetNumElements())
+	if(m_iCurrentItem<0 || m_iCurrentItem>=int(m_roi.GetNumElements()))
 		return;
 
 	RoiElement& elem = m_roi.GetElement(m_iCurrentItem);
@@ -149,7 +149,7 @@ void RoiDlg::NewRect() { NewElement(new RoiRect); }
 
 void RoiDlg::DeleteItem()
 {
-	if(m_iCurrentItem<0 || m_iCurrentItem >= m_roi.GetNumElements())
+	if(m_iCurrentItem<0 || m_iCurrentItem>=int(m_roi.GetNumElements()))
 		return;
 
 	int iCurItem = m_iCurrentItem;
@@ -178,11 +178,13 @@ void RoiDlg::SetRoi(const Roi* pRoi)
 	checkEnabled->setChecked(m_roi.IsRoiActive());
 
 	// add all roi elements to list
-	for(int i=0; i<m_roi.GetNumElements(); ++i)
+	for(unsigned int i=0; i<m_roi.GetNumElements(); ++i)
 		new QListWidgetItem(m_roi.GetElement(i).GetName().c_str(), listRois);
 
 	if(m_roi.GetNumElements() > 0)
 		listRois->setCurrentRow(0);
+	else
+		tableParams->setRowCount(0);
 }
 
 const Roi* RoiDlg::GetRoi(void) const { return &m_roi; }
@@ -196,7 +198,7 @@ void RoiDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	}
 	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::RejectRole)
 	{
-		m_roi = m_roi_last;
+		SetRoi(&m_roi_last);
 		reject();
 	}
 
@@ -263,6 +265,11 @@ void RoiDlg::SaveRoi()
 	const Roi* pRoi = GetRoi();
 	if(!pRoi->Save(strFile1.c_str()))
 		QMessageBox::critical(this, "Error", "Could not save ROI.");
+}
+
+void RoiDlg::showEvent(QShowEvent *event)
+{
+	QDialog::showEvent(event);
 }
 
 #include "RoiDlg.moc"

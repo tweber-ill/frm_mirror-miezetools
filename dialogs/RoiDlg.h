@@ -53,6 +53,9 @@ signals:
 	void SetRoiForActive();
 	void SetRoiForAll();
 	void WantActiveRoi();
+
+protected:
+	virtual void showEvent(QShowEvent *event);
 };
 
 #endif
