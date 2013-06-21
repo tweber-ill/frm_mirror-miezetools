@@ -49,7 +49,7 @@ void RoiElement::CalculateBoundingRect()
 	BoundingRect& rect = m_boundingrect;
 	rect.SetInvalidBounds();
 
-	for(int i=0; i<GetVertexCount(); ++i)
+	for(unsigned int i=0; i<GetVertexCount(); ++i)
 	{
 		ublas::vector<double> vert = GetVertex(i);
 		rect.AddVertex(vert);
@@ -204,12 +204,12 @@ void RoiRect::SetParam(int iParam, double dVal)
 	CalculateBoundingRect();
 }
 
-int RoiRect::GetVertexCount() const
+unsigned int RoiRect::GetVertexCount() const
 {
 	return 4;
 }
 
-ublas::vector<double> RoiRect::GetVertex(int i) const
+ublas::vector<double> RoiRect::GetVertex(unsigned int i) const
 {
 	ublas::vector<double> topleft(2), bottomright(2);
 	topleft[0] = m_bottomleft[0];
@@ -339,12 +339,12 @@ void RoiCircle::SetParam(int iParam, double dVal)
 	CalculateBoundingRect();
 }
 
-int RoiCircle::GetVertexCount() const
+unsigned int RoiCircle::GetVertexCount() const
 {
 	return CIRCLE_VERTICES;
 }
 
-ublas::vector<double> RoiCircle::GetVertex(int i) const
+ublas::vector<double> RoiCircle::GetVertex(unsigned int i) const
 {
 	double dAngle = 2*M_PI * double(i)/double(GetVertexCount()-1);
 
@@ -478,12 +478,12 @@ void RoiEllipse::SetParam(int iParam, double dVal)
 	CalculateBoundingRect();
 }
 
-int RoiEllipse::GetVertexCount() const
+unsigned int RoiEllipse::GetVertexCount() const
 {
 	return CIRCLE_VERTICES;
 }
 
-ublas::vector<double> RoiEllipse::GetVertex(int i) const
+ublas::vector<double> RoiEllipse::GetVertex(unsigned int i) const
 {
 	double dAngle = 2*M_PI * double(i)/double(GetVertexCount()-1);
 
@@ -632,15 +632,15 @@ void RoiCircleRing::SetParam(int iParam, double dVal)
 	CalculateBoundingRect();
 }
 
-int RoiCircleRing::GetVertexCount() const
+unsigned int RoiCircleRing::GetVertexCount() const
 {
 	return CIRCLE_VERTICES;
 }
 
-ublas::vector<double> RoiCircleRing::GetVertex(int i) const
+ublas::vector<double> RoiCircleRing::GetVertex(unsigned int i) const
 {
 	ublas::vector<double> vecRet(2);
-	const int iVerticesPerArc = (GetVertexCount())/2;
+	const unsigned int iVerticesPerArc = (GetVertexCount())/2;
 	const double dAngleRange = 2. * M_PI;
 
 	// inner circle
@@ -816,15 +816,15 @@ void RoiCircleSegment::SetParam(int iParam, double dVal)
 	CalculateBoundingRect();
 }
 
-int RoiCircleSegment::GetVertexCount() const
+unsigned int RoiCircleSegment::GetVertexCount() const
 {
 	return RoiCircleRing::GetVertexCount();
 }
 
-ublas::vector<double> RoiCircleSegment::GetVertex(int i) const
+ublas::vector<double> RoiCircleSegment::GetVertex(unsigned int i) const
 {
 	ublas::vector<double> vecRet(2);
-	const int iVerticesPerArc = (GetVertexCount())/2;
+	const unsigned int iVerticesPerArc = (GetVertexCount())/2;
 	const double dAngleRange = (m_dEndAngle-m_dBeginAngle) / 180. * M_PI;
 
 	// inner circle
@@ -903,7 +903,7 @@ class RoiPolygonArrayAdaptor
 					: m_pPoly(pPoly), m_iCoord(iCoord)
 		{}
 
-		double operator[](int i) const
+		double operator[](unsigned int i) const
 		{
 			// repeat first vertex
 			if(i==m_pPoly->GetVertexCount())
@@ -915,7 +915,7 @@ class RoiPolygonArrayAdaptor
 
 bool RoiPolygon::IsInside(double dX, double dY) const
 {
-	const int iVertCnt = GetVertexCount();
+	const unsigned int iVertCnt = GetVertexCount();
 
 	RoiPolygonArrayAdaptor adaptor_x(this,0);
 	RoiPolygonArrayAdaptor adaptor_y(this,1);
@@ -969,12 +969,12 @@ void RoiPolygon::SetParam(int iParam, double dVal)
 	CalculateBoundingRect();
 }
 
-int RoiPolygon::GetVertexCount() const
+unsigned int RoiPolygon::GetVertexCount() const
 {
 	return m_vertices.size();
 }
 
-ublas::vector<double> RoiPolygon::GetVertex(int i) const
+ublas::vector<double> RoiPolygon::GetVertex(unsigned int i) const
 {
 	return m_vertices[i];
 }
@@ -1264,6 +1264,9 @@ bool Roi::Save(const char* pcFile) const
 
 void Roi::DrawRoi(QPainter& painter, const XYRange& range)
 {
+	if(!m_bActive)
+		return;
+
 	for(unsigned int iElem=0; iElem<GetNumElements(); ++iElem)
 	{
 		RoiElement& elem = GetElement(iElem);
@@ -1271,32 +1274,25 @@ void Roi::DrawRoi(QPainter& painter, const XYRange& range)
 	}
 }
 
-void RoiRect::draw(QPainter& painter, const XYRange& range)
+void RoiElement::draw(QPainter& painter, const XYRange& range)
 {
+	if(GetVertexCount()<1)
+		return;
 
-}
+	ublas::vector<double> vertBegin = GetVertex(0);
+	ublas::vector<double> vertPrev = vertBegin;
+	for(unsigned int iVert=1; iVert<GetVertexCount(); ++iVert)
+	{
+		ublas::vector<double> vert = GetVertex(iVert);
 
-void RoiCircle::draw(QPainter& painter, const XYRange& range)
-{
+		QPointF pt0(range.GetPixelXPos(vertPrev[0]), range.GetPixelYPos(vertPrev[1])),
+				pt1(range.GetPixelXPos(vert[0]), range.GetPixelYPos(vert[1]));
+		painter.drawLine(pt0, pt1);
 
-}
+		vertPrev = vert;
+	}
 
-void RoiEllipse::draw(QPainter& painter, const XYRange& range)
-{
-
-}
-
-void RoiCircleRing::draw(QPainter& painter, const XYRange& range)
-{
-
-}
-
-void RoiCircleSegment::draw(QPainter& painter, const XYRange& range)
-{
-
-}
-
-void RoiPolygon::draw(QPainter& painter, const XYRange& range)
-{
-
+	QPointF pt0_(range.GetPixelXPos(vertPrev[0]), range.GetPixelYPos(vertPrev[1])),
+			pt1_(range.GetPixelXPos(vertBegin[0]), range.GetPixelYPos(vertBegin[1]));
+	painter.drawLine(pt0_, pt1_);
 }

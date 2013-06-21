@@ -766,16 +766,16 @@ double XYRange::GetRangeYPos(uint iY) const
 // range point -> pixel
 double XYRange::GetPixelXPos(double dRangeX) const
 {
-	double iX = (dRangeX-m_dXMin)/(m_dXMax-m_dXMin) * double(m_iWidth-1);
-	if(iX >= m_iWidth) iX = m_iWidth-1;
-	if(iX < 0) iX = 0;
+	double iX = (dRangeX-m_dXMin)/(m_dXMax-m_dXMin) * (double(m_iWidth)-1.);
+	//if(iX >= m_iWidth) iX = m_iWidth-1;
+	//if(iX < 0) iX = 0;
 	return iX;
 }
 double XYRange::GetPixelYPos(double dRangeY) const
 {
-	double iY = (dRangeY-m_dYMin)/(m_dYMax-m_dYMin) * double(m_iHeight-1);
-	if(iY >= m_iHeight) iY = m_iHeight-1;
-	if(iY < 0) iY = 0;
+	double iY = (dRangeY-m_dYMin)/(m_dYMax-m_dYMin) * (double(m_iHeight)-1.);
+	//if(iY >= m_iHeight) iY = m_iHeight-1;
+	//if(iY < 0) iY = 0;
 	return iY;
 }
 

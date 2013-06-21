@@ -833,6 +833,8 @@ void MiezeMainWnd::SetGlobalROIForAll()
 		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
 		pWnd = pWnd->GetActualWidget();
 		pWnd->SetROI(pRoi);
+
+		pWnd->repaint();
 	}
 }
 
@@ -849,6 +851,8 @@ void MiezeMainWnd::SetGlobalROIForActive()
 
 	pWnd = pWnd->GetActualWidget();
 	pWnd->SetROI(pRoi);
+
+	pWnd->repaint();
 }
 
 void MiezeMainWnd::SettingsTriggered()

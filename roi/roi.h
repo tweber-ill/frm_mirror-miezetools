@@ -66,8 +66,8 @@ class RoiElement
 
 		//----------------------------------------------------------------------
 		/// vertices of element (interpolated for circles)
-		virtual int GetVertexCount() const = 0;
-		virtual ublas::vector<double> GetVertex(int i) const = 0;
+		virtual unsigned int GetVertexCount() const = 0;
+		virtual ublas::vector<double> GetVertex(unsigned int i) const = 0;
 		//----------------------------------------------------------------------
 
 
@@ -92,7 +92,7 @@ class RoiElement
 		/// is point (iX, iY) inside elementzy
 		virtual bool IsInBoundingRect(double dX, double dY) const;
 
-		virtual void draw(QPainter& painter, const XYRange& range) = 0;
+		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -118,13 +118,11 @@ class RoiRect : public RoiElement
 		virtual double GetParam(int iParam) const;
 		virtual void SetParam(int iParam, double dVal);
 
-		virtual int GetVertexCount() const;
-		virtual ublas::vector<double> GetVertex(int i) const;
+		virtual unsigned int GetVertexCount() const;
+		virtual ublas::vector<double> GetVertex(unsigned int i) const;
 
 		virtual RoiRect& operator=(const RoiRect& elem);
 		virtual RoiElement* copy() const;
-
-		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -150,13 +148,11 @@ class RoiCircle : public RoiElement
 		virtual double GetParam(int iParam) const;
 		virtual void SetParam(int iParam, double dVal);
 
-		virtual int GetVertexCount() const;
-		virtual ublas::vector<double> GetVertex(int i) const;
+		virtual unsigned int GetVertexCount() const;
+		virtual ublas::vector<double> GetVertex(unsigned int i) const;
 
 		virtual RoiCircle& operator=(const RoiCircle& elem);
 		virtual RoiElement* copy() const;
-
-		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -183,13 +179,11 @@ class RoiEllipse : public RoiElement
 		virtual double GetParam(int iParam) const;
 		virtual void SetParam(int iParam, double dVal);
 
-		virtual int GetVertexCount() const;
-		virtual ublas::vector<double> GetVertex(int i) const;
+		virtual unsigned int GetVertexCount() const;
+		virtual ublas::vector<double> GetVertex(unsigned int i) const;
 
 		virtual RoiEllipse& operator=(const RoiEllipse& elem);
 		virtual RoiElement* copy() const;
-
-		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -216,13 +210,11 @@ class RoiCircleRing : public RoiElement
 		virtual double GetParam(int iParam) const;
 		virtual void SetParam(int iParam, double dVal);
 
-		virtual int GetVertexCount() const;
-		virtual ublas::vector<double> GetVertex(int i) const;
+		virtual unsigned int GetVertexCount() const;
+		virtual ublas::vector<double> GetVertex(unsigned int i) const;
 
 		virtual RoiCircleRing& operator=(const RoiCircleRing& elem);
 		virtual RoiElement* copy() const;
-
-		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -249,13 +241,11 @@ class RoiCircleSegment : public RoiCircleRing
 		virtual double GetParam(int iParam) const;
 		virtual void SetParam(int iParam, double dVal);
 
-		virtual int GetVertexCount() const;
-		virtual ublas::vector<double> GetVertex(int i) const;
+		virtual unsigned int GetVertexCount() const;
+		virtual ublas::vector<double> GetVertex(unsigned int i) const;
 
 		virtual RoiCircleSegment& operator=(const RoiCircleSegment& elem);
 		virtual RoiElement* copy() const;
-
-		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -278,14 +268,12 @@ class RoiPolygon : public RoiElement
 		virtual double GetParam(int iParam) const;
 		virtual void SetParam(int iParam, double dVal);
 
-		virtual int GetVertexCount() const;
-		virtual ublas::vector<double> GetVertex(int i) const;
+		virtual unsigned int GetVertexCount() const;
+		virtual ublas::vector<double> GetVertex(unsigned int i) const;
 		void AddVertex(const ublas::vector<double>& vertex);
 
 		virtual RoiPolygon& operator=(const RoiPolygon& elem);
 		virtual RoiElement* copy() const;
-
-		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
