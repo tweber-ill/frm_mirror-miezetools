@@ -14,6 +14,9 @@
 #include <boost/numeric/ublas/matrix.hpp>
 namespace ublas = boost::numeric::ublas;
 
+class XYRange;
+#include <QtGui/QPainter>
+
 #define CIRCLE_VERTICES 256
 
 
@@ -88,6 +91,8 @@ class RoiElement
 
 		/// is point (iX, iY) inside elementzy
 		virtual bool IsInBoundingRect(double dX, double dY) const;
+
+		virtual void draw(QPainter& painter, const XYRange& range) = 0;
 };
 
 
@@ -118,6 +123,8 @@ class RoiRect : public RoiElement
 
 		virtual RoiRect& operator=(const RoiRect& elem);
 		virtual RoiElement* copy() const;
+
+		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -148,6 +155,8 @@ class RoiCircle : public RoiElement
 
 		virtual RoiCircle& operator=(const RoiCircle& elem);
 		virtual RoiElement* copy() const;
+
+		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -179,6 +188,8 @@ class RoiEllipse : public RoiElement
 
 		virtual RoiEllipse& operator=(const RoiEllipse& elem);
 		virtual RoiElement* copy() const;
+
+		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -210,6 +221,8 @@ class RoiCircleRing : public RoiElement
 
 		virtual RoiCircleRing& operator=(const RoiCircleRing& elem);
 		virtual RoiElement* copy() const;
+
+		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -241,6 +254,8 @@ class RoiCircleSegment : public RoiCircleRing
 
 		virtual RoiCircleSegment& operator=(const RoiCircleSegment& elem);
 		virtual RoiElement* copy() const;
+
+		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -269,6 +284,8 @@ class RoiPolygon : public RoiElement
 
 		virtual RoiPolygon& operator=(const RoiPolygon& elem);
 		virtual RoiElement* copy() const;
+
+		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
 
@@ -298,10 +315,10 @@ class Roi
 		/// what fraction (0.0 .. 1.0) of pixel (iX, iY) is inside roi?
 		double HowMuchInside(int iX, int iY) const;
 
-		RoiElement& GetElement(int iElement);
-		const RoiElement& GetElement(int iElement) const;
+		RoiElement& GetElement(unsigned int iElement);
+		const RoiElement& GetElement(unsigned int iElement) const;
 		void DeleteElement(int iElement);
-		int GetNumElements() const;
+		unsigned int GetNumElements() const;
 
 		/// get total bounding rectangle of all elements
 		BoundingRect GetBoundingRect() const;
@@ -311,6 +328,8 @@ class Roi
 
 		bool IsRoiActive() const { return m_bActive; }
 		void SetRoiActive(bool bActive) { m_bActive = bActive; }
+
+		void DrawRoi(QPainter& painter, const XYRange& range);
 };
 
 #endif

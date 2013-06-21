@@ -98,8 +98,8 @@ public:
 	double GetRangeYPos(uint iY) const;
 
 	// range point -> pixel
-	uint GetPixelXPos(double dRangeX) const;
-	uint GetPixelYPos(double dRangeY) const;
+	double GetPixelXPos(double dRangeX) const;
+	double GetPixelYPos(double dRangeY) const;
 
 	void CopyXYRangeFrom(const XYRange* pRan);
 };

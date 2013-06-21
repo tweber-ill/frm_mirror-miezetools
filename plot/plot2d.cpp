@@ -171,7 +171,14 @@ void Plot2d::paintEvent (QPaintEvent *pEvent)
 		uint iY = m_rectCB.bottom() - iB;
 		painter.drawLine(iX0, iY, iX1, iY);
 	}
+
 	painter.setPen(penOrg);
+
+	painter.translate(m_rectImage.bottomLeft() + QPoint(0., 1.));
+	double dScaleX = 1.*double(m_rectImage.width()) / double(m_pImg->width());
+	double dScaleY = -1.*double(m_rectImage.height()) / double(m_pImg->height());
+	painter.scale(dScaleX, dScaleY);
+	m_dat.GetRoi().DrawRoi(painter, m_dat);
 
 	painter.restore();
 }

@@ -15,6 +15,7 @@
 #include "pnpoly.h"
 #include "../helper/math.h"
 #include "../helper/xml.h"
+#include "../data/data.h"
 
 //------------------------------------------------------------------------------
 // Bounding Rectangle
@@ -1096,12 +1097,12 @@ double Roi::HowMuchInside(int iX, int iY) const
 	return dFraction;
 }
 
-RoiElement& Roi::GetElement(int iElement)
+RoiElement& Roi::GetElement(unsigned int iElement)
 {
 	return *m_vecRoi[iElement];
 }
 
-const RoiElement& Roi::GetElement(int iElement) const
+const RoiElement& Roi::GetElement(unsigned int iElement) const
 {
 	return *m_vecRoi[iElement];
 }
@@ -1113,7 +1114,7 @@ void Roi::DeleteElement(int iElement)
 	m_vecRoi.erase(m_vecRoi.begin()+iElement);
 }
 
-int Roi::GetNumElements() const
+unsigned int Roi::GetNumElements() const
 {
 	return m_vecRoi.size();
 }
@@ -1256,4 +1257,46 @@ bool Roi::Save(const char* pcFile) const
 	ofstr.close();
 
 	return true;
+}
+
+
+// drawing routines
+
+void Roi::DrawRoi(QPainter& painter, const XYRange& range)
+{
+	for(unsigned int iElem=0; iElem<GetNumElements(); ++iElem)
+	{
+		RoiElement& elem = GetElement(iElem);
+		elem.draw(painter, range);
+	}
+}
+
+void RoiRect::draw(QPainter& painter, const XYRange& range)
+{
+
+}
+
+void RoiCircle::draw(QPainter& painter, const XYRange& range)
+{
+
+}
+
+void RoiEllipse::draw(QPainter& painter, const XYRange& range)
+{
+
+}
+
+void RoiCircleRing::draw(QPainter& painter, const XYRange& range)
+{
+
+}
+
+void RoiCircleSegment::draw(QPainter& painter, const XYRange& range)
+{
+
+}
+
+void RoiPolygon::draw(QPainter& painter, const XYRange& range)
+{
+
 }

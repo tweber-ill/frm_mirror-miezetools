@@ -725,7 +725,7 @@ bool get_multigauss(unsigned int iLen,
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			std::cerr << "result of double-gauss fit step " << (++uiMini) << std::endl;
+			std::cerr << "result of multi-gauss fit step " << (++uiMini) << std::endl;
 			std::cerr << "==========================" << std::endl;
 			std::cerr << mini << std::endl;
 		}
