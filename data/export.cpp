@@ -23,6 +23,8 @@ static std::string get_py_linestyle(PlotType plttype, unsigned int iLine)
 
 	if(plttype == PLOT_DATA)
 		return strStyles[iLine % (sizeof(strStyles)/sizeof(strStyles[0]))];
+
+	return "o";
 }
 
 bool export_py(const char* pcFile, const SubWindowBase *pSWB)

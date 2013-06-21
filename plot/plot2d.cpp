@@ -28,6 +28,7 @@ Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData, bool bCyc
 }
 
 Plot2d::Plot2d(const Plot2d& plot)
+			: SubWindowBase(plot.parentWidget()), m_pImg(0)
 {
 	this->m_bLog = plot.m_bLog;
 	this->m_bCountData = plot.m_bCountData;
