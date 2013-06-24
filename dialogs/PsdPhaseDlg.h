@@ -12,6 +12,7 @@
 #include <QtGui/QMdiArea>
 
 #include <vector>
+#include <string>
 
 #include "../subwnd.h"
 #include "../ui/ui_psd_phase.h"
@@ -27,8 +28,15 @@ protected:
 	Data2 m_dat;
 	bool m_bAllowUpdate;
 
+	std::vector<QDoubleSpinBox*> m_vecDSpinBoxes;
+	std::vector<std::string> m_vecStrDSpinBoxes;
+	std::vector<QSpinBox*> m_vecSpinBoxes;
+	std::vector<std::string> m_vecStrSpinBoxes;
+
+
 protected slots:
 	void Update();
+	void ButtonBoxClicked(QAbstractButton* pBtn);
 
 public:
 	PsdPhaseDlg(QWidget* pParent);
@@ -36,6 +44,10 @@ public:
 
 	const Data2& GetData() const { return m_dat; }
 	double GetTau() const { return spinTau->value(); }
+
+protected:
+	void LoadLastSettings();
+	void SaveLastSettings();
 };
 
 

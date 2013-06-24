@@ -25,18 +25,25 @@ PsdPhaseDlg::PsdPhaseDlg(QWidget* pParent)
 					  m_pPlot(new Plot2d(this, "PSD Phase", 0, 1))
 {
 	setupUi(this);
+
+	m_vecDSpinBoxes = {spinlx, spinly, spinXCenter, spinYCenter, spinLam, spinTau, spinLs};
+	m_vecSpinBoxes = {spinXPix, spinYPix};
+	m_vecStrDSpinBoxes = {"lx", "ly", "center_x", "center_y", "lam", "tau", "Ls"};
+	m_vecStrSpinBoxes = {"xpix", "ypix"};
+
 	m_pPlot->SetLabels("x Position (cm)", "y Position (cm)", "Phase (rad)");
 
 	QGridLayout *pGrid = new QGridLayout(frame);
 	pGrid->addWidget(m_pPlot, 0, 0, 1, 1);
 
-	std::vector<QDoubleSpinBox*> vecDSpinBoxes = {spinlx, spinly, spinXCenter, spinYCenter, spinLam, spinTau, spinLs};
-	std::vector<QSpinBox*> vecSpinBoxes = {spinXPix, spinYPix};
-	for(QDoubleSpinBox* pSpin : vecDSpinBoxes)
+	for(QDoubleSpinBox* pSpin : m_vecDSpinBoxes)
 		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(Update()));
-	for(QSpinBox* pSpin : vecSpinBoxes)
+	for(QSpinBox* pSpin : m_vecSpinBoxes)
 		QObject::connect(pSpin, SIGNAL(valueChanged(int)), this, SLOT(Update()));
 
+	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
+
+	LoadLastSettings();
 	m_bAllowUpdate = 1;
 	Update();
 }
@@ -76,6 +83,56 @@ void PsdPhaseDlg::Update()
 	m_pPlot->plot(m_dat);
 }
 
+void PsdPhaseDlg::LoadLastSettings()
+{
+	for(unsigned int i=0; i<m_vecSpinBoxes.size(); ++i)
+	{
+		QSpinBox* pSpin = m_vecSpinBoxes[i];
+		const std::string strName = "phase/" + m_vecStrSpinBoxes[i];
+
+		if(Settings::HasKey(strName.c_str()))
+			pSpin->setValue(Settings::Get<int>(strName.c_str()));
+	}
+
+	for(unsigned int i=0; i<m_vecDSpinBoxes.size(); ++i)
+	{
+		QDoubleSpinBox* pSpin = m_vecDSpinBoxes[i];
+		const std::string strName = "phase/" + m_vecStrDSpinBoxes[i];
+
+		if(Settings::HasKey(strName.c_str()))
+			pSpin->setValue(Settings::Get<double>(strName.c_str()));
+	}
+}
+
+void PsdPhaseDlg::SaveLastSettings()
+{
+	for(unsigned int i=0; i<m_vecSpinBoxes.size(); ++i)
+	{
+		const QSpinBox* pSpin = m_vecSpinBoxes[i];
+		const std::string strName = "phase/" + m_vecStrSpinBoxes[i];
+
+		Settings::Set<int>(strName.c_str(), pSpin->value());
+	}
+
+	for(unsigned int i=0; i<m_vecDSpinBoxes.size(); ++i)
+	{
+		const QDoubleSpinBox* pSpin = m_vecDSpinBoxes[i];
+		const std::string strName = "phase/" + m_vecStrDSpinBoxes[i];
+
+		Settings::Set<double>(strName.c_str(), pSpin->value());
+	}
+}
+
+void PsdPhaseDlg::ButtonBoxClicked(QAbstractButton* pBtn)
+{
+	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::RejectRole)
+		reject();
+	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
+	{
+		SaveLastSettings();
+		accept();
+	}
+}
 
 
 // --------------------------------------------------------------------------------
