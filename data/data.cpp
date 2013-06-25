@@ -130,6 +130,29 @@ void Data1::GetYErrMinMax(double& dYMin, double& dYMax) const
 	dYMax = (pair.second==m_vecErrsY.end()? 0.: *pair.second);
 }
 
+bool Data1::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<x> ";
+	for(double d : m_vecValsX)
+		ostr << d << " ";
+	ostr << "</x>\n";
+
+	ostr << "<y> ";
+	for(double d : m_vecValsY)
+		ostr << d << " ";
+	ostr << "</y>\n";
+
+	ostr << "<x_err> ";
+	for(double d : m_vecErrsX)
+		ostr << d << " ";
+	ostr << "</x_err>\n";
+
+	ostr << "<y_err> ";
+	for(double d : m_vecErrsY)
+		ostr << d << " ";
+	ostr << "</y_err>\n";
+}
+
 //------------------------------------------------------------------------
 
 

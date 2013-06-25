@@ -27,6 +27,7 @@
 #include "helper/file.h"
 #include "helper/misc.h"
 #include "helper/mieze.hpp"
+#include "helper/xml.h"
 
 #include "loader/loadtxt.h"
 #include "loader/loadnicos.h"
@@ -306,6 +307,10 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pExportPy, SIGNAL(triggered()), this, SLOT(FileExportPyTriggered()));
 	QObject::connect(pSettings, SIGNAL(triggered()), this, SLOT(SettingsTriggered()));
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
+
+	QObject::connect(pLoadSess, SIGNAL(triggered()), this, SLOT(SessionLoadTriggered()));
+	QObject::connect(pSaveSess, SIGNAL(triggered()), this, SLOT(SessionSaveTriggered()));
+	QObject::connect(pSaveSessAs, SIGNAL(triggered()), this, SLOT(SessionSaveAsTriggered()));
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
 	QObject::connect(pIntAlongY, SIGNAL(triggered()), this, SLOT(IntAlongY()));
@@ -1249,6 +1254,81 @@ void MiezeMainWnd::FileExportPyTriggered()
 		pGlobals->setValue("main/lastdir_py", QString(::get_dir(strFile1).c_str()));
 	else
 		QMessageBox::critical(this, "Error", "Export to Python failed.");
+}
+
+
+void MiezeMainWnd::SessionLoadTriggered()
+{
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
+	QString strFile = QFileDialog::getOpenFileName(this, "Load Session...", strLastDir,
+					"Session Files (*.cattus)", 0, QFileDialog::DontUseNativeDialog);
+	if(strFile == "")
+		return;
+
+	std::string strSess = strFile.toStdString();
+	Xml xml;
+	if(!xml.Load(strSess.c_str()))
+	{
+		QMessageBox::critical(this, "Error", "Failed to load session.");
+		return;
+	}
+
+	this->m_pmdi->closeAllSubWindows();
+	m_strCurSess = strSess;
+
+	// TODO: actual loading
+
+	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strSess).c_str()));
+}
+
+void MiezeMainWnd::SessionSaveTriggered()
+{
+	if(m_strCurSess=="")
+	{
+		SessionSaveAsTriggered();
+		return;
+	}
+
+
+	std::ofstream ofstr(m_strCurSess);
+	ofstr << "<cattus_session>\n\n";
+
+	unsigned int iWnd=0;
+	for(QMdiSubWindow *pItem : m_pmdi->subWindowList())
+	{
+		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
+		if(!pWnd) continue;
+		pWnd = pWnd->GetActualWidget();
+
+		ofstr << "<window_" << iWnd << ">\n";
+		pWnd->SaveXML(ofstr);
+		ofstr << "</window_" << iWnd << ">\n";
+
+		++iWnd;
+	}
+
+	ofstr << "\n\n</cattus_session>\n";
+}
+
+void MiezeMainWnd::SessionSaveAsTriggered()
+{
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
+	QString strFile = QFileDialog::getSaveFileName(this, "Save Session as...", strLastDir,
+					"Session Files (*.cattus)", 0, QFileDialog::DontUseNativeDialog);
+	if(strFile == "")
+		return;
+
+	std::string strFile1 = strFile.toStdString();
+	std::string strExt = get_fileext(strFile1);
+	if(strExt != "cattus")
+		strFile1 += ".cattus";
+
+	m_strCurSess = strFile1;
+	SessionSaveTriggered();
+
+	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strFile1).c_str()));
 }
 
 #include "mainwnd.moc"

@@ -29,6 +29,8 @@ struct PlotObj
 	Data1 dat;
 	std::string strName;
 	PlotType plttype;
+
+	void SaveXML(std::ostream& ostr) const;
 };
 
 class Plot : public SubWindowBase
@@ -95,6 +97,8 @@ public:
 
 	virtual void SetROI(const Roi* pROI);
 	virtual Roi* GetROI();
+
+	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
 

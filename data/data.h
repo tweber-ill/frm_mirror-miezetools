@@ -68,6 +68,8 @@ public:
 	DataInterface() {}
 	virtual ~DataInterface() {}
 	virtual DataType GetType() const = 0;
+
+	virtual bool SaveXML(std::ostream& ostr) const { return false; }
 };
 
 
@@ -163,6 +165,8 @@ public:
 	}
 
 	double SumY() const;
+
+	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
 

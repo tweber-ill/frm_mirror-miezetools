@@ -66,9 +66,15 @@ protected:
 	void UpdateRecentFileMenu();
 	void AddRecentFile(const QString& strFile);
 
+	std::string m_strCurSess;
+
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
+
+	void SessionLoadTriggered();
+	void SessionSaveTriggered();
+	void SessionSaveAsTriggered();
 
 	void FileExportPyTriggered();
 

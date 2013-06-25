@@ -10,7 +10,9 @@
 
 #include <QtGui/QWidget>
 #include <string>
+#include <iostream>
 #include "roi/roi.h"
+#include "helper/xml.h"
 
 class Plot;
 class Plot2d;
@@ -43,7 +45,6 @@ public:
 
 	virtual SubWindowBase* clone() const { return 0; }
 
-	//virtual std::string GetTitle() const = 0;
 	virtual double GetTotalCounts() const = 0;
 
 	virtual Plot* ConvertTo1d(int iParam=-1) { return 0; }
@@ -51,6 +52,9 @@ public:
 
 	virtual void SetROI(const Roi* pROI) {}
 	virtual Roi* GetROI() { return 0; }
+
+	virtual bool LoadXML(Xml& xml, const char* pcRootPath=0) { return false; }
+	virtual bool SaveXML(std::ostream& ostr) const { return false; }
 };
 
 #endif

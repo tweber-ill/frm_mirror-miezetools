@@ -496,4 +496,51 @@ Roi* Plot::GetROI()
 	return &GetData(0).dat.GetRoi();
 }
 
+bool Plot::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<x_label> " << m_strXAxis.toStdString() << " </x_label>\n";
+	ostr << "<y_label> " << m_strYAxis.toStdString() << " </y_label>\n";
+
+	ostr << "<title> " << m_strTitle.toStdString() << " </title>\n";
+	ostr << "<window_title> " << windowTitle().toStdString() << " </window_title>\n";
+
+	ostr << "<x_log> " << m_bXIsLog << " </x_log>\n";
+	ostr << "<y_log> " << m_bYIsLog << " </y_log>\n";
+
+	ostr << "<x_min> " << m_dxmin << " </x_min>\n";
+	ostr << "<x_max> " << m_dxmax << " </x_max>\n";
+	ostr << "<y_min> " << m_dymin << " </y_min>\n";
+	ostr << "<y_max> " << m_dymax << " </y_max>\n";
+
+	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
+	{
+		ostr << "<plot_obj_" << iDat << ">\n";
+		const PlotObj& obj = GetData(iDat);
+		obj.SaveXML(ostr);
+		ostr << "</plot_obj_" << iDat << ">\n";
+	}
+}
+
+void PlotObj::SaveXML(std::ostream& ostr) const
+{
+	std::string strType = "unknown";
+	switch(plttype)
+	{
+		case PLOT_DATA:
+			strType = "data";
+			break;
+		case PLOT_FKT:
+			strType = "function";
+			break;
+	}
+
+	ostr << "<type> " << strType << " </type>\n";
+	ostr << "<name> " << strName << " </name>\n";
+
+	ostr << "<data>\n";
+	dat.SaveXML(ostr);
+	ostr << "</data>\n";
+}
+
+
 #include "plot.moc"
