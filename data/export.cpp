@@ -142,6 +142,10 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 		ofstr << "y = np.linspace(0, " << dat.GetHeight()-1 << ", " << dat.GetHeight() << ")\n\n";
 
 		ofstr << "plt.pcolor(x, y, vals)\n";
+		if(plt->IsCyclicData())
+			ofstr << "plt.set_cmap('hsv')\n";
+		if(plt->IsPhaseData())
+			ofstr << "plt.clim(0, 2*np.pi)\n";
 		ofstr << "plt.colorbar()\n\n";
 
 		ofstr << "plt.xlabel(\"x pixels\")\n";

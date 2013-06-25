@@ -25,10 +25,11 @@ PsdPhaseDlg::PsdPhaseDlg(QWidget* pParent)
 					  m_pPlot(new Plot2d(this, "PSD Phase", 0, 1))
 {
 	setupUi(this);
+	spinPhase->setMaximum(2.*M_PI);
 
-	m_vecDSpinBoxes = {spinlx, spinly, spinXCenter, spinYCenter, spinLam, spinTau, spinLs};
+	m_vecDSpinBoxes = {spinlx, spinly, spinXCenter, spinYCenter, spinLam, spinTau, spinLs, spinPhase};
 	m_vecSpinBoxes = {spinXPix, spinYPix};
-	m_vecStrDSpinBoxes = {"lx", "ly", "center_x", "center_y", "lam", "tau", "Ls"};
+	m_vecStrDSpinBoxes = {"lx", "ly", "center_x", "center_y", "lam", "tau", "Ls", "central_phase"};
 	m_vecStrSpinBoxes = {"xpix", "ypix"};
 
 	m_pPlot->SetLabels("x Position (cm)", "y Position (cm)", "Phase (rad)");
@@ -71,9 +72,10 @@ void PsdPhaseDlg::Update()
 	unsigned int iYPixels = spinYPix->value();
 	units::quantity<units::si::length> xpos = spinXCenter->value()*cm;
 	units::quantity<units::si::length> ypos = spinYCenter->value()*cm;
+	units::quantity<units::si::plane_angle> pase_offs = spinPhase->value()*units::si::radians;
 
 	ublas::matrix<double> matPhases;
-	mieze_reduction_det(lx, ly, xpos, ypos, Ls, tau, lam, iXPixels, iYPixels, &matPhases);
+	mieze_reduction_det(lx, ly, xpos, ypos, Ls, tau, lam, pase_offs, iXPixels, iYPixels, &matPhases);
 
 	m_dat.FromMatrix(matPhases);
 	m_dat.SetXRange(-lx/2./cm, lx/2./cm);

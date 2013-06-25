@@ -68,7 +68,7 @@ public:
 	virtual std::string GetTitle() const { return m_pPlot->GetTitle(); }
 	virtual double GetTotalCounts() const { return m_pPlot->GetTotalCounts(); }
 
-	virtual Plot* ConvertTo1d(int iFoil) { return m_pPlot->ConvertTo1d(iFoil); }
+	virtual Plot* ConvertTo1d(int iFoil=-1) { return m_pPlot->ConvertTo1d(iFoil); }
 	virtual Plot3d* ConvertTo3d(int iFoil=-1) { return m_pPlot->ConvertTo3d(iFoil); }
 
 public slots:

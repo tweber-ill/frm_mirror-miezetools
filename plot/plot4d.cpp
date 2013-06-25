@@ -282,7 +282,7 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 
 	Plot3d* pPlot = new Plot3d(0, ostrTitle.str().c_str(), m_bCountData);
 	pPlot->plot(dat3);
-	pPlot->SetLabels("x", "y", "I");
+	pPlot->SetLabels(GetXStr().toStdString().c_str(), GetYStr().toStdString().c_str(), "I");
 
 	return pPlot;
 }

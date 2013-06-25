@@ -240,6 +240,23 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Phase (rad):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="spinPhase">
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -265,6 +282,7 @@
   <tabstop>spinLam</tabstop>
   <tabstop>spinTau</tabstop>
   <tabstop>spinLs</tabstop>
+  <tabstop>spinPhase</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>

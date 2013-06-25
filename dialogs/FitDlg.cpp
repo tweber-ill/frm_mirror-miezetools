@@ -48,6 +48,8 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 
 	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));
 
+	connect(radio1D, SIGNAL(toggled(bool)), this, SLOT(SpecialTypeChanged()));
+
 	tableLimits->setColumnWidth(2,50);
 	tableHints->setColumnWidth(2,50);
 
@@ -55,16 +57,44 @@ FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi
 	tableHints->verticalHeader()->setDefaultSectionSize(tableHints->verticalHeader()->minimumSectionSize()+2);
 
 	spinFoil->setMaximum(Settings::Get<unsigned int>("casc/foil_cnt")-1);
+	SpecialTypeChanged();
 }
 
 FitDlg::~FitDlg()
 {}
 
+void FitDlg::SpecialTypeChanged()
+{
+	SpecialFktChanged(comboSpecialFkt->currentIndex());
+}
+
 void FitDlg::SpecialFktChanged(int iFkt)
 {
-	if(iFkt == FIT_MULTI_GAUSSIAN)
+	static int iLastFkt = -1;
+
+	if(iFkt == FIT_MIEZE_SINE)
+	{
+		this->labelParam->setText("Foil: ");
+
+		this->spinParam->setMinimum(-1);
+		this->spinParam->setMaximum(Settings::Get<unsigned int>("casc/foil_cnt")-1);
+
+		if(iLastFkt != iFkt)
+			this->spinParam->setValue(-1);
+
+		this->labelParam->setEnabled(1);
+		this->spinParam->setEnabled(1);
+	}
+	else if(iFkt == FIT_MULTI_GAUSSIAN)
 	{
 		this->labelParam->setText("Number of peaks: ");
+
+		this->spinParam->setMinimum(1);
+		this->spinParam->setMaximum(99);
+
+		if(iLastFkt != iFkt)
+			this->spinParam->setValue(2);
+
 		this->labelParam->setEnabled(1);
 		this->spinParam->setEnabled(1);
 	}
@@ -74,6 +104,8 @@ void FitDlg::SpecialFktChanged(int iFkt)
 		this->labelParam->setEnabled(0);
 		this->spinParam->setEnabled(0);
 	}
+
+	iLastFkt = iFkt;
 }
 
 void FitDlg::FunctionTypeChanged()
@@ -414,8 +446,12 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 	bool bAssumeErrorIfZero = 1;
 	SpecialFitResult res;
 
+	int iFoil = -1;
+	if(iFkt == FIT_MIEZE_SINE)
+		iFoil = iParam;
+
 	res.bOk = 0;
-	res.pPlot = (Plot*)pSWB->ConvertTo1d();
+	res.pPlot = (Plot*)pSWB->ConvertTo1d(iFoil);
 	res.bCreatedNewPlot = (res.pPlot != pSWB);
 	if(!res.pPlot)
 	{
@@ -464,7 +500,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 		}
 
 		double dNumOsc = Settings::Get<double>("mieze/num_osc");
-		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));;
+		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));
 
 		MiezeSinModel *pModel = 0;
 		bOk = ::get_mieze_contrast(dFreq, dNumOsc, iLen, px, py, pyerr, &pModel);
@@ -538,10 +574,12 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 
 	const Data3& dat3 = pPlot3d->GetData();
 	const unsigned int iW = dat3.GetWidth(),
-			 	 	 	 	 	   iH = dat3.GetHeight();
+			 	 	 	iH = dat3.GetHeight();
 
 	Data2 dat2_c(iW, iH),
-			 dat2_ph(iW, iH);
+		  dat2_ph(iW, iH);
+	(XYRange&) dat2_c = (XYRange&)dat3;
+	(XYRange&) dat2_ph = (XYRange&)dat3;
 	dat2_c.SetZero();
 	dat2_ph.SetZero();
 
@@ -611,8 +649,13 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 	std::string strTitle = pPlot3d->windowTitle().toStdString();
 	strTitle += " -> ";
 
-	res.pPlot[0] = new Plot2d(0, (strTitle + std::string("contrast")).c_str(), 0);
-	res.pPlot[1] = new Plot2d(0, (strTitle + std::string("phase")).c_str(), 0);
+	res.pPlot[0] = new Plot2d(0, (strTitle + std::string("contrast")).c_str(), 0, 0);
+	res.pPlot[1] = new Plot2d(0, (strTitle + std::string("phase")).c_str(), 0, 1);
+
+	res.pPlot[0]->SetLabels(pPlot3d->GetXStr().toStdString().c_str(),
+							pPlot3d->GetYStr().toStdString().c_str());
+	res.pPlot[1]->SetLabels(pPlot3d->GetXStr().toStdString().c_str(),
+							pPlot3d->GetYStr().toStdString().c_str());
 
 	res.pPlot[0]->plot(dat2_c);
 	res.pPlot[1]->plot(dat2_ph);

@@ -73,6 +73,7 @@ struct FitParams
 	void AddActiveItemSelected();
 	void RemoveItemSelected();
 
+	void SpecialTypeChanged();
 	void SpecialFktChanged(int);
 	void FunctionTypeChanged();
 	void FunctionChanged(const QString&);

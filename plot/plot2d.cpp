@@ -17,10 +17,11 @@
 #define PAD_X 24
 #define PAD_Y 24
 
-Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData, bool bCyclicData)
+Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData, bool bPhaseData)
 			: SubWindowBase(pParent),
 			  m_pImg(0),
-			  m_bLog(bCountData), m_bCountData(bCountData), m_bCyclicData(bCyclicData)
+			  m_bLog(bCountData), m_bCountData(bCountData), m_bCyclicData(0),
+			  m_bPhaseData(bPhaseData)
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	if(pcTitle) this->setWindowTitle(QString(pcTitle));
@@ -33,6 +34,7 @@ Plot2d::Plot2d(const Plot2d& plot)
 	this->m_bLog = plot.m_bLog;
 	this->m_bCountData = plot.m_bCountData;
 	this->m_bCyclicData = plot.m_bCyclicData;
+	this->m_bPhaseData = plot.m_bPhaseData;
 
 	this->m_strXAxis = plot.m_strXAxis;
 	this->m_strYAxis = plot.m_strYAxis;
@@ -91,6 +93,12 @@ uint Plot2d::GetSpectroColor(double dVal) const
 {
 	double dMin = m_dat.GetMin();
 	double dMax = m_dat.GetMax();
+
+	if(IsPhaseData())
+	{
+		dMin = 0.;
+		dMax = 2.*M_PI;
+	}
 
 	if(m_bLog)
 	{
@@ -193,13 +201,31 @@ void Plot2d::plot(unsigned int iW, unsigned int iH, const double *pdat, const do
 	m_dat.SetSize(iW, iH);
 	m_dat.SetVals(pdat, perr);
 
+	CheckCyclicData();
 	RefreshPlot();
 }
 
 void Plot2d::plot(const Data2& dat)
 {
 	m_dat = dat;
+
+	CheckCyclicData();
 	RefreshPlot();
+}
+
+void Plot2d::CheckCyclicData()
+{
+	const double dTolerance = 0.2;
+
+	m_bCyclicData = 0;
+	if(IsPhaseData())
+	{
+		double dMin = m_dat.GetMin();
+		double dMax = m_dat.GetMax();
+
+		if(dMax - dMin >= 2.*M_PI-dTolerance)
+			m_bCyclicData = 1;
+	}
 }
 
 void Plot2d::RefreshPlot()

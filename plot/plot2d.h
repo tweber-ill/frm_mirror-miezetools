@@ -30,6 +30,7 @@ protected:
 	bool m_bLog;
 	bool m_bCountData;
 	bool m_bCyclicData;
+	bool m_bPhaseData;
 
 	QRect m_rectImage, m_rectCB;
 	QString m_strXAxis, m_strYAxis, m_strZAxis, m_strTitle;
@@ -38,7 +39,7 @@ protected:
 	uint GetSpectroColor01(double dVal) const;
 
 public:
-	Plot2d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1, bool bCyclicData=0);
+	Plot2d(QWidget* pParent=0, const char* pcTitle=0, bool bCountData=1, bool bPhaseData=0);
 	Plot2d(const Plot2d& plot);
 	virtual ~Plot2d();
 
@@ -56,19 +57,25 @@ public:
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }
 
-	void SetLabels(const char* pcX, const char* pcY, const char* pcZ)
+	void SetLabels(const char* pcX, const char* pcY, const char* pcZ=0)
 	{
-		m_strXAxis = QString(pcX);
-		m_strYAxis = QString(pcY);
-		m_strZAxis = QString(pcZ);
+		if(pcX) m_strXAxis = QString(pcX);
+		if(pcY) m_strYAxis = QString(pcY);
+		if(pcZ) m_strZAxis = QString(pcZ);
 	}
 
+	const QString& GetXStr() const { return m_strXAxis; }
+	const QString& GetYStr() const { return m_strYAxis; }
 	const QString& GetZStr() const { return m_strZAxis; }
 
 	virtual SubWindowType GetType() const { return PLOT_2D; }
 	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
 
 	bool IsCountData() const { return m_bCountData; }
+	bool IsCyclicData() const { return m_bCyclicData; }
+	bool IsPhaseData() const { return m_bPhaseData; }
+
+	void CheckCyclicData();
 
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat; }
