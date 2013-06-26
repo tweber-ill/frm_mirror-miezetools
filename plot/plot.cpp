@@ -496,7 +496,7 @@ Roi* Plot::GetROI()
 	return &GetData(0).dat.GetRoi();
 }
 
-bool Plot::LoadXML(Xml& xml, const std::string& strBase)
+bool Plot::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
 	unsigned int iDatCnt = xml.Query<unsigned int>((strBase + "data_count").c_str(), 0);
 	for(unsigned int iDat=0; iDat<iDatCnt; ++iDat)
@@ -506,7 +506,7 @@ bool Plot::LoadXML(Xml& xml, const std::string& strBase)
 		ostrPlotObj << strBase << "plot_obj_" << iDat << "/";
 		std::string strObjBase = ostrPlotObj.str();
 
-		obj.LoadXML(xml, strObjBase);
+		obj.LoadXML(xml, blob, strObjBase);
 		m_vecObjs.push_back(obj);
 	}
 
@@ -564,7 +564,7 @@ bool Plot::SaveXML(std::ostream& ostr) const
 	return 1;
 }
 
-bool PlotObj::LoadXML(Xml& xml, const std::string& strBase)
+bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
 	std::string strType = xml.QueryString((strBase + "type").c_str(), "data");
 	if(strType == "data")
@@ -579,7 +579,7 @@ bool PlotObj::LoadXML(Xml& xml, const std::string& strBase)
 
 	strName = xml.QueryString((strBase + "name").c_str(), "");
 
-	return dat.LoadXML(xml, strBase + "data/");
+	return dat.LoadXML(xml, blob, strBase + "data/");
 }
 
 bool PlotObj::SaveXML(std::ostream& ostr) const

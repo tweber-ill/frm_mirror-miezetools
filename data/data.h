@@ -19,6 +19,7 @@ namespace ublas = boost::numeric::ublas;
 
 #include "../roi/roi.h"
 #include "../helper/xml.h"
+#include "../helper/blob.h"
 
 enum DataType
 {
@@ -70,7 +71,7 @@ public:
 	virtual ~DataInterface() {}
 	virtual DataType GetType() const = 0;
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase) { return false; }
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return false; }
 	virtual bool SaveXML(std::ostream& ostr) const { return false; }
 };
 
@@ -171,7 +172,7 @@ public:
 
 	double SumY() const;
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase);
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
@@ -221,7 +222,7 @@ public:
 
 	void RecalcMinMaxTotal();
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase);
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
@@ -273,7 +274,7 @@ public:
 
 	void RecalcMinMaxTotal();
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase);
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
@@ -323,7 +324,7 @@ public:
 
 	void RecalcMinMaxTotal();
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase);
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 

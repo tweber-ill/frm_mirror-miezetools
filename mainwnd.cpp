@@ -1274,6 +1274,9 @@ void MiezeMainWnd::SessionLoadTriggered()
 		return;
 	}
 
+	Blob blob((strSess+".blob").c_str());
+	bool bHasBlob = blob.IsOpen();
+
 	this->m_pmdi->closeAllSubWindows();
 	m_strCurSess = strSess;
 
@@ -1306,7 +1309,7 @@ void MiezeMainWnd::SessionLoadTriggered()
 
 		if(pSWB)
 		{
-			pSWB->LoadXML(xml, strSWBase);
+			pSWB->LoadXML(xml, blob, strSWBase);
 			AddSubWindow(pSWB);
 			pSWB->GetActualWidget()->RefreshPlot();
 		}

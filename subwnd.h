@@ -13,6 +13,7 @@
 #include <iostream>
 #include "roi/roi.h"
 #include "helper/xml.h"
+#include "helper/blob.h"
 
 class Plot;
 class Plot2d;
@@ -53,7 +54,7 @@ public:
 	virtual void SetROI(const Roi* pROI) {}
 	virtual Roi* GetROI() { return 0; }
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase) { return false; }
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return false; }
 	virtual bool SaveXML(std::ostream& ostr) const { return false; }
 
 	virtual void RefreshPlot() {}

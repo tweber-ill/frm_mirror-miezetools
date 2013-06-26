@@ -131,7 +131,7 @@ void Data1::GetYErrMinMax(double& dYMin, double& dYMax) const
 }
 
 
-bool Data1::LoadXML(Xml& xml, const std::string& strBase)
+bool Data1::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
 	unsigned int uiLen = xml.Query<unsigned int>((strBase + "length").c_str(), 0);
 	m_vecValsX.resize(uiLen);
@@ -139,17 +139,36 @@ bool Data1::LoadXML(Xml& xml, const std::string& strBase)
 	m_vecErrsX.resize(uiLen);
 	m_vecErrsY.resize(uiLen);
 
-	std::istringstream istrX(xml.QueryString((strBase + "x").c_str(), ""));
-	std::istringstream istrY(xml.QueryString((strBase + "y").c_str(), ""));
-	std::istringstream istrXErr(xml.QueryString((strBase + "x_err").c_str(), ""));
-	std::istringstream istrYErr(xml.QueryString((strBase + "y_err").c_str(), ""));
-
-	for(unsigned int i=0; i<uiLen; ++i)
+	if(xml.Query<bool>((strBase + "in_blob").c_str(), 0))
 	{
-		istrX >> m_vecValsX[i];
-		istrY >> m_vecValsY[i];
-		istrXErr >> m_vecErrsX[i];
-		istrYErr >> m_vecErrsY[i];
+		std::vector<double>* vecs[] = {&m_vecValsX, &m_vecValsY, &m_vecErrsX, &m_vecErrsY};
+		std::string strs[] = {"blob_x", "blob_y", "blob_x_err", "blob_y_err"};
+
+		for(unsigned int iObj=0; iObj<4; ++iObj)
+		{
+			bool bHasBlobIdx = 0;
+			qint64 iBlobIdx = xml.Query<qint64>((strBase + strs[iObj]).c_str(), 0, &bHasBlobIdx);
+			if(bHasBlobIdx)
+				blob.copy<double>(iBlobIdx, qint64(uiLen), vecs[iObj]->begin());
+			else
+				std::cerr << "Error: Blob usage enabled, but no blob index given!"
+						  << std::endl;
+		}
+	}
+	else
+	{
+		std::istringstream istrX(xml.QueryString((strBase + "x").c_str(), ""));
+		std::istringstream istrY(xml.QueryString((strBase + "y").c_str(), ""));
+		std::istringstream istrXErr(xml.QueryString((strBase + "x_err").c_str(), ""));
+		std::istringstream istrYErr(xml.QueryString((strBase + "y_err").c_str(), ""));
+
+		for(unsigned int i=0; i<uiLen; ++i)
+		{
+			istrX >> m_vecValsX[i];
+			istrY >> m_vecValsY[i];
+			istrXErr >> m_vecErrsX[i];
+			istrYErr >> m_vecErrsY[i];
+		}
 	}
 
 	m_roi.LoadXML(xml, strBase);
@@ -341,7 +360,7 @@ void Data2::FromMatrix(const ublas::matrix<double>& mat)
 }
 
 
-bool Data2::LoadXML(Xml& xml, const std::string& strBase)
+bool Data2::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
 	LoadRangeXml(xml, strBase);
 	m_roi.LoadXML(xml, strBase);
@@ -350,13 +369,32 @@ bool Data2::LoadXML(Xml& xml, const std::string& strBase)
 	m_vecVals.resize(uiCnt);
 	m_vecErrs.resize(uiCnt);
 
-	std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
-	std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
-
-	for(unsigned int i=0; i<uiCnt; ++i)
+	if(xml.Query<bool>((strBase + "in_blob").c_str(), 0))
 	{
-		istrVals >> m_vecVals[i];
-		istrErrs >> m_vecErrs[i];
+		std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+		std::string strs[] = {"blob_vals", "blob_errs"};
+
+		for(unsigned int iObj=0; iObj<2; ++iObj)
+		{
+			bool bHasBlobIdx = 0;
+			qint64 iBlobIdx = xml.Query<qint64>((strBase + strs[iObj]).c_str(), 0, &bHasBlobIdx);
+			if(bHasBlobIdx)
+				blob.copy<double>(iBlobIdx, qint64(uiCnt), vecs[iObj]->begin());
+			else
+				std::cerr << "Error: Blob usage enabled, but no blob index given!"
+						  << std::endl;
+		}
+	}
+	else
+	{
+		std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
+		std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
+
+		for(unsigned int i=0; i<uiCnt; ++i)
+		{
+			istrVals >> m_vecVals[i];
+			istrErrs >> m_vecErrs[i];
+		}
 	}
 
 	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
@@ -598,7 +636,7 @@ Data1 Data3::GetXYSum() const
 }
 
 
-bool Data3::LoadXML(Xml& xml, const std::string& strBase)
+bool Data3::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
 	LoadRangeXml(xml, strBase);
 	m_iDepth = xml.Query<unsigned int>((strBase+"depth").c_str(), 0);
@@ -609,13 +647,32 @@ bool Data3::LoadXML(Xml& xml, const std::string& strBase)
 	m_vecVals.resize(uiCnt);
 	m_vecErrs.resize(uiCnt);
 
-	std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
-	std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
-
-	for(unsigned int i=0; i<uiCnt; ++i)
+	if(xml.Query<bool>((strBase + "in_blob").c_str(), 0))
 	{
-		istrVals >> m_vecVals[i];
-		istrErrs >> m_vecErrs[i];
+		std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+		std::string strs[] = {"blob_vals", "blob_errs"};
+
+		for(unsigned int iObj=0; iObj<2; ++iObj)
+		{
+			bool bHasBlobIdx = 0;
+			qint64 iBlobIdx = xml.Query<qint64>((strBase + strs[iObj]).c_str(), 0, &bHasBlobIdx);
+			if(bHasBlobIdx)
+				blob.copy<double>(iBlobIdx, qint64(uiCnt), vecs[iObj]->begin());
+			else
+				std::cerr << "Error: Blob usage enabled, but no blob index given!"
+						  << std::endl;
+		}
+	}
+	else
+	{
+		std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
+		std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
+
+		for(unsigned int i=0; i<uiCnt; ++i)
+		{
+			istrVals >> m_vecVals[i];
+			istrErrs >> m_vecErrs[i];
+		}
 	}
 
 	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
@@ -866,7 +923,7 @@ Data1 Data4::GetXYD2(uint iX, uint iY, uint iD2) const
 }
 
 
-bool Data4::LoadXML(Xml& xml, const std::string& strBase)
+bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
 	LoadRangeXml(xml, strBase);
 	m_iDepth = xml.Query<unsigned int>((strBase+"depth").c_str(), 0);
@@ -878,13 +935,32 @@ bool Data4::LoadXML(Xml& xml, const std::string& strBase)
 	m_vecVals.resize(uiCnt);
 	m_vecErrs.resize(uiCnt);
 
-	std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
-	std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
-
-	for(unsigned int i=0; i<uiCnt; ++i)
+	if(xml.Query<bool>((strBase + "in_blob").c_str(), 0))
 	{
-		istrVals >> m_vecVals[i];
-		istrErrs >> m_vecErrs[i];
+		std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+		std::string strs[] = {"blob_vals", "blob_errs"};
+
+		for(unsigned int iObj=0; iObj<2; ++iObj)
+		{
+			bool bHasBlobIdx = 0;
+			qint64 iBlobIdx = xml.Query<qint64>((strBase + strs[iObj]).c_str(), 0, &bHasBlobIdx);
+			if(bHasBlobIdx)
+				blob.copy<double>(iBlobIdx, qint64(uiCnt), vecs[iObj]->begin());
+			else
+				std::cerr << "Error: Blob usage enabled, but no blob index given!"
+						  << std::endl;
+		}
+	}
+	else
+	{
+		std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
+		std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
+
+		for(unsigned int i=0; i<uiCnt; ++i)
+		{
+			istrVals >> m_vecVals[i];
+			istrErrs >> m_vecErrs[i];
+		}
 	}
 
 	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);

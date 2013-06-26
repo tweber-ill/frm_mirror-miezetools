@@ -292,10 +292,10 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 }
 
 
-bool Plot4d::LoadXML(Xml& xml, const std::string& strBase)
+bool Plot4d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
-	m_dat4.LoadXML(xml, strBase + "data/");
-	Plot2d::LoadXML(xml, strBase+"sub_2d/");
+	m_dat4.LoadXML(xml, blob, strBase + "data/");
+	Plot2d::LoadXML(xml, blob, strBase+"sub_2d/");
 
 	m_iCurT = xml.Query<unsigned int>((strBase + "cur_t").c_str(), 0);
 	m_iCurF = xml.Query<unsigned int>((strBase + "cur_f").c_str(), 0);

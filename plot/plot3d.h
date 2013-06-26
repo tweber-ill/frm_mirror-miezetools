@@ -42,7 +42,7 @@ public:
 	virtual SubWindowBase* clone() const;
 	virtual void RefreshStatusMsgs();
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase);
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 
 protected:
@@ -74,7 +74,7 @@ public:
 	virtual Plot* ConvertTo1d(int iFoil) { return m_pPlot->ConvertTo1d(iFoil); }
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return m_pPlot->ConvertTo3d(iParam); }
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase) { return m_pPlot->LoadXML(xml, strBase); }
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return m_pPlot->LoadXML(xml, blob, strBase); }
 	virtual bool SaveXML(std::ostream& ostr) const { return m_pPlot->SaveXML(ostr); }
 
 public slots:

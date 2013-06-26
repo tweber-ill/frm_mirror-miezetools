@@ -31,7 +31,7 @@ struct PlotObj
 	PlotType plttype;
 
 	bool SaveXML(std::ostream& ostr) const;
-	bool LoadXML(Xml& xml, const std::string& strBase);
+	bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 };
 
 class Plot : public SubWindowBase
@@ -99,7 +99,7 @@ public:
 	virtual void SetROI(const Roi* pROI);
 	virtual Roi* GetROI();
 
-	virtual bool LoadXML(Xml& xml, const std::string& strBase);
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 

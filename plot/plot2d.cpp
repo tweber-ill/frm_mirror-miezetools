@@ -410,9 +410,9 @@ Roi* Plot2d::GetROI()
 }
 
 
-bool Plot2d::LoadXML(Xml& xml, const std::string& strBase)
+bool Plot2d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
-	m_dat.LoadXML(xml, strBase + "data/");
+	m_dat.LoadXML(xml, blob, strBase + "data/");
 
 	m_bLog = xml.Query<bool>((strBase+"log").c_str(), 0);
 	m_bCountData = xml.Query<bool>((strBase+"count_data").c_str(), 1);

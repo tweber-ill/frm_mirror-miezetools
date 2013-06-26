@@ -110,10 +110,10 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 }
 
 
-bool Plot3d::LoadXML(Xml& xml, const std::string& strBase)
+bool Plot3d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
-	m_dat3.LoadXML(xml, strBase + "data/");
-	Plot2d::LoadXML(xml, strBase+"sub_2d/");
+	m_dat3.LoadXML(xml, blob, strBase + "data/");
+	Plot2d::LoadXML(xml, blob, strBase+"sub_2d/");
 
 	m_iCurT = xml.Query<unsigned int>((strBase + "cur_t").c_str(), 0);
 	setWindowTitle(xml.QueryString((strBase+"window_title").c_str(), "").c_str());
