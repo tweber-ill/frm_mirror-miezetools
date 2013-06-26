@@ -45,13 +45,15 @@
 
 #include "data/export.h"
 
+#define WND_TITLE "Cattus, a MIEZE toolset"
+
 
 MiezeMainWnd::MiezeMainWnd()
 					: m_iPlotCnt(1), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)),
 					  m_presdlg(0), m_pphasecorrdlg(0)
 {
-	this->setWindowTitle("Cattus, a MIEZE toolset");
+	this->setWindowTitle(WND_TITLE);
 
 	m_pmdi = new QMdiArea(this);
 	m_pmdi->setActivationOrder(QMdiArea::StackingOrder);
@@ -771,6 +773,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		delete pdat;
 	}
 
+	this->SetStatusMsg("Ok.",0);
 	AddRecentFile(QString(strFile.c_str()));
 }
 
@@ -1325,6 +1328,7 @@ void MiezeMainWnd::SessionLoadTriggered()
 		}
 	}
 
+	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
 	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strSess).c_str()));
 }
 
@@ -1349,6 +1353,11 @@ void MiezeMainWnd::SessionSaveTriggered()
 	{
 		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
 		if(!pWnd) continue;
+
+		std::ostringstream ostrMsg;
+		ostrMsg << "Saving \"" << pWnd->windowTitle().toStdString() << "\"...";
+		this->SetStatusMsg(ostrMsg.str().c_str(), 0);
+
 		pWnd = pWnd->GetActualWidget();
 
 		ofstr << "<window_" << iWnd << ">\n";
@@ -1362,6 +1371,8 @@ void MiezeMainWnd::SessionSaveTriggered()
 
 	ofstrBlob.close();
 	ofstr.close();
+
+	this->SetStatusMsg("Ok.", 0);
 }
 
 void MiezeMainWnd::SessionSaveAsTriggered()
@@ -1381,6 +1392,7 @@ void MiezeMainWnd::SessionSaveAsTriggered()
 	m_strCurSess = strFile1;
 	SessionSaveTriggered();
 
+	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
 	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strFile1).c_str()));
 }
 
