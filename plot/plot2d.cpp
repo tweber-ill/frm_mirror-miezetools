@@ -410,4 +410,25 @@ Roi* Plot2d::GetROI()
 }
 
 
+bool Plot2d::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<log> " << m_bLog << " </log>\n";
+	ostr << "<count_data> " << m_bCountData << " </count_data>\n";
+	ostr << "<cyclic_data> " << m_bCyclicData << " </cyclic_data>\n";
+	ostr << "<phase_data> " << m_bPhaseData << " </phase_data>\n";
+
+	ostr << "<x_label> " << m_strXAxis.toStdString() << " </x_label>\n";
+	ostr << "<y_label> " << m_strYAxis.toStdString() << " </y_label>\n";
+	ostr << "<z_label> " << m_strZAxis.toStdString() << " </z_label>\n";
+	ostr << "<title> " << m_strTitle.toStdString() << " </title>\n";
+	ostr << "<window_title> " << windowTitle().toStdString() << " </window_title>\n";
+
+	ostr << "<data>\n";
+	m_dat.SaveXML(ostr);
+	ostr << "</data>\n";
+
+	return 1;
+}
+
+
 #include "plot2d.moc"

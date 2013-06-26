@@ -519,6 +519,8 @@ bool Plot::SaveXML(std::ostream& ostr) const
 		obj.SaveXML(ostr);
 		ostr << "</plot_obj_" << iDat << ">\n";
 	}
+
+	return 1;
 }
 
 void PlotObj::SaveXML(std::ostream& ostr) const

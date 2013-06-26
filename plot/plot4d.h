@@ -43,6 +43,8 @@ public:
 	virtual SubWindowBase* clone() const;
 	virtual void RefreshStatusMsgs();
 
+	virtual bool SaveXML(std::ostream& ostr) const;
+
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat4; }
 };
@@ -70,6 +72,8 @@ public:
 
 	virtual Plot* ConvertTo1d(int iFoil=-1) { return m_pPlot->ConvertTo1d(iFoil); }
 	virtual Plot3d* ConvertTo3d(int iFoil=-1) { return m_pPlot->ConvertTo3d(iFoil); }
+
+	virtual bool SaveXML(std::ostream& ostr) const { return m_pPlot->SaveXML(ostr); }
 
 public slots:
 	void DataLoaded();

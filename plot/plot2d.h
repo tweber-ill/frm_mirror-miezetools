@@ -83,6 +83,8 @@ protected:
 public:
 	virtual void SetROI(const Roi* pROI);
 	virtual Roi* GetROI();
+
+	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
 #endif

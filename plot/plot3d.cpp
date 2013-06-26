@@ -109,6 +109,22 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 	return pPlot;
 }
 
+bool Plot3d::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<window_title> " << windowTitle().toStdString() << " </window_title>\n";
+	ostr << "<cur_t> " << m_iCurT << " </cur_t>\n";
+
+	ostr << "<sub_2d>\n";
+	Plot2d::SaveXML(ostr);
+	ostr << "</sub_2d>\n";
+
+
+	ostr << "<data>\n";
+	m_dat3.SaveXML(ostr);
+	ostr << "</data>\n";
+
+	return 1;
+}
 
 
 

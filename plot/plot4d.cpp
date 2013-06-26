@@ -287,6 +287,24 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 	return pPlot;
 }
 
+bool Plot4d::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<window_title> " << windowTitle().toStdString() << " </window_title>\n";
+	ostr << "<cur_t> " << m_iCurT << " </cur_t>\n";
+	ostr << "<cur_f> " << m_iCurF << " </cur_f>\n";
+
+	ostr << "<sub_2d>\n";
+	Plot2d::SaveXML(ostr);
+	ostr << "</sub_2d>\n";
+
+
+	ostr << "<data>\n";
+	m_dat4.SaveXML(ostr);
+	ostr << "</data>\n";
+
+	return 1;
+}
+
 
 
 Plot4dWrapper::Plot4dWrapper(QWidget* pParent, const char* pcTitle, bool bCountData)

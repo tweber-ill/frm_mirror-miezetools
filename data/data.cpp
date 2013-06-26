@@ -135,22 +135,27 @@ bool Data1::SaveXML(std::ostream& ostr) const
 	ostr << "<x> ";
 	for(double d : m_vecValsX)
 		ostr << d << " ";
-	ostr << "</x>\n";
+	ostr << " </x>\n";
 
 	ostr << "<y> ";
 	for(double d : m_vecValsY)
 		ostr << d << " ";
-	ostr << "</y>\n";
+	ostr << " </y>\n";
 
 	ostr << "<x_err> ";
 	for(double d : m_vecErrsX)
 		ostr << d << " ";
-	ostr << "</x_err>\n";
+	ostr << " </x_err>\n";
 
 	ostr << "<y_err> ";
 	for(double d : m_vecErrsY)
 		ostr << d << " ";
-	ostr << "</y_err>\n";
+	ostr << " </y_err>\n";
+
+	if(m_roi.GetNumElements())
+		m_roi.SaveXML(ostr);
+
+	return 1;
 }
 
 //------------------------------------------------------------------------
@@ -307,6 +312,29 @@ void Data2::FromMatrix(const ublas::matrix<double>& mat)
 		}
 }
 
+bool Data2::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<vals> ";
+	for(double d : m_vecVals)
+		ostr << d << " ";
+	ostr << " </vals>\n";
+
+	ostr << "<errs> ";
+	for(double d : m_vecErrs)
+		ostr << d << " ";
+	ostr << " </errs>\n";
+
+	ostr << "<min> " << m_dMin << " </min>\n";
+	ostr << "<max> " << m_dMax << " </max>\n";
+	ostr << "<total> " << m_dTotal << " </total>\n";
+
+	SaveRangeXml(ostr);
+
+	if(m_roi.GetNumElements())
+		m_roi.SaveXML(ostr);
+
+	return 1;
+}
 
 //------------------------------------------------------------------------
 
@@ -516,6 +544,31 @@ Data1 Data3::GetXYSum() const
 	return dat;
 }
 
+
+bool Data3::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<vals> ";
+	for(double d : m_vecVals)
+		ostr << d << " ";
+	ostr << " </vals>\n";
+
+	ostr << "<errs> ";
+	for(double d : m_vecErrs)
+		ostr << d << " ";
+	ostr << " </errs>\n";
+
+	ostr << "<min> " << m_dMin << " </min>\n";
+	ostr << "<max> " << m_dMax << " </max>\n";
+	ostr << "<total> " << m_dTotal << " </total>\n";
+	ostr << "<depth> " << m_iDepth << " </depth>\n";
+
+	SaveRangeXml(ostr);
+
+	if(m_roi.GetNumElements())
+		m_roi.SaveXML(ostr);
+
+	return 1;
+}
 
 
 //------------------------------------------------------------------------
@@ -732,6 +785,31 @@ Data1 Data4::GetXYD2(uint iX, uint iY, uint iD2) const
 	return dat;
 }
 
+bool Data4::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<vals> ";
+	for(double d : m_vecVals)
+		ostr << d << " ";
+	ostr << " </vals>\n";
+
+	ostr << "<errs> ";
+	for(double d : m_vecErrs)
+		ostr << d << " ";
+	ostr << " </errs>\n";
+
+	ostr << "<min> " << m_dMin << " </min>\n";
+	ostr << "<max> " << m_dMax << " </max>\n";
+	ostr << "<total> " << m_dTotal << " </total>\n";
+	ostr << "<depth> " << m_iDepth << " </depth>\n";
+	ostr << "<depth2> " << m_iDepth2 << " </depth2>\n";
+
+	SaveRangeXml(ostr);
+
+	if(m_roi.GetNumElements())
+		m_roi.SaveXML(ostr);
+
+	return 1;
+}
 
 
 //------------------------------------------------------------------------
@@ -805,4 +883,21 @@ double XYRange::GetPixelYPos(double dRangeY) const
 void XYRange::CopyXYRangeFrom(const XYRange* pRan)
 {
 	*this = *pRan;
+}
+
+bool XYRange::SaveRangeXml(std::ostream& ostr) const
+{
+	ostr << "<range>\n";
+
+	ostr << "<active> " << m_bHasRange << " </active>\n";
+	ostr << "<width> " << m_iWidth << " </width>\n";
+	ostr << "<height> " << m_iWidth << " </height>\n";
+	ostr << "<min_x> " << m_dXMin << " </min_x>\n";
+	ostr << "<max_x> " << m_dXMax << " </max_x>\n";
+	ostr << "<min_y> " << m_dYMin << " </min_y>\n";
+	ostr << "<max_y> " << m_dYMax << " </max_y>\n";
+	ostr << "<log_x> " << m_bXIsLog << " </log_x>\n";
+	ostr << "<log_y> " << m_bYIsLog << " </log_y>\n";
+
+	ostr << "</range>\n";
 }

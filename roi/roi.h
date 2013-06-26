@@ -314,6 +314,8 @@ class Roi
 		bool Load(const char* pcFile);
 		bool Save(const char* pcFile) const;
 
+		bool SaveXML(std::ostream& ostr) const;
+
 		bool IsRoiActive() const { return m_bActive; }
 		void SetRoiActive(bool bActive) { m_bActive = bActive; }
 

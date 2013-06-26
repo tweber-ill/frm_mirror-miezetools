@@ -104,6 +104,8 @@ public:
 	double GetPixelYPos(double dRangeY) const;
 
 	void CopyXYRangeFrom(const XYRange* pRan);
+
+	bool SaveRangeXml(std::ostream& ostr) const;
 };
 
 
@@ -214,6 +216,8 @@ public:
 	Data1 SumY() const;
 
 	void RecalcMinMaxTotal();
+
+	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
 
@@ -263,6 +267,8 @@ public:
 	void Add(const Data3& dat);
 
 	void RecalcMinMaxTotal();
+
+	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
 class Data4 : public DataInterface, public XYRange
@@ -310,6 +316,8 @@ public:
 	Data1 GetXYD2(uint iX, uint iY, uint iD2) const;
 
 	void RecalcMinMaxTotal();
+
+	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
 #endif

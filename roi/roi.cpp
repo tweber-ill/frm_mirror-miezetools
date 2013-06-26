@@ -1217,6 +1217,37 @@ bool Roi::Load(const char* pcFile)
 	return true;
 }
 
+bool Roi::SaveXML(std::ostream& ostr) const
+{
+	ostr << "<roi>\n\n";
+	ostr << "<active> " << IsRoiActive() << " </active>\n\n";
+	ostr << "<elements>\n\n";
+
+	for(int i=0; i<GetNumElements(); ++i)
+	{
+		const RoiElement& elem = GetElement(i);
+		ostr << "\t<element_" << i << ">\n";
+		ostr << "\t\t<type> " << elem.GetName() << " </type>\n";
+
+		for(int iParam=0; iParam<elem.GetParamCount(); ++iParam)
+		{
+			std::string strParam = elem.GetParamName(iParam);
+			double dValue = elem.GetParam(iParam);
+
+			ostr << "\t\t<" << strParam << "> ";
+			ostr << dValue;
+			ostr << " </" << strParam << ">\n";
+		}
+
+		ostr << "\t</element_" << i << ">\n\n";
+	}
+
+	ostr << "</elements>\n\n";
+	ostr << "</roi>\n";
+
+	return 1;
+}
+
 bool Roi::Save(const char* pcFile) const
 {
 	std::ofstream ofstr(pcFile);
@@ -1229,34 +1260,10 @@ bool Roi::Save(const char* pcFile) const
 	ofstr << "<?xml version=\"1.0\"?>\n\n";
 	ofstr << "<!-- ROI element configuration for Cattus -->\n\n";
 
-	ofstr << "<roi>\n\n";
-	ofstr << "<active> " << IsRoiActive() << " </active>\n\n";
-	ofstr << "<elements>\n\n";
-
-	for(int i=0; i<GetNumElements(); ++i)
-	{
-		const RoiElement& elem = GetElement(i);
-		ofstr << "\t<element_" << i << ">\n";
-		ofstr << "\t\t<type> " << elem.GetName() << " </type>\n";
-
-		for(int iParam=0; iParam<elem.GetParamCount(); ++iParam)
-		{
-			std::string strParam = elem.GetParamName(iParam);
-			double dValue = elem.GetParam(iParam);
-
-			ofstr << "\t\t<" << strParam << "> ";
-			ofstr << dValue;
-			ofstr << " </" << strParam << ">\n";
-		}
-
-		ofstr << "\t</element_" << i << ">\n\n";
-	}
-
-	ofstr << "</elements>\n\n";
-	ofstr << "</roi>\n";
+	bool bOk = SaveXML(ofstr);
 	ofstr.close();
 
-	return true;
+	return bOk;
 }
 
 

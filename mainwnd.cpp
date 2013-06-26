@@ -1293,6 +1293,7 @@ void MiezeMainWnd::SessionSaveTriggered()
 
 	std::ofstream ofstr(m_strCurSess);
 	ofstr << "<cattus_session>\n\n";
+	ofstr << "<plot_counter> " << m_iPlotCnt << "</plot_counter>\n";
 
 	unsigned int iWnd=0;
 	for(QMdiSubWindow *pItem : m_pmdi->subWindowList())
