@@ -55,7 +55,7 @@ public:
 	virtual Roi* GetROI() { return 0; }
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return false; }
-	virtual bool SaveXML(std::ostream& ostr) const { return false; }
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return false; }
 
 	virtual void RefreshPlot() {}
 };

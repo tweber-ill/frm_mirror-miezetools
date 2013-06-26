@@ -44,7 +44,7 @@ public:
 	virtual void RefreshStatusMsgs();
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat4; }
@@ -75,7 +75,7 @@ public:
 	virtual Plot3d* ConvertTo3d(int iFoil=-1) { return m_pPlot->ConvertTo3d(iFoil); }
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return m_pPlot->LoadXML(xml, blob, strBase); }
-	virtual bool SaveXML(std::ostream& ostr) const { return m_pPlot->SaveXML(ostr); }
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return m_pPlot->SaveXML(ostr, ostrBlob); }
 
 public slots:
 	void DataLoaded();

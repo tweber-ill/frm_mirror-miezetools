@@ -428,7 +428,7 @@ bool Plot2d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return 1;
 }
 
-bool Plot2d::SaveXML(std::ostream& ostr) const
+bool Plot2d::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	ostr << "<type> plot_2d </type>\n";
 
@@ -444,7 +444,7 @@ bool Plot2d::SaveXML(std::ostream& ostr) const
 	ostr << "<window_title> " << windowTitle().toStdString() << " </window_title>\n";
 
 	ostr << "<data>\n";
-	m_dat.SaveXML(ostr);
+	m_dat.SaveXML(ostr, ostrBlob);
 	ostr << "</data>\n";
 
 	return 1;

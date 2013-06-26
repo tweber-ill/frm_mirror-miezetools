@@ -24,11 +24,11 @@ class Blob
 		void unmap(void* pv);
 
 		template<typename T, class Iter>
-		void copy(qint64 iStart, qint64 iLen, Iter begin)
+		void copy(qint64 iStart, qint64 iLenInT, Iter begin)
 		{
-			T* p = (T*)map(iStart, iLen);
+			T* p = (T*)map(iStart, iLenInT*sizeof(T));
 
-			for(qint64 i=0; i<iLen; ++i)
+			for(qint64 i=0; i<iLenInT; ++i)
 			{
 				*begin = T(p[i]);
 				begin++;

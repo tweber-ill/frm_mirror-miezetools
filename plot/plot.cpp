@@ -533,7 +533,7 @@ bool Plot::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return 1;
 }
 
-bool Plot::SaveXML(std::ostream& ostr) const
+bool Plot::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	ostr << "<type> plot_1d </type>\n";
 
@@ -557,7 +557,7 @@ bool Plot::SaveXML(std::ostream& ostr) const
 	{
 		ostr << "<plot_obj_" << iDat << ">\n";
 		const PlotObj& obj = GetData(iDat);
-		obj.SaveXML(ostr);
+		obj.SaveXML(ostr, ostrBlob);
 		ostr << "</plot_obj_" << iDat << ">\n";
 	}
 
@@ -582,7 +582,7 @@ bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return dat.LoadXML(xml, blob, strBase + "data/");
 }
 
-bool PlotObj::SaveXML(std::ostream& ostr) const
+bool PlotObj::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	std::string strType = "unknown";
 	switch(plttype)
@@ -599,7 +599,7 @@ bool PlotObj::SaveXML(std::ostream& ostr) const
 	ostr << "<name> " << strName << " </name>\n";
 
 	ostr << "<data>\n";
-	dat.SaveXML(ostr);
+	dat.SaveXML(ostr, ostrBlob);
 	ostr << "</data>\n";
 
 	return 1;

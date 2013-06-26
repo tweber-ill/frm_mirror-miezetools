@@ -122,7 +122,7 @@ bool Plot3d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return 1;
 }
 
-bool Plot3d::SaveXML(std::ostream& ostr) const
+bool Plot3d::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	ostr << "<type> plot_3d </type>\n";
 
@@ -130,12 +130,12 @@ bool Plot3d::SaveXML(std::ostream& ostr) const
 	ostr << "<cur_t> " << m_iCurT << " </cur_t>\n";
 
 	ostr << "<sub_2d>\n";
-	Plot2d::SaveXML(ostr);
+	Plot2d::SaveXML(ostr, ostrBlob);
 	ostr << "</sub_2d>\n";
 
 
 	ostr << "<data>\n";
-	m_dat3.SaveXML(ostr);
+	m_dat3.SaveXML(ostr, ostrBlob);
 	ostr << "</data>\n";
 
 	return 1;

@@ -30,7 +30,7 @@ struct PlotObj
 	std::string strName;
 	PlotType plttype;
 
-	bool SaveXML(std::ostream& ostr) const;
+	bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 	bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 };
 
@@ -100,7 +100,7 @@ public:
 	virtual Roi* GetROI();
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 };
 
 

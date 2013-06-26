@@ -85,7 +85,7 @@ public:
 	virtual Roi* GetROI();
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 };
 
 #endif

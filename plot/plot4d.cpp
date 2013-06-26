@@ -305,7 +305,7 @@ bool Plot4d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return 1;
 }
 
-bool Plot4d::SaveXML(std::ostream& ostr) const
+bool Plot4d::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	ostr << "<type> plot_4d </type>\n";
 
@@ -314,12 +314,12 @@ bool Plot4d::SaveXML(std::ostream& ostr) const
 	ostr << "<cur_f> " << m_iCurF << " </cur_f>\n";
 
 	ostr << "<sub_2d>\n";
-	Plot2d::SaveXML(ostr);
+	Plot2d::SaveXML(ostr, ostrBlob);
 	ostr << "</sub_2d>\n";
 
 
 	ostr << "<data>\n";
-	m_dat4.SaveXML(ostr);
+	m_dat4.SaveXML(ostr, ostrBlob);
 	ostr << "</data>\n";
 
 	return 1;

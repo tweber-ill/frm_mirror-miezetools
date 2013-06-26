@@ -1332,6 +1332,8 @@ void MiezeMainWnd::SessionSaveTriggered()
 	ofstr << "<plot_counter> " << m_iPlotCnt << " </plot_counter>\n";
 	ofstr << "<window_counter> " << m_pmdi->subWindowList().size() << " </window_counter>\n";
 
+	std::ofstream ofstrBlob(m_strCurSess + ".blob", std::ofstream::binary);
+
 	unsigned int iWnd=0;
 	for(QMdiSubWindow *pItem : m_pmdi->subWindowList())
 	{
@@ -1340,13 +1342,16 @@ void MiezeMainWnd::SessionSaveTriggered()
 		pWnd = pWnd->GetActualWidget();
 
 		ofstr << "<window_" << iWnd << ">\n";
-		pWnd->SaveXML(ofstr);
+		pWnd->SaveXML(ofstr, ofstrBlob);
 		ofstr << "</window_" << iWnd << ">\n";
 
 		++iWnd;
 	}
 
 	ofstr << "\n\n</cattus_session>\n";
+
+	ofstrBlob.close();
+	ofstr.close();
 }
 
 void MiezeMainWnd::SessionSaveAsTriggered()

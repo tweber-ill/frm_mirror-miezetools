@@ -9,6 +9,10 @@
 #include <limits>
 #include <boost/algorithm/minmax_element.hpp>
 
+// size beyond which session data is saved in the blob
+// file rather than the xml
+#define BLOB_SIZE 256
+
 Data1::Data1(uint uiNum, const double* pValsX, const double* pValsY,
 														  const double *pErrsY, const double *pErrsX)
 {
@@ -175,29 +179,51 @@ bool Data1::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return 1;
 }
 
-bool Data1::SaveXML(std::ostream& ostr) const
+bool Data1::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	ostr << "<length> " << m_vecValsX.size() << "</length>\n";
 
-	ostr << "<x> ";
-	for(double d : m_vecValsX)
-		ostr << d << " ";
-	ostr << " </x>\n";
+	const bool bSaveInBlob = (m_vecValsX.size() > BLOB_SIZE);
+	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
 
-	ostr << "<y> ";
-	for(double d : m_vecValsY)
-		ostr << d << " ";
-	ostr << " </y>\n";
+	if(bSaveInBlob)
+	{
+		const std::vector<double>* vecs[] = {&m_vecValsX, &m_vecValsY, &m_vecErrsX, &m_vecErrsY};
+		std::string strs[] = {"blob_x", "blob_y", "blob_x_err", "blob_y_err"};
 
-	ostr << "<x_err> ";
-	for(double d : m_vecErrsX)
-		ostr << d << " ";
-	ostr << " </x_err>\n";
+		for(unsigned int iObj=0; iObj<4; ++iObj)
+		{
+			qint64 iBlobIdx = ostrBlob.tellp();
+			for(double d : *vecs[iObj])
+				ostrBlob.write((char*)&d, sizeof(d));
 
-	ostr << "<y_err> ";
-	for(double d : m_vecErrsY)
-		ostr << d << " ";
-	ostr << " </y_err>\n";
+			ostr << "<" << strs[iObj] << "> ";
+			ostr << iBlobIdx;
+			ostr << " </" << strs[iObj] << ">\n";
+		}
+	}
+	else
+	{
+		ostr << "<x> ";
+		for(double d : m_vecValsX)
+			ostr << d << " ";
+		ostr << " </x>\n";
+
+		ostr << "<y> ";
+		for(double d : m_vecValsY)
+			ostr << d << " ";
+		ostr << " </y>\n";
+
+		ostr << "<x_err> ";
+		for(double d : m_vecErrsX)
+			ostr << d << " ";
+		ostr << " </x_err>\n";
+
+		ostr << "<y_err> ";
+		for(double d : m_vecErrsY)
+			ostr << d << " ";
+		ostr << " </y_err>\n";
+	}
 
 	if(m_roi.GetNumElements())
 		m_roi.SaveXML(ostr);
@@ -403,17 +429,39 @@ bool Data2::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return 1;
 }
 
-bool Data2::SaveXML(std::ostream& ostr) const
+bool Data2::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
-	ostr << "<vals> ";
-	for(double d : m_vecVals)
-		ostr << d << " ";
-	ostr << " </vals>\n";
+	const bool bSaveInBlob = (m_vecVals.size() > BLOB_SIZE);
+	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
 
-	ostr << "<errs> ";
-	for(double d : m_vecErrs)
-		ostr << d << " ";
-	ostr << " </errs>\n";
+	if(bSaveInBlob)
+	{
+		const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+		std::string strs[] = {"blob_vals", "blob_errs"};
+
+		for(unsigned int iObj=0; iObj<2; ++iObj)
+		{
+			qint64 iBlobIdx = ostrBlob.tellp();
+			for(double d : *vecs[iObj])
+				ostrBlob.write((char*)&d, sizeof(d));
+
+			ostr << "<" << strs[iObj] << "> ";
+			ostr << iBlobIdx;
+			ostr << " </" << strs[iObj] << ">\n";
+		}
+	}
+	else
+	{
+		ostr << "<vals> ";
+		for(double d : m_vecVals)
+			ostr << d << " ";
+		ostr << " </vals>\n";
+
+		ostr << "<errs> ";
+		for(double d : m_vecErrs)
+			ostr << d << " ";
+		ostr << " </errs>\n";
+	}
 
 	ostr << "<min> " << m_dMin << " </min>\n";
 	ostr << "<max> " << m_dMax << " </max>\n";
@@ -682,17 +730,39 @@ bool Data3::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return 1;
 }
 
-bool Data3::SaveXML(std::ostream& ostr) const
+bool Data3::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
-	ostr << "<vals> ";
-	for(double d : m_vecVals)
-		ostr << d << " ";
-	ostr << " </vals>\n";
+	const bool bSaveInBlob = (m_vecVals.size() > BLOB_SIZE);
+	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
 
-	ostr << "<errs> ";
-	for(double d : m_vecErrs)
-		ostr << d << " ";
-	ostr << " </errs>\n";
+	if(bSaveInBlob)
+	{
+		const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+		std::string strs[] = {"blob_vals", "blob_errs"};
+
+		for(unsigned int iObj=0; iObj<2; ++iObj)
+		{
+			qint64 iBlobIdx = ostrBlob.tellp();
+			for(double d : *vecs[iObj])
+				ostrBlob.write((char*)&d, sizeof(d));
+
+			ostr << "<" << strs[iObj] << "> ";
+			ostr << iBlobIdx;
+			ostr << " </" << strs[iObj] << ">\n";
+		}
+	}
+	else
+	{
+		ostr << "<vals> ";
+		for(double d : m_vecVals)
+			ostr << d << " ";
+		ostr << " </vals>\n";
+
+		ostr << "<errs> ";
+		for(double d : m_vecErrs)
+			ostr << d << " ";
+		ostr << " </errs>\n";
+	}
 
 	ostr << "<min> " << m_dMin << " </min>\n";
 	ostr << "<max> " << m_dMax << " </max>\n";
@@ -970,17 +1040,39 @@ bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return 1;
 }
 
-bool Data4::SaveXML(std::ostream& ostr) const
+bool Data4::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
-	ostr << "<vals> ";
-	for(double d : m_vecVals)
-		ostr << d << " ";
-	ostr << " </vals>\n";
+	const bool bSaveInBlob = (m_vecVals.size() > BLOB_SIZE);
+	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
 
-	ostr << "<errs> ";
-	for(double d : m_vecErrs)
-		ostr << d << " ";
-	ostr << " </errs>\n";
+	if(bSaveInBlob)
+	{
+		const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+		std::string strs[] = {"blob_vals", "blob_errs"};
+
+		for(unsigned int iObj=0; iObj<2; ++iObj)
+		{
+			qint64 iBlobIdx = ostrBlob.tellp();
+			for(double d : *vecs[iObj])
+				ostrBlob.write((char*)&d, sizeof(d));
+
+			ostr << "<" << strs[iObj] << "> ";
+			ostr << iBlobIdx;
+			ostr << " </" << strs[iObj] << ">\n";
+		}
+	}
+	else
+	{
+		ostr << "<vals> ";
+		for(double d : m_vecVals)
+			ostr << d << " ";
+		ostr << " </vals>\n";
+
+		ostr << "<errs> ";
+		for(double d : m_vecErrs)
+			ostr << d << " ";
+		ostr << " </errs>\n";
+	}
 
 	ostr << "<min> " << m_dMin << " </min>\n";
 	ostr << "<max> " << m_dMax << " </max>\n";

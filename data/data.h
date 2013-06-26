@@ -72,7 +72,7 @@ public:
 	virtual DataType GetType() const = 0;
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return false; }
-	virtual bool SaveXML(std::ostream& ostr) const { return false; }
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return false; }
 };
 
 
@@ -173,7 +173,7 @@ public:
 	double SumY() const;
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 };
 
 
@@ -223,7 +223,7 @@ public:
 	void RecalcMinMaxTotal();
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 };
 
 
@@ -275,7 +275,7 @@ public:
 	void RecalcMinMaxTotal();
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 };
 
 class Data4 : public DataInterface, public XYRange
@@ -325,7 +325,7 @@ public:
 	void RecalcMinMaxTotal();
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 };
 
 #endif
