@@ -13,6 +13,71 @@
 // file rather than the xml
 #define BLOB_SIZE 256
 
+static void load_xml_vecs(unsigned int iNumVecs,
+						std::vector<double>** pvecs,
+						const std::string* pstrs,
+						Xml& xml,
+						const std::string& strBase,
+						Blob& blob)
+{
+	bool bInBlob = xml.Query<bool>((strBase + "in_blob").c_str(), 0);
+
+	for(unsigned int iObj=0; iObj<iNumVecs; ++iObj)
+	{
+		if(bInBlob)
+		{
+			bool bHasBlobIdx = 0;
+			qint64 iBlobIdx = xml.Query<qint64>((strBase + "blob_" + pstrs[iObj]).c_str(), 0, &bHasBlobIdx);
+			if(bHasBlobIdx)
+				blob.copy<double>(iBlobIdx, qint64(pvecs[iObj]->size()), pvecs[iObj]->begin());
+			else
+				std::cerr << "Error: Blob usage enabled, but no blob index given!"
+						  << std::endl;
+		}
+		else
+		{
+			std::istringstream istr(xml.QueryString((strBase + pstrs[iObj]).c_str(), ""));
+
+			for(unsigned int i=0; i<pvecs[iObj]->size(); ++i)
+				istr >> (*pvecs[iObj])[i];
+		}
+	}
+}
+
+static void save_xml_vecs(unsigned int iNumVecs,
+					const std::vector<double>** pvecs,
+					const std::string* pstrs,
+					std::ostream& ostr,
+					std::ostream& ostrBlob,
+					bool bSaveInBlob)
+{
+	if(iNumVecs==0) return;
+
+	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
+
+	for(unsigned int iObj=0; iObj<iNumVecs; ++iObj)
+	{
+		if(bSaveInBlob)
+		{
+			qint64 iBlobIdx = ostrBlob.tellp();
+			for(double d : *pvecs[iObj])
+				ostrBlob.write((char*)&d, sizeof(d));
+
+			ostr << "<" << "blob_" << pstrs[iObj] << "> ";
+			ostr << iBlobIdx;
+			ostr << " </" << "blob_" << pstrs[iObj] << ">\n";
+		}
+		else
+		{
+			ostr << "<" << pstrs[iObj] << "> ";
+			for(double d : *pvecs[iObj])
+				ostr << d << " ";
+			ostr << " </" << pstrs[iObj] << ">\n";
+		}
+	}
+}
+
+
 Data1::Data1(uint uiNum, const double* pValsX, const double* pValsY,
 														  const double *pErrsY, const double *pErrsX)
 {
@@ -143,37 +208,10 @@ bool Data1::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_vecErrsX.resize(uiLen);
 	m_vecErrsY.resize(uiLen);
 
-	if(xml.Query<bool>((strBase + "in_blob").c_str(), 0))
-	{
-		std::vector<double>* vecs[] = {&m_vecValsX, &m_vecValsY, &m_vecErrsX, &m_vecErrsY};
-		std::string strs[] = {"blob_x", "blob_y", "blob_x_err", "blob_y_err"};
+	std::vector<double>* vecs[] = {&m_vecValsX, &m_vecValsY, &m_vecErrsX, &m_vecErrsY};
+	std::string strs[] = {"x", "y", "x_err", "y_err"};
 
-		for(unsigned int iObj=0; iObj<4; ++iObj)
-		{
-			bool bHasBlobIdx = 0;
-			qint64 iBlobIdx = xml.Query<qint64>((strBase + strs[iObj]).c_str(), 0, &bHasBlobIdx);
-			if(bHasBlobIdx)
-				blob.copy<double>(iBlobIdx, qint64(uiLen), vecs[iObj]->begin());
-			else
-				std::cerr << "Error: Blob usage enabled, but no blob index given!"
-						  << std::endl;
-		}
-	}
-	else
-	{
-		std::istringstream istrX(xml.QueryString((strBase + "x").c_str(), ""));
-		std::istringstream istrY(xml.QueryString((strBase + "y").c_str(), ""));
-		std::istringstream istrXErr(xml.QueryString((strBase + "x_err").c_str(), ""));
-		std::istringstream istrYErr(xml.QueryString((strBase + "y_err").c_str(), ""));
-
-		for(unsigned int i=0; i<uiLen; ++i)
-		{
-			istrX >> m_vecValsX[i];
-			istrY >> m_vecValsY[i];
-			istrXErr >> m_vecErrsX[i];
-			istrYErr >> m_vecErrsY[i];
-		}
-	}
+	load_xml_vecs(4, vecs, strs, xml, strBase, blob);
 
 	m_roi.LoadXML(xml, strBase);
 	return 1;
@@ -184,46 +222,11 @@ bool Data1::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 	ostr << "<length> " << m_vecValsX.size() << "</length>\n";
 
 	const bool bSaveInBlob = (m_vecValsX.size() > BLOB_SIZE);
-	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
 
-	if(bSaveInBlob)
-	{
-		const std::vector<double>* vecs[] = {&m_vecValsX, &m_vecValsY, &m_vecErrsX, &m_vecErrsY};
-		std::string strs[] = {"blob_x", "blob_y", "blob_x_err", "blob_y_err"};
+	const std::vector<double>* vecs[] = {&m_vecValsX, &m_vecValsY, &m_vecErrsX, &m_vecErrsY};
+	std::string strs[] = {"x", "y", "x_err", "y_err"};
 
-		for(unsigned int iObj=0; iObj<4; ++iObj)
-		{
-			qint64 iBlobIdx = ostrBlob.tellp();
-			for(double d : *vecs[iObj])
-				ostrBlob.write((char*)&d, sizeof(d));
-
-			ostr << "<" << strs[iObj] << "> ";
-			ostr << iBlobIdx;
-			ostr << " </" << strs[iObj] << ">\n";
-		}
-	}
-	else
-	{
-		ostr << "<x> ";
-		for(double d : m_vecValsX)
-			ostr << d << " ";
-		ostr << " </x>\n";
-
-		ostr << "<y> ";
-		for(double d : m_vecValsY)
-			ostr << d << " ";
-		ostr << " </y>\n";
-
-		ostr << "<x_err> ";
-		for(double d : m_vecErrsX)
-			ostr << d << " ";
-		ostr << " </x_err>\n";
-
-		ostr << "<y_err> ";
-		for(double d : m_vecErrsY)
-			ostr << d << " ";
-		ostr << " </y_err>\n";
-	}
+	save_xml_vecs(4, vecs, strs, ostr, ostrBlob, bSaveInBlob);
 
 	if(m_roi.GetNumElements())
 		m_roi.SaveXML(ostr);
@@ -395,33 +398,10 @@ bool Data2::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_vecVals.resize(uiCnt);
 	m_vecErrs.resize(uiCnt);
 
-	if(xml.Query<bool>((strBase + "in_blob").c_str(), 0))
-	{
-		std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
-		std::string strs[] = {"blob_vals", "blob_errs"};
+	std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+	std::string strs[] = {"vals", "errs"};
 
-		for(unsigned int iObj=0; iObj<2; ++iObj)
-		{
-			bool bHasBlobIdx = 0;
-			qint64 iBlobIdx = xml.Query<qint64>((strBase + strs[iObj]).c_str(), 0, &bHasBlobIdx);
-			if(bHasBlobIdx)
-				blob.copy<double>(iBlobIdx, qint64(uiCnt), vecs[iObj]->begin());
-			else
-				std::cerr << "Error: Blob usage enabled, but no blob index given!"
-						  << std::endl;
-		}
-	}
-	else
-	{
-		std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
-		std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
-
-		for(unsigned int i=0; i<uiCnt; ++i)
-		{
-			istrVals >> m_vecVals[i];
-			istrErrs >> m_vecErrs[i];
-		}
-	}
+	load_xml_vecs(2, vecs, strs, xml, strBase, blob);
 
 	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
 	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
@@ -432,36 +412,11 @@ bool Data2::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 bool Data2::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	const bool bSaveInBlob = (m_vecVals.size() > BLOB_SIZE);
-	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
 
-	if(bSaveInBlob)
-	{
-		const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
-		std::string strs[] = {"blob_vals", "blob_errs"};
+	const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+	std::string strs[] = {"vals", "errs"};
 
-		for(unsigned int iObj=0; iObj<2; ++iObj)
-		{
-			qint64 iBlobIdx = ostrBlob.tellp();
-			for(double d : *vecs[iObj])
-				ostrBlob.write((char*)&d, sizeof(d));
-
-			ostr << "<" << strs[iObj] << "> ";
-			ostr << iBlobIdx;
-			ostr << " </" << strs[iObj] << ">\n";
-		}
-	}
-	else
-	{
-		ostr << "<vals> ";
-		for(double d : m_vecVals)
-			ostr << d << " ";
-		ostr << " </vals>\n";
-
-		ostr << "<errs> ";
-		for(double d : m_vecErrs)
-			ostr << d << " ";
-		ostr << " </errs>\n";
-	}
+	save_xml_vecs(2, vecs, strs, ostr, ostrBlob, bSaveInBlob);
 
 	ostr << "<min> " << m_dMin << " </min>\n";
 	ostr << "<max> " << m_dMax << " </max>\n";
@@ -695,33 +650,10 @@ bool Data3::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_vecVals.resize(uiCnt);
 	m_vecErrs.resize(uiCnt);
 
-	if(xml.Query<bool>((strBase + "in_blob").c_str(), 0))
-	{
-		std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
-		std::string strs[] = {"blob_vals", "blob_errs"};
+	std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+	std::string strs[] = {"vals", "errs"};
 
-		for(unsigned int iObj=0; iObj<2; ++iObj)
-		{
-			bool bHasBlobIdx = 0;
-			qint64 iBlobIdx = xml.Query<qint64>((strBase + strs[iObj]).c_str(), 0, &bHasBlobIdx);
-			if(bHasBlobIdx)
-				blob.copy<double>(iBlobIdx, qint64(uiCnt), vecs[iObj]->begin());
-			else
-				std::cerr << "Error: Blob usage enabled, but no blob index given!"
-						  << std::endl;
-		}
-	}
-	else
-	{
-		std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
-		std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
-
-		for(unsigned int i=0; i<uiCnt; ++i)
-		{
-			istrVals >> m_vecVals[i];
-			istrErrs >> m_vecErrs[i];
-		}
-	}
+	load_xml_vecs(2, vecs, strs, xml, strBase, blob);
 
 	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
 	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
@@ -733,36 +665,11 @@ bool Data3::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 bool Data3::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	const bool bSaveInBlob = (m_vecVals.size() > BLOB_SIZE);
-	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
 
-	if(bSaveInBlob)
-	{
-		const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
-		std::string strs[] = {"blob_vals", "blob_errs"};
+	const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+	std::string strs[] = {"vals", "errs"};
 
-		for(unsigned int iObj=0; iObj<2; ++iObj)
-		{
-			qint64 iBlobIdx = ostrBlob.tellp();
-			for(double d : *vecs[iObj])
-				ostrBlob.write((char*)&d, sizeof(d));
-
-			ostr << "<" << strs[iObj] << "> ";
-			ostr << iBlobIdx;
-			ostr << " </" << strs[iObj] << ">\n";
-		}
-	}
-	else
-	{
-		ostr << "<vals> ";
-		for(double d : m_vecVals)
-			ostr << d << " ";
-		ostr << " </vals>\n";
-
-		ostr << "<errs> ";
-		for(double d : m_vecErrs)
-			ostr << d << " ";
-		ostr << " </errs>\n";
-	}
+	save_xml_vecs(2, vecs, strs, ostr, ostrBlob, bSaveInBlob);
 
 	ostr << "<min> " << m_dMin << " </min>\n";
 	ostr << "<max> " << m_dMax << " </max>\n";
@@ -1005,33 +912,10 @@ bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_vecVals.resize(uiCnt);
 	m_vecErrs.resize(uiCnt);
 
-	if(xml.Query<bool>((strBase + "in_blob").c_str(), 0))
-	{
-		std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
-		std::string strs[] = {"blob_vals", "blob_errs"};
+	std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+	std::string strs[] = {"vals", "errs"};
 
-		for(unsigned int iObj=0; iObj<2; ++iObj)
-		{
-			bool bHasBlobIdx = 0;
-			qint64 iBlobIdx = xml.Query<qint64>((strBase + strs[iObj]).c_str(), 0, &bHasBlobIdx);
-			if(bHasBlobIdx)
-				blob.copy<double>(iBlobIdx, qint64(uiCnt), vecs[iObj]->begin());
-			else
-				std::cerr << "Error: Blob usage enabled, but no blob index given!"
-						  << std::endl;
-		}
-	}
-	else
-	{
-		std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
-		std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
-
-		for(unsigned int i=0; i<uiCnt; ++i)
-		{
-			istrVals >> m_vecVals[i];
-			istrErrs >> m_vecErrs[i];
-		}
-	}
+	load_xml_vecs(2, vecs, strs, xml, strBase, blob);
 
 	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
 	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
@@ -1043,36 +927,11 @@ bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 bool Data4::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	const bool bSaveInBlob = (m_vecVals.size() > BLOB_SIZE);
-	ostr << "<in_blob> " << bSaveInBlob << " </in_blob>\n";
 
-	if(bSaveInBlob)
-	{
-		const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
-		std::string strs[] = {"blob_vals", "blob_errs"};
+	const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
+	std::string strs[] = {"vals", "errs"};
 
-		for(unsigned int iObj=0; iObj<2; ++iObj)
-		{
-			qint64 iBlobIdx = ostrBlob.tellp();
-			for(double d : *vecs[iObj])
-				ostrBlob.write((char*)&d, sizeof(d));
-
-			ostr << "<" << strs[iObj] << "> ";
-			ostr << iBlobIdx;
-			ostr << " </" << strs[iObj] << ">\n";
-		}
-	}
-	else
-	{
-		ostr << "<vals> ";
-		for(double d : m_vecVals)
-			ostr << d << " ";
-		ostr << " </vals>\n";
-
-		ostr << "<errs> ";
-		for(double d : m_vecErrs)
-			ostr << d << " ";
-		ostr << " </errs>\n";
-	}
+	save_xml_vecs(2, vecs, strs, ostr, ostrBlob, bSaveInBlob);
 
 	ostr << "<min> " << m_dMin << " </min>\n";
 	ostr << "<max> " << m_dMax << " </max>\n";
