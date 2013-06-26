@@ -97,7 +97,7 @@ void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
 	}
 
 	for(Plot* pPlot : m_pPlots)
-		pPlot->RefreshPaint();
+		pPlot->RefreshPlot();
 }
 
 //----------------------------------------------------------------------------------------

@@ -88,7 +88,7 @@ void Plot::resizeEvent(QResizeEvent *pEvent)
 	paint();
 }
 
-void Plot::RefreshPaint()
+void Plot::RefreshPlot()
 {
 	paint();
 	repaint();
@@ -496,8 +496,47 @@ Roi* Plot::GetROI()
 	return &GetData(0).dat.GetRoi();
 }
 
+bool Plot::LoadXML(Xml& xml, const std::string& strBase)
+{
+	unsigned int iDatCnt = xml.Query<unsigned int>((strBase + "data_count").c_str(), 0);
+	for(unsigned int iDat=0; iDat<iDatCnt; ++iDat)
+	{
+		PlotObj obj;
+		std::ostringstream ostrPlotObj;
+		ostrPlotObj << strBase << "plot_obj_" << iDat << "/";
+		std::string strObjBase = ostrPlotObj.str();
+
+		obj.LoadXML(xml, strObjBase);
+		m_vecObjs.push_back(obj);
+	}
+
+	std::string strXLab = xml.QueryString((strBase + "x_label").c_str(), "x");
+	std::string strYLab = xml.QueryString((strBase + "y_label").c_str(), "y");
+	SetLabels(strXLab.c_str(), strYLab.c_str());
+
+	std::string strTitle = xml.QueryString((strBase + "title").c_str(), "");
+	SetTitle(strTitle.c_str());
+
+	std::string strWinTitle = xml.QueryString((strBase + "window_title").c_str(), "");
+	setWindowTitle(strWinTitle.c_str());
+
+	SetXIsLog(xml.Query<bool>((strBase + "x_log").c_str(), 0));
+	SetYIsLog(xml.Query<bool>((strBase + "y_log").c_str(), 0));
+
+	m_dxmin = xml.Query<double>((strBase + "x_min").c_str(), m_dxmin);
+	m_dxmax = xml.Query<double>((strBase + "x_max").c_str(), m_dxmax);
+	m_dymin = xml.Query<double>((strBase + "y_min").c_str(), m_dymin);
+	m_dymax = xml.Query<double>((strBase + "y_max").c_str(), m_dymax);
+
+	//RefreshStatusMsgs();
+	//RefreshPlot();
+	return 1;
+}
+
 bool Plot::SaveXML(std::ostream& ostr) const
 {
+	ostr << "<type> plot_1d </type>\n";
+
 	ostr << "<x_label> " << m_strXAxis.toStdString() << " </x_label>\n";
 	ostr << "<y_label> " << m_strYAxis.toStdString() << " </y_label>\n";
 
@@ -512,6 +551,8 @@ bool Plot::SaveXML(std::ostream& ostr) const
 	ostr << "<y_min> " << m_dymin << " </y_min>\n";
 	ostr << "<y_max> " << m_dymax << " </y_max>\n";
 
+	ostr << "<data_count> " << GetDataCount() << " </data_count>\n";
+
 	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
 	{
 		ostr << "<plot_obj_" << iDat << ">\n";
@@ -523,7 +564,25 @@ bool Plot::SaveXML(std::ostream& ostr) const
 	return 1;
 }
 
-void PlotObj::SaveXML(std::ostream& ostr) const
+bool PlotObj::LoadXML(Xml& xml, const std::string& strBase)
+{
+	std::string strType = xml.QueryString((strBase + "type").c_str(), "data");
+	if(strType == "data")
+		plttype = PLOT_DATA;
+	else if(strType == "function")
+		plttype = PLOT_FKT;
+	else
+	{
+		plttype = PLOT_DATA;
+		std::cerr << "Error: Unknown plot object type: \"" << strType << "\"." << std::endl;
+	}
+
+	strName = xml.QueryString((strBase + "name").c_str(), "");
+
+	return dat.LoadXML(xml, strBase + "data/");
+}
+
+bool PlotObj::SaveXML(std::ostream& ostr) const
 {
 	std::string strType = "unknown";
 	switch(plttype)
@@ -542,6 +601,8 @@ void PlotObj::SaveXML(std::ostream& ostr) const
 	ostr << "<data>\n";
 	dat.SaveXML(ostr);
 	ostr << "</data>\n";
+
+	return 1;
 }
 
 

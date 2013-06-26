@@ -82,6 +82,10 @@ void Plot4dWrapper::DataLoaded()
 	m_pSliderF->setMaximum(iMaxF-1);
 	m_pSliderF->setValue(iCurF);
 
+	// take window title from child widget
+	if(windowTitle()=="")
+		setWindowTitle(GetActualWidget()->windowTitle());
+
 	/*
 	QString strZ = m_pPlot->GetZStr();
 	if(strZ=="")
@@ -287,8 +291,24 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 	return pPlot;
 }
 
+
+bool Plot4d::LoadXML(Xml& xml, const std::string& strBase)
+{
+	m_dat4.LoadXML(xml, strBase + "data/");
+	Plot2d::LoadXML(xml, strBase+"sub_2d/");
+
+	m_iCurT = xml.Query<unsigned int>((strBase + "cur_t").c_str(), 0);
+	m_iCurF = xml.Query<unsigned int>((strBase + "cur_f").c_str(), 0);
+	setWindowTitle(xml.QueryString((strBase+"window_title").c_str(), "").c_str());
+
+	emit DataLoaded();
+	return 1;
+}
+
 bool Plot4d::SaveXML(std::ostream& ostr) const
 {
+	ostr << "<type> plot_4d </type>\n";
+
 	ostr << "<window_title> " << windowTitle().toStdString() << " </window_title>\n";
 	ostr << "<cur_t> " << m_iCurT << " </cur_t>\n";
 	ostr << "<cur_f> " << m_iCurF << " </cur_f>\n";

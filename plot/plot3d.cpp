@@ -109,8 +109,23 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 	return pPlot;
 }
 
+
+bool Plot3d::LoadXML(Xml& xml, const std::string& strBase)
+{
+	m_dat3.LoadXML(xml, strBase + "data/");
+	Plot2d::LoadXML(xml, strBase+"sub_2d/");
+
+	m_iCurT = xml.Query<unsigned int>((strBase + "cur_t").c_str(), 0);
+	setWindowTitle(xml.QueryString((strBase+"window_title").c_str(), "").c_str());
+
+	emit DataLoaded();
+	return 1;
+}
+
 bool Plot3d::SaveXML(std::ostream& ostr) const
 {
+	ostr << "<type> plot_3d </type>\n";
+
 	ostr << "<window_title> " << windowTitle().toStdString() << " </window_title>\n";
 	ostr << "<cur_t> " << m_iCurT << " </cur_t>\n";
 
@@ -189,6 +204,10 @@ void Plot3dWrapper::DataLoaded()
 	if(strZ=="")
 		strZ =*/ "t: ";
 	m_pLabel->setText(strZ);
+
+	// take window title from child widget
+	if(windowTitle()=="")
+		setWindowTitle(GetActualWidget()->windowTitle());
 
 	m_pPlot->RefreshPlot();
 	m_pPlot->RefreshStatusMsgs();

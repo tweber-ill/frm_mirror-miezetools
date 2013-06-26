@@ -30,7 +30,8 @@ struct PlotObj
 	std::string strName;
 	PlotType plttype;
 
-	void SaveXML(std::ostream& ostr) const;
+	bool SaveXML(std::ostream& ostr) const;
+	bool LoadXML(Xml& xml, const std::string& strBase);
 };
 
 class Plot : public SubWindowBase
@@ -68,7 +69,7 @@ public:
 	void clearfkt();
 
 	void paint();
-	void RefreshPaint();
+	virtual void RefreshPlot();
 
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }
@@ -98,6 +99,7 @@ public:
 	virtual void SetROI(const Roi* pROI);
 	virtual Roi* GetROI();
 
+	virtual bool LoadXML(Xml& xml, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 

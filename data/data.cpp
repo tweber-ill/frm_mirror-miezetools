@@ -130,8 +130,36 @@ void Data1::GetYErrMinMax(double& dYMin, double& dYMax) const
 	dYMax = (pair.second==m_vecErrsY.end()? 0.: *pair.second);
 }
 
+
+bool Data1::LoadXML(Xml& xml, const std::string& strBase)
+{
+	unsigned int uiLen = xml.Query<unsigned int>((strBase + "length").c_str(), 0);
+	m_vecValsX.resize(uiLen);
+	m_vecValsY.resize(uiLen);
+	m_vecErrsX.resize(uiLen);
+	m_vecErrsY.resize(uiLen);
+
+	std::istringstream istrX(xml.QueryString((strBase + "x").c_str(), ""));
+	std::istringstream istrY(xml.QueryString((strBase + "y").c_str(), ""));
+	std::istringstream istrXErr(xml.QueryString((strBase + "x_err").c_str(), ""));
+	std::istringstream istrYErr(xml.QueryString((strBase + "y_err").c_str(), ""));
+
+	for(unsigned int i=0; i<uiLen; ++i)
+	{
+		istrX >> m_vecValsX[i];
+		istrY >> m_vecValsY[i];
+		istrXErr >> m_vecErrsX[i];
+		istrYErr >> m_vecErrsY[i];
+	}
+
+	m_roi.LoadXML(xml, strBase);
+	return 1;
+}
+
 bool Data1::SaveXML(std::ostream& ostr) const
 {
+	ostr << "<length> " << m_vecValsX.size() << "</length>\n";
+
 	ostr << "<x> ";
 	for(double d : m_vecValsX)
 		ostr << d << " ";
@@ -310,6 +338,31 @@ void Data2::FromMatrix(const ublas::matrix<double>& mat)
 
 			m_dTotal += dVal;
 		}
+}
+
+
+bool Data2::LoadXML(Xml& xml, const std::string& strBase)
+{
+	LoadRangeXml(xml, strBase);
+	m_roi.LoadXML(xml, strBase);
+
+	unsigned int uiCnt = m_iWidth*m_iHeight;
+	m_vecVals.resize(uiCnt);
+	m_vecErrs.resize(uiCnt);
+
+	std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
+	std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
+
+	for(unsigned int i=0; i<uiCnt; ++i)
+	{
+		istrVals >> m_vecVals[i];
+		istrErrs >> m_vecErrs[i];
+	}
+
+	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
+	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
+	m_dTotal = xml.Query<double>((strBase+"total").c_str(), 0.);
+	return 1;
 }
 
 bool Data2::SaveXML(std::ostream& ostr) const
@@ -544,6 +597,33 @@ Data1 Data3::GetXYSum() const
 	return dat;
 }
 
+
+bool Data3::LoadXML(Xml& xml, const std::string& strBase)
+{
+	LoadRangeXml(xml, strBase);
+	m_iDepth = xml.Query<unsigned int>((strBase+"depth").c_str(), 0);
+
+	m_roi.LoadXML(xml, strBase);
+
+	unsigned int uiCnt = m_iWidth*m_iHeight*m_iDepth;
+	m_vecVals.resize(uiCnt);
+	m_vecErrs.resize(uiCnt);
+
+	std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
+	std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
+
+	for(unsigned int i=0; i<uiCnt; ++i)
+	{
+		istrVals >> m_vecVals[i];
+		istrErrs >> m_vecErrs[i];
+	}
+
+	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
+	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
+	m_dTotal = xml.Query<double>((strBase+"total").c_str(), 0.);
+
+	return 1;
+}
 
 bool Data3::SaveXML(std::ostream& ostr) const
 {
@@ -785,6 +865,35 @@ Data1 Data4::GetXYD2(uint iX, uint iY, uint iD2) const
 	return dat;
 }
 
+
+bool Data4::LoadXML(Xml& xml, const std::string& strBase)
+{
+	LoadRangeXml(xml, strBase);
+	m_iDepth = xml.Query<unsigned int>((strBase+"depth").c_str(), 0);
+	m_iDepth2 = xml.Query<unsigned int>((strBase+"depth2").c_str(), 0);
+
+	m_roi.LoadXML(xml, strBase);
+
+	unsigned int uiCnt = m_iWidth*m_iHeight*m_iDepth*m_iDepth2;
+	m_vecVals.resize(uiCnt);
+	m_vecErrs.resize(uiCnt);
+
+	std::istringstream istrVals(xml.QueryString((strBase+"vals").c_str(), ""));
+	std::istringstream istrErrs(xml.QueryString((strBase+"errs").c_str(), ""));
+
+	for(unsigned int i=0; i<uiCnt; ++i)
+	{
+		istrVals >> m_vecVals[i];
+		istrErrs >> m_vecErrs[i];
+	}
+
+	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
+	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
+	m_dTotal = xml.Query<double>((strBase+"total").c_str(), 0.);
+
+	return 1;
+}
+
 bool Data4::SaveXML(std::ostream& ostr) const
 {
 	ostr << "<vals> ";
@@ -885,6 +994,22 @@ void XYRange::CopyXYRangeFrom(const XYRange* pRan)
 	*this = *pRan;
 }
 
+
+bool XYRange::LoadRangeXml(Xml& xml, const std::string& strBase)
+{
+	m_bHasRange = xml.Query<bool>((strBase+"range/active").c_str(), 0);
+	m_iWidth = xml.Query<unsigned int>((strBase+"range/width").c_str(), 0);
+	m_iHeight = xml.Query<unsigned int>((strBase+"range/height").c_str(), 0);
+	m_dXMin = xml.Query<double>((strBase+"range/min_x").c_str(), 0);
+	m_dXMax = xml.Query<double>((strBase+"range/max_x").c_str(), 0);
+	m_dYMin = xml.Query<double>((strBase+"range/min_y").c_str(), 0);
+	m_dYMax = xml.Query<double>((strBase+"range/max_y").c_str(), 0);
+	m_bXIsLog = xml.Query<bool>((strBase+"range/log_x").c_str(), 0);
+	m_bYIsLog = xml.Query<bool>((strBase+"range/log_y").c_str(), 0);
+
+	return 1;
+}
+
 bool XYRange::SaveRangeXml(std::ostream& ostr) const
 {
 	ostr << "<range>\n";
@@ -900,4 +1025,5 @@ bool XYRange::SaveRangeXml(std::ostream& ostr) const
 	ostr << "<log_y> " << m_bYIsLog << " </log_y>\n";
 
 	ostr << "</range>\n";
+	return 1;
 }

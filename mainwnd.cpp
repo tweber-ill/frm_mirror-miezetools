@@ -1069,7 +1069,7 @@ void MiezeMainWnd::Interpolation(SubWindowBase* pSWB, InterpFkt iFkt)
 	delete[] px;
 	delete[] py;
 
-	pPlot->RefreshPaint();
+	pPlot->RefreshPlot();
 }
 
 void MiezeMainWnd::BSplineInterpolation() { Interpolation(GetActivePlot(), INTERP_BSPLINE); }
@@ -1277,7 +1277,40 @@ void MiezeMainWnd::SessionLoadTriggered()
 	this->m_pmdi->closeAllSubWindows();
 	m_strCurSess = strSess;
 
-	// TODO: actual loading
+	std::string strBase = "/cattus_session/";
+	m_iPlotCnt = xml.Query<unsigned int>((strBase + "plot_counter").c_str(), 0);
+	unsigned int iWndCnt = xml.Query<unsigned int>((strBase + "window_counter").c_str(), 0);
+
+	for(unsigned int iWnd=0; iWnd<iWndCnt; ++iWnd)
+	{
+		std::ostringstream ostrSWBase;
+		ostrSWBase << strBase << "window_" << iWnd << "/";
+		std::string strSWBase = ostrSWBase.str();
+		std::string strSWType = xml.QueryString((strSWBase + "type").c_str(), "");
+
+		SubWindowBase *pSWB = 0;
+		if(strSWType == "plot_1d")
+			pSWB = new Plot(m_pmdi);
+		else if(strSWType == "plot_2d")
+			pSWB = new Plot2d(m_pmdi);
+		else if(strSWType == "plot_3d")
+			pSWB = new Plot3dWrapper(m_pmdi);
+		else if(strSWType == "plot_4d")
+			pSWB = new Plot4dWrapper(m_pmdi);
+		else
+		{
+			std::cerr << "Error: Unknown plot type: \"" << strSWType << "\"."
+						<< std::endl;
+			continue;
+		}
+
+		if(pSWB)
+		{
+			pSWB->LoadXML(xml, strSWBase);
+			AddSubWindow(pSWB);
+			pSWB->GetActualWidget()->RefreshPlot();
+		}
+	}
 
 	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strSess).c_str()));
 }
@@ -1293,7 +1326,8 @@ void MiezeMainWnd::SessionSaveTriggered()
 
 	std::ofstream ofstr(m_strCurSess);
 	ofstr << "<cattus_session>\n\n";
-	ofstr << "<plot_counter> " << m_iPlotCnt << "</plot_counter>\n";
+	ofstr << "<plot_counter> " << m_iPlotCnt << " </plot_counter>\n";
+	ofstr << "<window_counter> " << m_pmdi->subWindowList().size() << " </window_counter>\n";
 
 	unsigned int iWnd=0;
 	for(QMdiSubWindow *pItem : m_pmdi->subWindowList())

@@ -14,7 +14,6 @@
 #include "roi.h"
 #include "pnpoly.h"
 #include "../helper/math.h"
-#include "../helper/xml.h"
 #include "../data/data.h"
 
 //------------------------------------------------------------------------------
@@ -1135,24 +1134,15 @@ BoundingRect Roi::GetBoundingRect() const
 	return totalrect;
 }
 
-bool Roi::Load(const char* pcFile)
+bool Roi::LoadXML(Xml& xml, const std::string& strBase)
 {
-	clear();
-
-	Xml xml;
-	if(!xml.Load(pcFile))
-	{
-		std::cerr << "Roi: Cannot load \"" << pcFile << "\"." << std::endl;
-		return false;
-	}
-
 	bool bOKActive=false;
-	SetRoiActive(xml.Query<bool>("/roi/active", 0, &bOKActive));
+	SetRoiActive(xml.Query<bool>((strBase+"roi/active").c_str(), 0, &bOKActive));
 
 	const std::string strPaths[] =
 	{
-			"/roi_elements/element_",		// old format
-			"/roi/elements/element_"			// new format
+			strBase + "roi_elements/element_",		// old format
+			strBase + "roi/elements/element_"		// new format
 	};
 
 	for(const std::string& strPath : strPaths)
@@ -1215,6 +1205,20 @@ bool Roi::Load(const char* pcFile)
 		}
 
 	return true;
+}
+
+bool Roi::Load(const char* pcFile)
+{
+	clear();
+
+	Xml xml;
+	if(!xml.Load(pcFile))
+	{
+		std::cerr << "Roi: Cannot load \"" << pcFile << "\"." << std::endl;
+		return false;
+	}
+
+	return LoadXML(xml, "/");
 }
 
 bool Roi::SaveXML(std::ostream& ostr) const

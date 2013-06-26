@@ -530,7 +530,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 					<< *pFkt << std::endl;
 
 		res.pPlot->plot_fkt(*pFkt);
-		res.pPlot->RefreshPaint();
+		res.pPlot->RefreshPlot();
 		res.bOk = 1;
 
 		delete pFkt;
@@ -779,7 +779,7 @@ void FitDlg::DoFit()
 				 }
 
 				pPlot->plot_fkt(*pModel);
-				pPlot->RefreshPaint();
+				pPlot->RefreshPlot();
 
 				delete pModel;
 			 }

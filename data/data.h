@@ -18,6 +18,7 @@ typedef unsigned char uchar;
 namespace ublas = boost::numeric::ublas;
 
 #include "../roi/roi.h"
+#include "../helper/xml.h"
 
 enum DataType
 {
@@ -69,6 +70,7 @@ public:
 	virtual ~DataInterface() {}
 	virtual DataType GetType() const = 0;
 
+	virtual bool LoadXML(Xml& xml, const std::string& strBase) { return false; }
 	virtual bool SaveXML(std::ostream& ostr) const { return false; }
 };
 
@@ -105,6 +107,7 @@ public:
 
 	void CopyXYRangeFrom(const XYRange* pRan);
 
+	bool LoadRangeXml(Xml& xml, const std::string& strBase);
 	bool SaveRangeXml(std::ostream& ostr) const;
 };
 
@@ -168,6 +171,7 @@ public:
 
 	double SumY() const;
 
+	virtual bool LoadXML(Xml& xml, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
@@ -217,6 +221,7 @@ public:
 
 	void RecalcMinMaxTotal();
 
+	virtual bool LoadXML(Xml& xml, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
@@ -268,6 +273,7 @@ public:
 
 	void RecalcMinMaxTotal();
 
+	virtual bool LoadXML(Xml& xml, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 
@@ -317,6 +323,7 @@ public:
 
 	void RecalcMinMaxTotal();
 
+	virtual bool LoadXML(Xml& xml, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr) const;
 };
 

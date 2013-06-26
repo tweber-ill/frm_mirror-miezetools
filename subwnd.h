@@ -53,8 +53,10 @@ public:
 	virtual void SetROI(const Roi* pROI) {}
 	virtual Roi* GetROI() { return 0; }
 
-	virtual bool LoadXML(Xml& xml, const char* pcRootPath=0) { return false; }
+	virtual bool LoadXML(Xml& xml, const std::string& strBase) { return false; }
 	virtual bool SaveXML(std::ostream& ostr) const { return false; }
+
+	virtual void RefreshPlot() {}
 };
 
 #endif

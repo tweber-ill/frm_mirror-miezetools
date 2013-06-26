@@ -410,8 +410,28 @@ Roi* Plot2d::GetROI()
 }
 
 
+bool Plot2d::LoadXML(Xml& xml, const std::string& strBase)
+{
+	m_dat.LoadXML(xml, strBase + "data/");
+
+	m_bLog = xml.Query<bool>((strBase+"log").c_str(), 0);
+	m_bCountData = xml.Query<bool>((strBase+"count_data").c_str(), 1);
+	m_bCyclicData = xml.Query<bool>((strBase+"cyclic_data").c_str(), 0);
+	m_bPhaseData = xml.Query<bool>((strBase+"phase_data").c_str(), 0);
+
+	m_strXAxis = xml.QueryString((strBase+"x_label").c_str(), "x").c_str();
+	m_strYAxis = xml.QueryString((strBase+"y_label").c_str(), "y").c_str();
+	m_strZAxis = xml.QueryString((strBase+"z_label").c_str(), "z").c_str();
+	m_strTitle = xml.QueryString((strBase+"title").c_str(), "").c_str();
+	setWindowTitle(xml.QueryString((strBase+"window_title").c_str(), "").c_str());
+
+	return 1;
+}
+
 bool Plot2d::SaveXML(std::ostream& ostr) const
 {
+	ostr << "<type> plot_2d </type>\n";
+
 	ostr << "<log> " << m_bLog << " </log>\n";
 	ostr << "<count_data> " << m_bCountData << " </count_data>\n";
 	ostr << "<cyclic_data> " << m_bCyclicData << " </cyclic_data>\n";
