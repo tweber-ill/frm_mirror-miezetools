@@ -5,6 +5,7 @@
  */
 
 #include "blob.h"
+#include <iostream>
 
 
 Blob::Blob(const char* pcFile) : m_file(QString(pcFile))
@@ -25,6 +26,13 @@ bool Blob::IsOpen() const
 
 void* Blob::map(qint64 iStart, qint64 iLen)
 {
+	qint64 iSize = m_file.size();
+	if(iStart+iLen > iSize)
+	{
+		std::cerr << "Error: Tried to map beyond size." << std::endl;
+		return 0;
+	}
+
 	return m_file.map(iStart, iLen);
 }
 

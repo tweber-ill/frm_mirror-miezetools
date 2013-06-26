@@ -463,6 +463,11 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 		for(uint iFoil=0; iFoil<iFoilCnt; ++iFoil)
 		{
 			const uint* pDat = tof.GetData(iFoil);
+			if(!pDat)
+			{
+				std::cerr << "Error: Could not load \"" << strFileNoDir << "\" correctly." << std::endl;
+				break;
+			}
 			convert(pdDat, pDat, iW*iH*iTcCnt);
 
 			//for(unsigned int iTc=0; iTc<iTcCnt; ++iTc)
@@ -489,6 +494,11 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 			return;
 
 		const uint* pDat = pad.GetData();
+		if(!pDat)
+		{
+			std::cerr << "Error: Could not load \"" << strFileNoDir << "\"." << std::endl;
+			return;
+		}
 
 		const uint iW = pad.GetWidth();
 		const uint iH = pad.GetHeight();
@@ -508,7 +518,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 
 		AddSubWindow(pPlot);
 	}
-	else 	if(is_equal(strExt, "dat") || is_equal(strExt, "sim"))
+	else if(is_equal(strExt, "dat") || is_equal(strExt, "sim"))
 	{
 		LoadTxt * pdat = new LoadTxt();
 		if(!pdat->Load(strFile.c_str()))

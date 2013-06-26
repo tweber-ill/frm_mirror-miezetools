@@ -10,6 +10,7 @@
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
+#include <iostream>
 
 
 PadFile::PadFile(const char* pcFile) : m_file(QString(pcFile))
@@ -37,7 +38,16 @@ const unsigned int* PadFile::GetData()
 	const unsigned int iW = GetWidth();
 	const unsigned int iH = GetHeight();
 
-	unsigned int *pDat = (unsigned int*)m_file.map(qint64(0), qint64(iW*iH*sizeof(int)));
+	qint64 iLen = qint64(iW*iH*sizeof(int));
+
+	qint64 iSize = m_file.size();
+	if(iLen > iSize)
+	{
+		std::cerr << "Error: Tried to map beyond size." << std::endl;
+		return 0;
+	}
+
+	unsigned int *pDat = (unsigned int*)m_file.map(qint64(0), iLen);
 	return pDat;
 }
 
@@ -99,8 +109,17 @@ const unsigned int* TofFile::GetData(unsigned int iFoil)
 	std::vector<unsigned int> vecStartIndices = GetStartIndices();
 	const unsigned int iStartIdx = vecStartIndices[iFoil];
 
-	unsigned int *pDat = (unsigned int*)m_file.map(qint64(iStartIdx*iW*iH*sizeof(int)),
-														qint64(iW*iH*iTcCnt*sizeof(int)));
+	qint64 iStart = qint64(iStartIdx*iW*iH*sizeof(int));
+	qint64 iLen = qint64(iW*iH*iTcCnt*sizeof(int));
+
+	qint64 iSize = m_file.size();
+	if(iStart+iLen > iSize)
+	{
+		std::cerr << "Error: Tried to map beyond size." << std::endl;
+		return 0;
+	}
+
+	unsigned int *pDat = (unsigned int*)m_file.map(iStart, iLen);
 	return pDat;
 }
 
