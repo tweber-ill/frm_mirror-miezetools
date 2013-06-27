@@ -10,6 +10,7 @@
 #include <limits>
 #include <iostream>
 #include "../helper/string.h"
+#include "../fitter/models/freefit.h"
 
 #define PAD_X 18
 #define PAD_Y 18
@@ -373,7 +374,6 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 }
 
 
-#include "../fitter/models/freefit.h"
 
 void Plot::replot_fkts()
 {

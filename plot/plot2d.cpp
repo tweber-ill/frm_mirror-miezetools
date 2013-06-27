@@ -238,7 +238,7 @@ void Plot2d::RefreshPlot()
 		QRgb* pline = (QRgb*)m_pImg->scanLine(m_dat.GetHeight()-iY-1);
 		for(uint iX=0; iX<m_dat.GetWidth(); ++iX)
 		{
-			pline[iX] = GetSpectroColor(m_dat.GetVal(iX, iY));
+			pline[iX] = GetSpectroColor(m_dat.GetValRaw(iX, iY));
 			//m_pImg->setPixel(iX, iY, GetSpectroColor(m_dat.GetVal(iX, iY)));
 		}
 	}

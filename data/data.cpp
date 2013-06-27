@@ -581,10 +581,10 @@ Data2 Data3::GetVal(uint iT) const
 	for(uint iY=0; iY<m_iHeight; ++iY)
 		for(uint iX=0; iX<m_iWidth; ++iX)
 		{
-			double dVal = iT<m_iDepth ? this->GetVal(iX, iY, iT) : 0.;
+			double dVal = iT<m_iDepth ? this->GetValRaw(iX, iY, iT) : 0.;
 
 			dat.SetVal(iX, iY, dVal);
-			dat.SetErr(iX, iY, iT<m_iDepth ? this->GetErr(iX, iY, iT) : 0.);
+			dat.SetErr(iX, iY, iT<m_iDepth ? this->GetErrRaw(iX, iY, iT) : 0.);
 
 			dTotal += dVal;
 		}
@@ -617,24 +617,51 @@ Data1 Data3::GetXYSum() const
 	Data1 dat;
 	dat.SetLength(this->GetDepth());
 
-	for(uint iT=0; iT<GetDepth(); ++iT)
+	uint iYStart=0, iYEnd=GetHeight();
+	uint iXStart=0, iXEnd=GetWidth();
+
+	if(IsRoiActive())
 	{
-		double dSum = 0.;
-		double dErrSum = 0.;
+		BoundingRect br = m_roi.GetBoundingRect();
+		iXStart = br.bottomleft[0];
+		iYStart = br.bottomleft[1];
 
-		for(uint iY=0; iY<GetHeight(); ++iY)
-			for(uint iX=0; iX<GetWidth(); ++iX)
-			{
-				dSum += GetVal(iX, iY, iT);
-				dErrSum += GetErr(iX, iY, iT);
-			}
-
-		dat.SetX(iT, iT);
-		dat.SetXErr(iT, 0.);
-		dat.SetY(iT, dSum);
-		dat.SetYErr(iT, dErrSum);
+		iXEnd = br.topright[0];
+		iYEnd = br.topright[1];
 	}
 
+
+	double* pMem = new double[dat.GetLength()*2];
+	double* dSum = pMem;
+	double* dErrSum = pMem + dat.GetLength();
+
+	for(uint iT=0; iT<GetDepth(); ++iT)
+		dSum[iT] = dErrSum[iT] = 0.;
+
+	for(uint iY=iYStart; iY<iYEnd; ++iY)
+	{
+		for(uint iX=iXStart; iX<iXEnd; ++iX)
+		{
+			if(!m_roi.IsInside(iX, iY))
+				continue;
+
+			for(uint iT=0; iT<GetDepth(); ++iT)
+			{
+				dSum[iT] += GetValRaw(iX, iY, iT);
+				dErrSum[iT] += GetErrRaw(iX, iY, iT);
+			}
+		}
+	}
+
+	for(uint iT=0; iT<GetDepth(); ++iT)
+	{
+		dat.SetX(iT, iT);
+		dat.SetXErr(iT, 0.);
+		dat.SetY(iT, dSum[iT]);
+		dat.SetYErr(iT, dErrSum[iT]);
+	}
+
+	delete[] pMem;
 	return dat;
 }
 
@@ -820,8 +847,8 @@ Data3 Data4::GetVal(uint iD2) const
 		for(uint iY=0; iY<m_iHeight; ++iY)
 			for(uint iX=0; iX<m_iWidth; ++iX)
 			{
-				dat.SetVal(iX, iY, iD, this->GetVal(iX, iY, iD, iD2));
-				dat.SetErr(iX, iY, iD, this->GetErr(iX, iY, iD, iD2));
+				dat.SetVal(iX, iY, iD, this->GetValRaw(iX, iY, iD, iD2));
+				dat.SetErr(iX, iY, iD, this->GetErrRaw(iX, iY, iD, iD2));
 			}
 
 	return dat;
@@ -840,8 +867,8 @@ Data2 Data4::GetVal(uint iD, uint iD2) const
 			double dVal=0., dErr=0.;
 			if(iD<m_iDepth && iD2<m_iDepth2)
 			{
-				dVal = this->GetVal(iX, iY, iD, iD2);
-				dErr = this->GetErr(iX, iY, iD, iD2);
+				dVal = this->GetValRaw(iX, iY, iD, iD2);
+				dErr = this->GetErrRaw(iX, iY, iD, iD2);
 			}
 
 			dat.SetVal(iX, iY, dVal);
@@ -859,24 +886,51 @@ Data1 Data4::GetXYSum(uint iD2) const
 	Data1 dat;
 	dat.SetLength(this->GetDepth());
 
-	for(uint iT=0; iT<GetDepth(); ++iT)
+	uint iYStart=0, iYEnd=GetHeight();
+	uint iXStart=0, iXEnd=GetWidth();
+
+	if(IsRoiActive())
 	{
-		double dSum = 0.;
-		double dErrSum = 0.;
+		BoundingRect br = m_roi.GetBoundingRect();
+		iXStart = br.bottomleft[0];
+		iYStart = br.bottomleft[1];
 
-		for(uint iY=0; iY<GetHeight(); ++iY)
-			for(uint iX=0; iX<GetWidth(); ++iX)
-			{
-				dSum += GetVal(iX, iY, iT, iD2);
-				dErrSum += GetErr(iX, iY, iT, iD2);
-			}
-
-		dat.SetX(iT, iT);
-		dat.SetXErr(iT, 0.);
-		dat.SetY(iT, dSum);
-		dat.SetYErr(iT, dErrSum);
+		iXEnd = br.topright[0];
+		iYEnd = br.topright[1];
 	}
 
+
+	double* pMem = new double[dat.GetLength()*2];
+	double* dSum = pMem;
+	double* dErrSum = pMem + dat.GetLength();
+
+	for(uint iT=0; iT<GetDepth(); ++iT)
+		dSum[iT] = dErrSum[iT] = 0.;
+
+	for(uint iY=iYStart; iY<iYEnd; ++iY)
+	{
+		for(uint iX=iXStart; iX<iXEnd; ++iX)
+		{
+			if(!m_roi.IsInside(iX, iY))
+				continue;
+
+			for(uint iT=0; iT<GetDepth(); ++iT)
+			{
+				dSum[iT] += GetValRaw(iX, iY, iT, iD2);
+				dErrSum[iT] += GetErrRaw(iX, iY, iT, iD2);
+			}
+		}
+	}
+
+	for(uint iT=0; iT<GetDepth(); ++iT)
+	{
+		dat.SetX(iT, iT);
+		dat.SetXErr(iT, 0.);
+		dat.SetY(iT, dSum[iT]);
+		dat.SetYErr(iT, dErrSum[iT]);
+	}
+
+	delete[] pMem;
 	return dat;
 }
 

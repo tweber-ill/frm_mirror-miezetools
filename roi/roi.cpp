@@ -138,13 +138,16 @@ RoiRect::RoiRect(const RoiRect& rect)
 
 bool RoiRect::IsInside(double dX, double dY) const
 {
-	ublas::vector<double> vecCenter = m_bottomleft + (m_topright-m_bottomleft)*.5;
-	ublas::matrix<double> matRot_inv = ::rotation_matrix_2d<double>(-m_dAngle/180.*M_PI);
-
 	ublas::vector<double> vecPoint(2);
 	vecPoint[0] = dX;
 	vecPoint[1] = dY;
-	vecPoint = ublas::prod(matRot_inv, (vecPoint-vecCenter)) + vecCenter;
+
+	if(!float_equal(m_dAngle, 0.))
+	{
+		ublas::vector<double> vecCenter = m_bottomleft + (m_topright-m_bottomleft)*.5;
+		ublas::matrix<double> matRot_inv = ::rotation_matrix_2d<double>(-m_dAngle/180.*M_PI);
+		vecPoint = ublas::prod(matRot_inv, (vecPoint-vecCenter)) + vecCenter;
+	}
 
 	if(vecPoint[0]>=m_bottomleft[0] && vecPoint[0]<m_topright[0] &&
 	   vecPoint[1]>=m_bottomleft[1] && vecPoint[1]<m_topright[1])
