@@ -28,6 +28,7 @@ struct PlotObj
 {
 	Data1 dat;
 	std::string strName;
+	std::string strFkt;
 	PlotType plttype;
 
 	bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
@@ -63,6 +64,7 @@ public:
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
 	void plot(const Data1& dat, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
 	void plot_fkt(const FunctionModel& fkt, int iObj=-1);
+	void replot_fkts();
 	void plot_param(const FunctionModel_param& fkt, int iObj=-1);
 
 	void clear();

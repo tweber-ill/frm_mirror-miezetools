@@ -78,14 +78,14 @@ std::string GaussModel::print(bool bFillInSyms) const
 		if(m_bNormalized)
 			ostr << "/sqrt(2*pi * " << m_spread << ")";
 		ostr << " * exp(-0.5 * ((x-" << m_x0 << ")/"
-			 << m_spread << ")**2) + " << m_offs;
+			 << m_spread << ")^2) + " << m_offs;
 	}
 	else
 	{
 		ostr << "amp";
 		if(m_bNormalized)
 			ostr << "/sqrt(2*pi * sigma)";
-		ostr << " * exp(-0.5 * ((x-x0) / sigma)**2) + offs";
+		ostr << " * exp(-0.5 * ((x-x0) / sigma)^2) + offs";
 	}
 	return ostr.str();
 }
@@ -406,7 +406,7 @@ std::string MultiGaussModel::print(bool bFillInSyms) const
 			if(m_bNormalized)
 				ostr << "/sqrt(2*pi * " << m_vecParams[i].m_spread << ")";
 			ostr << " * exp(-0.5 * ((x-" << m_vecParams[i].m_x0 << ")/"
-				 << m_vecParams[i].m_spread << ")**2) + ";
+				 << m_vecParams[i].m_spread << ")^2) + ";
 		}
 
 		ostr << m_offs;
@@ -418,7 +418,7 @@ std::string MultiGaussModel::print(bool bFillInSyms) const
 			ostr << "amp_" << i;
 			if(m_bNormalized)
 				ostr << "/sqrt(2*pi * sigma_"<<i<<")";
-			ostr << " * exp(-0.5 * ((x-x0_" <<i<<") / sigma_"<<i<<")**2) + ";
+			ostr << " * exp(-0.5 * ((x-x0_" <<i<<") / sigma_"<<i<<")^2) + ";
 		}
 
 		ostr << "offs";

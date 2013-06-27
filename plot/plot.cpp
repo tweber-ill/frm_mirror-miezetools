@@ -317,6 +317,7 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 	PlotObj pltobj;
 	pltobj.plttype = PLOT_FKT;
 	pltobj.strName = fkt.print(0);
+	pltobj.strFkt = fkt.print(1);
 	Data1& dat = pltobj.dat;
 
 
@@ -370,6 +371,25 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 	estimate_minmax();
 	RefreshStatusMsgs();
 }
+
+
+#include "../fitter/models/freefit.h"
+
+void Plot::replot_fkts()
+{
+	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
+	{
+		PlotObj& obj1 = GetData(iDat);
+		trim(obj1.strFkt);
+
+		if(obj1.plttype == PLOT_FKT && obj1.strFkt!="")
+		{
+			FreeFktModel fkt(obj1.strFkt.c_str());
+			plot_fkt(fkt, iDat);
+		}
+	}
+}
+
 
 void Plot::clearfkt()
 {
@@ -528,6 +548,7 @@ bool Plot::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_dymin = xml.Query<double>((strBase + "y_min").c_str(), m_dymin);
 	m_dymax = xml.Query<double>((strBase + "y_max").c_str(), m_dymax);
 
+	replot_fkts();
 	//RefreshStatusMsgs();
 	//RefreshPlot();
 	return 1;
@@ -578,12 +599,16 @@ bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	}
 
 	strName = xml.QueryString((strBase + "name").c_str(), "");
+	strFkt = xml.QueryString((strBase + "function").c_str(), "");
 
-	return dat.LoadXML(xml, blob, strBase + "data/");
+	bool bOk = dat.LoadXML(xml, blob, strBase + "data/");
+	return bOk;
 }
 
 bool PlotObj::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
+	bool bSaveDat = 1;
+
 	std::string strType = "unknown";
 	switch(plttype)
 	{
@@ -591,17 +616,22 @@ bool PlotObj::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 			strType = "data";
 			break;
 		case PLOT_FKT:
+			if(strFkt != "")
+				bSaveDat = 0;
 			strType = "function";
 			break;
 	}
 
 	ostr << "<type> " << strType << " </type>\n";
 	ostr << "<name> " << strName << " </name>\n";
+	ostr << "<function> " << strFkt << " </function>\n";
 
-	ostr << "<data>\n";
-	dat.SaveXML(ostr, ostrBlob);
-	ostr << "</data>\n";
-
+	if(bSaveDat)
+	{
+		ostr << "<data>\n";
+		dat.SaveXML(ostr, ostrBlob);
+		ostr << "</data>\n";
+	}
 	return 1;
 }
 

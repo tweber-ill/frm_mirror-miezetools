@@ -106,7 +106,7 @@ std::string GaussModel_nd::print(bool bFillInSyms) const
 		for(unsigned int i=0; i<m_uiDim; ++i)
 		{
 			ostr << " * exp(-0.5 * ((" << pcVar[i] <<  "-" << m_px0[i] << ")/"
-				 << m_pspread[i] << ")**2)";
+				 << m_pspread[i] << ")^2)";
 		}
 	}
 	else
@@ -116,7 +116,7 @@ std::string GaussModel_nd::print(bool bFillInSyms) const
 		for(unsigned int i=0; i<m_uiDim; ++i)
 		{
 			ostr << " * exp(-0.5 * ((" << pcVar[i] <<  "-" << m_px0[i] << ")/"
-				 << "sigma_" << pcVar[i] << ")**2)";
+				 << "sigma_" << pcVar[i] << ")^2)";
 		}
 	}
 
