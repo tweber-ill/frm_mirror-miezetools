@@ -14,6 +14,9 @@
 
 class AboutDlg : public QDialog, Ui::AboutDlg
 {Q_OBJECT
+protected:
+	QImage m_katze;
+
 public:
 	AboutDlg(QWidget* pParent) : QDialog(pParent)
 	{
@@ -51,10 +54,21 @@ public:
 		this->labelDate->setText(strDate);
 
 		this->labelLibs->setText(strLibs);
+
+
+		m_katze.load("res/katze.jpg");
+		m_katze = m_katze.scaledToWidth(64, Qt::SmoothTransformation);
 	}
 
 	virtual ~AboutDlg()
 	{}
+
+	virtual void paintEvent(QPaintEvent *pEvent)
+	{
+		QPainter painter(this);
+
+		painter.drawImage(QPoint(width()-64-4,4), m_katze);
+	}
 
 public slots:
 	void ShowAboutQt()
