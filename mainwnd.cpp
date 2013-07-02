@@ -51,7 +51,8 @@
 MiezeMainWnd::MiezeMainWnd()
 					: m_iPlotCnt(1), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)),
-					  m_presdlg(0), m_pphasecorrdlg(0)
+					  m_presdlg(0), m_pphasecorrdlg(0),
+					  m_pradialintdlg(0)
 {
 	this->setWindowTitle(WND_TITLE);
 
@@ -205,6 +206,10 @@ MiezeMainWnd::MiezeMainWnd()
 	pIntAlongY->setText("Integrate Y");
 	pMenuIntegrate->addAction(pIntAlongY);
 
+	QAction *pIntRad = new QAction(this);
+	pIntRad->setText("Integrate Radially...");
+	pMenuIntegrate->addAction(pIntRad);
+
 	pMenuTools->addMenu(pMenuIntegrate);
 
 
@@ -316,6 +321,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
 	QObject::connect(pIntAlongY, SIGNAL(triggered()), this, SLOT(IntAlongY()));
+	QObject::connect(pIntRad, SIGNAL(triggered()), this, SLOT(IntRad()));
 
 	QObject::connect(pFit, SIGNAL(triggered()), this, SLOT(ShowFitDlg()));
 	QObject::connect(pQFitMieze, SIGNAL(triggered()), this, SLOT(QuickFitMIEZE()));
@@ -356,6 +362,28 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_proidlg) delete m_proidlg;
 	if(m_presdlg) delete m_presdlg;
 	if(m_pphasecorrdlg) delete m_pphasecorrdlg;
+	if(m_pradialintdlg) delete m_pradialintdlg;
+}
+
+std::vector<SubWindowBase*> MiezeMainWnd::GetSubWindows(bool bResolveActualWidget)
+{
+	std::vector<SubWindowBase*> vec;
+	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
+	vec.reserve(lst.size());
+
+	for(QMdiSubWindow* pWnd : lst)
+	{
+		if(!pWnd) continue;
+		SubWindowBase* pSWB = (SubWindowBase*)pWnd->widget();
+		if(!pSWB) continue;
+
+		if(bResolveActualWidget)
+			pSWB = pSWB->GetActualWidget();
+
+		vec.push_back(pSWB);
+	}
+
+	return vec;
 }
 
 void MiezeMainWnd::UpdateSubWndList()
@@ -369,14 +397,14 @@ void MiezeMainWnd::UpdateSubWndList()
 	}
 	m_vecSubWndActions.clear();
 
+	std::vector<SubWindowBase*> vec = GetSubWindows(0);
+
 	// add new list
-	QList<QMdiSubWindow*> list = m_pmdi->subWindowList();
-	for(auto item : list)
+	for(SubWindowBase *pSWB : vec)
 	{
-		const QWidget* pWidget = item->widget();
-		if(pWidget)
+		if(pSWB)
 		{
-			QString strTitle = pWidget->windowTitle();
+			QString strTitle = pSWB->windowTitle();
 
 			QAction *pAction = new QAction(pMenuWindows);
 			pAction->setText(strTitle);
@@ -384,8 +412,8 @@ void MiezeMainWnd::UpdateSubWndList()
 
 			pMenuWindows->addAction(pAction);
 
-			QObject::connect(pAction, SIGNAL(triggered()), pWidget, SLOT(showNormal()));
-			QObject::connect(pAction, SIGNAL(triggered()), pWidget, SLOT(setFocus()));
+			QObject::connect(pAction, SIGNAL(triggered()), pSWB, SLOT(showNormal()));
+			QObject::connect(pAction, SIGNAL(triggered()), pSWB, SLOT(setFocus()));
 		}
 	}
 }
@@ -845,13 +873,10 @@ void MiezeMainWnd::SetGlobalROIForAll()
 {
 	const Roi* pRoi = m_proidlg->GetRoi();
 
-	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
-	for(QMdiSubWindow *pItem : lst)
+	std::vector<SubWindowBase*> vec = GetSubWindows(1);
+	for(SubWindowBase *pWnd : vec)
 	{
-		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
-		pWnd = pWnd->GetActualWidget();
 		pWnd->SetROI(pRoi);
-
 		pWnd->repaint();
 	}
 }
@@ -926,13 +951,9 @@ void MiezeMainWnd::ShowListWindowsDlg()
 {
 	ListGraphsDlg dlg(this);
 
-	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
-	for(QMdiSubWindow *pItem : lst)
-	{
-		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
-		if(pWnd)
-			dlg.AddSubWnd(pWnd);
-	}
+	std::vector<SubWindowBase*> vec = GetSubWindows(0);
+	for(SubWindowBase *pWnd : vec)
+		dlg.AddSubWnd(pWnd);
 
 	int iStatus = dlg.exec();
 	/*if(iStatus == QDialog::Accepted)
@@ -948,13 +969,9 @@ void MiezeMainWnd::ShowCombineGraphsDlg()
 {
 	CombineGraphsDlg dlg(this);
 
-	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
-	for(QMdiSubWindow *pItem : lst)
-	{
-		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
-		if(pWnd)
-			dlg.AddAvailSubWnd(pWnd);
-	}
+	std::vector<SubWindowBase*> vec = GetSubWindows(0);
+	for(SubWindowBase *pWnd : vec)
+		dlg.AddAvailSubWnd(pWnd);
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
@@ -982,6 +999,21 @@ void MiezeMainWnd::IntAlongY()
 	Data1 dat1 = pPlot->GetData2().SumY();
 
 	MakePlot(dat1, pSWB->windowTitle().toStdString()+std::string(" -> y int"));
+}
+
+void MiezeMainWnd::IntRad()
+{
+	if(!m_pradialintdlg)
+	{
+		m_pradialintdlg = new RadialIntDlg(this);
+		m_pradialintdlg->SetSubWindows(GetSubWindows());
+
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pradialintdlg, SLOT(SubWindowRemoved(SubWindowBase*)));
+		QObject::connect(this, SIGNAL(SubWindowAdded(SubWindowBase*)), m_pradialintdlg, SLOT(SubWindowAdded(SubWindowBase*)));
+	}
+
+	m_pradialintdlg->show();
+	m_pradialintdlg->activateWindow();
 }
 
 SubWindowBase* MiezeMainWnd::GetActivePlot()
@@ -1340,20 +1372,19 @@ void MiezeMainWnd::SessionSaveTriggered()
 		return;
 	}
 
+	std::vector<SubWindowBase*> vecWnd = GetSubWindows(0);
 
 	std::ofstream ofstr(m_strCurSess);
 	ofstr << "<cattus_session>\n\n";
 	ofstr << "<plot_counter> " << m_iPlotCnt << " </plot_counter>\n";
-	ofstr << "<window_counter> " << m_pmdi->subWindowList().size() << " </window_counter>\n";
+	ofstr << "<window_counter> " << vecWnd.size() << " </window_counter>\n";
 
 	std::ofstream ofstrBlob(m_strCurSess + ".blob", std::ofstream::binary);
 
 	unsigned int iWnd=0;
-	for(QMdiSubWindow *pItem : m_pmdi->subWindowList())
-	{
-		SubWindowBase *pWnd = (SubWindowBase *) pItem->widget();
-		if(!pWnd) continue;
 
+	for(SubWindowBase *pWnd : vecWnd)
+	{
 		std::ostringstream ostrMsg;
 		ostrMsg << "Saving \"" << pWnd->windowTitle().toStdString() << "\"...";
 		this->SetStatusMsg(ostrMsg.str().c_str(), 0);

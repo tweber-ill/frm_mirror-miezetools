@@ -25,6 +25,7 @@
 #include "dialogs/FitDlg.h"
 #include "dialogs/ResoDlg.h"
 #include "dialogs/PsdPhaseDlg.h"
+#include "dialogs/RadialIntDlg.h"
 
 #define MAX_RECENT_FILES 16
 
@@ -41,6 +42,7 @@ protected:
 	FitDlg *m_pfitdlg;
 	RoiDlg *m_proidlg;
 	ResoDlg *m_presdlg;
+	RadialIntDlg *m_pradialintdlg;
 	PsdPhaseCorrDlg *m_pphasecorrdlg;
 
 	unsigned int m_iPlotCnt;
@@ -68,6 +70,8 @@ protected:
 
 	std::string m_strCurSess;
 
+	std::vector<SubWindowBase*> GetSubWindows(bool bResolveActualWidget=1);
+
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
@@ -83,6 +87,7 @@ protected slots:
 
 	void ShowCombineGraphsDlg();
 	void IntAlongY();
+	void IntRad();
 
 	void SettingsTriggered();
 	void ROIManageTriggered();

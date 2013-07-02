@@ -7,8 +7,8 @@ LIBS_RESO = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS} ${LAPACK_LIBS}
 LIBS = -L/usr/lib64 -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lstdc++ -lm -fopenmp -lMinuit2 -lfftw3 ${QT_LIBS} ${LAPACK_LIBS}
 
 
-cattus: main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o
-	${CC} ${FLAGS} -o cattus main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o ${LIBS}
+cattus: main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o
+	${CC} ${FLAGS} -o cattus main.o mainwnd.o settings.o data.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o ${LIBS}
 	strip cattus
 
 reso: settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o
@@ -59,6 +59,9 @@ RoiDlg.o: dialogs/RoiDlg.cpp dialogs/RoiDlg.h
 
 SettingsDlg.o: dialogs/SettingsDlg.cpp dialogs/SettingsDlg.h
 	${CC} ${FLAGS} -c -o SettingsDlg.o dialogs/SettingsDlg.cpp
+
+RadialIntDlg.o: dialogs/RadialIntDlg.cpp dialogs/RadialIntDlg.h
+	${CC} ${FLAGS} -c -o RadialIntDlg.o dialogs/RadialIntDlg.cpp
 
 
 

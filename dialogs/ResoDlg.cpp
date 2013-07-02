@@ -92,6 +92,12 @@ void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
 	for(unsigned int i=0; i<m_pPlots.size(); ++i)
 	{
 		m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str());
+		std::ostringstream ostrSlope;
+		ostrSlope.precision(4);
+		ostrSlope << "Slope (proj): " << std::tan(-m_elliProj[i].phi)
+				  << ", Angle (proj): " << m_elliProj[i].phi;
+
+		m_pPlots[i]->SetTitle(ostrSlope.str().c_str());
 		m_pPlots[i]->plot_param(m_elliProj[i],1);
 		m_pPlots[i]->plot_param(m_elliSlice[i],0);
 	}
