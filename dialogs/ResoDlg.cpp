@@ -94,6 +94,10 @@ void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
 		m_pPlots[i]->SetLabels(m_elliProj[i].x_lab.c_str(), m_elliProj[i].y_lab.c_str());
 		std::ostringstream ostrSlope;
 		ostrSlope.precision(4);
+
+		// We do not know which principal axis corresponds to which axis,
+		// so the angle can be rotated by PI/2
+		// TODO: correct the angle which is printed here
 		ostrSlope << "Slope (proj): " << std::tan(-m_elliProj[i].phi)
 				  << ", Angle (proj): " << m_elliProj[i].phi;
 

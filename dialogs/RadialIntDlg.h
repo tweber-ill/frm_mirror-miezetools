@@ -31,6 +31,8 @@ public:
 public slots:
 	void SubWindowRemoved(SubWindowBase *pSWB);
 	void SubWindowAdded(SubWindowBase *pSWB);
+
+	void Calc();
 };
 
 
