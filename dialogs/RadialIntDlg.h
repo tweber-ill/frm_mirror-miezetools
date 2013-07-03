@@ -12,6 +12,7 @@
 #include "../ui/ui_radialint.h"
 #include "../subwnd.h"
 #include "../plot/plot2d.h"
+#include "../plot/plot.h"
 
 #include <vector>
 
@@ -20,6 +21,7 @@ class RadialIntDlg : public QDialog, Ui::RadialIntDlg
 { Q_OBJECT
 
 protected:
+	Plot* m_pPlot;
 	std::vector<Plot2d*> m_vecPlots;
 
 public:

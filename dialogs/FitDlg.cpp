@@ -509,6 +509,12 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 						<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
 						<< std::endl;
 		pFkt = pModel;
+
+		std::ostringstream ostrTitle;
+		ostrTitle.precision(3);
+		ostrTitle << "Contrast: " << pModel->GetContrast() << "+-" << pModel->GetContrastErr()
+				  << ", Phase: " << pModel->GetPhase() << "+-" << pModel->GetPhaseErr();
+		res.pPlot->SetTitle(ostrTitle.str().c_str());
 	}
 	else if(iFkt == FIT_GAUSSIAN) 		// Gaussian
 	{

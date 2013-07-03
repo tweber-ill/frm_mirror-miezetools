@@ -6,22 +6,31 @@
 
 #include "RadialIntDlg.h"
 
-RadialIntDlg::RadialIntDlg(QWidget* pParent) : QDialog(pParent)
+RadialIntDlg::RadialIntDlg(QWidget* pParent)
+			: QDialog(pParent), m_pPlot(new Plot(this))
 {
 	setupUi(this);
+
+	QGridLayout *pGrid = new QGridLayout(frame);
+	pGrid->addWidget(m_pPlot, 0, 0, 1, 1);
+
 
 	std::vector<QDoubleSpinBox*> vecSpinBoxes = { spinX, spinY, spinXInc, spinYInc };
 	std::vector<QComboBox*> vecComboBoxes = { comboSrc, comboType };
 
 	for(QDoubleSpinBox* pSpinBox : vecSpinBoxes)
 		QObject::connect(pSpinBox, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
-
 	for(QComboBox* pComboBox : vecComboBoxes)
 		QObject::connect(pComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(Calc()));
 }
 
 RadialIntDlg::~RadialIntDlg()
 {
+	if(m_pPlot)
+	{
+		delete m_pPlot;
+		m_pPlot = 0;
+	}
 }
 
 void RadialIntDlg::SubWindowRemoved(SubWindowBase *pSWB)
@@ -72,7 +81,16 @@ void RadialIntDlg::SetSubWindows(std::vector<SubWindowBase*> vecSWB)
 
 void RadialIntDlg::Calc()
 {
-	std::cout << "TODO: calc" << std::endl;
+	int iSrcIdx = comboSrc->currentIndex();
+	if(iSrcIdx<0)
+	{
+		m_pPlot->clear();
+		return;
+	}
+
+	const Plot2d* pPlot2d = m_vecPlots[iSrcIdx];
+
+	std::cout << "TODO: Calc" << std::endl;
 }
 
 #include "RadialIntDlg.moc"
