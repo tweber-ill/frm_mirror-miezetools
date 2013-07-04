@@ -77,17 +77,71 @@ void EllipseDlg::SetStatusMsg(const char* pcMsg, int iPos)
 
 void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
 {
-	m_elliProj[0] = ::calc_res_ellipse(res.reso, res.Q_avg, 0, 3, 1, 2, -1);
-	m_elliSlice[0] = ::calc_res_ellipse(res.reso, res.Q_avg, 0, 3, -1, 2, 1);
+	int iParams[2][4][5] =
+	{
+		{
+			{0, 3, 1, 2, -1},
+			{1, 3, 0, 2, -1},
+			{2, 3, 0, 1, -1},
+			{0, 1, 3, 2, -1}
+		},
+		{
+			{0, 3, -1, 2, 1},
+			{1, 3, -1, 2, 0},
+			{2, 3, -1, 1, 0},
+			{0, 1, -1, 2, 3}
+		}
+	};
 
-	m_elliProj[1] = ::calc_res_ellipse(res.reso, res.Q_avg, 1, 3, 0, 2, -1);
-	m_elliSlice[1] = ::calc_res_ellipse(res.reso, res.Q_avg, 1, 3, -1, 2, 0);
 
-	m_elliProj[2] = ::calc_res_ellipse(res.reso, res.Q_avg, 2, 3, 0, 1, -1);
-	m_elliSlice[2] = ::calc_res_ellipse(res.reso, res.Q_avg, 2, 3, -1, 1, 0);
+	Xml xmlparams;
+	bool bXMLLoaded = xmlparams.Load("res.conf");
+	bool bCenterOn0 = xmlparams.Query<bool>("/res/center_around_origin", 0);
 
-	m_elliProj[3] = ::calc_res_ellipse(res.reso, res.Q_avg, 0, 1, 3, 2, -1);
-	m_elliSlice[3] = ::calc_res_ellipse(res.reso, res.Q_avg, 0, 1, -1, 2, 3);
+	for(unsigned int iEll=0; iEll<4; ++iEll)
+	{
+		if(bXMLLoaded)
+		{
+			std::ostringstream ostrCfg;
+			ostrCfg << "/res/ellipse_2d_" << iEll;
+
+			std::string strProjPath = ostrCfg.str() + "_proj";
+			std::string strSlicePath = ostrCfg.str() + "_slice";
+
+			std::string strProj = xmlparams.QueryString(strProjPath.c_str(), "");
+			std::string strSlice = xmlparams.QueryString(strSlicePath.c_str(), "");
+
+			const std::string* strEllis[] = {&strProj, &strSlice};
+
+			for(unsigned int iWhichEll=0; iWhichEll<2; ++iWhichEll)
+			{
+				if(*strEllis[iWhichEll] != "")
+				{
+					std::vector<int> vecIdx;
+					::get_tokens(*strEllis[iWhichEll], ",", vecIdx);
+
+					if(vecIdx.size() == 5)
+					{
+						for(unsigned int iParam=0; iParam<5; ++iParam)
+							iParams[iWhichEll][iEll][iParam] = vecIdx[iParam];
+					}
+					else
+					{
+						std::cerr << "Error in res.conf: Wrong size of parameters for "
+								 << strProj << "." << std::endl;
+					}
+				}
+			}
+		}
+
+		ublas::vector<double> Q_avg = res.Q_avg;
+		if(bCenterOn0)
+			Q_avg = ublas::zero_vector<double>(Q_avg.size());
+
+		m_elliProj[iEll] = ::calc_res_ellipse(res.reso, Q_avg, iParams[0][iEll][0], iParams[0][iEll][1], iParams[0][iEll][2], iParams[0][iEll][3], iParams[0][iEll][4]);
+		m_elliSlice[iEll] = ::calc_res_ellipse(res.reso, Q_avg, iParams[1][iEll][0], iParams[1][iEll][1], iParams[1][iEll][2], iParams[1][iEll][3], iParams[1][iEll][4]);
+	}
+
 
 	for(unsigned int i=0; i<m_pPlots.size(); ++i)
 	{
@@ -184,10 +238,18 @@ void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
 	const int iZ[] = {3, 2};
 	const int iIntOrRem[] = {2, 3};
 
+	Xml xmlparams;
+	bool bXMLLoaded = xmlparams.Load("res.conf");
+	bool bCenterOn0 = xmlparams.Query<bool>("/res/center_around_origin", 0);
+
+	ublas::vector<double> Q_avg = res.Q_avg;
+	if(bCenterOn0)
+		Q_avg = ublas::zero_vector<double>(Q_avg.size());
+
 	for(unsigned int i=0; i<m_pPlots.size(); ++i)
 	{
-		m_elliProj[i] = ::calc_res_ellipsoid(res.reso, res.Q_avg, iX[i], iY[i], iZ[i], iIntOrRem[i], -1);
-		m_elliSlice[i] = ::calc_res_ellipsoid(res.reso, res.Q_avg, iX[i], iY[i], iZ[i], -1, iIntOrRem[i]);
+		m_elliProj[i] = ::calc_res_ellipsoid(res.reso, Q_avg, iX[i], iY[i], iZ[i], iIntOrRem[i], -1);
+		m_elliSlice[i] = ::calc_res_ellipsoid(res.reso, Q_avg, iX[i], iY[i], iZ[i], -1, iIntOrRem[i]);
 
 		ublas::vector<double> vecWProj(3), vecWSlice(3);
 		ublas::vector<double> vecOffsProj(3), vecOffsSlice(3);
