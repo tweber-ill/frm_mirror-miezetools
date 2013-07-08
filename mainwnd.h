@@ -26,6 +26,7 @@
 #include "dialogs/ResoDlg.h"
 #include "dialogs/PsdPhaseDlg.h"
 #include "dialogs/RadialIntDlg.h"
+#include "dialogs/FormulaDlg.h"
 
 #define MAX_RECENT_FILES 16
 
@@ -44,6 +45,7 @@ protected:
 	ResoDlg *m_presdlg;
 	RadialIntDlg *m_pradialintdlg;
 	PsdPhaseCorrDlg *m_pphasecorrdlg;
+	FormulaDlg *m_pformuladlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -107,6 +109,7 @@ protected slots:
 	void ShowReso();
 	void ShowPSDPhaseCorr();
 	void CalcPSDPhases();
+	void ShowFormulas();
 
 	void ShowAbout();
 	void ShowBrowser();

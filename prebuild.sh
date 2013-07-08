@@ -39,5 +39,6 @@ moc dialogs/ComboDlg.h -o dialogs/ComboDlg.moc
 moc dialogs/ResoDlg.h -o dialogs/ResoDlg.moc
 moc dialogs/PsdPhaseDlg.h -o dialogs/PsdPhaseDlg.moc
 moc dialogs/RadialIntDlg.h -o dialogs/RadialIntDlg.moc
+moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
 
 echo -e "\n"

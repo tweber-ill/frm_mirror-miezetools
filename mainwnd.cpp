@@ -52,7 +52,8 @@ MiezeMainWnd::MiezeMainWnd()
 					: m_iPlotCnt(1), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)),
 					  m_presdlg(0), m_pphasecorrdlg(0),
-					  m_pradialintdlg(0)
+					  m_pradialintdlg(0),
+					  m_pformuladlg(0)
 {
 	this->setWindowTitle(WND_TITLE);
 
@@ -252,13 +253,20 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QAction *pReso = new QAction(this);
 	pReso->setText("Resolution...");
+	pMenuCalc->addAction(pReso);
+
+
+	pMenuCalc->addSeparator();
+
+
+	QAction *pFormulas = new QAction(this);
+	pFormulas->setText("Formulas...");
+	pMenuCalc->addAction(pFormulas);
 
 	QAction *pPSDPhase = new QAction(this);
 	pPSDPhase->setText("Flat PSD Phases...");
-
-	pMenuCalc->addAction(pReso);
-	pMenuCalc->addSeparator();
 	pMenuCalc->addAction(pPSDPhase);
+
 
 
 
@@ -345,6 +353,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pReso, SIGNAL(triggered()), this, SLOT(ShowReso()));
 	QObject::connect(pPhaseCorr, SIGNAL(triggered()), this, SLOT(ShowPSDPhaseCorr()));
 	QObject::connect(pPSDPhase, SIGNAL(triggered()), this, SLOT(CalcPSDPhases()));
+	QObject::connect(pFormulas, SIGNAL(triggered()), this, SLOT(ShowFormulas()));
 
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
 	QObject::connect(pBrowser, SIGNAL(triggered()), this, SLOT(ShowBrowser()));
@@ -363,6 +372,7 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_presdlg) delete m_presdlg;
 	if(m_pphasecorrdlg) delete m_pphasecorrdlg;
 	if(m_pradialintdlg) delete m_pradialintdlg;
+	if(m_pformuladlg) delete m_pformuladlg;
 }
 
 std::vector<SubWindowBase*> MiezeMainWnd::GetSubWindows(bool bResolveActualWidget)
@@ -1255,6 +1265,15 @@ void MiezeMainWnd::CalcPSDPhases()
 		pPlot->plot(dlg.GetData());
 		AddSubWindow(pPlot);
 	}
+}
+
+void MiezeMainWnd::ShowFormulas()
+{
+	if(!m_pformuladlg)
+		m_pformuladlg = new FormulaDlg(this);
+
+	m_pformuladlg->show();
+	m_pformuladlg->activateWindow();
 }
 
 void MiezeMainWnd::ShowPSDPhaseCorr()
