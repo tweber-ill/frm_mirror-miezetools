@@ -48,6 +48,7 @@
 #define WND_TITLE "Cattus, a MIEZE toolset"
 
 
+
 MiezeMainWnd::MiezeMainWnd()
 					: m_iPlotCnt(1), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)),
@@ -373,6 +374,22 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pphasecorrdlg) delete m_pphasecorrdlg;
 	if(m_pradialintdlg) delete m_pradialintdlg;
 	if(m_pformuladlg) delete m_pformuladlg;
+}
+
+QMdiSubWindow* MiezeMainWnd::FindSubWindow(SubWindowBase* pSWB)
+{
+	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
+	for(QMdiSubWindow* pWnd : lst)
+	{
+		if(!pWnd) continue;
+		SubWindowBase* pCurSWB = (SubWindowBase*)pWnd->widget();
+		if(!pCurSWB) continue;
+
+		if(pCurSWB==pSWB || pCurSWB->GetActualWidget()==pSWB)
+			return pWnd;
+	}
+
+	return 0;
 }
 
 std::vector<SubWindowBase*> MiezeMainWnd::GetSubWindows(bool bResolveActualWidget)
@@ -1375,6 +1392,13 @@ void MiezeMainWnd::SessionLoadTriggered()
 		{
 			pSWB->LoadXML(xml, blob, strSWBase);
 			AddSubWindow(pSWB);
+
+			QMdiSubWindow *pSubWnd = FindSubWindow(pSWB);
+
+			std::string strGeo = xml.QueryString((strSWBase+"geo").c_str(), "");
+			if(pSubWnd && strGeo != "")
+				pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
+
 			pSWB->GetActualWidget()->RefreshPlot();
 		}
 	}
@@ -1411,6 +1435,12 @@ void MiezeMainWnd::SessionSaveTriggered()
 		pWnd = pWnd->GetActualWidget();
 
 		ofstr << "<window_" << iWnd << ">\n";
+		QMdiSubWindow *pSubWnd = FindSubWindow(pWnd);
+		if(pSubWnd)
+		{
+			std::string strGeo = pSubWnd->saveGeometry().toHex().data();
+			ofstr << "<geo> " << strGeo << " </geo>\n";
+		}
 		pWnd->SaveXML(ofstr, ofstrBlob);
 		ofstr << "</window_" << iWnd << ">\n";
 

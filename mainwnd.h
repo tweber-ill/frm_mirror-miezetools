@@ -72,6 +72,7 @@ protected:
 
 	std::string m_strCurSess;
 
+	QMdiSubWindow* FindSubWindow(SubWindowBase* pSWB);
 	std::vector<SubWindowBase*> GetSubWindows(bool bResolveActualWidget=1);
 
 protected slots:
