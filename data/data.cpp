@@ -6,6 +6,7 @@
  */
 
 #include "data.h"
+#include "../helper/math.h"
 #include <limits>
 #include <boost/algorithm/minmax_element.hpp>
 
@@ -386,6 +387,74 @@ void Data2::FromMatrix(const ublas::matrix<double>& mat)
 
 			m_dTotal += dVal;
 		}
+}
+
+void Data2::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
+{
+	std::vector<double> vecVals = m_vecVals;
+	std::vector<double> vecErrs = m_vecErrs;
+
+	m_vecVals.resize(iNewWidth*iNewHeight);
+	m_vecErrs.resize(iNewWidth*iNewHeight);
+
+	double dAreaFactor = double(m_iWidth*m_iHeight)/double(iNewWidth*iNewHeight);
+
+	for(int iY=0; iY<iNewHeight; ++iY)
+		for(int iX=0; iX<iNewWidth; ++iX)
+		{
+			double dOldY0 = ((iY+0.5)*double(m_iHeight))/double(iNewHeight) - 0.5;
+			double dOldX0 = ((iX+0.5)*double(m_iWidth))/double(iNewWidth) - 0.5;
+
+			int iX0 = int(dOldX0);
+			int iY0 = int(dOldY0);
+			int iX1 = iX0+1;
+			int iY1 = iY0+1;
+
+			if(iX0<0) iX0=0;
+			if(iY0<0) iY0=0;
+			if(iX1<0) iX1=0;
+			if(iY1<0) iY1=0;
+
+			if(iX0>=m_iWidth) iX0=m_iWidth-1;
+			if(iY0>=m_iHeight) iY0=m_iHeight-1;
+			if(iX1>=m_iWidth) iX1=m_iWidth-1;
+			if(iY1>=m_iHeight) iY1=m_iHeight-1;
+
+			double dX = (dOldX0 - double(iX0));
+			double dY = (dOldY0 - double(iY0));
+
+			if(dX<0.) dX=0.; if(dX>1.) dX=1.;
+			if(dY<0.) dY=0.; if(dY>1.) dY=1.;
+
+			double dx0y0 = vecVals[iY0*m_iWidth + iX0];
+			double dx0y1 = vecVals[iY1*m_iWidth + iX0];
+			double dx1y0 = vecVals[iY0*m_iWidth + iX1];
+			double dx1y1 = vecVals[iY1*m_iWidth + iX1];
+
+			double dx0y0_err = vecErrs[iY0*m_iWidth + iX0];
+			double dx0y1_err = vecErrs[iY1*m_iWidth + iX0];
+			double dx1y0_err = vecErrs[iY0*m_iWidth + iX1];
+			double dx1y1_err = vecErrs[iY1*m_iWidth + iX1];
+
+			m_vecVals[iY*iNewWidth + iX] = bilinear_interp<double>(dx0y0, dx1y0, dx0y1, dx1y1, dX, dY);
+			m_vecErrs[iY*iNewHeight + iX] = bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
+
+			if(bKeepTotalCounts)
+			{
+				m_vecVals[iY*iNewWidth + iX] *= dAreaFactor;
+				m_vecErrs[iY*iNewWidth + iX] *= dAreaFactor;
+			}
+		}
+
+	// TODO: handle range correctly
+	//if(!m_bHasRange)
+	{
+		m_dXMax = iNewWidth-1;
+		m_dYMax = iNewHeight-1;
+
+		m_iWidth = iNewWidth;
+		m_iHeight = iNewHeight;
+	}
 }
 
 

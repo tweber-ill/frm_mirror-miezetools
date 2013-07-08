@@ -77,6 +77,8 @@ public:
 
 	void CheckCyclicData();
 
+	void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false);
+
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat; }
 

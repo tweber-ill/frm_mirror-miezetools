@@ -41,11 +41,21 @@ Plot2d::Plot2d(const Plot2d& plot)
 	this->m_strZAxis = plot.m_strZAxis;
 	this->m_strTitle = plot.m_strTitle;
 
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->setWindowTitle(plot.windowTitle());
+	this->setMouseTracking(true);
+
 	this->plot(plot.GetData2());
 }
 
 Plot2d::~Plot2d()
 { clear(); }
+
+void Plot2d::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
+{
+	m_dat.ChangeResolution(iNewWidth, iNewHeight, bKeepTotalCounts);
+	RefreshPlot();
+}
 
 void Plot2d::clear()
 {

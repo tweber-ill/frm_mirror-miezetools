@@ -79,8 +79,14 @@ void RadialIntDlg::SetSubWindows(std::vector<SubWindowBase*> vecSWB)
 	}
 }
 
+
+#define TYPE_VALS_SPLIT 	0
+#define TYPE_VALS_AGV 		1
+
 void RadialIntDlg::Calc()
 {
+	const int iTypeIdx = comboType->currentIndex();
+
 	int iSrcIdx = comboSrc->currentIndex();
 	if(iSrcIdx<0)
 	{
@@ -89,6 +95,11 @@ void RadialIntDlg::Calc()
 	}
 
 	const Plot2d* pPlot2d = m_vecPlots[iSrcIdx];
+
+	Plot2d* pPlotInterp = new Plot2d(*pPlot2d);
+	pPlotInterp->ChangeResolution(512, 512, iTypeIdx==TYPE_VALS_SPLIT);
+	// TODO
+	delete pPlotInterp;
 
 	std::cout << "TODO: Calc" << std::endl;
 }

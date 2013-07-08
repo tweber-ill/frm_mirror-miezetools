@@ -12,6 +12,7 @@
 #include "../helper/string.h"
 #include "../helper/misc.h"
 #include "../helper/xml.h"
+//#include "../data/export.h"
 
 #include <QtGui/QPainter>
 #include <QtGui/QFileDialog>
@@ -60,6 +61,13 @@ void EllipseDlg::paintEvent (QPaintEvent *pEvent)
 
 void EllipseDlg::hideEvent (QHideEvent *event)
 {
+	/* was for debug
+	export_py("0.py", m_pPlots[0]);
+	export_py("1.py", m_pPlots[1]);
+	export_py("2.py", m_pPlots[2]);
+	export_py("3.py", m_pPlots[3]);
+	*/
+
 	Settings::GetGlobals()->setValue("reso/wnd_ellipses_geo", saveGeometry());
 }
 void EllipseDlg::showEvent(QShowEvent *event)
