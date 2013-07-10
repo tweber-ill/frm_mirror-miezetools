@@ -163,9 +163,12 @@ void RadialIntDlg::Calc()
 			pPlot->SetROI(&roi);
 
 			double dCnts = pPlot->GetData2().GetTotalInROI();
-			dat1d.SetX(iPt, iPt);
+			dat1d.SetX(iPt, dCircBegin + 0.5*(dCircEnd-dCircBegin));
 			dat1d.SetY(iPt, dCnts);
+			dat1d.SetYErr(iPt, std::sqrt(dCnts));
 		}
+
+		m_pPlot->SetLabels("Radius", "Counts");
 	}
 	// mieze data
 	else if(pSWB->GetType() == PLOT_3D)
@@ -179,6 +182,9 @@ void RadialIntDlg::Calc()
 	}
 
 	delete pInterp;
+
+	QString strTitle = pSWB->windowTitle() + " -> rad int";
+	m_pPlot->setWindowTitle(strTitle);
 
 	m_pPlot->plot(dat1d);
 	m_pPlot->RefreshPlot();
