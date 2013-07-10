@@ -88,6 +88,7 @@ void Plot3d::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, b
 	RefreshPlot();
 }
 
+
 Plot* Plot3d::ConvertTo1d(int iParam)
 {
 	const Plot3d* pPlot3d = this;

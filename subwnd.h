@@ -27,6 +27,12 @@ enum SubWindowType
 	PLOT_4D
 };
 
+struct PlotInfo
+{
+	unsigned int iWidth;
+	unsigned int iHeight;
+};
+
 class SubWindowBase : public QWidget
 {
 Q_OBJECT
@@ -59,7 +65,13 @@ public:
 
 	virtual void RefreshPlot() {}
 
-	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false) = 0;
+	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false) {}
+	virtual PlotInfo GetPlotInfo() const
+	{
+		PlotInfo info;
+		info.iWidth = info.iHeight = 0;
+		return info;
+	}
 };
 
 #endif

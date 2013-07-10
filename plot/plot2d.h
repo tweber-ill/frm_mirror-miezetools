@@ -80,6 +80,7 @@ public:
 	void CheckCyclicData();
 
 	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false);
+	virtual PlotInfo GetPlotInfo() const;
 
 protected:
 	virtual DataInterface* GetInternalData() { return &m_dat; }

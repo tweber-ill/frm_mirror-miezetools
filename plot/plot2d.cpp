@@ -63,6 +63,14 @@ void Plot2d::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, b
 	RefreshPlot();
 }
 
+PlotInfo Plot2d::GetPlotInfo() const
+{
+	PlotInfo info;
+	info.iWidth = m_dat.GetWidth();
+	info.iHeight = m_dat.GetHeight();
+	return info;
+}
+
 void Plot2d::clear()
 {
 	if(m_pImg)

@@ -78,6 +78,7 @@ public:
 
 	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false)
 	{ m_pPlot->ChangeResolution(iNewWidth, iNewHeight, bKeepTotalCounts); }
+	virtual PlotInfo GetPlotInfo() const { return m_pPlot->GetPlotInfo(); }
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return m_pPlot->LoadXML(xml, blob, strBase); }
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return m_pPlot->SaveXML(ostr, ostrBlob); }

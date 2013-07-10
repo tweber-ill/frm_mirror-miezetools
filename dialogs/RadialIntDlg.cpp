@@ -16,7 +16,7 @@ RadialIntDlg::RadialIntDlg(QWidget* pParent)
 	pGrid->addWidget(m_pPlot, 0, 0, 1, 1);
 
 
-	std::vector<QDoubleSpinBox*> vecSpinBoxes = { spinX, spinY, spinRadius, spinInc };
+	std::vector<QDoubleSpinBox*> vecSpinBoxes = { spinX, spinY, spinRadius, spinInc, spinScale };
 	std::vector<QComboBox*> vecComboBoxes = { comboSrc };
 
 	for(QDoubleSpinBox* pSpinBox : vecSpinBoxes)
@@ -123,9 +123,10 @@ void RadialIntDlg::Calc()
 	const SubWindowBase* pSWB = m_vecPlots[iSrcIdx];
 	SubWindowBase* pInterp = pSWB->clone();
 
-	uint iOldW = 128;	// TODO
-	uint iOldH = 128;
-	double dResScale = 5.;
+	PlotInfo info = pSWB->GetPlotInfo();
+	uint iOldW = info.iWidth;
+	uint iOldH = info.iHeight;
+	const double dResScale = spinScale->value();;
 	pInterp->ChangeResolution(uint(iOldW*dResScale), uint(iOldH*dResScale), 1);
 
 	dXStart *= dResScale;

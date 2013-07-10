@@ -128,6 +128,7 @@ void Plot4d::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, b
 }
 
 
+
 Plot* Plot4d::ConvertTo1d(int iFoil)
 {
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
