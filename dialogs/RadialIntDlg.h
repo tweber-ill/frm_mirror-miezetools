@@ -24,6 +24,10 @@ protected:
 	Plot* m_pPlot;
 	std::vector<Plot2d*> m_vecPlots;
 
+protected slots:
+	void AutoCalc();
+	void ButtonBoxClicked(QAbstractButton* pBtn);
+
 public:
 	RadialIntDlg(QWidget* pParent);
 	virtual ~RadialIntDlg();
@@ -35,6 +39,9 @@ public slots:
 	void SubWindowAdded(SubWindowBase *pSWB);
 
 	void Calc();
+
+signals:
+	void NewSubWindow(SubWindowBase* pWnd);
 };
 
 

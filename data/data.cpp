@@ -331,6 +331,17 @@ void Data2::SetVals(const double* pDat, const double *pErr)
 		}
 }
 
+double Data2::GetTotalInROI() const
+{
+	double dTotal = 0.;
+
+	for(uint iY=0; iY<m_iHeight; ++iY)
+		for(uint iX=0; iX<m_iWidth; ++iX)
+			dTotal += GetVal(iX, iY);
+
+	return dTotal;
+}
+
 void Data2::RecalcMinMaxTotal()
 {
 	m_dMin = std::numeric_limits<double>::max();

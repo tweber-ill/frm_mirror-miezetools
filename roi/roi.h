@@ -44,12 +44,12 @@ class RoiElement
 {
 	protected:
 		BoundingRect m_boundingrect;
-		virtual void CalculateBoundingRect();
-
 		RoiElement();
 
 	public:
 		virtual ~RoiElement() {}
+
+		virtual void CalculateBoundingRect();
 
 		virtual RoiElement& operator=(const RoiElement& elem);
 		virtual RoiElement* copy() const = 0;
@@ -134,13 +134,12 @@ class RoiCircle : public RoiElement
 		ublas::vector<double> m_vecCenter;
 		double m_dRadius;
 
-		virtual void CalculateBoundingRect();
-
 	public:
 		RoiCircle(const ublas::vector<double>& vecCenter, double dRadius);
 		RoiCircle();
 		RoiCircle(const RoiCircle& elem);
 
+		virtual void CalculateBoundingRect();
 		virtual bool IsInside(double dX, double dY) const;
 
 		virtual std::string GetName() const;
@@ -155,6 +154,9 @@ class RoiCircle : public RoiElement
 
 		virtual RoiCircle& operator=(const RoiCircle& elem);
 		virtual RoiElement* copy() const;
+
+		double& GetRadius() { return m_dRadius; }
+		ublas::vector<double>& GetCenter() { return m_vecCenter; }
 };
 
 
@@ -164,14 +166,13 @@ class RoiEllipse : public RoiElement
 		ublas::vector<double> m_vecCenter;
 		double m_dRadiusX, m_dRadiusY;
 
-		virtual void CalculateBoundingRect();
-
 	public:
 		RoiEllipse(const ublas::vector<double>& vecCenter,
 					double dRadiusX, double dRadiusY);
 		RoiEllipse();
 		RoiEllipse(const RoiEllipse& elem);
 
+		virtual void CalculateBoundingRect();
 		virtual bool IsInside(double dX, double dY) const;
 
 		virtual std::string GetName() const;
@@ -195,14 +196,13 @@ class RoiCircleRing : public RoiElement
 		ublas::vector<double> m_vecCenter;
 		double m_dInnerRadius, m_dOuterRadius;
 
-		virtual void CalculateBoundingRect();
-
 	public:
 		RoiCircleRing(const ublas::vector<double>& vecCenter,
 					  double dInnerRadius, double dOuterRadius);
 		RoiCircleRing();
 		RoiCircleRing(const RoiCircleRing& elem);
 
+		virtual void CalculateBoundingRect();
 		virtual bool IsInside(double dX, double dY) const;
 
 		virtual std::string GetName() const;
@@ -217,6 +217,10 @@ class RoiCircleRing : public RoiElement
 
 		virtual RoiCircleRing& operator=(const RoiCircleRing& elem);
 		virtual RoiElement* copy() const;
+
+		double& GetInnerRadius() { return m_dInnerRadius; }
+		double& GetOuterRadius() { return m_dOuterRadius; }
+		ublas::vector<double>& GetCenter() { return m_vecCenter; }
 };
 
 
@@ -225,8 +229,6 @@ class RoiCircleSegment : public RoiCircleRing
 	protected:
 		double m_dBeginAngle, m_dEndAngle;
 
-		virtual void CalculateBoundingRect();
-
 	public:
 		RoiCircleSegment(const ublas::vector<double>& vecCenter,
 						double dInnerRadius, double dOuterRadius,
@@ -234,6 +236,7 @@ class RoiCircleSegment : public RoiCircleRing
 		RoiCircleSegment();
 		RoiCircleSegment(const RoiCircleSegment& elem);
 
+		virtual void CalculateBoundingRect();
 		virtual bool IsInside(double dX, double dY) const;
 
 		virtual std::string GetName() const;

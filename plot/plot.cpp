@@ -30,6 +30,26 @@ Plot::~Plot()
 	if(m_pPixmap) delete m_pPixmap;
 }
 
+SubWindowBase* Plot::clone() const
+{
+	Plot *pPlot = new Plot(parentWidget(), windowTitle().toStdString().c_str());
+
+	pPlot->m_vecObjs = this->m_vecObjs;
+	pPlot->m_bXIsLog = this->m_bXIsLog;
+	pPlot->m_bYIsLog = this->m_bYIsLog;
+	pPlot->m_strXAxis = this->m_strXAxis;
+	pPlot->m_strYAxis = this->m_strYAxis;
+	pPlot->m_strTitle = this->m_strTitle;
+
+	pPlot->m_dxmin = this->m_dxmin;
+	pPlot->m_dxmax = this->m_dxmax;
+	pPlot->m_dymin = this->m_dymin;
+	pPlot->m_dymax = this->m_dymax;
+
+	pPlot->RefreshPlot();
+	return pPlot;
+}
+
 QSize Plot::minimumSizeHint() const
 {
 	return QSize(320,240);

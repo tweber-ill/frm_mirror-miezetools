@@ -1037,6 +1037,7 @@ void MiezeMainWnd::IntRad()
 
 		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pradialintdlg, SLOT(SubWindowRemoved(SubWindowBase*)));
 		QObject::connect(this, SIGNAL(SubWindowAdded(SubWindowBase*)), m_pradialintdlg, SLOT(SubWindowAdded(SubWindowBase*)));
+		QObject::connect(m_pradialintdlg, SIGNAL(NewSubWindow(SubWindowBase*)), this, SLOT(AddSubWindow(SubWindowBase*)));
 	}
 
 	m_pradialintdlg->show();

@@ -48,6 +48,12 @@ Plot2d::Plot2d(const Plot2d& plot)
 	this->plot(plot.GetData2());
 }
 
+SubWindowBase* Plot2d::clone() const
+{
+	Plot2d* pPlot = new Plot2d(*this);
+	return pPlot;
+}
+
 Plot2d::~Plot2d()
 { clear(); }
 

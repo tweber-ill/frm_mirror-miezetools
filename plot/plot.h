@@ -73,6 +73,8 @@ public:
 	void paint();
 	virtual void RefreshPlot();
 
+	virtual SubWindowBase* clone() const;
+
 	void SetTitle(const char* pc) { m_strTitle = QString(pc); }
 	virtual std::string GetTitle() const { return m_strTitle.toStdString(); }
 

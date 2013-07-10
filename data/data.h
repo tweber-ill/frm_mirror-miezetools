@@ -215,6 +215,7 @@ public:
 
 	double GetTotal() const { return m_dTotal; }
 	void SetTotal(double dTot) { m_dTotal = dTot; }
+	double GetTotalInROI() const;
 
 	void FromMatrix(const ublas::matrix<double>& mat);
 
