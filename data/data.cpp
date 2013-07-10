@@ -735,6 +735,80 @@ Data1 Data3::GetXYSum() const
 }
 
 
+void Data3::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
+{
+	std::vector<double> vecVals = m_vecVals;
+	std::vector<double> vecErrs = m_vecErrs;
+
+	m_vecVals.resize(m_iDepth*iNewWidth*iNewHeight);
+	m_vecErrs.resize(m_iDepth*iNewWidth*iNewHeight);
+
+	double dAreaFactor = double(m_iWidth*m_iHeight)/double(iNewWidth*iNewHeight);
+
+	for(int iT=0; iT<m_iDepth; ++iT)
+		for(int iY=0; iY<iNewHeight; ++iY)
+			for(int iX=0; iX<iNewWidth; ++iX)
+			{
+				double dOldY0 = ((iY+0.5)*double(m_iHeight))/double(iNewHeight) - 0.5;
+				double dOldX0 = ((iX+0.5)*double(m_iWidth))/double(iNewWidth) - 0.5;
+
+				int iX0 = int(dOldX0);
+				int iY0 = int(dOldY0);
+				int iX1 = iX0+1;
+				int iY1 = iY0+1;
+
+				if(iX0<0) iX0=0;
+				if(iY0<0) iY0=0;
+				if(iX1<0) iX1=0;
+				if(iY1<0) iY1=0;
+
+				if(iX0>=m_iWidth) iX0=m_iWidth-1;
+				if(iY0>=m_iHeight) iY0=m_iHeight-1;
+				if(iX1>=m_iWidth) iX1=m_iWidth-1;
+				if(iY1>=m_iHeight) iY1=m_iHeight-1;
+
+				double dX = (dOldX0 - double(iX0));
+				double dY = (dOldY0 - double(iY0));
+
+				if(dX<0.) dX=0.; if(dX>1.) dX=1.;
+				if(dY<0.) dY=0.; if(dY>1.) dY=1.;
+
+				const uint iOldIdx = iT*m_iWidth*m_iHeight;
+
+				double dx0y0 = vecVals[iOldIdx + iY0*m_iWidth + iX0];
+				double dx0y1 = vecVals[iOldIdx + iY1*m_iWidth + iX0];
+				double dx1y0 = vecVals[iOldIdx + iY0*m_iWidth + iX1];
+				double dx1y1 = vecVals[iOldIdx + iY1*m_iWidth + iX1];
+
+				double dx0y0_err = vecErrs[iOldIdx + iY0*m_iWidth + iX0];
+				double dx0y1_err = vecErrs[iOldIdx + iY1*m_iWidth + iX0];
+				double dx1y0_err = vecErrs[iOldIdx + iY0*m_iWidth + iX1];
+				double dx1y1_err = vecErrs[iOldIdx + iY1*m_iWidth + iX1];
+
+				const uint iNewIdx = iT*iNewWidth*iNewHeight + iY*iNewWidth + iX;
+
+				m_vecVals[iNewIdx] = bilinear_interp<double>(dx0y0, dx1y0, dx0y1, dx1y1, dX, dY);
+				m_vecErrs[iNewIdx] = bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
+
+				if(bKeepTotalCounts)
+				{
+					m_vecVals[iNewIdx] *= dAreaFactor;
+					m_vecErrs[iNewIdx] *= dAreaFactor;
+				}
+			}
+
+	// TODO: handle range correctly
+	//if(!m_bHasRange)
+	{
+		m_dXMax = iNewWidth-1;
+		m_dYMax = iNewHeight-1;
+
+		m_iWidth = iNewWidth;
+		m_iHeight = iNewHeight;
+	}
+}
+
+
 bool Data3::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
 	LoadRangeXml(xml, strBase);
@@ -1020,6 +1094,83 @@ Data1 Data4::GetXYD2(uint iX, uint iY, uint iD2) const
 	}
 
 	return dat;
+}
+
+
+void Data4::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
+{
+	std::vector<double> vecVals = m_vecVals;
+	std::vector<double> vecErrs = m_vecErrs;
+
+	m_vecVals.resize(m_iDepth2*m_iDepth*iNewWidth*iNewHeight);
+	m_vecErrs.resize(m_iDepth2*m_iDepth*iNewWidth*iNewHeight);
+
+	double dAreaFactor = double(m_iWidth*m_iHeight)/double(iNewWidth*iNewHeight);
+
+	for(int iF=0; iF<m_iDepth2; ++iF)
+		for(int iT=0; iT<m_iDepth; ++iT)
+			for(int iY=0; iY<iNewHeight; ++iY)
+				for(int iX=0; iX<iNewWidth; ++iX)
+				{
+					double dOldY0 = ((iY+0.5)*double(m_iHeight))/double(iNewHeight) - 0.5;
+					double dOldX0 = ((iX+0.5)*double(m_iWidth))/double(iNewWidth) - 0.5;
+
+					int iX0 = int(dOldX0);
+					int iY0 = int(dOldY0);
+					int iX1 = iX0+1;
+					int iY1 = iY0+1;
+
+					if(iX0<0) iX0=0;
+					if(iY0<0) iY0=0;
+					if(iX1<0) iX1=0;
+					if(iY1<0) iY1=0;
+
+					if(iX0>=m_iWidth) iX0=m_iWidth-1;
+					if(iY0>=m_iHeight) iY0=m_iHeight-1;
+					if(iX1>=m_iWidth) iX1=m_iWidth-1;
+					if(iY1>=m_iHeight) iY1=m_iHeight-1;
+
+					double dX = (dOldX0 - double(iX0));
+					double dY = (dOldY0 - double(iY0));
+
+					if(dX<0.) dX=0.; if(dX>1.) dX=1.;
+					if(dY<0.) dY=0.; if(dY>1.) dY=1.;
+
+
+					const uint iOldIdx = iF*m_iDepth*m_iWidth*m_iHeight + iT*m_iWidth*m_iHeight;
+
+					double dx0y0 = vecVals[iOldIdx + iY0*m_iWidth + iX0];
+					double dx0y1 = vecVals[iOldIdx + iY1*m_iWidth + iX0];
+					double dx1y0 = vecVals[iOldIdx + iY0*m_iWidth + iX1];
+					double dx1y1 = vecVals[iOldIdx + iY1*m_iWidth + iX1];
+
+					double dx0y0_err = vecErrs[iOldIdx + iY0*m_iWidth + iX0];
+					double dx0y1_err = vecErrs[iOldIdx + iY1*m_iWidth + iX0];
+					double dx1y0_err = vecErrs[iOldIdx + iY0*m_iWidth + iX1];
+					double dx1y1_err = vecErrs[iOldIdx + iY1*m_iWidth + iX1];
+
+
+					const uint iNewIdx = iF*m_iDepth*iNewWidth*iNewHeight + iT*iNewWidth*iNewHeight + iY*iNewWidth + iX;
+
+					m_vecVals[iNewIdx] = bilinear_interp<double>(dx0y0, dx1y0, dx0y1, dx1y1, dX, dY);
+					m_vecErrs[iNewIdx] = bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
+
+					if(bKeepTotalCounts)
+					{
+						m_vecVals[iNewIdx] *= dAreaFactor;
+						m_vecErrs[iNewIdx] *= dAreaFactor;
+					}
+				}
+
+	// TODO: handle range correctly
+	//if(!m_bHasRange)
+	{
+		m_dXMax = iNewWidth-1;
+		m_dYMax = iNewHeight-1;
+
+		m_iWidth = iNewWidth;
+		m_iHeight = iNewHeight;
+	}
 }
 
 

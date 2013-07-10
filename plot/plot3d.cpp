@@ -82,6 +82,12 @@ void Plot3d::RefreshStatusMsgs()
 	}
 }
 
+void Plot3d::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
+{
+	m_dat3.ChangeResolution(iNewWidth, iNewHeight, bKeepTotalCounts);
+	RefreshPlot();
+}
+
 Plot* Plot3d::ConvertTo1d(int iParam)
 {
 	const Plot3d* pPlot3d = this;

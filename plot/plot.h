@@ -101,6 +101,9 @@ public:
 	virtual void SetROI(const Roi* pROI);
 	virtual Roi* GetROI();
 
+	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
+	{}
+
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 };

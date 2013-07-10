@@ -58,6 +58,8 @@ public:
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return false; }
 
 	virtual void RefreshPlot() {}
+
+	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false) = 0;
 };
 
 #endif

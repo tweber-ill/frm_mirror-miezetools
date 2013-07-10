@@ -121,6 +121,13 @@ void Plot4d::RefreshStatusMsgs()
 	}
 }
 
+void Plot4d::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
+{
+	m_dat4.ChangeResolution(iNewWidth, iNewHeight, bKeepTotalCounts);
+	RefreshPlot();
+}
+
+
 Plot* Plot4d::ConvertTo1d(int iFoil)
 {
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");

@@ -274,6 +274,7 @@ public:
 	void Add(const Data3& dat);
 
 	void RecalcMinMaxTotal();
+	void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false);
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
@@ -324,6 +325,7 @@ public:
 	Data1 GetXYD2(uint iX, uint iY, uint iD2) const;
 
 	void RecalcMinMaxTotal();
+	void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false);
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
