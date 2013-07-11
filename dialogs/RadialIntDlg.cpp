@@ -127,7 +127,9 @@ void RadialIntDlg::Calc()
 	uint iOldW = info.iWidth;
 	uint iOldH = info.iHeight;
 	const double dResScale = spinScale->value();;
-	pInterp->ChangeResolution(uint(iOldW*dResScale), uint(iOldH*dResScale), 1);
+
+	if(dResScale != 1.)
+		pInterp->ChangeResolution(uint(iOldW*dResScale), uint(iOldH*dResScale), 1);
 
 	dXStart *= dResScale;
 	dYStart *= dResScale;
@@ -146,12 +148,13 @@ void RadialIntDlg::Calc()
 	circ->GetCenter() = center;
 	roi.SetRoiActive(1);
 
+	uint iNumPts = uint(dRadius/dInc);
+	dat1d.SetLength(iNumPts);
+
 	// count data
 	if(pSWB->GetType() == PLOT_2D)
 	{
 		Plot2d* pPlot = (Plot2d*)pInterp;
-		uint iNumPts = uint(dRadius/dInc);
-		dat1d.SetLength(iNumPts);
 
 		for(uint iPt=0; iPt<iNumPts; ++iPt)
 		{
