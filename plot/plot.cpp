@@ -397,6 +397,7 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 
 void Plot::replot_fkts()
 {
+#ifndef NO_PARSER
 	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
 	{
 		PlotObj& obj1 = GetData(iDat);
@@ -408,6 +409,9 @@ void Plot::replot_fkts()
 			plot_fkt(fkt, iDat);
 		}
 	}
+#else
+	std::cerr << "Error: Parser not linked." << std::endl;
+#endif
 }
 
 

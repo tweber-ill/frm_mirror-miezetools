@@ -6,13 +6,12 @@ QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lQtCore -lQtGui -lQtXml 
 LIBS_RESO = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS} ${LAPACK_LIBS}
 LIBS = -L/usr/lib64 -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lstdc++ -lm -fopenmp -lMinuit2 -lfftw3 ${QT_LIBS} ${LAPACK_LIBS}
 
-
-cattus: main.o mainwnd.o settings.o data.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o
-	${CC} ${FLAGS} -o cattus main.o mainwnd.o settings.o data.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o ${LIBS}
+cattus: main.o mainwnd.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o
+	${CC} ${FLAGS} -o cattus main.o mainwnd.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o ${LIBS}
 	strip cattus
 
-reso: settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o
-	${CC} ${FLAGS} -o reso settings.o data.o ResoDlg_prog.o string.o xml.o plot.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o ${LIBS_RESO}
+reso: settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o
+	${CC} ${FLAGS} -o reso settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o ${LIBS_RESO}
 	strip reso
 
 
@@ -28,6 +27,21 @@ settings.o: settings.cpp settings.h
 
 data.o: data/data.cpp data/data.h
 	${CC} ${FLAGS} -c -o data.o data/data.cpp
+
+data1.o: data/data1.cpp data/data1.h
+	${CC} ${FLAGS} -c -o data1.o data/data1.cpp
+
+data2.o: data/data2.cpp data/data2.h
+	${CC} ${FLAGS} -c -o data2.o data/data2.cpp
+
+data3.o: data/data3.cpp data/data3.h
+	${CC} ${FLAGS} -c -o data3.o data/data3.cpp
+
+data4.o: data/data4.cpp data/data4.h
+	${CC} ${FLAGS} -c -o data4.o data/data4.cpp
+
+fit_data.o: data/fit_data.cpp data/fit_data.h
+	${CC} ${FLAGS} -c -o fit_data.o data/fit_data.cpp
 
 export.o: data/export.cpp data/export.h
 	${CC} ${FLAGS} -c -o export.o data/export.cpp
@@ -98,6 +112,9 @@ loadtxt.o: loader/loadtxt.cpp loader/loadtxt.h
 
 plot.o: plot/plot.cpp plot/plot.h
 	${CC} ${FLAGS} -c -o plot.o plot/plot.cpp
+
+plot_nopars.o: plot/plot.cpp plot/plot.h
+	${CC} ${FLAGS} -DNO_PARSER -c -o plot_nopars.o plot/plot.cpp
 
 plotgl.o: plot/plotgl.cpp plot/plotgl.h
 	${CC} ${FLAGS} -c -o plotgl.o plot/plotgl.cpp
