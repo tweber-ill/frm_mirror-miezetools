@@ -56,7 +56,7 @@ public:
 	void SetLength(uint uiLen);
 
 	template<typename T=double>
-	void ToArray(T* pX, T* pY, T *pYErr, T *pXErr=0)
+	void ToArray(T* pX, T* pY, T *pYErr, T *pXErr=0) const
 	{
 		for(uint i=0; i<GetLength(); ++i)
 		{

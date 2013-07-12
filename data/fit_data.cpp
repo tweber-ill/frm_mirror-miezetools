@@ -11,6 +11,7 @@
 #include "../fitter/models/gauss.h"
 #include "../helper/misc.h"
 #include "../helper/mieze.hpp"
+#include "../helper/fourier.h"
 #include "../settings.h"
 
 bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt)
@@ -86,7 +87,73 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 
 Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils)
 {
-	// TODO
+	if(vecFoils.size() == 0)
+	{
+		std::cerr << "Error: No foils in dataset." << std::endl;
+		return Data1();
+	}
 
-	return vecFoils[0];
+	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
+	const unsigned int iNumFoils = vecFoils.size();
+	const unsigned int iNumTC = vecFoils[0].GetLength();
+	Fourier fourier(iNumTC);
+
+	double *pdyTotal = new double[iNumTC];
+	double *pdyerrTotal = new double[iNumTC];
+	autodeleter<double> _a1(pdyTotal, 1);
+	autodeleter<double> _a2(pdyerrTotal, 1);
+	for(unsigned int iTc=0; iTc<iNumTC; ++iTc)
+		pdyTotal[iTc] = pdyerrTotal[iTc] = 0.;
+
+	double *pdPhases = new double[iNumTC];
+	autodeleter<double> _a7(pdPhases, 1);
+
+	double dMeanPhase=0.;
+	double dTotalCnts = 0.;
+	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
+	{
+		const Data1 *dat = &vecFoils[iFoil];
+		FitDataParams params;
+		params.iFkt = FIT_MIEZE_SINE;
+		FunctionModel *pFkt = 0;
+		bool bOk = FitData::fit(*dat, params, &pFkt);
+		MiezeSinModel *pModel = (MiezeSinModel*) pFkt;
+
+		pdPhases[iFoil] = pModel->GetPhase();
+
+		//std::cout << "fit: " << pModel->print(1) << std::endl;
+		double dCnts = dat->SumY();
+		dTotalCnts += dCnts;
+		dMeanPhase += pdPhases[iFoil] * dCnts;
+
+		if(pModel) delete pModel;
+	}
+	dMeanPhase /= dTotalCnts;
+	dMeanPhase = fmod(dMeanPhase, 2.*M_PI);
+
+	double *pdxFoil = new double[iNumTC];
+	double *pdyFoil = new double[iNumTC];
+	double *pdyFoilCorr = new double[iNumTC];
+	autodeleter<double> _a8(pdxFoil, 1);
+	autodeleter<double> _a9(pdyFoil, 1);
+	autodeleter<double> _a10(pdyFoilCorr, 1);
+
+	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
+	{
+		const Data1 *dat = &vecFoils[iFoil];
+		dat->ToArray<double>(pdxFoil, pdyFoil, 0, 0);
+
+		fourier.phase_correction_0(pdyFoil, pdyFoilCorr, (pdPhases[iFoil]-dMeanPhase)/dNumOsc);
+
+		for(unsigned int iTc=0; iTc<iNumTC; ++iTc)
+			pdyTotal[iTc] += pdyFoilCorr[iTc];
+	}
+	//std::cout << "mean phase: " << dMeanPhase/M_PI*180. << std::endl;
+
+	for(unsigned int iTc=0; iTc<iNumTC; ++iTc)
+		pdyerrTotal[iTc] = sqrt(pdyTotal[iTc]);
+
+
+	Data1 result(iNumTC, pdxFoil, pdyTotal, pdyerrTotal);
+	return result;
 }

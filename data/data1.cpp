@@ -13,7 +13,7 @@
 
 
 Data1::Data1(uint uiNum, const double* pValsX, const double* pValsY,
-														  const double *pErrsY, const double *pErrsX)
+						const double *pErrsY, const double *pErrsX)
 {
 	if(uiNum)
 	{

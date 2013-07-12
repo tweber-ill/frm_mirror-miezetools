@@ -15,9 +15,8 @@
 #include "../helper/misc.h"
 #include "../helper/fourier.h"
 #include "../helper/mieze.hpp"
-
+#include "../data/fit_data.h"
 #include "../fitter/models/msin.h"
-
 #include "../settings.h"
 
 
@@ -134,138 +133,46 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 	const Plot4d* pPlot4d = this;
 
+	Data1 dat;
+
+	std::string strTitle = pPlot4d->windowTitle().toStdString();
+	const Data4& dat4 = pPlot4d->GetData();
+	const unsigned int iNumFoils = dat4.GetDepth2();
+
 	if(iFoil<0)
 	{	// total, corrected MIEZE signal
-		const Data4& dat4 = pPlot4d->GetData();
-		const unsigned int iNumFoils = dat4.GetDepth2();
-		Fourier fourier(dat4.GetDepth());
-
-		double *pdyTotal = new double[dat4.GetDepth()];
-		double *pdyerrTotal = new double[dat4.GetDepth()];
-		autodeleter<double> _a1(pdyTotal, 1);
-		autodeleter<double> _a2(pdyerrTotal, 1);
-		for(unsigned int iTc=0; iTc<dat4.GetDepth(); ++iTc)
-			pdyTotal[iTc] = pdyerrTotal[iTc] = 0.;
-
-		std::vector<double*> vecXFoil; vecXFoil.resize(iNumFoils);
-		std::vector<double*> vecYFoil; vecYFoil.resize(iNumFoils);
-		std::vector<double*> vecYErrFoil; vecYErrFoil.resize(iNumFoils);
-		std::vector<double*> vecYCorrFoil; vecYCorrFoil.resize(iNumFoils);
-		std::vector<std::vector<double*>*> all_vecs = {&vecXFoil, &vecYFoil, &vecYErrFoil, &vecYCorrFoil};
-
-		double *pdPhases = new double[dat4.GetDepth()];
-		autodeleter<double> _a7(pdPhases, 1);
-
-		double dMeanPhase=0.;
-		double dTotalCnts = 0.;
-		for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
-		{
-			Data1 dat = dat4.GetXYSum(iFoil);
-			const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
-			dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
-			// TODO: case for dat4.GetDepth() != pvecDatX->size() (ROI)
-
-			const std::vector<double> &vecX = *pvecDatX,
-									&vecY = *pvecDatY,
-									&vecYErr = *pvecDatYErr;
-
-			double *pdxFoil = new double[dat4.GetDepth()];
-			double *pdyFoil = new double[dat4.GetDepth()];
-			double *pdyerrFoil = new double[dat4.GetDepth()];
-			vecXFoil[iFoil] = pdxFoil;
-			vecYFoil[iFoil] = pdyFoil;
-			vecYErrFoil[iFoil] = pdyerrFoil;
-
-			for(unsigned int iTc=0; iTc<dat4.GetDepth(); ++iTc)
-			{
-				pdxFoil[iTc] = vecX[iTc];
-				pdyFoil[iTc] = vecY[iTc];
-				pdyerrFoil[iTc] = vecYErr[iTc];
-			}
-
-			MiezeSinModel *pModel = 0;
-			double dThisNumOsc = dNumOsc;
-			double dFreq = get_mieze_freq(pdxFoil, dat.GetLength(), dNumOsc);
-			bool bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat.GetLength(), pdxFoil, pdyFoil, pdyerrFoil, &pModel);
-			pdPhases[iFoil] = pModel->GetPhase();
-
-			/*Fourier fourier(dat4.GetDepth());
-			double dCont, dPhi;
-			bool bOk = fourier.get_contrast(dThisNumOsc, pdyFoil, dCont, dPhi);
-			pdPhases[iFoil] = dPhi;*/
-
-			//std::cout << "fit: " << pModel->print(1) << std::endl;
-			double dCnts = sum_vec(vecY);
-			dTotalCnts += dCnts;
-			dMeanPhase += pdPhases[iFoil] * dCnts;
-
-			if(pModel) delete pModel;
-		}
-		dMeanPhase /= dTotalCnts;
-		dMeanPhase = fmod(dMeanPhase, 2.*M_PI);
-
-
-		for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
-		{
-			double *pdxFoil = vecXFoil[iFoil];
-			double *pdyFoil = vecYFoil[iFoil];
-			double *pdyerrFoil = vecYErrFoil[iFoil];
-
-			double *pdyFoilCorr = new double[dat4.GetDepth()];
-			vecYCorrFoil[iFoil] = pdyFoilCorr;
-
-			fourier.phase_correction_0(pdyFoil, pdyFoilCorr, (pdPhases[iFoil]-dMeanPhase)/dNumOsc);
-
-			for(unsigned int iTc=0; iTc<dat4.GetDepth(); ++iTc)
-				pdyTotal[iTc] += pdyFoilCorr[iTc];
-		}
-		//std::cout << "mean phase: " << dMeanPhase/M_PI*180. << std::endl;
-
-		for(unsigned int iTc=0; iTc<dat4.GetDepth(); ++iTc)
-			pdyerrTotal[iTc] = sqrt(pdyTotal[iTc]);
-
-		std::string strTitle = pPlot4d->windowTitle().toStdString();
 		strTitle += std::string(" -> t channels (corr)");
 
-		Plot *pPlot = new Plot(0, strTitle.c_str());
-		pPlot->plot(dat4.GetDepth(), vecXFoil[0], pdyTotal, pdyerrTotal);
+		std::vector<Data1> vecFoils;
+		for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
+			vecFoils.push_back(dat4.GetXYSum(iFoil));
 
-		pPlot->SetLabels(/*pPlot4d->GetZStr().toAscii().data()*/"t", "I");
-		pPlot->SetTitle("");
-
-
-		// cleanup
-		for(std::vector<double*>* pVec : all_vecs)
-			for(double *pArr : *pVec)
-				delete[] pArr;
-
-		return pPlot;
+		dat = FitData::mieze_sum_foils(vecFoils);
 	}
 	else
 	{
-		std::string strTitle = pPlot4d->windowTitle().toStdString();
 		strTitle += std::string(" -> t channels");
-
-		Data1 dat = pPlot4d->GetData().GetXYSum(iFoil);
-		const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
-		dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
-		// TODO
-
-		double *pdx = vec_to_array<double>(*pvecDatX);
-		double *pdy = vec_to_array<double>(*pvecDatY);
-		double *pdyerr = vec_to_array<double>(*pvecDatYErr);
-		autodeleter<double> _a0(pdx, 1);
-		autodeleter<double> _a1(pdy, 1);
-		autodeleter<double> _a2(pdyerr, 1);
-
-		Plot *pPlot = new Plot(0, strTitle.c_str());
-		pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
-
-		pPlot->SetLabels(/*pPlot4d->GetZStr().toAscii().data()*/"t", "I");
-		pPlot->SetTitle("");
-
-		return pPlot;
+		dat = pPlot4d->GetData().GetXYSum(iFoil);
 	}
+
+	const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
+	dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
+
+	double *pdx = vec_to_array<double>(*pvecDatX);
+	double *pdy = vec_to_array<double>(*pvecDatY);
+	double *pdyerr = vec_to_array<double>(*pvecDatYErr);
+	autodeleter<double> _a0(pdx, 1);
+	autodeleter<double> _a1(pdy, 1);
+	autodeleter<double> _a2(pdyerr, 1);
+
+
+	Plot *pPlot = new Plot(0, strTitle.c_str());
+	pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);
+
+	pPlot->SetLabels(/*pPlot4d->GetZStr().toAscii().data()*/"t", "I");
+	pPlot->SetTitle("");
+
+	return pPlot;
 }
 
 Plot3d* Plot4d::ConvertTo3d(int iFoil)
