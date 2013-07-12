@@ -443,7 +443,6 @@ void FitDlg::UpdateHint(const std::string& str, double dVal, double dErr)
 
 SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 {
-	bool bAssumeErrorIfZero = 1;
 	SpecialFitResult res;
 
 	int iFoil = -1;
@@ -466,49 +465,21 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 	}
 
 	Data1& dat = res.pPlot->GetData(0).dat;
-	const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
-	dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
-
-	double *px = vec_to_array<double>(*pvecDatX);
-	double *py = vec_to_array<double>(*pvecDatY);
-	double *pyerr = vec_to_array<double>(*pvecDatYErr);
-	autodeleter<double> _a0(px, 1);
-	autodeleter<double> _a1(py, 1);
-	autodeleter<double> _a2(pyerr, 1);
-	const unsigned int iLen = pvecDatX->size();
-
-
-	if(bAssumeErrorIfZero)
-	{
-		double dMaxY = *std::max_element(py, py+iLen);
-		for(unsigned int iErr=0; iErr<iLen; ++iErr)
-		{
-			if(pyerr[iErr] < std::numeric_limits<double>::min())
-				pyerr[iErr] = dMaxY * 0.1;
-		}
-	}
-
-
 	FunctionModel* pFkt = 0;
+	FitDataParams fitparams;
+	fitparams.iFkt = iFkt;
+	fitparams.iNumPeaks = iParam;
+	FitData::fit(dat, fitparams, &pFkt);
+
+
 	bool bOk = 0;
 	if(iFkt == FIT_MIEZE_SINE) 				// MIEZE sine
 	{
-		if(iLen < 2)
-		{
-			res.strErr = "Too few data points for MIEZE sine fit.";
-			return res;
-		}
-
-		double dNumOsc = Settings::Get<double>("mieze/num_osc");
-		double dFreq = dNumOsc * 2.*M_PI/((px[1]-px[0]) * double(dat.GetLength()));
-
-		MiezeSinModel *pModel = 0;
-		bOk = ::get_mieze_contrast(dFreq, dNumOsc, iLen, px, py, pyerr, &pModel);
+		MiezeSinModel *pModel = (MiezeSinModel*)pFkt;
 
 		std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
 						<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
 						<< std::endl;
-		pFkt = pModel;
 
 		std::ostringstream ostrTitle;
 		ostrTitle.precision(3);
@@ -516,25 +487,9 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 				  << ", Phase: " << pModel->GetPhase() << "+-" << pModel->GetPhaseErr();
 		res.pPlot->SetTitle(ostrTitle.str().c_str());
 	}
-	else if(iFkt == FIT_GAUSSIAN) 		// Gaussian
-	{
-		GaussModel *pModel = 0;
-		bOk = ::get_gauss(iLen, px, py, pyerr, &pModel);
-		pFkt = pModel;
-	}
-	else if(iFkt == FIT_MULTI_GAUSSIAN)
-	{
-		MultiGaussModel *pModel = 0;
-		int iNumPeaks = iParam;
-		bOk = ::get_multigauss(iLen, px, py, pyerr, &pModel, iNumPeaks);
-		pFkt = pModel;
-	}
 
 	if(pFkt)
 	{
-		std::cout << "Fit " << (bOk ? "(ok)" : "(failed)" ) << ": "
-					<< *pFkt << std::endl;
-
 		res.pPlot->plot_fkt(*pFkt);
 		res.pPlot->RefreshPlot();
 		res.bOk = 1;

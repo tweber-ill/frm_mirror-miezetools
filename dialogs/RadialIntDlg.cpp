@@ -6,6 +6,10 @@
 
 #include "RadialIntDlg.h"
 #include "../roi/roi.h"
+#include "../plot/plot3d.h"
+#include "../plot/plot4d.h"
+#include "../data/fit_data.h"
+#include "../fitter/models/msin.h"
 
 RadialIntDlg::RadialIntDlg(QWidget* pParent)
 			: QDialog(pParent), m_pPlot(new Plot(this))
@@ -151,38 +155,74 @@ void RadialIntDlg::Calc()
 	uint iNumPts = uint(dRadius/dInc);
 	dat1d.SetLength(iNumPts);
 
-	// count data
-	if(pSWB->GetType() == PLOT_2D)
+	for(uint iPt=0; iPt<iNumPts; ++iPt)
 	{
-		Plot2d* pPlot = (Plot2d*)pInterp;
+		double dCircBegin = dInc*double(iPt);
+		double dCircEnd = dInc*double(iPt+1);
 
-		for(uint iPt=0; iPt<iNumPts; ++iPt)
+		circ->GetInnerRadius() = dCircBegin;
+		circ->GetOuterRadius() = dCircEnd;
+		circ->CalculateBoundingRect();
+
+		// count data
+		if(pSWB->GetType() == PLOT_2D)
 		{
-			double dCircBegin = dInc*double(iPt);
-			double dCircEnd = dInc*double(iPt+1);
-
-			circ->GetInnerRadius() = dCircBegin;
-			circ->GetOuterRadius() = dCircEnd;
-			circ->CalculateBoundingRect();
+			Plot2d* pPlot = (Plot2d*)pInterp;
 			pPlot->SetROI(&roi);
 
 			double dCnts = pPlot->GetData2().GetTotalInROI();
 			dat1d.SetX(iPt, dCircBegin + 0.5*(dCircEnd-dCircBegin));
 			dat1d.SetY(iPt, dCnts);
 			dat1d.SetYErr(iPt, std::sqrt(dCnts));
-		}
 
-		m_pPlot->SetLabels("Radius", "Counts");
-	}
-	// mieze data
-	else if(pSWB->GetType() == PLOT_3D)
-	{
-		std::cout << "TODO" << std::endl;
-	}
-	// mieze data
-	else if(pSWB->GetType() == PLOT_4D)
-	{
-		std::cout << "TODO" << std::endl;
+			m_pPlot->SetLabels("Radius", "Counts");
+		}
+		// mieze data
+		else if(pSWB->GetType() == PLOT_3D)
+		{
+			std::cout << "TODO" << std::endl;
+		}
+		// mieze data
+		else if(pSWB->GetType() == PLOT_4D)
+		{
+			Plot4d* pPlot = (Plot4d*)pInterp->GetActualWidget();
+			const Data4& dat = pPlot->GetData();
+			pPlot->SetROI(&roi);
+
+			std::vector<Data1> foils;
+			foils.reserve(dat.GetDepth2());
+			for(unsigned int iFoil=0; iFoil<dat.GetDepth2(); ++iFoil)
+			{
+				Data1 dat1 = dat.GetXYSum(0);
+				foils.push_back(dat1);
+			}
+
+			Data1 dat1 = FitData::mieze_sum_foils(foils);
+
+			FitDataParams params;
+			params.iFkt = FIT_MIEZE_SINE;
+			FunctionModel *pFkt = 0;
+			bool bOk = FitData::fit(dat1, params, &pFkt);
+			MiezeSinModel *pSin = (MiezeSinModel*)pFkt;
+
+			double dContrast = 0.;
+			double dContrastErr = 0.;
+
+			if(bOk && pSin)
+			{
+				dContrast = pSin->GetContrast();
+				dContrastErr = pSin->GetContrastErr();
+			}
+
+			dat1d.SetX(iPt, dCircBegin + 0.5*(dCircEnd-dCircBegin));
+			dat1d.SetY(iPt, dContrast);
+			dat1d.SetYErr(iPt, dContrastErr);
+
+			m_pPlot->SetLabels("Radius", "Contrast");
+
+			if(pFkt)
+				delete pFkt;
+		}
 	}
 
 	delete pInterp;

@@ -11,17 +11,11 @@
 #include "../subwnd.h"
 #include "../plot/plot.h"
 #include "../plot/plot2d.h"
+#include "../data/fit_data.h"
 
 #include <string>
 #include <map>
 #include <QtGui/QMdiArea>
-
-#define FIT_MIEZE_SINE 					0
-#define FIT_GAUSSIAN 						1
-#define FIT_MULTI_GAUSSIAN 				2
-
-#define FIT_MIEZE_SINE_PIXELWISE 			0
-#define FIT_MIEZE_SINE_PIXELWISE_FFT 	1
 
 
 struct SpecialFitResult
