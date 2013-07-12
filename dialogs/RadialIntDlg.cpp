@@ -178,26 +178,33 @@ void RadialIntDlg::Calc()
 			m_pPlot->SetLabels("Radius", "Counts");
 		}
 		// mieze data
-		else if(pSWB->GetType() == PLOT_3D)
+		else if(pSWB->GetType()==PLOT_3D || pSWB->GetType()==PLOT_4D)
 		{
-			std::cout << "TODO" << std::endl;
-		}
-		// mieze data
-		else if(pSWB->GetType() == PLOT_4D)
-		{
-			Plot4d* pPlot = (Plot4d*)pInterp->GetActualWidget();
-			const Data4& dat = pPlot->GetData();
-			pPlot->SetROI(&roi);
+			Data1 dat1;
 
-			std::vector<Data1> foils;
-			foils.reserve(dat.GetDepth2());
-			for(unsigned int iFoil=0; iFoil<dat.GetDepth2(); ++iFoil)
+			if(pSWB->GetType()==PLOT_3D)
 			{
-				Data1 dat1 = dat.GetXYSum(0);
-				foils.push_back(dat1);
-			}
+				Plot3d* pPlot = (Plot3d*)pInterp->GetActualWidget();
+				const Data3& dat = pPlot->GetData();
+				pPlot->SetROI(&roi);
 
-			Data1 dat1 = FitData::mieze_sum_foils(foils);
+				dat1 = dat.GetXYSum();
+			}
+			else if(pSWB->GetType()==PLOT_4D)
+			{
+				Plot4d* pPlot = (Plot4d*)pInterp->GetActualWidget();
+				const Data4& dat = pPlot->GetData();
+				pPlot->SetROI(&roi);
+
+				std::vector<Data1> foils;
+				for(unsigned int iFoil=0; iFoil<dat.GetDepth2(); ++iFoil)
+				{
+					Data1 dat1 = dat.GetXYSum(iFoil);
+					foils.push_back(dat1);
+				}
+
+				dat1 = FitData::mieze_sum_foils(foils);
+			}
 
 			FitDataParams params;
 			params.iFkt = FIT_MIEZE_SINE;

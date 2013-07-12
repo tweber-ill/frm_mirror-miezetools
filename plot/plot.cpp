@@ -224,25 +224,13 @@ void Plot::paint()
 				painter.setBrush(brush);
 				painter.drawEllipse(coord, 2./dScaleX, 2./dScaleY);
 
-				// y error bar
-				if(err.y() != 0.)
-				{
-					QPen penerr(col);
-					penerr.setWidthF(1.5/dScaleX);
-					painter.setPen(penerr);
-					painter.drawLine(QLineF(coord.x(), coord.y()-err.y()/2.,
-														coord.x(), coord.y()+err.y()/2.));
-				}
-
-				// x error bar
-				if(err.y() != 0.)
-				{
-					QPen penerr(col);
-					penerr.setWidthF(1.5/dScaleX);
-					painter.setPen(penerr);
-					painter.drawLine(QLineF(coord.x()-err.x()/2., coord.y(),
-														coord.x()+err.x()/2., coord.y()));
-				}
+				// error bars
+				if(err.y()!=0.)
+					painter.drawRect(QRectF(coord.x()-0.5/dScaleX, coord.y()-0.5*err.y(),
+											1.5/dScaleX, err.y()));
+				if(err.x()!=0.)
+					painter.drawRect(QRectF(coord.x()-0.5*err.x(), coord.y()-0.5/dScaleY,
+											err.x(), 1.5/dScaleY));
 			}
 		}
 		else if(pltobj.plttype == PLOT_FKT)

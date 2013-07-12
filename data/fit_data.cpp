@@ -112,6 +112,8 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils)
 	double dTotalCnts = 0.;
 	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 	{
+		pdPhases[iFoil] = 0.;
+
 		const Data1 *dat = &vecFoils[iFoil];
 		FitDataParams params;
 		params.iFkt = FIT_MIEZE_SINE;
@@ -119,7 +121,8 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils)
 		bool bOk = FitData::fit(*dat, params, &pFkt);
 		MiezeSinModel *pModel = (MiezeSinModel*) pFkt;
 
-		pdPhases[iFoil] = pModel->GetPhase();
+		if(bOk && pModel)
+			pdPhases[iFoil] = pModel->GetPhase();
 
 		//std::cout << "fit: " << pModel->print(1) << std::endl;
 		double dCnts = dat->SumY();
