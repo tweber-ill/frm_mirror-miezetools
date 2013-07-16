@@ -20,6 +20,8 @@ protected:
 	std::vector<QDoubleSpinBox*> m_vecSpins;
 	std::vector<std::string> m_vecSpinNames;
 
+	void setupConstants();
+
 protected slots:
 	void CalcMIEZE();
 	void CalcNeutronLam();

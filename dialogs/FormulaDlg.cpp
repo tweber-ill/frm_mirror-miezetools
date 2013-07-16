@@ -7,6 +7,7 @@
 #include "FormulaDlg.h"
 #include <boost/units/io.hpp>
 #include "../helper/mieze.hpp"
+#include "../helper/string.h"
 #include "../settings.h"
 
 #include <sstream>
@@ -15,7 +16,7 @@
 FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent)
 {
 	setupUi(this);
-
+	setupConstants();
 
 	QObject::connect(editNeutronLam, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronLam()));
 	QObject::connect(editNeutronE, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronE()));
@@ -46,7 +47,188 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent)
 }
 
 FormulaDlg::~FormulaDlg()
+{}
+
+void FormulaDlg::setupConstants()
 {
+	struct Constant
+	{
+		std::string strSymbol;
+		std::string strName;
+
+		std::string strVal;
+	};
+
+	std::vector<Constant> vecConsts;
+
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << one_eV;
+
+		Constant constant;
+		constant.strSymbol = "eV";
+		constant.strName = "1 electron volt";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::h;
+
+		Constant constant;
+		constant.strSymbol = "h";
+		constant.strName = "Planck constant";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << (co::h / one_eV) << " eV";
+
+		Constant constant;
+		constant.strSymbol = "h";
+		constant.strName = "Planck constant";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::hbar;
+
+		Constant constant;
+		constant.strSymbol = "hbar";
+		constant.strName = "Planck constant";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << (co::hbar / one_eV) << " eV";
+
+		Constant constant;
+		constant.strSymbol = "hbar";
+		constant.strName = "Planck constant";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::m_n;
+
+		Constant constant;
+		constant.strSymbol = "m_n";
+		constant.strName = "Neutron mass";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::g_n;
+
+		Constant constant;
+		constant.strSymbol = "g_n";
+		constant.strName = "Neutron g";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::gamma_n;
+
+		Constant constant;
+		constant.strSymbol = "gamma_n";
+		constant.strName = "Neutron gyromagnetic ratio";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	/*{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::gamma_n/(2.*M_PI);
+
+		Constant constant;
+		constant.strSymbol = "gamma_n/(2pi)";
+		constant.strName = "";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}*/
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::mu_n;
+
+		Constant constant;
+		constant.strSymbol = "mu_n";
+		constant.strName = "Neutron magnetic moment";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::mu_N;
+
+		Constant constant;
+		constant.strSymbol = "mu_N";
+		constant.strName = "Nuclear magneton";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+	{
+		std::ostringstream ostrVal;
+		ostrVal << std::scientific;
+		ostrVal << co::c;
+
+		Constant constant;
+		constant.strSymbol = "c";
+		constant.strName = "Vacuum speed of light";
+		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+
+		vecConsts.push_back(constant);
+	}
+
+
+	tableConst->setColumnCount(2);
+	tableConst->setRowCount(vecConsts.size());
+	tableConst->setColumnWidth(1, 200);
+	//tableConst->verticalHeader()->setDefaultSectionSize(tableConst->verticalHeader()->minimumSectionSize()+2);
+
+
+	for(unsigned int iConst=0; iConst<vecConsts.size(); ++iConst)
+	{
+		const Constant& constant = vecConsts[iConst];
+
+		QTableWidgetItem *pConstSym = new QTableWidgetItem();
+		pConstSym->setText(constant.strSymbol.c_str());
+		tableConst->setVerticalHeaderItem(iConst, pConstSym);
+
+		QTableWidgetItem *pConstName = new QTableWidgetItem();
+		pConstName->setText(constant.strName.c_str());
+		tableConst->setItem(iConst,0,pConstName);
+
+		QTableWidgetItem *pConstVal = new QTableWidgetItem();
+		pConstVal->setText(constant.strVal.c_str());
+		tableConst->setItem(iConst,1,pConstVal);
+	}
 }
 
 static bool check_input(const std::string& strInput)
@@ -163,8 +345,6 @@ void FormulaDlg::CalcNeutronT()
 
 void FormulaDlg::CalcMIEZE()
 {
-	#define one_meV (1e-3 * co::e * units::si::volts)
-	static const units::quantity<units::si::length> angstrom = 1e-10 * units::si::meter;
 	static const units::quantity<units::si::length> cm = units::si::meter/100.;
 
 	units::quantity<units::si::length> lam = spinLam->value() * angstrom;
