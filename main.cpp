@@ -19,6 +19,7 @@ extern "C" int XInitThreads();
 
 #include "dialogs/SettingsDlg.h"
 
+extern void init_formulas();
 
 static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 {
@@ -32,6 +33,8 @@ int main(int argc, char **argv)
 	XInitThreads();
 #endif
 	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
+
+	init_formulas();
 
 	int iRet = -1;
 	try

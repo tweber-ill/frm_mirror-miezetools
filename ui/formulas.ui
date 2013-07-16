@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>326</height>
+    <width>379</width>
+    <height>319</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,12 +17,68 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabNeutron">
       <attribute name="title">
        <string>Neutron Properties</string>
       </attribute>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>lambda:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>k:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>v:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>E:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="editNeutronLam">
+         <property name="text">
+          <string>5 A</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="editNeutronK"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="editNeutronV"/>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="editNeutronE"/>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="editNeutronT"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>T:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tabMIEZE">
       <attribute name="title">
@@ -213,6 +269,11 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Constants</string>
+      </attribute>
+     </widget>
     </widget>
    </item>
    <item>
@@ -229,6 +290,11 @@
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>
+  <tabstop>editNeutronLam</tabstop>
+  <tabstop>editNeutronK</tabstop>
+  <tabstop>editNeutronV</tabstop>
+  <tabstop>editNeutronE</tabstop>
+  <tabstop>editNeutronT</tabstop>
   <tabstop>spinLam</tabstop>
   <tabstop>spinF1</tabstop>
   <tabstop>spinF2</tabstop>

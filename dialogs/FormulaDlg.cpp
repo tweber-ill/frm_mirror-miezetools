@@ -15,9 +15,17 @@
 FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent)
 {
 	setupUi(this);
+
+
+	QObject::connect(editNeutronLam, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronLam()));
+	QObject::connect(editNeutronE, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronE()));
+	QObject::connect(editNeutronV, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronv()));
+	QObject::connect(editNeutronK, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronk()));
+	QObject::connect(editNeutronT, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronT()));
+
+
 	m_vecSpins = {spinLam, spinF1, spinF2, spinL1, spinLb, spinE};
 	m_vecSpinNames = {"formulas/mieze/lam", "formulas/mieze/f1", "formulas/mieze/f2", "formulas/mieze/L1", "formulas/mieze/Lb", "formulas/mieze/E"};
-
 
 	for(unsigned int iItem=0; iItem<m_vecSpins.size(); ++iItem)
 	{
@@ -31,17 +39,129 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent)
 
 
 	for(QDoubleSpinBox* pSpinBox : m_vecSpins)
-		QObject::connect(pSpinBox, SIGNAL(valueChanged(double)), this, SLOT(Calc()));
+		QObject::connect(pSpinBox, SIGNAL(valueChanged(double)), this, SLOT(CalcMIEZE()));
 
-	Calc();
+	CalcNeutronLam();
+	CalcMIEZE();
 }
 
 FormulaDlg::~FormulaDlg()
 {
 }
 
+static bool check_input(const std::string& strInput)
+{
+	double dVal = 0.;
+	std::string strUnit;
+	return get_val(strInput, dVal, strUnit);
+}
 
-void FormulaDlg::Calc()
+void FormulaDlg::CalcNeutronLam()
+{
+	std::string strInput = editNeutronLam->text().toStdString();
+	if(!check_input(strInput))
+		return;
+
+	units::quantity<units::si::length> lam_n = get_length(strInput);
+	units::quantity<units::si::wavenumber> k_n = lam2k(lam_n);
+	units::quantity<units::si::momentum> p_n = lam2p(lam_n);
+	units::quantity<units::si::energy> E_n = p_n*p_n / (2.*co::m_n);
+
+	std::ostringstream ostrk, ostrv, ostrE, ostrT;
+	ostrk << k_n;
+	ostrv << (p_n / co::m_n);
+	ostrE << double(E_n / one_meV) << " meV";
+	ostrT << (E_n / co::k_B);
+
+	editNeutronE->setText(ostrE.str().c_str());
+	editNeutronK->setText(ostrk.str().c_str());
+	editNeutronV->setText(ostrv.str().c_str());
+	editNeutronT->setText(ostrT.str().c_str());
+}
+
+void FormulaDlg::CalcNeutronk()
+{
+	std::string strInput = editNeutronK->text().toStdString();
+	if(!check_input(strInput))
+		return;
+
+	units::quantity<units::si::wavenumber> k_n = get_wavenumber(strInput);
+	units::quantity<units::si::length> lam_n = k2lam(k_n);
+	units::quantity<units::si::momentum> p_n = lam2p(lam_n);
+	units::quantity<units::si::energy> E_n = p_n*p_n / (2.*co::m_n);
+
+	std::ostringstream ostrlam, ostrv, ostrE, ostrT;
+	ostrlam << lam_n;
+	ostrv << (p_n / co::m_n);
+	ostrE << double(E_n / one_meV) << " meV";
+	ostrT << (E_n / co::k_B);
+
+	editNeutronLam->setText(ostrlam.str().c_str());
+	editNeutronE->setText(ostrE.str().c_str());
+	editNeutronV->setText(ostrv.str().c_str());
+	editNeutronT->setText(ostrT.str().c_str());
+}
+
+void FormulaDlg::CalcNeutronv()
+{
+	std::string strInput = editNeutronV->text().toStdString();
+	if(!check_input(strInput))
+		return;
+
+	std::cerr << "Error: Velocity parsing not yet implemented." << std::endl;
+}
+
+void FormulaDlg::CalcNeutronE()
+{
+	std::string strInput = editNeutronE->text().toStdString();
+	if(!check_input(strInput))
+		return;
+
+	bool bImag = 0;
+	units::quantity<units::si::energy> E_n = get_energy(strInput);
+	units::quantity<units::si::wavenumber> k_n = E2k(E_n, bImag);
+	units::quantity<units::si::length> lam_n = k2lam(k_n);
+	units::quantity<units::si::momentum> p_n = lam2p(lam_n);
+
+	std::ostringstream ostrlam, ostrv, ostrk, ostrT;
+	ostrlam << lam_n;
+	ostrk << k_n;
+	ostrv << (p_n / co::m_n);
+	ostrT << (E_n / co::k_B);
+
+	editNeutronLam->setText(ostrlam.str().c_str());
+	editNeutronK->setText(ostrk.str().c_str());
+	editNeutronV->setText(ostrv.str().c_str());
+	editNeutronT->setText(ostrT.str().c_str());
+}
+
+void FormulaDlg::CalcNeutronT()
+{
+	std::string strInput = editNeutronT->text().toStdString();
+	if(!check_input(strInput))
+		return;
+
+	bool bImag;
+	units::quantity<units::si::temperature> T_n = get_temperature(strInput);
+	units::quantity<units::si::energy> E_n = T_n * co::k_B;
+	units::quantity<units::si::wavenumber> k_n = E2k(E_n, bImag);
+	units::quantity<units::si::length> lam_n = k2lam(k_n);
+	units::quantity<units::si::momentum> p_n = lam2p(lam_n);
+
+	std::ostringstream ostrlam, ostrv, ostrk, ostrE;
+	ostrlam << lam_n;
+	ostrk << k_n;
+	ostrv << (p_n / co::m_n);
+	ostrE << double(E_n / one_meV) << " meV";
+
+	editNeutronLam->setText(ostrlam.str().c_str());
+	editNeutronK->setText(ostrk.str().c_str());
+	editNeutronV->setText(ostrv.str().c_str());
+	editNeutronE->setText(ostrE.str().c_str());
+}
+
+
+void FormulaDlg::CalcMIEZE()
 {
 	#define one_meV (1e-3 * co::e * units::si::volts)
 	static const units::quantity<units::si::length> angstrom = 1e-10 * units::si::meter;
@@ -50,8 +170,8 @@ void FormulaDlg::Calc()
 	units::quantity<units::si::length> lam = spinLam->value() * angstrom;
 	units::quantity<units::si::length> L1 = spinL1->value() * cm;
 	units::quantity<units::si::length> Lb = spinLb->value() * cm;
-	units::quantity<units::si::frequency> f1 = spinF1->value() * units::si::hertz;
-	units::quantity<units::si::frequency> f2 = spinF2->value() * units::si::hertz;
+	units::quantity<units::si::frequency> f1 = spinF1->value() * 1000. * units::si::hertz;
+	units::quantity<units::si::frequency> f2 = spinF2->value() * 1000. * units::si::hertz;
 	units::quantity<units::si::energy> E = spinE->value() * one_meV;
 
 	units::quantity<units::si::length> L2 = mieze_condition_L2(f1, f2, L1);

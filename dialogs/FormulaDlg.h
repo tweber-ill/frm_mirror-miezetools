@@ -21,7 +21,12 @@ protected:
 	std::vector<std::string> m_vecSpinNames;
 
 protected slots:
-	void Calc();
+	void CalcMIEZE();
+	void CalcNeutronLam();
+	void CalcNeutronk();
+	void CalcNeutronv();
+	void CalcNeutronE();
+	void CalcNeutronT();
 
 public:
 	FormulaDlg(QWidget* pParent);
