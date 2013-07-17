@@ -95,10 +95,10 @@ QColor Plot::GetColor(unsigned int iPlotObj) const
 {
 	static const std::vector<QColor> cols =
 	{
-			QColor::fromRgbF(0., 0., 1., 1.),
-			QColor::fromRgbF(0., 0.5, 0., 1.),
-			QColor::fromRgbF(1., 0., 0., 1.),
-			QColor::fromRgbF(0., 0., 0., 1.)
+		QColor::fromRgbF(0., 0., 1., 1.),
+		QColor::fromRgbF(0., 0.5, 0., 1.),
+		QColor::fromRgbF(1., 0., 0., 1.),
+		QColor::fromRgbF(0., 0., 0., 1.)
 	};
 
 	return cols[iPlotObj % cols.size()];

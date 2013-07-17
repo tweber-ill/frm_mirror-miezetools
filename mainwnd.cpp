@@ -973,10 +973,8 @@ void MiezeMainWnd::SetStatusMsg(const char* pcMsg, int iPos)
 	QString strMsg(pcMsg);
 	if(pLabel->text() != strMsg)
 	{
-		//std::cout << "old: " << pLabel->text().toStdString() << ", new: " << strMsg.toStdString() << std::endl;
-
 		pLabel->setText(pcMsg);
-		pLabel->repaint();
+		//pLabel->repaint();
 	}
 }
 
