@@ -79,6 +79,7 @@ protected slots:
 
 public slots:
 	void RefreshPhaseCombo();
+	void SubWindowRemoved(SubWindowBase *pSWB);
 
 public:
 	PsdPhaseCorrDlg(QWidget* pParent, QMdiArea *pmdi);

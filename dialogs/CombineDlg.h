@@ -19,17 +19,25 @@ class CombineGraphsDlg : public QDialog, Ui::CombineDlg
 protected:
 	std::list<SubWindowBase*> m_allSubWnds;
 
+protected:
+	Plot* CreatePlot(const std::string& strTitle, QWidget* pPlotParent=0) const;
+
 protected slots:
 	void AddItemSelected();
 	void RemoveItemSelected();
+
+	void ButtonBoxClicked(QAbstractButton*);
 
 public:
 	CombineGraphsDlg(QWidget* pParent);
 	virtual ~CombineGraphsDlg();
 
-	void AddAvailSubWnd(SubWindowBase* pSubWnd);
+public slots:
+	void SubWindowRemoved(SubWindowBase *pSWB);
+	void SubWindowAdded(SubWindowBase *pSWB);
 
-	Plot* CreatePlot(const std::string& strTitle, QWidget* pPlotParent=0) const;
+signals:
+	void AddSubWindow(SubWindowBase* pWnd);
 };
 
 #endif

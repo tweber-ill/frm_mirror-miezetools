@@ -34,7 +34,6 @@
 #include "loader/loadcasc.h"
 
 #include "dialogs/ListDlg.h"
-#include "dialogs/CombineDlg.h"
 #include "dialogs/SettingsDlg.h"
 #include "dialogs/AboutDlg.h"
 #include "dialogs/ComboDlg.h"
@@ -50,7 +49,8 @@
 
 
 MiezeMainWnd::MiezeMainWnd()
-					: m_iPlotCnt(1), m_pfitdlg(0),
+					: m_iPlotCnt(1),
+					  m_pcombinedlg(0), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)),
 					  m_presdlg(0), m_pphasecorrdlg(0),
 					  m_pradialintdlg(0),
@@ -368,6 +368,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 MiezeMainWnd::~MiezeMainWnd()
 {
+	if(m_pcombinedlg) delete m_pcombinedlg;
 	if(m_pfitdlg) delete m_pfitdlg;
 	if(m_proidlg) delete m_proidlg;
 	if(m_presdlg) delete m_presdlg;
@@ -994,17 +995,20 @@ void MiezeMainWnd::ShowListWindowsDlg()
 
 void MiezeMainWnd::ShowCombineGraphsDlg()
 {
-	CombineGraphsDlg dlg(this);
-
-	std::vector<SubWindowBase*> vec = GetSubWindows(0);
-	for(SubWindowBase *pWnd : vec)
-		dlg.AddAvailSubWnd(pWnd);
-
-	if(dlg.exec() == QDialog::Accepted)
+	if(!m_pcombinedlg)
 	{
-		Plot *pPlot = dlg.CreatePlot(GetPlotTitle("combined plot"), m_pmdi);
-		AddSubWindow(pPlot);
+		m_pcombinedlg = new CombineGraphsDlg(this);
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pcombinedlg, SLOT(SubWindowRemoved(SubWindowBase*)));
+		QObject::connect(this, SIGNAL(SubWindowAdded(SubWindowBase*)), m_pcombinedlg, SLOT(SubWindowAdded(SubWindowBase*)));
+		QObject::connect(m_pcombinedlg, SIGNAL(AddSubWindow(SubWindowBase*)), this, SLOT(AddSubWindow(SubWindowBase*)));
+
+		std::vector<SubWindowBase*> vec = GetSubWindows(0);
+		for(SubWindowBase *pWnd : vec)
+			m_pcombinedlg->SubWindowAdded(pWnd);
 	}
+
+	m_pcombinedlg->show();
+	m_pcombinedlg->activateWindow();
 }
 
 void MiezeMainWnd::IntAlongY()
@@ -1065,6 +1069,7 @@ void MiezeMainWnd::ShowFitDlg()
 	{
 		m_pfitdlg = new FitDlg(this, m_pmdi);
 		QObject::connect(m_pfitdlg, SIGNAL(AddSubWindow(SubWindowBase*)), this, SLOT(AddSubWindow(SubWindowBase*)));
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pfitdlg, SLOT(SubWindowRemoved(SubWindowBase*)));
 	}
 
 	m_pfitdlg->show();
@@ -1300,6 +1305,7 @@ void MiezeMainWnd::ShowPSDPhaseCorr()
 	{
 		m_pphasecorrdlg = new PsdPhaseCorrDlg(this, m_pmdi);
 		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pphasecorrdlg, SLOT(RefreshPhaseCombo()));
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pphasecorrdlg, SLOT(SubWindowRemoved(SubWindowBase*)));
 		QObject::connect(this, SIGNAL(SubWindowAdded(SubWindowBase*)), m_pphasecorrdlg, SLOT(RefreshPhaseCombo()));
 
 		QObject::connect(m_pphasecorrdlg, SIGNAL(AddNewPlot(SubWindowBase*)), this, SLOT(AddSubWindow(SubWindowBase*)));

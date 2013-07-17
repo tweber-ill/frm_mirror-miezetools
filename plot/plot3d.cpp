@@ -194,6 +194,7 @@ void Plot3dWrapper::Init()
 
 Plot3dWrapper::~Plot3dWrapper()
 {
+	emit WndDestroyed(m_pPlot);
 	delete m_pPlot;
 }
 

@@ -67,6 +67,7 @@ struct FitParams
 	void AddActiveItemSelected();
 	void RemoveItemSelected();
 
+
 	void SpecialTypeChanged();
 	void SpecialFktChanged(int);
 	void FunctionTypeChanged();
@@ -82,6 +83,7 @@ struct FitParams
 	 static SpecialFitPixelResult DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, int iFkt);
 
 public slots:
+	void SubWindowRemoved(SubWindowBase *pSWB);
 
 signals:
 	void AddSubWindow(SubWindowBase* pWnd);

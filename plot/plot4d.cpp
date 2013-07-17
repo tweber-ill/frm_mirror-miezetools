@@ -26,7 +26,9 @@ Plot4d::Plot4d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 	this->m_bLog = false;
 }
 
-Plot4d::~Plot4d() {}
+Plot4d::~Plot4d()
+{
+}
 
 void Plot4d::plot_manual()
 {
@@ -263,6 +265,7 @@ Plot4dWrapper::Plot4dWrapper(Plot4d* pPlot)
 
 Plot4dWrapper::~Plot4dWrapper()
 {
+	emit WndDestroyed(m_pPlot);
 	delete m_pPlot;
 }
 

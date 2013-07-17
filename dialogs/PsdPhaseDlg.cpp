@@ -210,6 +210,22 @@ void PsdPhaseCorrDlg::AddItemSelected()
 	RemoveDuplicate();
 }
 
+void PsdPhaseCorrDlg::SubWindowRemoved(SubWindowBase *pSWB)
+{
+	if(!pSWB) return;
+
+	for(int i=0; i<listGraphs->count(); ++i)
+	{
+		SubWindowBase* pCurItem = ((ListGraphsItem*)listGraphs->item(i))->subWnd();
+
+		if(pCurItem==pSWB)
+		{
+			delete listGraphs->item(i);
+			--i;
+		}
+	}
+}
+
 void PsdPhaseCorrDlg::RemoveItemSelected()
 {
 	if(listGraphs->selectedItems().size() == 0)

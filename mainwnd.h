@@ -21,6 +21,7 @@
 #include "plot/plot3d.h"
 #include "plot/plot4d.h"
 
+#include "dialogs/CombineDlg.h"
 #include "dialogs/RoiDlg.h"
 #include "dialogs/FitDlg.h"
 #include "dialogs/ResoDlg.h"
@@ -40,6 +41,8 @@ class MiezeMainWnd : public QMainWindow
 { Q_OBJECT
 protected:
 	QMdiArea *m_pmdi;
+
+	CombineGraphsDlg *m_pcombinedlg;
 	FitDlg *m_pfitdlg;
 	RoiDlg *m_proidlg;
 	ResoDlg *m_presdlg;

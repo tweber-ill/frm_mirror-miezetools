@@ -324,6 +324,22 @@ void FitDlg::RemoveItemSelected()
 		delete pItem;
 }
 
+void FitDlg::SubWindowRemoved(SubWindowBase *pSWB)
+{
+	if(!pSWB) return;
+
+	for(int i=0; i<listGraphs->count(); ++i)
+	{
+		SubWindowBase* pCurItem = ((ListGraphsItem*)listGraphs->item(i))->subWnd();
+
+		if(pCurItem==pSWB)
+		{
+			delete listGraphs->item(i);
+			--i;
+		}
+	}
+}
+
 void FitDlg::RemoveDuplicate()
 {
 	std::set<SubWindowBase*> setItems;
