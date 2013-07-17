@@ -416,6 +416,8 @@ std::vector<SubWindowBase*> MiezeMainWnd::GetSubWindows(bool bResolveActualWidge
 
 void MiezeMainWnd::UpdateSubWndList()
 {
+	SubWindowBase *pSWBActive = GetActivePlot();
+
 	// remove previous list
 	for(QAction* pAction : m_vecSubWndActions)
 	{
@@ -432,12 +434,15 @@ void MiezeMainWnd::UpdateSubWndList()
 	{
 		if(pSWB)
 		{
+			bool bActiveWindow = (pSWB == pSWBActive || pSWB->GetActualWidget() == pSWBActive);
 			QString strTitle = pSWB->windowTitle();
 
 			QAction *pAction = new QAction(pMenuWindows);
+			pAction->setCheckable(1);
+			pAction->setChecked(bActiveWindow);
 			pAction->setText(strTitle);
-			m_vecSubWndActions.push_back(pAction);
 
+			m_vecSubWndActions.push_back(pAction);
 			pMenuWindows->addAction(pAction);
 
 			QObject::connect(pAction, SIGNAL(triggered()), pSWB, SLOT(showNormal()));

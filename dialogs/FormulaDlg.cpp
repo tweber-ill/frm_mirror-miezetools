@@ -228,6 +228,8 @@ void FormulaDlg::setupConstants()
 		QTableWidgetItem *pConstVal = new QTableWidgetItem();
 		pConstVal->setText(constant.strVal.c_str());
 		tableConst->setItem(iConst,1,pConstVal);
+
+		//pConstVal->setFlags(pConstVal->flags() & ~Qt::ItemIsEditable);
 	}
 }
 
