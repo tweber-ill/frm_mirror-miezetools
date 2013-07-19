@@ -138,14 +138,20 @@ Data3 Data4::GetVal(uint iD2) const
 	dat.CopyXYRangeFrom(this);
 	dat.CopyRoiFlagsFrom(this);
 
+	double dTotal = 0.;
 	for(uint iD=0; iD<m_iDepth; ++iD)
 		for(uint iY=0; iY<m_iHeight; ++iY)
 			for(uint iX=0; iX<m_iWidth; ++iX)
 			{
-				dat.SetVal(iX, iY, iD, this->GetValRaw(iX, iY, iD, iD2));
+				double dVal = this->GetValRaw(iX, iY, iD, iD2);
+
+				dat.SetVal(iX, iY, iD, dVal);
 				dat.SetErr(iX, iY, iD, this->GetErrRaw(iX, iY, iD, iD2));
+
+				dTotal += dVal;
 			}
 
+	dat.SetTotal(dTotal);
 	return dat;
 }
 
