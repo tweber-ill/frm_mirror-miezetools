@@ -8,6 +8,7 @@
 #include <QtGui/QApplication>
 #include <iostream>
 #include <string>
+#include "helper/string.h"
 
 #ifdef Q_WS_X11
 //#include <X11/Xlib.h>
@@ -24,7 +25,15 @@ extern void init_formulas();
 static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 {
 	for(int iFile=0; iFile<iNum; ++iFile)
-		wnd.LoadFile(std::string(pcFiles[iFile]));
+	{
+		std::string strFile = pcFiles[iFile];
+		std::string strExt = get_fileext(strFile);
+
+		if(strExt == "cattus")
+			wnd.LoadSession(strFile);
+		else
+			wnd.LoadFile(strFile);
+	}
 }
 
 int main(int argc, char **argv)

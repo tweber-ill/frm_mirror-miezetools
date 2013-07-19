@@ -336,7 +336,7 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 	{
 		const PlotObj& obj1 = GetData(iDat);
 		const Data1& dat1 = obj1.dat;
-		if(dat1.GetType() == DATA_1D)
+		if(obj1.plttype == PLOT_DATA)
 		{
 			double dxmin1, dxmax1;
 			dat1.GetXMinMax(dxmin1, dxmax1);

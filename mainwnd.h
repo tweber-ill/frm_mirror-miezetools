@@ -30,7 +30,7 @@
 #include "dialogs/RadialIntDlg.h"
 #include "dialogs/FormulaDlg.h"
 
-#define MAX_RECENT_FILES 16
+#define MAX_RECENT_FILES 32
 
 enum InterpFkt
 {
@@ -69,11 +69,20 @@ protected:
 
 	std::string m_strLastXColumn;
 
+	// recent files
 	QStringList m_lstRecentFiles;
 	QMenu *m_pMenuLoadRecent;
 	void LoadRecentFileList();
 	void UpdateRecentFileMenu();
 	void AddRecentFile(const QString& strFile);
+
+	// recent sessions
+	QStringList m_lstRecentSessions;
+	QMenu *m_pMenuLoadRecentSession;
+	void LoadRecentSessionList();
+	void UpdateRecentSessionMenu();
+	void AddRecentSession(const QString& strSession);
+
 
 	std::string m_strCurSess;
 
@@ -131,12 +140,14 @@ public:
 	virtual ~MiezeMainWnd();
 
 	void LoadFile(const std::string& strFile);
+	void LoadSession(const std::string& strFile);
 	void MakePlot(const Data1& dat, const std::string& strTitle);
 
 public slots:
 	void SetStatusMsg(const char* pcMsg, int iPos);
 	void AddSubWindow(SubWindowBase* pWnd);
 	void LoadFile(const QString& strFile);
+	void LoadSession(const QString& strFile);
 
 protected slots:
 	void SubWindowDestroyed(SubWindowBase *pSWB);

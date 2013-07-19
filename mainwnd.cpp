@@ -83,10 +83,6 @@ MiezeMainWnd::MiezeMainWnd()
 	m_pMenuLoadRecent->setTitle("Open Recent");
 	pMenuFile->addMenu(m_pMenuLoadRecent);
 
-	QAction *pExportPy = new QAction(this);
-	pExportPy->setText("Export as Python Script...");
-	pMenuFile->addAction(pExportPy);
-
 	QAction *pCloseAll = new QAction(this);
 	pCloseAll->setText("Close All");
 	pCloseAll->setIcon(QIcon::fromTheme("window-close"));
@@ -99,6 +95,11 @@ MiezeMainWnd::MiezeMainWnd()
 	pLoadSess->setShortcut(Qt::CTRL + Qt::Key_L);
 	pLoadSess->setIcon(QIcon::fromTheme("document-open"));
 	pMenuFile->addAction(pLoadSess);
+
+	m_pMenuLoadRecentSession = new QMenu(this);
+	m_pMenuLoadRecentSession->setTitle("Open Recent Session");
+	pMenuFile->addMenu(m_pMenuLoadRecentSession);
+
 
 	QAction *pSaveSess = new QAction(this);
 	pSaveSess->setText("Save Session");
@@ -133,16 +134,29 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuPlot->setTitle("Plot");
 	pMenuPlot->setEnabled(0);
 
+	QAction *pExportPy = new QAction(this);
+	pExportPy->setText("Export as Python Script...");
+
 	m_pMenu1d = new QMenu(this);
+	//m_pMenu1d->addSeparator();
+	m_pMenu1d->addAction(pExportPy);
 
 	m_pMenu2d = new QMenu(this);
+	//m_pMenu2d->addSeparator();
+	m_pMenu2d->addAction(pExportPy);
 
 	m_pMenu3d = new QMenu(this);
+	//m_pMenu3d->addSeparator();
+	m_pMenu3d->addAction(pExportPy);
+
 
 	m_pMenu4d = new QMenu(this);
 	QAction *pExtractFoils = new QAction(m_pMenu4d);
 	pExtractFoils->setText("Extract Foils");
 	m_pMenu4d->addAction(pExtractFoils);
+
+	m_pMenu4d->addSeparator();
+	m_pMenu4d->addAction(pExportPy);
 
 
 
@@ -384,6 +398,7 @@ MiezeMainWnd::MiezeMainWnd()
 	//--------------------------------------------------------------------------------
 
 	LoadRecentFileList();
+	LoadRecentSessionList();
 }
 
 MiezeMainWnd::~MiezeMainWnd()
@@ -475,7 +490,10 @@ void MiezeMainWnd::SubWindowChanged()
 {
 	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
 	if(!pWnd)
+	{
+		pMenuPlot->setEnabled(0);
 		return;
+	}
 
 	SubWindowBase* pSWB = (SubWindowBase*)pWnd->widget();
 
@@ -1264,6 +1282,9 @@ void MiezeMainWnd::ShowBrowser()
 #endif
 }
 
+
+// --------------------------------------------------------------------------------
+// recent files
 void MiezeMainWnd::AddRecentFile(const QString& strFile)
 {
 	m_lstRecentFiles.push_front(strFile);
@@ -1304,11 +1325,66 @@ void MiezeMainWnd::LoadRecentFileList()
 
 	UpdateRecentFileMenu();
 }
+// --------------------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------------------------------
+// recent sessions
+void MiezeMainWnd::AddRecentSession(const QString& strFile)
+{
+	m_lstRecentSessions.push_front(strFile);
+	m_lstRecentSessions.removeDuplicates();
+
+	if(m_lstRecentSessions.size() > MAX_RECENT_FILES)
+	{
+		QStringList::iterator iter = m_lstRecentSessions.begin();
+		for(unsigned int i=0; i<MAX_RECENT_FILES; ++i) ++iter;
+		m_lstRecentSessions.erase(iter, m_lstRecentSessions.end());
+	}
+
+	Settings::Set<QStringList>("general/recent_sessions", m_lstRecentSessions);
+	UpdateRecentSessionMenu();
+}
+
+void MiezeMainWnd::UpdateRecentSessionMenu()
+{
+	m_pMenuLoadRecentSession->clear();
+
+	for(QStringList::iterator iter=m_lstRecentSessions.begin(); iter!=m_lstRecentSessions.end(); ++iter)
+	{
+		QAction *pRec = new QAction(this);
+		pRec->setText(*iter);
+		m_pMenuLoadRecentSession->addAction(pRec);
+
+		QSignalMapper *pSigs = new QSignalMapper(this);
+		pSigs->setMapping(pRec, pRec->text());
+		QObject::connect(pRec, SIGNAL(triggered()), pSigs, SLOT(map()));
+		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), this, SLOT(LoadSession(const QString&)));
+	}
+}
+
+void MiezeMainWnd::LoadRecentSessionList()
+{
+	m_lstRecentSessions = Settings::Get<QStringList>("general/recent_sessions");
+	m_lstRecentSessions.removeDuplicates();
+
+	UpdateRecentSessionMenu();
+}
+// --------------------------------------------------------------------------------
+
+
+
 
 void MiezeMainWnd::LoadFile(const QString& strFile)
 {
 	m_strLastXColumn = "";
 	LoadFile(strFile.toStdString());
+}
+
+void MiezeMainWnd::LoadSession(const QString& strFile)
+{
+	LoadSession(strFile.toStdString());
 }
 
 
@@ -1390,16 +1466,10 @@ void MiezeMainWnd::FileExportPyTriggered()
 }
 
 
-void MiezeMainWnd::SessionLoadTriggered()
+// --------------------------------------------------------------------------------
+// session loading/saving
+void MiezeMainWnd::LoadSession(const std::string& strSess)
 {
-	QSettings *pGlobals = Settings::GetGlobals();
-	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
-	QString strFile = QFileDialog::getOpenFileName(this, "Load Session...", strLastDir,
-					"Session Files (*.cattus)", 0, QFileDialog::DontUseNativeDialog);
-	if(strFile == "")
-		return;
-
-	std::string strSess = strFile.toStdString();
 	Xml xml;
 	if(!xml.Load(strSess.c_str()))
 	{
@@ -1410,7 +1480,7 @@ void MiezeMainWnd::SessionLoadTriggered()
 	Blob blob((strSess+".blob").c_str());
 	bool bHasBlob = blob.IsOpen();
 
-	this->m_pmdi->closeAllSubWindows();
+	//m_pmdi->closeAllSubWindows();
 	m_strCurSess = strSess;
 
 	std::string strBase = "/cattus_session/";
@@ -1456,7 +1526,23 @@ void MiezeMainWnd::SessionLoadTriggered()
 	}
 
 	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
+
+	QSettings *pGlobals = Settings::GetGlobals();
 	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strSess).c_str()));
+	AddRecentSession(QString(strSess.c_str()));
+}
+
+void MiezeMainWnd::SessionLoadTriggered()
+{
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
+	QString strFile = QFileDialog::getOpenFileName(this, "Load Session...", strLastDir,
+					"Session Files (*.cattus)", 0, QFileDialog::DontUseNativeDialog);
+	if(strFile == "")
+		return;
+
+	m_pmdi->closeAllSubWindows();
+	LoadSession(strFile.toStdString());
 }
 
 void MiezeMainWnd::SessionSaveTriggered()
@@ -1504,6 +1590,7 @@ void MiezeMainWnd::SessionSaveTriggered()
 	ofstrBlob.close();
 	ofstr.close();
 
+	AddRecentSession(QString(m_strCurSess.c_str()));
 	this->SetStatusMsg("Ok.", 0);
 }
 
@@ -1527,6 +1614,8 @@ void MiezeMainWnd::SessionSaveAsTriggered()
 	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
 	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strFile1).c_str()));
 }
+// --------------------------------------------------------------------------------
+
 
 void MiezeMainWnd::ExtractFoils()
 {
