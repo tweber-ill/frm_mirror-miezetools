@@ -487,25 +487,23 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 	fitparams.iNumPeaks = iParam;
 	FitData::fit(dat, fitparams, &pFkt);
 
-
-	bool bOk = 0;
-	if(iFkt == FIT_MIEZE_SINE) 				// MIEZE sine
-	{
-		MiezeSinModel *pModel = (MiezeSinModel*)pFkt;
-
-		std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
-						<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
-						<< std::endl;
-
-		std::ostringstream ostrTitle;
-		ostrTitle.precision(3);
-		ostrTitle << "Contrast: " << pModel->GetContrast() << "+-" << pModel->GetContrastErr()
-				  << ", Phase: " << pModel->GetPhase() << "+-" << pModel->GetPhaseErr();
-		res.pPlot->SetTitle(ostrTitle.str().c_str());
-	}
-
 	if(pFkt)
-	{
+	{	
+		if(iFkt == FIT_MIEZE_SINE) 				// MIEZE sine
+		{
+			MiezeSinModel *pModel = (MiezeSinModel*)pFkt;
+
+			std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
+							<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
+							<< std::endl;
+
+			std::ostringstream ostrTitle;
+			ostrTitle.precision(3);
+			ostrTitle << "Contrast: " << pModel->GetContrast() << "+-" << pModel->GetContrastErr()
+					  << ", Phase: " << pModel->GetPhase() << "+-" << pModel->GetPhaseErr();
+			res.pPlot->SetTitle(ostrTitle.str().c_str());
+		}
+
 		res.pPlot->plot_fkt(*pFkt);
 		res.pPlot->RefreshPlot();
 		res.bOk = 1;

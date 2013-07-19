@@ -1,6 +1,7 @@
 CC = gcc
 INC = -I/usr/include/qt4 -I/usr/local/include
 FLAGS = ${INC} -O2 -march=native -std=c++11 -DNDEBUG
+# FLAGS = ${INC} -std=c++11 -ggdb
 LAPACK_LIBS = -L/usr/local/lib64 -llapack -llapacke
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lQtCore -lQtGui -lQtXml -lQtXmlPatterns -lQtOpenGL -lGL -lGLU -lX11
 LIBS_RESO = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS} ${LAPACK_LIBS}

@@ -8,7 +8,6 @@
 #include "mainwnd.h"
 
 #include<QtGui/QLabel>
-#include<QtGui/QMenu>
 #include<QtGui/QMenuBar>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QFileDialog>
@@ -126,6 +125,24 @@ MiezeMainWnd::MiezeMainWnd()
 	pExit->setText("Exit");
 	pExit->setIcon(QIcon::fromTheme("application-exit"));
 	pMenuFile->addAction(pExit);
+
+
+
+	// Cur. Plot
+	/*QMenu**/ pMenuPlot = new QMenu(this);
+	pMenuPlot->setTitle("Plot");
+	pMenuPlot->setEnabled(0);
+
+	m_pMenu1d = new QMenu(this);
+
+	m_pMenu2d = new QMenu(this);
+
+	m_pMenu3d = new QMenu(this);
+
+	m_pMenu4d = new QMenu(this);
+	QAction *pExtractFoils = new QAction(m_pMenu4d);
+	pExtractFoils->setText("Extract Foils");
+	m_pMenu4d->addAction(pExtractFoils);
 
 
 
@@ -291,6 +308,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QMenuBar *pMenuBar = new QMenuBar(this);
 	pMenuBar->addMenu(pMenuFile);
+	pMenuBar->addMenu(pMenuPlot);
 	pMenuBar->addMenu(pMenuFit);
 	pMenuBar->addMenu(pMenuTools);
 	pMenuBar->addMenu(pMenuROI);
@@ -327,6 +345,8 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pLoadSess, SIGNAL(triggered()), this, SLOT(SessionLoadTriggered()));
 	QObject::connect(pSaveSess, SIGNAL(triggered()), this, SLOT(SessionSaveTriggered()));
 	QObject::connect(pSaveSessAs, SIGNAL(triggered()), this, SLOT(SessionSaveAsTriggered()));
+
+	QObject::connect(pExtractFoils, SIGNAL(triggered()), this, SLOT(ExtractFoils()));
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
 	QObject::connect(pIntAlongY, SIGNAL(triggered()), this, SLOT(IntAlongY()));
@@ -454,17 +474,39 @@ void MiezeMainWnd::UpdateSubWndList()
 void MiezeMainWnd::SubWindowChanged()
 {
 	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
-	if(pWnd)
+	if(!pWnd)
+		return;
+
+	SubWindowBase* pSWB = (SubWindowBase*)pWnd->widget();
+
+	if(pSWB->GetType() == PLOT_1D)
 	{
-		QWidget *pWdg = pWnd->widget();
-
-		SubWindowType type = ((SubWindowBase*)pWdg)->GetType();
-		if(type == PLOT_1D)
-		{
-
-		}
+		pMenuPlot->clear();
+		pMenuPlot->addActions(m_pMenu1d->actions());
+		pMenuPlot->setEnabled(1);
 	}
-	// ...
+	else if(pSWB->GetType() == PLOT_2D)
+	{
+		pMenuPlot->clear();
+		pMenuPlot->addActions(m_pMenu2d->actions());
+		pMenuPlot->setEnabled(1);
+	}
+	else if(pSWB->GetType() == PLOT_3D)
+	{
+		pMenuPlot->clear();
+		pMenuPlot->addActions(m_pMenu3d->actions());
+		pMenuPlot->setEnabled(1);
+	}
+	else if(pSWB->GetType() == PLOT_4D)
+	{
+		pMenuPlot->clear();
+		pMenuPlot->addActions(m_pMenu4d->actions());
+		pMenuPlot->setEnabled(1);
+	}
+	else
+	{
+		pMenuPlot->setEnabled(0);
+	}
 }
 
 void MiezeMainWnd::SubWindowDestroyed(SubWindowBase *pSWB)
@@ -1484,6 +1526,24 @@ void MiezeMainWnd::SessionSaveAsTriggered()
 
 	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
 	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strFile1).c_str()));
+}
+
+void MiezeMainWnd::ExtractFoils()
+{
+	SubWindowBase* pSWB = GetActivePlot();
+	if(!pSWB) return;
+	pSWB = pSWB->GetActualWidget();
+	if(pSWB->GetType() != PLOT_4D)
+		return;
+
+	Plot4d* pPlot = (Plot4d*)pSWB;
+	for(unsigned int iFoil=0; iFoil<pPlot->GetNumF(); ++iFoil)
+	{
+		Plot3d* pPlot3d = pPlot->ConvertTo3d(iFoil);
+		Plot3dWrapper *pWrap = new Plot3dWrapper(pPlot3d);
+
+		AddSubWindow(pWrap);
+	}
 }
 
 #include "mainwnd.moc"

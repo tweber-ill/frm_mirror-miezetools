@@ -68,43 +68,6 @@ SubWindowBase* Plot4d::clone() const
 	return pPlot;
 }
 
-void Plot4dWrapper::DataLoaded()
-{
-	const Data4 &dat = m_pPlot->GetData();
-	uint iMaxT = dat.GetDepth();
-	uint iCurT = m_pPlot->GetCurT();
-	m_pSliderT->setMinimum(0);
-	m_pSliderT->setMaximum(iMaxT-1);
-	m_pSliderT->setValue(iCurT);
-
-	uint iMaxF = dat.GetDepth2();
-	uint iCurF = m_pPlot->GetCurF();
-	m_pSliderF->setMinimum(0);
-	m_pSliderF->setMaximum(iMaxF-1);
-	m_pSliderF->setValue(iCurF);
-
-	// take window title from child widget
-	if(windowTitle()=="")
-		setWindowTitle(GetActualWidget()->windowTitle());
-
-	/*
-	QString strZ = m_pPlot->GetZStr();
-	if(strZ=="")
-		strZ = "t: ";
-	m_pLabel->setText(strZ);
-	*/
-
-	m_pPlot->RefreshPlot();
-	m_pPlot->RefreshStatusMsgs();
-}
-
-void Plot4dWrapper::SliderValueChanged()
-{
-	uint iValT = (uint)m_pSliderT->value();
-	uint iValF = (uint)m_pSliderF->value();
-	m_pPlot->RefreshTFSlice(iValT, iValF);
-}
-
 void Plot4d::RefreshStatusMsgs()
 {
 	Plot2d::RefreshStatusMsgs();
@@ -244,6 +207,7 @@ bool Plot4d::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 
 
 
+
 Plot4dWrapper::Plot4dWrapper(QWidget* pParent, const char* pcTitle, bool bCountData)
 	: SubWindowBase(pParent)
 {
@@ -254,6 +218,7 @@ Plot4dWrapper::Plot4dWrapper(QWidget* pParent, const char* pcTitle, bool bCountD
 }
 
 Plot4dWrapper::Plot4dWrapper(Plot4d* pPlot)
+				: SubWindowBase(pPlot->parentWidget())
 {
 	m_pPlot = pPlot;
 	setWindowTitle(m_pPlot->windowTitle());
@@ -267,6 +232,43 @@ Plot4dWrapper::~Plot4dWrapper()
 {
 	emit WndDestroyed(m_pPlot);
 	delete m_pPlot;
+}
+
+void Plot4dWrapper::DataLoaded()
+{
+	const Data4 &dat = m_pPlot->GetData();
+	uint iMaxT = dat.GetDepth();
+	uint iCurT = m_pPlot->GetCurT();
+	m_pSliderT->setMinimum(0);
+	m_pSliderT->setMaximum(iMaxT-1);
+	m_pSliderT->setValue(iCurT);
+
+	uint iMaxF = dat.GetDepth2();
+	uint iCurF = m_pPlot->GetCurF();
+	m_pSliderF->setMinimum(0);
+	m_pSliderF->setMaximum(iMaxF-1);
+	m_pSliderF->setValue(iCurF);
+
+	// take window title from child widget
+	if(windowTitle()=="")
+		setWindowTitle(GetActualWidget()->windowTitle());
+
+	/*
+	QString strZ = m_pPlot->GetZStr();
+	if(strZ=="")
+		strZ = "t: ";
+	m_pLabel->setText(strZ);
+	*/
+
+	m_pPlot->RefreshPlot();
+	m_pPlot->RefreshStatusMsgs();
+}
+
+void Plot4dWrapper::SliderValueChanged()
+{
+	uint iValT = (uint)m_pSliderT->value();
+	uint iValF = (uint)m_pSliderF->value();
+	m_pPlot->RefreshTFSlice(iValT, iValF);
 }
 
 void Plot4dWrapper::Init()

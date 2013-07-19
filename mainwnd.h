@@ -11,6 +11,7 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QMdiArea>
 #include <QtGui/QLabel>
+#include <QtGui/QMenu>
 
 #include <vector>
 #include <string>
@@ -53,7 +54,8 @@ protected:
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
 
-	QMenu* pMenuWindows;
+	QMenu* pMenuWindows, *pMenuPlot;
+	QMenu *m_pMenu1d, *m_pMenu2d, *m_pMenu3d, *m_pMenu4d;
 	std::vector<QAction*> m_vecSubWndActions;
 
 	QLabel *m_pStatusLabelLeft, *m_pStatusLabelMiddle, *m_pStatusLabelRight;
@@ -121,6 +123,8 @@ protected slots:
 	void GetActiveROI();
 	void SetGlobalROIForAll();
 	void SetGlobalROIForActive();
+
+	void ExtractFoils();
 
 public:
 	MiezeMainWnd();

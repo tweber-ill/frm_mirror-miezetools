@@ -33,6 +33,8 @@ public:
 	Data4& GetData() { return m_dat4; }
 	uint GetCurT() const { return m_iCurT; }
 	uint GetCurF() const { return m_iCurF; }
+	uint GetNumT() const { return m_dat4.GetDepth(); }
+	uint GetNumF() const { return m_dat4.GetDepth2(); }
 
 	virtual SubWindowType GetType() const { return PLOT_4D; }
 	virtual double GetTotalCounts() const { return m_dat4.GetTotal(); }

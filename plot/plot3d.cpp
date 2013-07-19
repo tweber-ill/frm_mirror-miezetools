@@ -162,6 +162,7 @@ Plot3dWrapper::Plot3dWrapper(QWidget* pParent, const char* pcTitle, bool bCountD
 }
 
 Plot3dWrapper::Plot3dWrapper(Plot3d* pPlot)
+				: SubWindowBase(pPlot->parentWidget())
 {
 	m_pPlot = pPlot;
 	setWindowTitle(m_pPlot->windowTitle());
