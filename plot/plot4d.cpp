@@ -116,7 +116,9 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 	}
 	else
 	{
-		strTitle += std::string(" -> t channels");
+		std::ostringstream ostrTitle;
+		ostrTitle << " -> foil " << iFoil << " -> t channels";
+		strTitle += ostrTitle.str();
 		dat = pPlot4d->GetData().GetXYSum(iFoil);
 	}
 

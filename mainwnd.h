@@ -133,6 +133,7 @@ protected slots:
 	void SetGlobalROIForAll();
 	void SetGlobalROIForActive();
 
+	void ShowTimeChannels();
 	void ExtractFoils();
 
 public:

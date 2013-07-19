@@ -134,6 +134,9 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuPlot->setTitle("Plot");
 	pMenuPlot->setEnabled(0);
 
+	QAction *pShowT = new QAction(this);
+	pShowT->setText("Show Time Channels");
+
 	QAction *pExportPy = new QAction(this);
 	pExportPy->setText("Export as Python Script...");
 
@@ -146,7 +149,8 @@ MiezeMainWnd::MiezeMainWnd()
 	m_pMenu2d->addAction(pExportPy);
 
 	m_pMenu3d = new QMenu(this);
-	//m_pMenu3d->addSeparator();
+	m_pMenu3d->addAction(pShowT);
+	m_pMenu3d->addSeparator();
 	m_pMenu3d->addAction(pExportPy);
 
 
@@ -154,6 +158,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pExtractFoils = new QAction(m_pMenu4d);
 	pExtractFoils->setText("Extract Foils");
 	m_pMenu4d->addAction(pExtractFoils);
+	m_pMenu4d->addAction(pShowT);
 
 	m_pMenu4d->addSeparator();
 	m_pMenu4d->addAction(pExportPy);
@@ -360,6 +365,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pSaveSess, SIGNAL(triggered()), this, SLOT(SessionSaveTriggered()));
 	QObject::connect(pSaveSessAs, SIGNAL(triggered()), this, SLOT(SessionSaveAsTriggered()));
 
+	QObject::connect(pShowT, SIGNAL(triggered()), this, SLOT(ShowTimeChannels()));
 	QObject::connect(pExtractFoils, SIGNAL(triggered()), this, SLOT(ExtractFoils()));
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
@@ -1617,6 +1623,8 @@ void MiezeMainWnd::SessionSaveAsTriggered()
 // --------------------------------------------------------------------------------
 
 
+// --------------------------------------------------------------------------------
+// plot specific stuff
 void MiezeMainWnd::ExtractFoils()
 {
 	SubWindowBase* pSWB = GetActivePlot();
@@ -1634,6 +1642,31 @@ void MiezeMainWnd::ExtractFoils()
 		AddSubWindow(pWrap);
 	}
 }
+
+void MiezeMainWnd::ShowTimeChannels()
+{
+	SubWindowBase* pSWB = GetActivePlot();
+	if(!pSWB) return;
+	pSWB = pSWB->GetActualWidget();
+
+	if(pSWB->GetType()==PLOT_3D)
+	{
+		Plot3d* pPlot3 = (Plot3d*)pSWB;
+		Plot* pPlot = pPlot3->ConvertTo1d(0);
+		AddSubWindow(pPlot);
+	}
+	else if(pSWB->GetType()==PLOT_4D)
+	{
+		Plot4d* pPlot4 = (Plot4d*)pSWB;
+		for(unsigned int iFoil=0; iFoil<pPlot4->GetNumF(); ++iFoil)
+		{
+			Plot* pPlot = pPlot4->ConvertTo1d(iFoil);
+			AddSubWindow(pPlot);
+		}
+	}
+}
+// --------------------------------------------------------------------------------
+
 
 #include "mainwnd.moc"
 #include "subwnd.moc"
