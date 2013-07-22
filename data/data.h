@@ -115,7 +115,12 @@ public:
 	{}
 
 	void SetXRange(double dXMin, double dXMax);
-	void SetYRange(double dYMin, double dYMax);;
+	void SetYRange(double dYMin, double dYMax);
+
+	double GetXRangeMin() const { return m_dXMin; }
+	double GetXRangeMax() const { return m_dXMax; }
+	double GetYRangeMin() const { return m_dYMin; }
+	double GetYRangeMax() const { return m_dYMax; }
 
 	void SetXYLog(bool bLogX, bool bLogY) { m_bXIsLog=bLogX; m_bYIsLog=bLogY; }
 

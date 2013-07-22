@@ -34,6 +34,8 @@ void PlotPropDlg::SubWindowActivated(SubWindowBase* pSWB)
 	editTLabel->setText(m_pCurPlot->GetLabel(LABEL_T).c_str());
 	editFoilLabel->setText(m_pCurPlot->GetLabel(LABEL_F).c_str());
 
+	XYRange *pRange = 0;
+
 	if(m_pCurPlot->GetType() == PLOT_1D)
 	{
 		groupXYRanges->setEnabled(false);
@@ -57,19 +59,31 @@ void PlotPropDlg::SubWindowActivated(SubWindowBase* pSWB)
 		{
 			editTLabel->setEnabled(false);
 			editFoilLabel->setEnabled(false);
+
+			pRange = &pPlot2d->GetData2();
 		}
 		else if(m_pCurPlot->GetType() == PLOT_3D)
 		{
 			editTLabel->setEnabled(true);
 			editFoilLabel->setEnabled(false);
+
+			pRange = &((Plot3d*)pPlot2d)->GetData();
 		}
 		else if(m_pCurPlot->GetType() == PLOT_4D)
 		{
 			editTLabel->setEnabled(true);
 			editFoilLabel->setEnabled(true);
-		}
 
-		// TODO: xyrange
+			pRange = &((Plot4d*)pPlot2d)->GetData();
+		}
+	}
+
+	if(pRange)
+	{
+		spinXMin->setValue(pRange->GetXRangeMin());
+		spinXMax->setValue(pRange->GetXRangeMax());
+		spinYMin->setValue(pRange->GetYRangeMin());
+		spinYMax->setValue(pRange->GetYRangeMax());
 	}
 }
 
@@ -104,6 +118,9 @@ void PlotPropDlg::SaveSettings()
 	m_pCurPlot->SetLabel(LABEL_Z, editZLabel->text().toStdString().c_str());
 	m_pCurPlot->SetLabel(LABEL_T, editTLabel->text().toStdString().c_str());
 	m_pCurPlot->SetLabel(LABEL_F, editFoilLabel->text().toStdString().c_str());
+	m_pCurPlot->setWindowTitle(editWindowTitle->text());
+
+	XYRange *pRange = 0;
 
 	if(m_pCurPlot->GetType() == PLOT_1D)
 	{
@@ -116,7 +133,29 @@ void PlotPropDlg::SaveSettings()
 
 		pPlot2d->SetLog(checkLogZ->isChecked());
 
-		// TODO: xyrange
+		if(m_pCurPlot->GetType() == PLOT_2D)
+		{
+			pRange = &pPlot2d->GetData2();
+		}
+		else if(m_pCurPlot->GetType() == PLOT_3D)
+		{
+			pRange = &((Plot3d*)pPlot2d)->GetData();
+		}
+		else if(m_pCurPlot->GetType() == PLOT_4D)
+		{
+			pRange = &((Plot4d*)pPlot2d)->GetData();
+		}
+	}
+
+	if(pRange)
+	{
+		double dXMin = spinXMin->value();
+		double dXMax = spinXMax->value();
+		double dYMin = spinYMin->value();
+		double dYMax = spinYMax->value();
+
+		pRange->SetXRange(dXMin, dXMax);
+		pRange->SetYRange(dYMin, dYMax);
 	}
 }
 
