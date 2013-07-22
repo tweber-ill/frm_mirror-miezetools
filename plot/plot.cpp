@@ -648,4 +648,29 @@ bool PlotObj::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 }
 
 
+std::string Plot::GetLabel(LabelType iWhich) const
+{
+	if(iWhich == LABEL_X)
+		return GetXLabel();
+	else if(iWhich == LABEL_Y)
+		return GetYLabel();
+	else if(iWhich == LABEL_TITLE)
+		return GetTitle();
+
+	return "";
+}
+void Plot::SetLabel(LabelType iWhich, const char* pcLab)
+{
+	if(iWhich == LABEL_X)
+		m_strXAxis = pcLab;
+	else if(iWhich == LABEL_Y)
+		m_strYAxis = pcLab;
+	else if(iWhich == LABEL_TITLE)
+		SetTitle(pcLab);
+	else
+		return;
+
+	RefreshPlot();
+}
+
 #include "plot.moc"

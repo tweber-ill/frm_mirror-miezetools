@@ -305,5 +305,24 @@ void Plot4dWrapper::Init()
 	QObject::connect(m_pSliderT, SIGNAL(valueChanged(int)), this, SLOT(SliderValueChanged()));
 }
 
+std::string Plot4dWrapper::GetLabel(LabelType iWhich) const
+{
+	if(iWhich == LABEL_T)
+		return m_pLabelT->text().toStdString();
+	else if(iWhich == LABEL_F)
+		return m_pLabelF->text().toStdString();
+
+	return m_pPlot->GetLabel(iWhich);
+}
+
+void Plot4dWrapper::SetLabel(LabelType iWhich, const char* pcLab)
+{
+	if(iWhich == LABEL_T)
+		m_pLabelT->setText(pcLab);
+	if(iWhich == LABEL_F)
+		m_pLabelF->setText(pcLab);
+	m_pPlot->SetLabel(iWhich, pcLab);
+}
+
 
 #include "plot4d.moc"

@@ -29,6 +29,7 @@
 #include "dialogs/PsdPhaseDlg.h"
 #include "dialogs/RadialIntDlg.h"
 #include "dialogs/FormulaDlg.h"
+#include "dialogs/PlotPropDlg.h"
 
 #define MAX_RECENT_FILES 32
 
@@ -50,6 +51,7 @@ protected:
 	RadialIntDlg *m_pradialintdlg;
 	PsdPhaseCorrDlg *m_pphasecorrdlg;
 	FormulaDlg *m_pformuladlg;
+	PlotPropDlg *m_pplotpropdlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -62,7 +64,7 @@ protected:
 
 	virtual void keyPressEvent (QKeyEvent * event);
 
-	SubWindowBase* GetActivePlot();
+	SubWindowBase* GetActivePlot(bool bResolveWidget=1);
 
 	Plot* Convert3d1d(Plot3d* pPlot3d);
 	Plot* Convert4d1d(Plot4d* pPlot4d, int iFoil=-1);
@@ -135,6 +137,7 @@ protected slots:
 
 	void ShowTimeChannels();
 	void ExtractFoils();
+	void PlotPropertiesTriggered();
 
 public:
 	MiezeMainWnd();
@@ -156,6 +159,7 @@ protected slots:
 signals:
 	void SubWindowRemoved(SubWindowBase *pSWB);
 	void SubWindowAdded(SubWindowBase *pSWB);
+	void SubWindowActivated(SubWindowBase *pSWB);
 };
 
 #endif

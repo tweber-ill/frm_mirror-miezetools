@@ -53,7 +53,8 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_proidlg(new RoiDlg(this)),
 					  m_presdlg(0), m_pphasecorrdlg(0),
 					  m_pradialintdlg(0),
-					  m_pformuladlg(0)
+					  m_pformuladlg(0),
+					  m_pplotpropdlg(0)
 {
 	this->setWindowTitle(WND_TITLE);
 
@@ -140,21 +141,31 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pExportPy = new QAction(this);
 	pExportPy->setText("Export as Python Script...");
 
+	QAction *pPlotProp = new QAction(this);
+	pPlotProp->setText("Plot Properties...");
+
 	m_pMenu1d = new QMenu(this);
-	//m_pMenu1d->addSeparator();
+	m_pMenu1d->addAction(pPlotProp);
+	m_pMenu1d->addSeparator();
 	m_pMenu1d->addAction(pExportPy);
 
 	m_pMenu2d = new QMenu(this);
-	//m_pMenu2d->addSeparator();
+	m_pMenu2d->addAction(pPlotProp);
+	m_pMenu2d->addSeparator();
 	m_pMenu2d->addAction(pExportPy);
 
 	m_pMenu3d = new QMenu(this);
+	m_pMenu3d->addAction(pPlotProp);
+	m_pMenu3d->addSeparator();
 	m_pMenu3d->addAction(pShowT);
 	m_pMenu3d->addSeparator();
 	m_pMenu3d->addAction(pExportPy);
 
 
 	m_pMenu4d = new QMenu(this);
+	m_pMenu4d->addAction(pPlotProp);
+	m_pMenu4d->addSeparator();
+
 	QAction *pExtractFoils = new QAction(m_pMenu4d);
 	pExtractFoils->setText("Extract Foils");
 	m_pMenu4d->addAction(pExtractFoils);
@@ -367,6 +378,8 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QObject::connect(pShowT, SIGNAL(triggered()), this, SLOT(ShowTimeChannels()));
 	QObject::connect(pExtractFoils, SIGNAL(triggered()), this, SLOT(ExtractFoils()));
+	QObject::connect(pPlotProp, SIGNAL(triggered()), this, SLOT(PlotPropertiesTriggered()));
+
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
 	QObject::connect(pIntAlongY, SIGNAL(triggered()), this, SLOT(IntAlongY()));
@@ -416,6 +429,7 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pphasecorrdlg) delete m_pphasecorrdlg;
 	if(m_pradialintdlg) delete m_pradialintdlg;
 	if(m_pformuladlg) delete m_pformuladlg;
+	if(m_pplotpropdlg) delete m_pplotpropdlg;
 }
 
 QMdiSubWindow* MiezeMainWnd::FindSubWindow(SubWindowBase* pSWB)
@@ -502,6 +516,7 @@ void MiezeMainWnd::SubWindowChanged()
 	}
 
 	SubWindowBase* pSWB = (SubWindowBase*)pWnd->widget();
+	bool bSignal = 1;
 
 	if(pSWB->GetType() == PLOT_1D)
 	{
@@ -530,7 +545,11 @@ void MiezeMainWnd::SubWindowChanged()
 	else
 	{
 		pMenuPlot->setEnabled(0);
+		bSignal = 0;
 	}
+
+	if(bSignal)
+		emit SubWindowActivated(pSWB);
 }
 
 void MiezeMainWnd::SubWindowDestroyed(SubWindowBase *pSWB)
@@ -1117,7 +1136,7 @@ void MiezeMainWnd::IntRad()
 	m_pradialintdlg->activateWindow();
 }
 
-SubWindowBase* MiezeMainWnd::GetActivePlot()
+SubWindowBase* MiezeMainWnd::GetActivePlot(bool bResolveWidget)
 {
 	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
 	if(pWnd && pWnd->widget())
@@ -1126,7 +1145,10 @@ SubWindowBase* MiezeMainWnd::GetActivePlot()
 		if(!pWndBase)
 			return 0;
 
-		return pWndBase->GetActualWidget();
+		if(bResolveWidget)
+			pWndBase = pWndBase->GetActualWidget();
+
+		return pWndBase;
 	}
 
 	return 0;
@@ -1664,6 +1686,21 @@ void MiezeMainWnd::ShowTimeChannels()
 			AddSubWindow(pPlot);
 		}
 	}
+}
+
+void MiezeMainWnd::PlotPropertiesTriggered()
+{
+	if(!m_pplotpropdlg)
+	{
+		m_pplotpropdlg = new PlotPropDlg(this);
+		QObject::connect(this, SIGNAL(SubWindowActivated(SubWindowBase*)), m_pplotpropdlg, SLOT(SubWindowActivated(SubWindowBase*)));
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pplotpropdlg, SLOT(SubWindowRemoved(SubWindowBase*)));
+
+		m_pplotpropdlg->SubWindowActivated(GetActivePlot(0));
+	}
+
+	m_pplotpropdlg->show();
+	m_pplotpropdlg->activateWindow();
 }
 // --------------------------------------------------------------------------------
 

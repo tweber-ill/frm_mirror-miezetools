@@ -70,6 +70,9 @@ public:
 	const QString& GetYStr() const { return m_strYAxis; }
 	const QString& GetZStr() const { return m_strZAxis; }
 
+	virtual std::string GetLabel(LabelType iWhich) const;
+	virtual void SetLabel(LabelType iWhich, const char* pcLab);
+
 	virtual SubWindowType GetType() const { return PLOT_2D; }
 	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
 

@@ -27,6 +27,16 @@ enum SubWindowType
 	PLOT_4D
 };
 
+enum LabelType
+{
+	LABEL_X,
+	LABEL_Y,
+	LABEL_Z,
+	LABEL_T,
+	LABEL_F,
+	LABEL_TITLE
+};
+
 struct PlotInfo
 {
 	unsigned int iWidth;
@@ -51,6 +61,9 @@ public:
 	virtual SubWindowBase* GetActualWidget() { return this; }
 
 	virtual SubWindowBase* clone() const { return 0; }
+
+	virtual std::string GetLabel(LabelType iWhich) const = 0;
+	virtual void SetLabel(LabelType iWhich, const char* pcLab) = 0;
 
 	virtual double GetTotalCounts() const = 0;
 

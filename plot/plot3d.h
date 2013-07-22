@@ -71,7 +71,11 @@ public:
 	virtual SubWindowBase* GetActualWidget() { return m_pPlot; }
 
 	virtual std::string GetTitle() const { return m_pPlot->GetTitle(); }
+	virtual void SetTitle(const char* pcTitle) { m_pPlot->SetTitle(pcTitle); }
 	virtual double GetTotalCounts() const { return m_pPlot->GetTotalCounts(); }
+
+	virtual std::string GetLabel(LabelType iWhich) const;
+	virtual void SetLabel(LabelType iWhich, const char* pcLab);
 
 	virtual Plot* ConvertTo1d(int iFoil) { return m_pPlot->ConvertTo1d(iFoil); }
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return m_pPlot->ConvertTo3d(iParam); }

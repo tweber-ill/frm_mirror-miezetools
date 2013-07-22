@@ -40,5 +40,6 @@ moc dialogs/ResoDlg.h -o dialogs/ResoDlg.moc
 moc dialogs/PsdPhaseDlg.h -o dialogs/PsdPhaseDlg.moc
 moc dialogs/RadialIntDlg.h -o dialogs/RadialIntDlg.moc
 moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
+moc dialogs/PlotPropDlg.h -o dialogs/PlotPropDlg.moc
 
 echo -e "\n"

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PlotPropertiesDlg</class>
+ <widget class="QDialog" name="PlotPropertiesDlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>376</width>
+    <height>318</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Plot Properties</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupLabels">
+     <property name="title">
+      <string>Labels</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="editTLabel"/>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLineEdit" name="editWindowTitle"/>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Window Title:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>t Label:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="editTitle"/>
+      </item>
+      <item row="1" column="4">
+       <widget class="QLineEdit" name="editYLabel"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>x Label:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Foil Label:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>y Label:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QLineEdit" name="editFoilLabel"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="editXLabel"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Title:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" rowspan="4">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>10</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="editZLabel"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>z Label:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupXYRanges">
+     <property name="title">
+      <string>XY Ranges</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>x Minimum:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="spinXMin"/>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>x Maximum:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="spinYMin"/>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>y Maximum:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>y Minimum:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QDoubleSpinBox" name="spinYMax"/>
+      </item>
+      <item row="0" column="4">
+       <widget class="QDoubleSpinBox" name="spinXMax"/>
+      </item>
+      <item row="0" column="2" rowspan="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>10</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupSettings">
+     <property name="title">
+      <string>Settings</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="checkLogZ">
+        <property name="text">
+         <string>Logarithmic z Scale</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>editTitle</tabstop>
+  <tabstop>editWindowTitle</tabstop>
+  <tabstop>editXLabel</tabstop>
+  <tabstop>editYLabel</tabstop>
+  <tabstop>editZLabel</tabstop>
+  <tabstop>editTLabel</tabstop>
+  <tabstop>editFoilLabel</tabstop>
+  <tabstop>spinXMin</tabstop>
+  <tabstop>spinXMax</tabstop>
+  <tabstop>spinYMin</tabstop>
+  <tabstop>spinYMax</tabstop>
+  <tabstop>checkLogZ</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>PlotPropertiesDlg</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>PlotPropertiesDlg</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

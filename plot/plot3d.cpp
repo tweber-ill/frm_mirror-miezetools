@@ -228,4 +228,19 @@ void Plot3dWrapper::SliderValueChanged()
 	m_pPlot->RefreshTSlice(iVal);
 }
 
+std::string Plot3dWrapper::GetLabel(LabelType iWhich) const
+{
+	if(iWhich == LABEL_T)
+		return m_pLabel->text().toStdString();
+	return m_pPlot->GetLabel(iWhich);
+}
+
+void Plot3dWrapper::SetLabel(LabelType iWhich, const char* pcLab)
+{
+	if(iWhich == LABEL_T)
+		m_pLabel->setText(pcLab);
+	m_pPlot->SetLabel(iWhich, pcLab);
+}
+
+
 #include "plot3d.moc"

@@ -475,4 +475,34 @@ bool Plot2d::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 }
 
 
+std::string Plot2d::GetLabel(LabelType iWhich) const
+{
+	if(iWhich == LABEL_X)
+		return GetXStr().toStdString();
+	else if(iWhich == LABEL_Y)
+		return GetYStr().toStdString();
+	else if(iWhich == LABEL_Z)
+		return GetZStr().toStdString();
+	else if(iWhich == LABEL_TITLE)
+		return GetTitle();
+
+	return "";
+}
+void Plot2d::SetLabel(LabelType iWhich, const char* pcLab)
+{
+	if(iWhich == LABEL_X)
+		m_strXAxis = pcLab;
+	else if(iWhich == LABEL_Y)
+		m_strYAxis = pcLab;
+	else if(iWhich == LABEL_Z)
+		m_strZAxis = pcLab;
+	else if(iWhich == LABEL_TITLE)
+		SetTitle(pcLab);
+	else
+		return;
+
+	RefreshPlot();
+}
+
+
 #include "plot2d.moc"

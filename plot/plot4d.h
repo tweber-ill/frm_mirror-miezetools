@@ -73,7 +73,11 @@ public:
 	virtual SubWindowType GetType() const { return PLOT_4D; }
 	virtual SubWindowBase* GetActualWidget() { return m_pPlot; }
 	virtual std::string GetTitle() const { return m_pPlot->GetTitle(); }
+	virtual void SetTitle(const char* pcTitle) { m_pPlot->SetTitle(pcTitle); }
 	virtual double GetTotalCounts() const { return m_pPlot->GetTotalCounts(); }
+
+	virtual std::string GetLabel(LabelType iWhich) const;
+	virtual void SetLabel(LabelType iWhich, const char* pcLab);
 
 	virtual Plot* ConvertTo1d(int iFoil=-1) { return m_pPlot->ConvertTo1d(iFoil); }
 	virtual Plot3d* ConvertTo3d(int iFoil=-1) { return m_pPlot->ConvertTo3d(iFoil); }
