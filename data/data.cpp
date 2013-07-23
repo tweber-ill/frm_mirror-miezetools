@@ -142,7 +142,7 @@ double XYRange::GetPixelYPos(double dRangeY) const
 
 void XYRange::CopyXYRangeFrom(const XYRange* pRan)
 {
-	*this = *pRan;
+	*((XYRange*)this) = *pRan;
 }
 
 

@@ -120,8 +120,6 @@ void PlotPropDlg::SaveSettings()
 	m_pCurPlot->SetLabel(LABEL_F, editFoilLabel->text().toStdString().c_str());
 	m_pCurPlot->setWindowTitle(editWindowTitle->text());
 
-	XYRange *pRange = 0;
-
 	if(m_pCurPlot->GetType() == PLOT_1D)
 	{
 	}
@@ -129,33 +127,34 @@ void PlotPropDlg::SaveSettings()
 			m_pCurPlot->GetType() == PLOT_3D ||
 			m_pCurPlot->GetType() == PLOT_4D)
 	{
+		XYRange *pRange = 0;
 		Plot2d *pPlot2d = (Plot2d*)m_pCurPlot->GetActualWidget();
 
 		pPlot2d->SetLog(checkLogZ->isChecked());
 
 		if(m_pCurPlot->GetType() == PLOT_2D)
-		{
 			pRange = &pPlot2d->GetData2();
-		}
 		else if(m_pCurPlot->GetType() == PLOT_3D)
-		{
 			pRange = &((Plot3d*)pPlot2d)->GetData();
-		}
 		else if(m_pCurPlot->GetType() == PLOT_4D)
-		{
 			pRange = &((Plot4d*)pPlot2d)->GetData();
+
+
+		if(pRange)
+		{
+			double dXMin = spinXMin->value();
+			double dXMax = spinXMax->value();
+			double dYMin = spinYMin->value();
+			double dYMax = spinYMax->value();
+
+			pRange->SetXRange(dXMin, dXMax);
+			pRange->SetYRange(dYMin, dYMax);
+
+			if(m_pCurPlot->GetType() == PLOT_3D)
+				((Plot3d*)pPlot2d)->RefreshTSlice(((Plot3d*)pPlot2d)->GetCurT());
+			else if(m_pCurPlot->GetType() == PLOT_4D)
+				((Plot4d*)pPlot2d)->RefreshTFSlice(((Plot4d*)pPlot2d)->GetCurT(), ((Plot4d*)pPlot2d)->GetCurF());
 		}
-	}
-
-	if(pRange)
-	{
-		double dXMin = spinXMin->value();
-		double dXMax = spinXMax->value();
-		double dYMin = spinYMin->value();
-		double dYMax = spinYMax->value();
-
-		pRange->SetXRange(dXMin, dXMax);
-		pRange->SetYRange(dYMin, dYMax);
 	}
 }
 
