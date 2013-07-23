@@ -26,6 +26,7 @@
 								<option id="gnu.cpp.compiler.option.other.other.982403098" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1776715981" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/c++/4.7"/>
+									<listOptionValue builtIn="false" value="/usr/local/cuda/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/qt4"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/Qt"/>
@@ -46,9 +47,12 @@
 									<listOptionValue builtIn="false" value="/usr/lib64/qt4/lib"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib64"/>
 									<listOptionValue builtIn="false" value="/usr/lib64/qt4"/>
+									<listOptionValue builtIn="false" value="/usr/local/cuda/lib64"/>
+									<listOptionValue builtIn="false" value="/usr/local/cuda/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.848003280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="QtGui"/>
+									<listOptionValue builtIn="false" value="cufft"/>
 									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="QtOpenGL"/>
 									<listOptionValue builtIn="false" value="GLU"/>
@@ -104,6 +108,7 @@
 								<option id="gnu.cpp.compiler.option.other.other.1556194018" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.26320680" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/usr/include/c++/4.7"/>
+									<listOptionValue builtIn="false" value="/usr/local/cuda/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/qt4"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/Qt"/>
@@ -124,9 +129,12 @@
 									<listOptionValue builtIn="false" value="/usr/lib64/qt4/lib"/>
 									<listOptionValue builtIn="false" value="/usr/local/lib64"/>
 									<listOptionValue builtIn="false" value="/usr/lib64/qt4"/>
+									<listOptionValue builtIn="false" value="/usr/local/cuda/lib64"/>
+									<listOptionValue builtIn="false" value="/usr/local/cuda/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1439036568" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="QtGui"/>
+									<listOptionValue builtIn="false" value="cufft"/>
 									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="QtOpenGL"/>
 									<listOptionValue builtIn="false" value="GLU"/>
