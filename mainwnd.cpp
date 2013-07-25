@@ -54,7 +54,8 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_presdlg(0), m_pphasecorrdlg(0),
 					  m_pradialintdlg(0),
 					  m_pformuladlg(0),
-					  m_pplotpropdlg(0)
+					  m_pplotpropdlg(0),
+					  m_pexportdlg(0)
 {
 	this->setWindowTitle(WND_TITLE);
 
@@ -261,6 +262,12 @@ MiezeMainWnd::MiezeMainWnd()
 
 	pMenuTools->addMenu(pMenuIntegrate);
 
+	pMenuTools->addSeparator();
+
+	QAction *pExportPlots = new QAction(this);
+	pExportPlots->setText("Export Multiple Plots...");
+	pMenuTools->addAction(pExportPlots);
+
 
 	// ROI
 	QMenu *pMenuROI = new QMenu(this);
@@ -368,7 +375,6 @@ MiezeMainWnd::MiezeMainWnd()
 	//--------------------------------------------------------------------------------
 	// Connections
 	QObject::connect(pLoad, SIGNAL(triggered()), this, SLOT(FileLoadTriggered()));
-	QObject::connect(pExportPy, SIGNAL(triggered()), this, SLOT(FileExportPyTriggered()));
 	QObject::connect(pSettings, SIGNAL(triggered()), this, SLOT(SettingsTriggered()));
 	QObject::connect(pExit, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -379,6 +385,8 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pShowT, SIGNAL(triggered()), this, SLOT(ShowTimeChannels()));
 	QObject::connect(pExtractFoils, SIGNAL(triggered()), this, SLOT(ExtractFoils()));
 	QObject::connect(pPlotProp, SIGNAL(triggered()), this, SLOT(PlotPropertiesTriggered()));
+	QObject::connect(pExportPy, SIGNAL(triggered()), this, SLOT(FileExportPyTriggered()));
+	QObject::connect(pExportPlots, SIGNAL(triggered()), this, SLOT(ShowExportDlg()));
 
 
 	QObject::connect(pCombineGraphs, SIGNAL(triggered()), this, SLOT(ShowCombineGraphsDlg()));
@@ -430,6 +438,7 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pradialintdlg) delete m_pradialintdlg;
 	if(m_pformuladlg) delete m_pformuladlg;
 	if(m_pplotpropdlg) delete m_pplotpropdlg;
+	if(m_pexportdlg) delete m_pexportdlg;
 }
 
 QMdiSubWindow* MiezeMainWnd::FindSubWindow(SubWindowBase* pSWB)
@@ -1462,6 +1471,19 @@ void MiezeMainWnd::ShowPSDPhaseCorr()
 
 	m_pphasecorrdlg->show();
 	m_pphasecorrdlg->activateWindow();
+}
+
+
+void MiezeMainWnd::ShowExportDlg()
+{
+	if(!m_pexportdlg)
+	{
+		m_pexportdlg = new ExportDlg(this, m_pmdi);
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pexportdlg, SLOT(SubWindowRemoved(SubWindowBase*)));
+	}
+
+	m_pexportdlg->show();
+	m_pexportdlg->activateWindow();
 }
 
 void MiezeMainWnd::FileExportPyTriggered()

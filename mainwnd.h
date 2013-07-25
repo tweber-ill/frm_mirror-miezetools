@@ -30,6 +30,7 @@
 #include "dialogs/RadialIntDlg.h"
 #include "dialogs/FormulaDlg.h"
 #include "dialogs/PlotPropDlg.h"
+#include "dialogs/ExportDlg.h"
 
 #define MAX_RECENT_FILES 32
 
@@ -52,6 +53,7 @@ protected:
 	PsdPhaseCorrDlg *m_pphasecorrdlg;
 	FormulaDlg *m_pformuladlg;
 	PlotPropDlg *m_pplotpropdlg;
+	ExportDlg *m_pexportdlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -100,6 +102,7 @@ protected slots:
 	void SessionSaveAsTriggered();
 
 	void FileExportPyTriggered();
+	void ShowExportDlg();
 
 	void UpdateSubWndList();
 	void ShowListWindowsDlg();

@@ -27,22 +27,8 @@ static std::string get_py_linestyle(PlotType plttype, unsigned int iLine)
 	return "o";
 }
 
-bool export_py(const char* pcFile, const SubWindowBase *pSWB)
+static bool export_single_plot_py(const SubWindowBase *pSWB, std::ostream& ofstr)
 {
-	if(!pSWB) return false;
-
-	std::ofstream ofstr(pcFile);
-	if(!ofstr.is_open())
-	{
-		std::cerr << "Error: Cannot open file \"" << pcFile << "\"." << std::endl;
-		return false;
-	}
-
-	ofstr << "import numpy as np\n";
-	ofstr << "import matplotlib.pyplot as plt\n\n";
-
-	ofstr << "plt.figure()\n\n";
-
 	double dXLim[2];
 	double dYLim[2];
 
@@ -55,6 +41,11 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 		const Plot* plt = (Plot*)pSWB;
 		for(unsigned int iLine=0; iLine<plt->GetDataCount(); ++iLine)
 		{
+			std::ostringstream ostrPlotName;
+			ostrPlotName << "plt_" << iLine;
+			std::string strPlotName = ostrPlotName.str();
+
+
 			const PlotObj& obj = plt->GetData(iLine);
 			const Data1& dat = obj.dat;
 
@@ -85,7 +76,7 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 
 			if(obj.plttype == PLOT_DATA)
 			{
-				ofstr << "plt.errorbar(x_" << iLine
+				ofstr << strPlotName << " = plt.errorbar(x_" << iLine
 						<< ", " << "y_" << iLine
 						<< ", " << "xerr=xerr_" << iLine
 						<< ", " << "yerr=yerr_" << iLine
@@ -94,11 +85,15 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 			}
 			else if(obj.plttype == PLOT_FKT)
 			{
-				ofstr << "plt.plot(x_" << iLine
+				ofstr << strPlotName << " = plt.plot(x_" << iLine
 						<< ", " << "y_" << iLine
 						<< ", " << "ls=\"" << strLineStyle << "\""
 						<< ", " << "lw=1.4"
 						<< ")\n\n";
+
+				ofstr << "plt.legend([" << strPlotName << "[0]], [\""
+						<< obj.strFkt
+						<< "\"], loc='best')\n\n";
 			}
 
 			ofstr << "plt.xlabel(\"" << plt->GetXLabel() << "\")\n";
@@ -153,14 +148,74 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 
 		ofstr << "plt.xlim(0, " << dat.GetWidth()-1 << ")\n";
 		ofstr << "plt.ylim(0, " << dat.GetHeight()-1 << ")\n\n";
+
+		ofstr << "plt.grid(True)\n";
 	}
 	else
 	{
 		std::cerr << "Error: Data type not (yet) supported." << std::endl;
 		return false;
 	}
-
-	ofstr << "plt.grid(True)\n";
-	ofstr << "plt.show()\n";
 	return true;
+}
+
+
+
+bool export_subplots_py(const char* pcFile, const std::vector<SubWindowBase*>& vecSWB, int iHCnt, int iVCnt)
+{
+	if(vecSWB.size()==0)
+		return false;
+
+	std::ofstream ofstr(pcFile);
+	if(!ofstr.is_open())
+	{
+		std::cerr << "Error: Cannot open file \"" << pcFile << "\"." << std::endl;
+		return false;
+	}
+
+	ofstr << "import numpy as np\n";
+	ofstr << "import matplotlib.pyplot as plt\n\n";
+	ofstr << "plt.figure()\n\n";
+
+	unsigned int iNumPlt = 1;
+	for(const SubWindowBase* pSWB : vecSWB)
+	{
+		ofstr << "\n\n# --------------------------------------------------------------------------------\n";
+		ofstr << "# plot " << iNumPlt << "\n";
+
+		ofstr << "plt.subplot(" << iVCnt << ", " << iHCnt << ", " << iNumPlt << ")\n";
+		export_single_plot_py(pSWB, ofstr);
+
+		ofstr << "# --------------------------------------------------------------------------------\n\n";
+		++iNumPlt;
+	}
+
+	ofstr << "\n\n";
+	ofstr << "plt.tight_layout()\n";
+	ofstr << "plt.show()\n";
+
+	return true;
+}
+
+
+bool export_py(const char* pcFile, const SubWindowBase *pSWB)
+{
+	if(!pSWB) return false;
+
+	std::ofstream ofstr(pcFile);
+	if(!ofstr.is_open())
+	{
+		std::cerr << "Error: Cannot open file \"" << pcFile << "\"." << std::endl;
+		return false;
+	}
+
+	ofstr << "import numpy as np\n";
+	ofstr << "import matplotlib.pyplot as plt\n\n";
+	ofstr << "plt.figure()\n\n";
+
+	bool bOk = export_single_plot_py(pSWB, ofstr);
+
+	ofstr << "plt.tight_layout()\n";
+	ofstr << "plt.show()\n";
+	return bOk;
 }
