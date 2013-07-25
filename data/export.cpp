@@ -99,6 +99,9 @@ static bool export_single_plot_py(const SubWindowBase *pSWB, std::ostream& ofstr
 			ofstr << "plt.xlabel(\"" << plt->GetXLabel() << "\")\n";
 			ofstr << "plt.ylabel(\"" << plt->GetYLabel() << "\")\n\n";
 
+			if(plt->GetTitle() != "")
+				ofstr << "plt.title(\"" << plt->GetTitle() << "\")\n\n";
+
 			double dXMin, dXMax, dXErrMin, dXErrMax;
 			double dYMin, dYMax, dYErrMin, dYErrMax;
 			dat.GetXMinMax(dXMin, dXMax);
@@ -114,6 +117,8 @@ static bool export_single_plot_py(const SubWindowBase *pSWB, std::ostream& ofstr
 
 		ofstr << "plt.xlim(" << dXLim[0] << ", " << dXLim[1] << ")\n";
 		ofstr << "plt.ylim(" << dYLim[0] << ", " << dYLim[1] << ")\n\n";
+
+		ofstr << "plt.grid(True)\n";
 	}
 	else if(pSWB->GetType() == PLOT_2D)
 	{
@@ -148,8 +153,6 @@ static bool export_single_plot_py(const SubWindowBase *pSWB, std::ostream& ofstr
 
 		ofstr << "plt.xlim(0, " << dat.GetWidth()-1 << ")\n";
 		ofstr << "plt.ylim(0, " << dat.GetHeight()-1 << ")\n\n";
-
-		ofstr << "plt.grid(True)\n";
 	}
 	else
 	{
