@@ -7,8 +7,8 @@ QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lQtCore -lQtGui -lQtXml 
 LIBS_RESO = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS} ${LAPACK_LIBS}
 LIBS = -L/usr/lib64 -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -lstdc++ -lm -fopenmp -lMinuit2 -lfftw3 ${QT_LIBS} ${LAPACK_LIBS}
 
-cattus: main.o mainwnd.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o
-	${CC} ${FLAGS} -o cattus main.o mainwnd.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o ${LIBS}
+cattus: main.o mainwnd.o mainwnd_files.o mainwnd_session.o mainwnd_mdi.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o ExportDlg.o PlotPropDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o
+	${CC} ${FLAGS} -o cattus main.o mainwnd.o mainwnd_files.o mainwnd_session.o mainwnd_mdi.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o ExportDlg.o PlotPropDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o ${LIBS}
 	strip cattus
 
 reso: settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o
@@ -21,6 +21,15 @@ main.o: main.cpp
 
 mainwnd.o: mainwnd.cpp mainwnd.h
 	${CC} ${FLAGS} -c -o mainwnd.o mainwnd.cpp
+
+mainwnd_files.o: mainwnd_files.cpp mainwnd.h
+	${CC} ${FLAGS} -c -o mainwnd_files.o mainwnd_files.cpp
+
+mainwnd_session.o: mainwnd_session.cpp mainwnd.h
+	${CC} ${FLAGS} -c -o mainwnd_session.o mainwnd_session.cpp
+
+mainwnd_mdi.o: mainwnd_mdi.cpp mainwnd.h
+	${CC} ${FLAGS} -c -o mainwnd_mdi.o mainwnd_mdi.cpp
 
 settings.o: settings.cpp settings.h
 	${CC} ${FLAGS} -c -o settings.o settings.cpp
@@ -81,6 +90,11 @@ RadialIntDlg.o: dialogs/RadialIntDlg.cpp dialogs/RadialIntDlg.h
 FormulaDlg.o: dialogs/FormulaDlg.cpp dialogs/FormulaDlg.h
 	${CC} ${FLAGS} -c -o FormulaDlg.o dialogs/FormulaDlg.cpp
 
+ExportDlg.o: dialogs/ExportDlg.cpp dialogs/ExportDlg.h
+	${CC} ${FLAGS} -c -o ExportDlg.o dialogs/ExportDlg.cpp
+
+PlotPropDlg.o: dialogs/PlotPropDlg.cpp dialogs/PlotPropDlg.h
+	${CC} ${FLAGS} -c -o PlotPropDlg.o dialogs/PlotPropDlg.cpp
 
 
 fourier.o: helper/fourier.cpp helper/fourier.h

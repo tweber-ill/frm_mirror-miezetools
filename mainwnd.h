@@ -33,6 +33,7 @@
 #include "dialogs/ExportDlg.h"
 
 #define MAX_RECENT_FILES 32
+#define WND_TITLE "Cattus, a MIEZE toolset"
 
 enum InterpFkt
 {

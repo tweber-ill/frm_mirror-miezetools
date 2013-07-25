@@ -7,8 +7,8 @@
 
 #include "mainwnd.h"
 
-#include<QtGui/QLabel>
-#include<QtGui/QMenuBar>
+#include <QtGui/QLabel>
+#include <QtGui/QMenuBar>
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
@@ -28,10 +28,6 @@
 #include "helper/mieze.hpp"
 #include "helper/xml.h"
 
-#include "loader/loadtxt.h"
-#include "loader/loadnicos.h"
-#include "loader/loadcasc.h"
-
 #include "dialogs/ListDlg.h"
 #include "dialogs/SettingsDlg.h"
 #include "dialogs/AboutDlg.h"
@@ -42,8 +38,6 @@
 #include "fitter/models/interpolation.h"
 
 #include "data/export.h"
-
-#define WND_TITLE "Cattus, a MIEZE toolset"
 
 
 
@@ -441,145 +435,6 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pexportdlg) delete m_pexportdlg;
 }
 
-QMdiSubWindow* MiezeMainWnd::FindSubWindow(SubWindowBase* pSWB)
-{
-	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
-	for(QMdiSubWindow* pWnd : lst)
-	{
-		if(!pWnd) continue;
-		SubWindowBase* pCurSWB = (SubWindowBase*)pWnd->widget();
-		if(!pCurSWB) continue;
-
-		if(pCurSWB==pSWB || pCurSWB->GetActualWidget()==pSWB)
-			return pWnd;
-	}
-
-	return 0;
-}
-
-std::vector<SubWindowBase*> MiezeMainWnd::GetSubWindows(bool bResolveActualWidget)
-{
-	std::vector<SubWindowBase*> vec;
-	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
-	vec.reserve(lst.size());
-
-	for(QMdiSubWindow* pWnd : lst)
-	{
-		if(!pWnd) continue;
-		SubWindowBase* pSWB = (SubWindowBase*)pWnd->widget();
-		if(!pSWB) continue;
-
-		if(bResolveActualWidget)
-			pSWB = pSWB->GetActualWidget();
-
-		vec.push_back(pSWB);
-	}
-
-	return vec;
-}
-
-void MiezeMainWnd::UpdateSubWndList()
-{
-	SubWindowBase *pSWBActive = GetActivePlot();
-
-	// remove previous list
-	for(QAction* pAction : m_vecSubWndActions)
-	{
-		pMenuWindows->removeAction(pAction);
-		pAction->disconnect();
-		delete pAction;
-	}
-	m_vecSubWndActions.clear();
-
-	std::vector<SubWindowBase*> vec = GetSubWindows(0);
-
-	// add new list
-	for(SubWindowBase *pSWB : vec)
-	{
-		if(pSWB)
-		{
-			bool bActiveWindow = (pSWB == pSWBActive || pSWB->GetActualWidget() == pSWBActive);
-			QString strTitle = pSWB->windowTitle();
-
-			QAction *pAction = new QAction(pMenuWindows);
-			pAction->setCheckable(1);
-			pAction->setChecked(bActiveWindow);
-			pAction->setText(strTitle);
-
-			m_vecSubWndActions.push_back(pAction);
-			pMenuWindows->addAction(pAction);
-
-			QObject::connect(pAction, SIGNAL(triggered()), pSWB, SLOT(showNormal()));
-			QObject::connect(pAction, SIGNAL(triggered()), pSWB, SLOT(setFocus()));
-		}
-	}
-}
-
-void MiezeMainWnd::SubWindowChanged()
-{
-	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
-	if(!pWnd)
-	{
-		pMenuPlot->setEnabled(0);
-		return;
-	}
-
-	SubWindowBase* pSWB = (SubWindowBase*)pWnd->widget();
-	bool bSignal = 1;
-
-	if(pSWB->GetType() == PLOT_1D)
-	{
-		pMenuPlot->clear();
-		pMenuPlot->addActions(m_pMenu1d->actions());
-		pMenuPlot->setEnabled(1);
-	}
-	else if(pSWB->GetType() == PLOT_2D)
-	{
-		pMenuPlot->clear();
-		pMenuPlot->addActions(m_pMenu2d->actions());
-		pMenuPlot->setEnabled(1);
-	}
-	else if(pSWB->GetType() == PLOT_3D)
-	{
-		pMenuPlot->clear();
-		pMenuPlot->addActions(m_pMenu3d->actions());
-		pMenuPlot->setEnabled(1);
-	}
-	else if(pSWB->GetType() == PLOT_4D)
-	{
-		pMenuPlot->clear();
-		pMenuPlot->addActions(m_pMenu4d->actions());
-		pMenuPlot->setEnabled(1);
-	}
-	else
-	{
-		pMenuPlot->setEnabled(0);
-		bSignal = 0;
-	}
-
-	if(bSignal)
-		emit SubWindowActivated(pSWB);
-}
-
-void MiezeMainWnd::SubWindowDestroyed(SubWindowBase *pSWB)
-{
-	emit SubWindowRemoved(pSWB);
-}
-
-void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
-{
-	if(!pWnd) return;
-
-	pWnd->setParent(m_pmdi);
-	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
-	QObject::connect(pWnd, SIGNAL(WndDestroyed(SubWindowBase*)), this, SLOT(SubWindowDestroyed(SubWindowBase*)));
-	QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
-
-	m_pmdi->addSubWindow(pWnd);
-	emit SubWindowAdded(pWnd);
-
-	pWnd->show();
-}
 
 void MiezeMainWnd::MakePlot(const Data1& dat, const std::string& strTitle)
 {
@@ -589,349 +444,6 @@ void MiezeMainWnd::MakePlot(const Data1& dat, const std::string& strTitle)
 	AddSubWindow(pPlot);
 }
 
-void MiezeMainWnd::LoadFile(const std::string& strFile)
-{
-	std::string strFileNoDir = ::get_file(strFile);
-	std::string strExt = get_fileext(strFile);
-
-	std::ostringstream ostrMsg;
-	ostrMsg << "Loading " << strFileNoDir << "...";
-	this->SetStatusMsg(ostrMsg.str().c_str(),0);
-
-	if(is_equal(strExt, "tof"))
-	{
-		TofFile tof(strFile.c_str());
-		if(!tof.IsOpen())
-			return;
-
-		const uint iW = tof.GetWidth();
-		const uint iH = tof.GetHeight();
-		const uint iTcCnt = tof.GetTcCnt();
-		const uint iFoilCnt = tof.GetFoilCnt();
-
-		std::string strTitle = GetPlotTitle(strFileNoDir);
-		Plot4dWrapper *pPlotWrapper = new Plot4dWrapper(m_pmdi, strTitle.c_str(), true);
-		Plot4d *pPlot = (Plot4d*)pPlotWrapper->GetActualWidget();
-		Data4& dat4 = pPlot->GetData();
-		dat4.SetSize(iW, iH, iTcCnt, iFoilCnt);
-
-		double *pdDat = new double[iW*iH*iTcCnt];
-		double *pdErr = new double[iW*iH*iTcCnt];
-		for(uint iFoil=0; iFoil<iFoilCnt; ++iFoil)
-		{
-			const uint* pDat = tof.GetData(iFoil);
-			if(!pDat)
-			{
-				std::cerr << "Error: Could not load \"" << strFileNoDir << "\" correctly." << std::endl;
-				break;
-			}
-			convert(pdDat, pDat, iW*iH*iTcCnt);
-
-			//for(unsigned int iTc=0; iTc<iTcCnt; ++iTc)
-			//	for(unsigned int iY=0; iY<iH; ++iY)
-			//		convert(pdDat+iTc*iW*iH + iY*iW, pDat + iTc*iW*iH + (iH-iY-1)*iW, iW);
-
-			tof.ReleaseData(pDat);
-
-			apply_fkt(pdDat, pdErr, ::sqrt, iW*iH*iTcCnt);
-			dat4.SetVals(iFoil, pdDat, pdErr);
-		}
-		delete[] pdDat;
-		delete[] pdErr;
-
-		pPlot->plot_manual();
-		pPlot->SetLabels("x pixels", "y pixels", "");
-
-		AddSubWindow(pPlotWrapper);
-	}
-	else if(is_equal(strExt, "pad"))
-	{
-		PadFile pad(strFile.c_str());
-		if(!pad.IsOpen())
-			return;
-
-		const uint* pDat = pad.GetData();
-		if(!pDat)
-		{
-			std::cerr << "Error: Could not load \"" << strFileNoDir << "\"." << std::endl;
-			return;
-		}
-
-		const uint iW = pad.GetWidth();
-		const uint iH = pad.GetHeight();
-
-		double *pdDat = new double[iW*iH];
-		convert(pdDat, pDat, iW*iH);
-		//for(unsigned int iY=0; iY<iH; ++iY)
-		//	convert(pdDat+iY*iW, pDat+(iH-iY-1)*iW, iW);
-
-		std::string strTitle = GetPlotTitle(strFileNoDir);
-		Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), true);
-
-		pPlot->plot(iW, iH, pdDat);
-		pPlot->SetLabels("x pixels", "y pixels", "");
-
-		delete[] pdDat;
-
-		AddSubWindow(pPlot);
-	}
-	else if(is_equal(strExt, "dat") || is_equal(strExt, "sim"))
-	{
-		LoadTxt * pdat = new LoadTxt();
-		if(!pdat->Load(strFile.c_str()))
-		{
-			QString strErr = QString("Could not load \"") + QString(strFile.c_str()) +QString("\".");
-			QMessageBox::critical(this, "Error", strErr);
-			return;
-		}
-
-		TxtType dattype = pdat->GetFileType();
-
-		if(dattype == MCSTAS_DATA)
-		{
-			//dat.SetMapVal<int>("which-col-is-x", 0);
-			//dat.SetMapVal<int>("which-col-is-y", 1);
-			//dat.SetMapVal<int>("which-col-is-yerr", 2);
-
-			int iArrayDim = 1;
-			const LoadTxt::t_mapComm& mapComm = pdat->GetCommMap();
-			LoadTxt::t_mapComm::const_iterator iter = mapComm.find("type");
-			if(iter != mapComm.end() && (*iter).second.size()>=1)
-			{
-					const std::string& strType = (*iter).second[0];
-
-					if(strType.compare(0,8, "array_1d") == 0)
-							iArrayDim = 1;
-					else if(strType.compare(0,8, "array_2d") == 0)
-							iArrayDim = 2;
-					else if(strType.compare(0,8, "array_3d") == 0)
-							iArrayDim = 3;
-			}
-
-			if(iArrayDim == 1)
-			{
-				Data1D * pdat1d = new Data1D(*pdat);
-
-				int iX=0, iY=1, iYErr=2;
-				pdat1d->GetColumnIndices(iX, iY, iYErr);
-				const double *pdx = pdat1d->GetColumn(iX);
-				const double *pdy = pdat1d->GetColumn(iY);
-				const double *pdyerr = pdat1d->GetColumn(iYErr);
-
-				if(Settings::Get<int>("general/sort_x"))
-				{
-					if(pdyerr)
-						::sort_3<double*, double>((double*)pdx,
-												(double*)pdx+pdat1d->GetDim(),
-												(double*)pdy,
-												(double*)pdyerr);
-					else
-						::sort_2<double*, double>((double*)pdx,
-												(double*)pdx+pdat1d->GetDim(),
-												(double*)pdy);
-				}
-
-				std::string strTitle = GetPlotTitle(strFileNoDir);
-
-				Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-
-				pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
-
-				std::string strLabX, strLabY, strPlotTitle;
-				pdat1d->GetLabels(strLabX, strLabY);
-				pdat1d->GetTitle(strPlotTitle);
-				pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
-				pPlot->SetTitle(strPlotTitle.c_str());
-
-				bool bXLog=0, bYLog=0;
-				pdat1d->GetLogScale(bXLog, bYLog);
-				pPlot->SetXIsLog(bXLog);
-				pPlot->SetYIsLog(bYLog);
-
-				delete pdat1d;
-
-				AddSubWindow(pPlot);
-			}
-			else if(iArrayDim == 2)
-			{
-				Data2D* pdat2d = new Data2D(*pdat);
-
-				const uint iW = pdat2d->GetXDim();
-				const uint iH = pdat2d->GetYDim();
-
-				double *pDat = new double[iW*iH];
-				double *pErr = new double[iW*iH];
-
-				for(uint iY=0; iY<iH; ++iY)
-					for(uint iX=0; iX<iW; ++iX)
-					{
-						pDat[iY*iW + iX] = pdat2d->GetVal(iX, iY);
-						pErr[iY*iW + iX] = pdat2d->GetErr(iX, iY);
-					}
-
-				std::string strTitle = GetPlotTitle(strFileNoDir);
-				Plot2d *pPlot = new Plot2d(m_pmdi, strTitle.c_str(), false);
-
-				pPlot->plot(iW, iH, pDat, pErr);
-				Data2& dat2 = pPlot->GetData2();
-
-				std::string strLabX, strLabY, strLabZ, strPlotTitle;
-				pdat2d->GetLabels(strLabX, strLabY, strLabZ);
-				pdat2d->GetTitle(strPlotTitle);
-				pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
-				pPlot->SetTitle(strPlotTitle.c_str());
-
-				double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
-				if(pdat2d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
-				{
-					dat2.SetXRange(dXMin, dXMax);
-					dat2.SetYRange(dYMin, dYMax);
-				}
-
-				bool bXLog=0, bYLog=0;
-				pdat2d->GetLogScale(bXLog, bYLog);
-				dat2.SetXYLog(bXLog, bYLog);
-
-				delete[] pDat;
-				delete[] pErr;
-				delete pdat2d;
-
-				AddSubWindow(pPlot);
-			}
-			else if(iArrayDim == 3)
-			{
-				Data3D* pdat3d = new Data3D(*pdat);
-
-				const uint iW = pdat3d->GetXDim();
-				const uint iH = pdat3d->GetYDim();
-				const uint iT = pdat3d->GetTDim();
-
-				double *pDat = new double[iW*iH*iT];
-				double *pErr = new double[iW*iH*iT];
-
-				for(uint iZ=0; iZ<iT; ++iZ)
-					for(uint iY=0; iY<iH; ++iY)
-						for(uint iX=0; iX<iW; ++iX)
-						{
-							pDat[iZ*iW*iH + iY*iW + iX] = pdat3d->GetVal(iX, iY, iZ);
-							pErr[iZ*iW*iH + iY*iW + iX] = pdat3d->GetErr(iX, iY, iZ);
-						}
-
-
-				std::string strTitle = GetPlotTitle(strFileNoDir);
-				Plot3dWrapper *pPlotWrapper = new Plot3dWrapper(m_pmdi, strTitle.c_str(), false);
-				Plot3d *pPlot = (Plot3d*)pPlotWrapper->GetActualWidget();
-
-				pPlot->plot(iW, iH, iT, pDat, pErr);
-				Data3& dat3 = pPlot->GetData();
-
-				std::string strLabX, strLabY, strLabZ, strPlotTitle;
-				pdat3d->GetLabels(strLabX, strLabY, strLabZ);
-				pdat3d->GetTitle(strPlotTitle);
-				pPlot->SetLabels(strLabX.c_str(), strLabY.c_str(), strLabZ.c_str());
-				pPlot->SetTitle(strPlotTitle.c_str());
-
-				double dXMin, dXMax, dYMin, dYMax, dZMin, dZMax;
-				if(pdat3d->GetLimits(dXMin, dXMax, dYMin, dYMax, dZMin, dZMax))
-				{
-					dat3.SetXRange(dXMin, dXMax);
-					dat3.SetYRange(dYMin, dYMax);
-				}
-
-				bool bXLog=0, bYLog=0;
-				pdat3d->GetLogScale(bXLog, bYLog);
-				dat3.SetXYLog(bXLog, bYLog);
-
-				delete[] pDat;
-				delete[] pErr;
-				delete pdat3d;
-
-				AddSubWindow(pPlotWrapper);
-			}
-		}
-		else if(dattype == NICOS_DATA)
-		{
-			NicosData * pnicosdat = new NicosData(*pdat);
-			::autodeleter<NicosData> _a0(pnicosdat);
-			const std::string strCtrName = Settings::Get<QString>("nicos/counter_name").toStdString();
-
-			bool bSelectNewXColumn = 0;
-			int iX = 0;
-			if(m_strLastXColumn.length())
-			{
-				iX = pnicosdat->GetColIdx(m_strLastXColumn);
-				if(iX == -1)
-					bSelectNewXColumn = 1;
-			}
-			else
-				bSelectNewXColumn = 1;
-
-			if(bSelectNewXColumn)
-			{
-				ComboDlg dlg(this);
-				dlg.SetCurFile(strFileNoDir.c_str());
-				dlg.SetValues(pnicosdat->GetColNames());
-				dlg.SetLabel("Select x value: ");
-
-				if(dlg.exec() == QDialog::Accepted)
-				{
-					iX = dlg.GetSelectedValue();
-					m_strLastXColumn = pnicosdat->GetColName(iX);
-				}
-				else
-					return;
-			}
-
-			int iY = pnicosdat->GetColIdx(strCtrName);
-			const double *pdx = pnicosdat->GetColumn(iX);
-			const double *pdy = pnicosdat->GetColumn(iY);
-			double *pdyerr = new double[pnicosdat->GetDim()];
-			::apply_fkt<double>(pdy, pdyerr, sqrt, pnicosdat->GetDim());
-
-			if(Settings::Get<int>("general/sort_x"))
-			{
-				if(pdyerr)
-					::sort_3<double*, double>((double*)pdx,
-											(double*)pdx+pnicosdat->GetDim(),
-											(double*)pdy,
-											pdyerr);
-				else
-					::sort_2<double*, double>((double*)pdx,
-											(double*)pdx+pnicosdat->GetDim(),
-											(double*)pdy);
-			}
-
-			std::string strTitle = GetPlotTitle(strFileNoDir);
-
-			Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-			pPlot->plot(pnicosdat->GetDim(), pdx, pdy, pdyerr);
-
-			delete[] pdyerr;
-
-			std::string strLabX = pnicosdat->GetColName(iX) + std::string(" (") + pnicosdat->GetColUnit(iX) +std::string(")") ;
-			std::string strLabY = pnicosdat->GetColName(iY) + std::string(" (") + pnicosdat->GetColUnit(iY) +std::string(")") ;
-			std::string strPlotTitle;
-			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
-			pPlot->SetTitle(strPlotTitle.c_str());
-
-			AddSubWindow(pPlot);
-		}
-		else
-		{
-			QString strErr = "Unknown data format in file \"";
-			strErr += strFile.c_str();
-			strErr += "\".";
-			QMessageBox::critical(this, "Error", "Unknown data format.");
-			delete pdat;
-			return;
-		}
-		delete pdat;
-	}
-
-	this->SetStatusMsg("Ok.",0);
-	AddRecentFile(QString(strFile.c_str()));
-}
-
 std::string MiezeMainWnd::GetPlotTitle(const std::string& strFile)
 {
 	std::ostringstream ostrTitle;
@@ -939,37 +451,10 @@ std::string MiezeMainWnd::GetPlotTitle(const std::string& strFile)
 	return ostrTitle.str();
 }
 
-void MiezeMainWnd::FileLoadTriggered()
-{
-	QSettings *pGlobals = Settings::GetGlobals();
-	QString strLastDir = pGlobals->value("main/lastdir", ".").toString();
 
-	QStringList strFiles = QFileDialog::getOpenFileNames(this, "Open data file...", strLastDir,
-					"All data files (*.dat *.sim *.pad *.tof);;TOF files (*.tof);;PAD files(*.pad);;DAT files (*.dat *.sim)",
-					0, QFileDialog::DontUseNativeDialog);
-	if(strFiles.size() == 0)
-		return;
 
-	m_strLastXColumn = "";
-	bool bDirSet=false;
-	for(const QString& strFile : strFiles)
-	{
-		if(strFile == "")
-			continue;
-
-		std::string strFile1 = strFile.toStdString();
-		std::string strExt = get_fileext(strFile1);
-
-		if(!bDirSet)
-		{
-			pGlobals->setValue("main/lastdir", QString(::get_dir(strFile1).c_str()));
-			bDirSet = true;
-		}
-
-		LoadFile(strFile1);
-	}
-}
-
+// --------------------------------------------------------------------------------
+// ROI stuff
 void MiezeMainWnd::ROIManageTriggered()
 {
 	if(!m_proidlg->isVisible())
@@ -1024,6 +509,9 @@ void MiezeMainWnd::SetGlobalROIForActive()
 
 	pWnd->repaint();
 }
+// --------------------------------------------------------------------------------
+
+
 
 void MiezeMainWnd::SettingsTriggered()
 {
@@ -1108,6 +596,9 @@ void MiezeMainWnd::ShowCombineGraphsDlg()
 	m_pcombinedlg->activateWindow();
 }
 
+
+
+
 void MiezeMainWnd::IntAlongY()
 {
 	SubWindowBase* pSWB = GetActivePlot();
@@ -1145,24 +636,9 @@ void MiezeMainWnd::IntRad()
 	m_pradialintdlg->activateWindow();
 }
 
-SubWindowBase* MiezeMainWnd::GetActivePlot(bool bResolveWidget)
-{
-	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
-	if(pWnd && pWnd->widget())
-	{
-		SubWindowBase* pWndBase = (SubWindowBase*)pWnd->widget();
-		if(!pWndBase)
-			return 0;
 
-		if(bResolveWidget)
-			pWndBase = pWndBase->GetActualWidget();
-
-		return pWndBase;
-	}
-
-	return 0;
-}
-
+// --------------------------------------------------------------------------------
+// fit
 void MiezeMainWnd::ShowFitDlg()
 {
 	if(!m_pfitdlg)
@@ -1282,6 +758,7 @@ void MiezeMainWnd::QuickFitMIEZEpixel()
 	if(res.pPlot[1]) delete res.pPlot[1];
 }
 
+
 Plot* MiezeMainWnd::Convert3d1d(Plot3d* pPlot3d)
 {
 	Plot* pPlot = pPlot3d->ConvertTo1d();
@@ -1303,6 +780,9 @@ Plot* MiezeMainWnd::Convert4d1d(Plot4d* pPlot4d, int iFoil)
 	}
 	return pPlot;
 }
+// --------------------------------------------------------------------------------
+
+
 
 void MiezeMainWnd::ShowAbout()
 {
@@ -1319,110 +799,6 @@ void MiezeMainWnd::ShowBrowser()
 #endif
 }
 
-
-// --------------------------------------------------------------------------------
-// recent files
-void MiezeMainWnd::AddRecentFile(const QString& strFile)
-{
-	m_lstRecentFiles.push_front(strFile);
-	m_lstRecentFiles.removeDuplicates();
-
-	if(m_lstRecentFiles.size() > MAX_RECENT_FILES)
-	{
-		QStringList::iterator iter = m_lstRecentFiles.begin();
-		for(unsigned int i=0; i<MAX_RECENT_FILES; ++i) ++iter;
-		m_lstRecentFiles.erase(iter, m_lstRecentFiles.end());
-	}
-
-	Settings::Set<QStringList>("general/recent_files", m_lstRecentFiles);
-	UpdateRecentFileMenu();
-}
-
-void MiezeMainWnd::UpdateRecentFileMenu()
-{
-	m_pMenuLoadRecent->clear();
-
-	for(QStringList::iterator iter=m_lstRecentFiles.begin(); iter!=m_lstRecentFiles.end(); ++iter)
-	{
-		QAction *pRec = new QAction(this);
-		pRec->setText(*iter);
-		m_pMenuLoadRecent->addAction(pRec);
-
-		QSignalMapper *pSigs = new QSignalMapper(this);
-		pSigs->setMapping(pRec, pRec->text());
-		QObject::connect(pRec, SIGNAL(triggered()), pSigs, SLOT(map()));
-		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), this, SLOT(LoadFile(const QString&)));
-	}
-}
-
-void MiezeMainWnd::LoadRecentFileList()
-{
-	m_lstRecentFiles = Settings::Get<QStringList>("general/recent_files");
-	m_lstRecentFiles.removeDuplicates();
-
-	UpdateRecentFileMenu();
-}
-// --------------------------------------------------------------------------------
-
-
-
-// --------------------------------------------------------------------------------
-// recent sessions
-void MiezeMainWnd::AddRecentSession(const QString& strFile)
-{
-	m_lstRecentSessions.push_front(strFile);
-	m_lstRecentSessions.removeDuplicates();
-
-	if(m_lstRecentSessions.size() > MAX_RECENT_FILES)
-	{
-		QStringList::iterator iter = m_lstRecentSessions.begin();
-		for(unsigned int i=0; i<MAX_RECENT_FILES; ++i) ++iter;
-		m_lstRecentSessions.erase(iter, m_lstRecentSessions.end());
-	}
-
-	Settings::Set<QStringList>("general/recent_sessions", m_lstRecentSessions);
-	UpdateRecentSessionMenu();
-}
-
-void MiezeMainWnd::UpdateRecentSessionMenu()
-{
-	m_pMenuLoadRecentSession->clear();
-
-	for(QStringList::iterator iter=m_lstRecentSessions.begin(); iter!=m_lstRecentSessions.end(); ++iter)
-	{
-		QAction *pRec = new QAction(this);
-		pRec->setText(*iter);
-		m_pMenuLoadRecentSession->addAction(pRec);
-
-		QSignalMapper *pSigs = new QSignalMapper(this);
-		pSigs->setMapping(pRec, pRec->text());
-		QObject::connect(pRec, SIGNAL(triggered()), pSigs, SLOT(map()));
-		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), this, SLOT(LoadSession(const QString&)));
-	}
-}
-
-void MiezeMainWnd::LoadRecentSessionList()
-{
-	m_lstRecentSessions = Settings::Get<QStringList>("general/recent_sessions");
-	m_lstRecentSessions.removeDuplicates();
-
-	UpdateRecentSessionMenu();
-}
-// --------------------------------------------------------------------------------
-
-
-
-
-void MiezeMainWnd::LoadFile(const QString& strFile)
-{
-	m_strLastXColumn = "";
-	LoadFile(strFile.toStdString());
-}
-
-void MiezeMainWnd::LoadSession(const QString& strFile)
-{
-	LoadSession(strFile.toStdString());
-}
 
 
 void MiezeMainWnd::ShowReso()
@@ -1474,6 +850,8 @@ void MiezeMainWnd::ShowPSDPhaseCorr()
 }
 
 
+// --------------------------------------------------------------------------------
+// export
 void MiezeMainWnd::ShowExportDlg()
 {
 	if(!m_pexportdlg)
@@ -1513,156 +891,6 @@ void MiezeMainWnd::FileExportPyTriggered()
 		pGlobals->setValue("main/lastdir_py", QString(::get_dir(strFile1).c_str()));
 	else
 		QMessageBox::critical(this, "Error", "Export to Python failed.");
-}
-
-
-// --------------------------------------------------------------------------------
-// session loading/saving
-void MiezeMainWnd::LoadSession(const std::string& strSess)
-{
-	Xml xml;
-	if(!xml.Load(strSess.c_str()))
-	{
-		QMessageBox::critical(this, "Error", "Failed to load session.");
-		return;
-	}
-
-	Blob blob((strSess+".blob").c_str());
-	bool bHasBlob = blob.IsOpen();
-
-	//m_pmdi->closeAllSubWindows();
-	m_strCurSess = strSess;
-
-	std::string strBase = "/cattus_session/";
-	m_iPlotCnt = xml.Query<unsigned int>((strBase + "plot_counter").c_str(), 0);
-	unsigned int iWndCnt = xml.Query<unsigned int>((strBase + "window_counter").c_str(), 0);
-
-	for(unsigned int iWnd=0; iWnd<iWndCnt; ++iWnd)
-	{
-		std::ostringstream ostrSWBase;
-		ostrSWBase << strBase << "window_" << iWnd << "/";
-		std::string strSWBase = ostrSWBase.str();
-		std::string strSWType = xml.QueryString((strSWBase + "type").c_str(), "");
-
-		SubWindowBase *pSWB = 0;
-		if(strSWType == "plot_1d")
-			pSWB = new Plot(m_pmdi);
-		else if(strSWType == "plot_2d")
-			pSWB = new Plot2d(m_pmdi);
-		else if(strSWType == "plot_3d")
-			pSWB = new Plot3dWrapper(m_pmdi);
-		else if(strSWType == "plot_4d")
-			pSWB = new Plot4dWrapper(m_pmdi);
-		else
-		{
-			std::cerr << "Error: Unknown plot type: \"" << strSWType << "\"."
-						<< std::endl;
-			continue;
-		}
-
-		if(pSWB)
-		{
-			pSWB->LoadXML(xml, blob, strSWBase);
-			AddSubWindow(pSWB);
-
-			QMdiSubWindow *pSubWnd = FindSubWindow(pSWB);
-
-			std::string strGeo = xml.QueryString((strSWBase+"geo").c_str(), "");
-			if(pSubWnd && strGeo != "")
-				pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
-
-			pSWB->GetActualWidget()->RefreshPlot();
-		}
-	}
-
-	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
-
-	QSettings *pGlobals = Settings::GetGlobals();
-	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strSess).c_str()));
-	AddRecentSession(QString(strSess.c_str()));
-}
-
-void MiezeMainWnd::SessionLoadTriggered()
-{
-	QSettings *pGlobals = Settings::GetGlobals();
-	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
-	QString strFile = QFileDialog::getOpenFileName(this, "Load Session...", strLastDir,
-					"Session Files (*.cattus)", 0, QFileDialog::DontUseNativeDialog);
-	if(strFile == "")
-		return;
-
-	m_pmdi->closeAllSubWindows();
-	LoadSession(strFile.toStdString());
-}
-
-void MiezeMainWnd::SessionSaveTriggered()
-{
-	if(m_strCurSess=="")
-	{
-		SessionSaveAsTriggered();
-		return;
-	}
-
-	std::vector<SubWindowBase*> vecWnd = GetSubWindows(0);
-
-	std::ofstream ofstr(m_strCurSess);
-	ofstr << "<cattus_session>\n\n";
-	ofstr << "<plot_counter> " << m_iPlotCnt << " </plot_counter>\n";
-	ofstr << "<window_counter> " << vecWnd.size() << " </window_counter>\n";
-
-	std::ofstream ofstrBlob(m_strCurSess + ".blob", std::ofstream::binary);
-
-	unsigned int iWnd=0;
-
-	for(SubWindowBase *pWnd : vecWnd)
-	{
-		std::ostringstream ostrMsg;
-		ostrMsg << "Saving \"" << pWnd->windowTitle().toStdString() << "\"...";
-		this->SetStatusMsg(ostrMsg.str().c_str(), 0);
-
-		pWnd = pWnd->GetActualWidget();
-
-		ofstr << "<window_" << iWnd << ">\n";
-		QMdiSubWindow *pSubWnd = FindSubWindow(pWnd);
-		if(pSubWnd)
-		{
-			std::string strGeo = pSubWnd->saveGeometry().toHex().data();
-			ofstr << "<geo> " << strGeo << " </geo>\n";
-		}
-		pWnd->SaveXML(ofstr, ofstrBlob);
-		ofstr << "</window_" << iWnd << ">\n";
-
-		++iWnd;
-	}
-
-	ofstr << "\n\n</cattus_session>\n";
-
-	ofstrBlob.close();
-	ofstr.close();
-
-	AddRecentSession(QString(m_strCurSess.c_str()));
-	this->SetStatusMsg("Ok.", 0);
-}
-
-void MiezeMainWnd::SessionSaveAsTriggered()
-{
-	QSettings *pGlobals = Settings::GetGlobals();
-	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
-	QString strFile = QFileDialog::getSaveFileName(this, "Save Session as...", strLastDir,
-					"Session Files (*.cattus)", 0, QFileDialog::DontUseNativeDialog);
-	if(strFile == "")
-		return;
-
-	std::string strFile1 = strFile.toStdString();
-	std::string strExt = get_fileext(strFile1);
-	if(strExt != "cattus")
-		strFile1 += ".cattus";
-
-	m_strCurSess = strFile1;
-	SessionSaveTriggered();
-
-	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
-	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strFile1).c_str()));
 }
 // --------------------------------------------------------------------------------
 
