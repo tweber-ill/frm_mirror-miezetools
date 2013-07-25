@@ -128,6 +128,8 @@ void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder
 	T *pSplineDiff = new T[iNumSpline];
 	T *pSplineDiff2 = new T[iNumSpline];
 
+	const double* pdyMin = std::min_element(py, py+iLen);
+
 	for(unsigned int iSpline=0; iSpline<iNumSpline; ++iSpline)
 	{
 		const T dT = T(iSpline) / T(iNumSpline-1);
@@ -141,13 +143,13 @@ void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder
 	::diff(iNumSpline, pSplineX, pSplineDiff, pSplineDiff2);
 	std::vector<unsigned int> vecZeroes = ::find_zeroes<T>(iNumSpline, pSplineDiff);
 
-	/*
+/*
 	std::cout << "Prefitter found maxima at: ";
 	for(unsigned int iZero : vecZeroes)
 		if(pSplineDiff2[iZero] < 0.)
 			std::cout  << pSplineX[iZero] << ", ";
 	std::cout << std::endl;
-	*/
+*/
 
 	for(unsigned int iZeroIdx = 0; iZeroIdx<vecZeroes.size(); ++iZeroIdx)
 	{
@@ -169,18 +171,31 @@ void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder
 		T dHeight = 0.;
 		T dWidth = 0.;
 		T dDiv = 0.;
+
+		// minimum left of the peak
 		if(iMinIdxLeft>=0)
 		{
 			dHeight += (pSplineY[iZero]-pSplineY[iMinIdxLeft]);
 			dWidth += fabs((pSplineX[iZero]-pSplineX[iMinIdxLeft]));
 			dDiv += 1.;
 		}
+
+		// minimum right of the peak
 		if(iMinIdxRight>=0)
 		{
 			dHeight += (pSplineY[iZero]-pSplineY[iMinIdxRight]);
 			dWidth += fabs((pSplineX[iZero]-pSplineX[iMinIdxRight]));
 			dDiv += 1.;
 		}
+
+		// no adjacent minima...
+		if(iMinIdxLeft<0 && iMinIdxRight<0)
+		{
+			dHeight = pSplineY[iZero]- *pdyMin;
+			dWidth = (px[iLen-1] - px[0]) / 10.;	// guess something...
+			dDiv = 1.;
+		}
+
 		if(dDiv != 0.)
 		{
 			dHeight /= dDiv;
