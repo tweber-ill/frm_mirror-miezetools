@@ -747,6 +747,9 @@ void FitDlg::DoFit()
 
 			 if(pModel)
 			 {
+                 std::cout << "Fit " << (bOk ? "ok" : "failed") << ": " 
+                            << *pModel << std::endl;
+
 				 if(bUpdateHints)
 				 {
 					 for(unsigned int iParam=0; iParam<vecFittedNames.size(); ++iParam)

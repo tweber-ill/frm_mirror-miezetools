@@ -78,7 +78,7 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 
 	if(*pFkt)
 	{
-		std::cout << "Fit " << (bOk ? "(ok)" : "(failed)" ) << ": "
+		std::cout << "Fit " << (bOk ? "ok" : "failed" ) << ": "
 					<< **pFkt << std::endl;
 	}
 

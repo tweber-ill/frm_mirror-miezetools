@@ -107,11 +107,11 @@ class MultiGaussModel : public FunctionModel
 };
 
 
-bool get_gauss(unsigned int iLen,
+extern bool get_gauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
 					GaussModel **pmodel);
 
-bool get_multigauss(unsigned int iLen,
+extern bool get_multigauss(unsigned int iLen,
 					const double *px, const double *py, const double *pdy,
 					MultiGaussModel **pmodel, unsigned int iNumGauss=2);
 

@@ -143,7 +143,7 @@ bool get_gauss(unsigned int iLen,
 	std::vector<double> vecMaximaWidth;
 
 	const int iDegree = Settings::Get<int>("interpolation/spline_degree");
-	find_peaks(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
+	find_peaks<double>(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
 
 	bool bPrefitOk = 1;
 	if(vecMaximaX.size() < 1)
@@ -501,7 +501,7 @@ bool get_multigauss(unsigned int iLen,
 	std::vector<double> vecMaximaWidth;
 
 	const int iDegree = Settings::Get<int>("interpolation/spline_degree");
-	find_peaks(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
+	find_peaks<double>(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
 
 	if(vecMaximaX.size() < iNumGauss)
 		vecMaximaX.resize(iNumGauss);
@@ -509,6 +509,7 @@ bool get_multigauss(unsigned int iLen,
 		vecMaximaSize.resize(iNumGauss);
 	if(vecMaximaWidth.size() < iNumGauss)
 		vecMaximaWidth.resize(iNumGauss);
+
 
 	MultiGaussModel gmod(iNumGauss);
 	Chi2Function fkt(&gmod, iLen, px, py, pdy);
@@ -576,8 +577,9 @@ bool get_multigauss(unsigned int iLen,
 
 		params.Release(ostrAmp.str());
 		params.Release(ostrSpread.str());
-		params.Release(ostrX0.str());
-		//params.Fix("offs");
+		params.Fix(ostrX0.str());
+
+		params.Fix("offs");
 
 		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
 		ROOT::Minuit2::FunctionMinimum mini = migrad();
@@ -588,6 +590,49 @@ bool get_multigauss(unsigned int iLen,
 
 		params.SetValue(ostrSpread.str(), mini.UserState().Value(ostrSpread.str()));
 		params.SetError(ostrSpread.str(), mini.UserState().Error(ostrSpread.str()));
+
+		//params.SetValue(ostrX0.str(), mini.UserState().Value(ostrX0.str()));
+		//params.SetError(ostrX0.str(), mini.UserState().Error(ostrX0.str()));
+
+		//params.SetValue("offs", mini.UserState().Value("offs"));
+		//params.SetError("offs", mini.UserState().Error("offs"));
+
+		minis.push_back(mini);
+	}
+
+	
+	for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
+	{
+		std::ostringstream ostrAmp, ostrSpread, ostrX0;
+		ostrAmp << "amp_" << iGauss;
+		ostrSpread << "spread_" << iGauss;
+		ostrX0 << "x0_" << iGauss;
+
+		// fix all other peaks
+		for(unsigned int iGaussOther=0; iGaussOther<iNumGauss; ++iGaussOther)
+		{
+			if(iGaussOther == iGauss)
+				continue;
+
+			std::ostringstream ostrAmpO, ostrSpreadO, ostrX0O;
+			ostrAmpO << "amp_" << iGaussOther;
+			ostrSpreadO << "spread_" << iGaussOther;
+			ostrX0O << "x0_" << iGaussOther;
+
+			params.Fix(ostrAmpO.str());
+			params.Fix(ostrSpreadO.str());
+			params.Fix(ostrX0O.str());
+		}
+
+		params.Fix(ostrAmp.str());
+		params.Fix(ostrSpread.str());
+		params.Release(ostrX0.str());
+
+		params.Release("offs");
+
+		ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/2);
+		ROOT::Minuit2::FunctionMinimum mini = migrad();
+		bValidFit = mini.IsValid() && mini.HasValidParameters();
 
 		params.SetValue(ostrX0.str(), mini.UserState().Value(ostrX0.str()));
 		params.SetError(ostrX0.str(), mini.UserState().Error(ostrX0.str()));
@@ -600,6 +645,7 @@ bool get_multigauss(unsigned int iLen,
 
 
 	// release all parameters
+    //if(0)
 	{
 		for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
 		{
@@ -644,6 +690,7 @@ bool get_multigauss(unsigned int iLen,
 
 
 	// release all limits
+    //if(0)
 	{
 		for(unsigned int iGauss=0; iGauss<iNumGauss; ++iGauss)
 		{

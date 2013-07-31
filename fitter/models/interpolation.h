@@ -17,6 +17,9 @@
 #include "../../helper/math.h"
 #include "../../helper/misc.h"
 
+extern int iFitterVerbosity;
+
+
 // see:
 // http://mathworld.wolfram.com/BernsteinPolynomial.html
 template<typename T> T bernstein(int i, int n, T t)
@@ -120,9 +123,9 @@ template<typename T>
 void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder,
 						std::vector<T>& vecMaximaX, std::vector<T>& vecMaximaSize, std::vector<T>& vecMaximaWidth)
 {
-
 	BSpline spline(iLen, px, py, iOrder);
-	const unsigned int iNumSpline = 256;
+	const unsigned int iNumSpline = 512;    // TODO: in config
+
 	T *pSplineX = new T[iNumSpline];
 	T *pSplineY = new T[iNumSpline];
 	T *pSplineDiff = new T[iNumSpline];
@@ -143,13 +146,6 @@ void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder
 	::diff(iNumSpline, pSplineX, pSplineDiff, pSplineDiff2);
 	std::vector<unsigned int> vecZeroes = ::find_zeroes<T>(iNumSpline, pSplineDiff);
 
-/*
-	std::cout << "Prefitter found maxima at: ";
-	for(unsigned int iZero : vecZeroes)
-		if(pSplineDiff2[iZero] < 0.)
-			std::cout  << pSplineX[iZero] << ", ";
-	std::cout << std::endl;
-*/
 
 	for(unsigned int iZeroIdx = 0; iZeroIdx<vecZeroes.size(); ++iZeroIdx)
 	{
@@ -210,6 +206,16 @@ void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder
 	std::reverse(vecMaximaSize.begin(), vecMaximaSize.end());
 	std::reverse(vecMaximaWidth.begin(), vecMaximaWidth.end());
 	std::reverse(vecMaximaX.begin(), vecMaximaX.end());
+
+
+    if(iFitterVerbosity >= 3)
+    {
+        std::cout << "Prefitter found peaks at: ";
+        for(double dValX : vecMaximaX)
+                std::cout << dValX << ", ";
+        std::cout << std::endl;
+    }
+
 
 	delete[] pSplineX;
 	delete[] pSplineY;
