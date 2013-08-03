@@ -70,8 +70,10 @@ public:
 	virtual Plot* ConvertTo1d(int iParam=-1) { return 0; }
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return 0; }
 
-	virtual void SetROI(const Roi* pROI) {}
-	virtual Roi* GetROI() { return 0; }
+
+	virtual void SetROI(const Roi* pROI, bool bAntiRoi=0) {}
+	virtual Roi* GetROI(bool bAntiRoi=0) { return 0; }
+
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return false; }
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return false; }

@@ -1009,7 +1009,7 @@ RoiElement* RoiPolygon::copy() const
 //------------------------------------------------------------------------------
 // roi
 
-Roi::Roi() : m_bActive(0)
+Roi::Roi() : m_bActive(0), m_strName("roi")
 {}
 
 Roi::Roi(const Roi& roi)
@@ -1029,6 +1029,7 @@ Roi& Roi::operator=(const Roi& roi)
 	}
 
 	this->m_bActive = roi.m_bActive;
+	this->m_strName = roi.m_strName;
 	return *this;
 }
 
@@ -1140,12 +1141,12 @@ BoundingRect Roi::GetBoundingRect() const
 bool Roi::LoadXML(Xml& xml, const std::string& strBase)
 {
 	bool bOKActive=false;
-	SetRoiActive(xml.Query<bool>((strBase+"roi/active").c_str(), 0, &bOKActive));
+	SetRoiActive(xml.Query<bool>((strBase+m_strName+"/active").c_str(), 0, &bOKActive));
 
 	const std::string strPaths[] =
 	{
-			strBase + "roi_elements/element_",		// old format
-			strBase + "roi/elements/element_"		// new format
+			strBase + m_strName + "_elements/element_",		// old format
+			strBase + m_strName + "/elements/element_"		// new format
 	};
 
 	for(const std::string& strPath : strPaths)
@@ -1226,7 +1227,7 @@ bool Roi::Load(const char* pcFile)
 
 bool Roi::SaveXML(std::ostream& ostr) const
 {
-	ostr << "<roi>\n\n";
+	ostr << "<" << m_strName << ">\n\n";
 	ostr << "<active> " << IsRoiActive() << " </active>\n\n";
 	ostr << "<elements>\n\n";
 
@@ -1250,7 +1251,7 @@ bool Roi::SaveXML(std::ostream& ostr) const
 	}
 
 	ostr << "</elements>\n\n";
-	ostr << "</roi>\n";
+	ostr << "</" << m_strName << ">\n";
 
 	return 1;
 }

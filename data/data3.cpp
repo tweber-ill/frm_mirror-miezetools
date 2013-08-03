@@ -219,7 +219,7 @@ Data1 Data3::GetXYSum() const
 	{
 		for(uint iX=iXStart; iX<iXEnd; ++iX)
 		{
-			if(!m_roi.IsInside(iX, iY))
+			if(!IsInsideRoi(iX, iY))
 				continue;
 
 			for(uint iT=0; iT<GetDepth(); ++iT)
@@ -323,6 +323,7 @@ bool Data3::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_iDepth = xml.Query<unsigned int>((strBase+"depth").c_str(), 0);
 
 	m_roi.LoadXML(xml, strBase);
+	m_antiroi.LoadXML(xml, strBase);
 
 	unsigned int uiCnt = m_iWidth*m_iHeight*m_iDepth;
 	m_vecVals.resize(uiCnt);
@@ -358,6 +359,8 @@ bool Data3::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 
 	if(m_roi.GetNumElements())
 		m_roi.SaveXML(ostr);
+	if(m_antiroi.GetNumElements())
+		m_antiroi.SaveXML(ostr);
 
 	return 1;
 }

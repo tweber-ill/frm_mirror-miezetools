@@ -148,6 +148,7 @@ bool Data1::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	load_xml_vecs(4, vecs, strs, xml, strBase, blob);
 
 	m_roi.LoadXML(xml, strBase);
+	m_antiroi.LoadXML(xml, strBase);
 	return 1;
 }
 
@@ -164,6 +165,8 @@ bool Data1::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 
 	if(m_roi.GetNumElements())
 		m_roi.SaveXML(ostr);
+	if(m_antiroi.GetNumElements())
+		m_antiroi.SaveXML(ostr);
 
 	return 1;
 }

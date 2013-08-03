@@ -211,12 +211,18 @@ void Plot2d::paintEvent (QPaintEvent *pEvent)
 	painter.scale(dScaleX, dScaleY);
 
 	QPen penROI = penOrg;
-	penROI.setColor(Qt::black);
-	penROI.setWidthF(0.5);
+	penROI.setColor(Qt::white);
+	penROI.setWidthF(0.75);
 	painter.setPen(penROI);
-	m_dat.GetRoi().DrawRoi(painter, m_dat);
+	m_dat.GetRoi(0).DrawRoi(painter, m_dat);
+
+	penROI.setColor(Qt::yellow);
+	painter.setPen(penROI);
+	m_dat.GetRoi(1).DrawRoi(painter, m_dat);
 
 	painter.setPen(penOrg);
+
+
 	painter.restore();
 }
 
@@ -358,15 +364,14 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 			ostr << dPixelVal;
 
 
-		if(m_dat.IsRoiActive())
+		if(m_dat.IsAnyRoiActive())
 		{
 			bool bInsideRoi = 0;
-			const Roi *pRoi = &m_dat.GetRoi();
 
 			if(bPixelVal)
-				bInsideRoi = pRoi->IsInside(iX, iY);
+				bInsideRoi = m_dat.IsInsideRoi(iX, iY);
 			else
-				bInsideRoi = pRoi->IsInside(dX_Val, dY_Val);
+				bInsideRoi = m_dat.IsInsideRoi(dX_Val, dY_Val);
 
 			ostr << " (" << (bInsideRoi?"in ROI":"not in ROI") << ")";
 		}
@@ -416,21 +421,21 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 	}
 }
 
-void Plot2d::SetROI(const Roi* pROI)
+void Plot2d::SetROI(const Roi* pROI, bool bAntiRoi)
 {
 	DataInterface* pDat = GetInternalData();
 	if(!pDat) return;
 
-	pDat->SetROI(pROI);
-	GetData2().SetROI(pROI);
+	pDat->SetROI(pROI, bAntiRoi);
+	GetData2().SetROI(pROI, bAntiRoi);
 }
 
-Roi* Plot2d::GetROI()
+Roi* Plot2d::GetROI(bool bAntiRoi)
 {
 	DataInterface* pDat = GetInternalData();
 	if(!pDat) return 0;
 
-	return &pDat->GetRoi();
+	return &pDat->GetRoi(bAntiRoi);
 }
 
 

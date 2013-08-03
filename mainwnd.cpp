@@ -42,9 +42,11 @@
 
 
 MiezeMainWnd::MiezeMainWnd()
-					: m_iPlotCnt(1),
+					: m_pmdi(new QMdiArea(this)),
+					  m_iPlotCnt(1),
 					  m_pcombinedlg(0), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)),
+					  m_pantiroidlg(new RoiDlg(this)),
 					  m_presdlg(0), m_pphasecorrdlg(0),
 					  m_pradialintdlg(0),
 					  m_pformuladlg(0),
@@ -52,8 +54,9 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_pexportdlg(0)
 {
 	this->setWindowTitle(WND_TITLE);
+	m_proidlg->setWindowTitle("Inclusive ROI");
+	m_pantiroidlg->setWindowTitle("Exclusive ROI");
 
-	m_pmdi = new QMdiArea(this);
 	m_pmdi->setActivationOrder(QMdiArea::StackingOrder);
 	//m_pmdi->setViewMode(QMdiArea::TabbedView);
 	//m_pmdi->setDocumentMode(1);
@@ -268,9 +271,14 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuROI->setTitle("ROI");
 
 	QAction *pManageROI = new QAction(this);
-	pManageROI->setText("Manage ROI...");
+	pManageROI->setText("Manage Inclusive ROI...");
 	pManageROI->setIcon(QIcon::fromTheme("list-add"));
 	pMenuROI->addAction(pManageROI);
+
+	QAction *pManageAntiROI = new QAction(this);
+	pManageAntiROI->setText("Manage Exclusive ROI...");
+	pManageAntiROI->setIcon(QIcon::fromTheme("list-add"));
+	pMenuROI->addAction(pManageAntiROI);
 
 
 
@@ -396,10 +404,17 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pInterpBezier, SIGNAL(triggered()), this, SLOT(BezierInterpolation()));
 	QObject::connect(pInterpBSpline, SIGNAL(triggered()), this, SLOT(BSplineInterpolation()));
 
+
 	QObject::connect(pManageROI, SIGNAL(triggered()), this, SLOT(ROIManageTriggered()));
 	QObject::connect(m_proidlg, SIGNAL(WantActiveRoi()), this, SLOT(GetActiveROI()));
 	QObject::connect(m_proidlg, SIGNAL(SetRoiForActive()), this, SLOT(SetGlobalROIForActive()));
 	QObject::connect(m_proidlg, SIGNAL(SetRoiForAll()), this, SLOT(SetGlobalROIForAll()));
+
+	QObject::connect(pManageAntiROI, SIGNAL(triggered()), this, SLOT(AntiROIManageTriggered()));
+	QObject::connect(m_pantiroidlg, SIGNAL(WantActiveRoi()), this, SLOT(GetActiveAntiROI()));
+	QObject::connect(m_pantiroidlg, SIGNAL(SetRoiForActive()), this, SLOT(SetGlobalAntiROIForActive()));
+	QObject::connect(m_pantiroidlg, SIGNAL(SetRoiForAll()), this, SLOT(SetGlobalAntiROIForAll()));
+
 
 	QObject::connect(pWndList, SIGNAL(triggered()), this, SLOT(ShowListWindowsDlg()));
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
@@ -427,6 +442,7 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pcombinedlg) delete m_pcombinedlg;
 	if(m_pfitdlg) delete m_pfitdlg;
 	if(m_proidlg) delete m_proidlg;
+	if(m_pantiroidlg) delete m_pantiroidlg;
 	if(m_presdlg) delete m_presdlg;
 	if(m_pphasecorrdlg) delete m_pphasecorrdlg;
 	if(m_pradialintdlg) delete m_pradialintdlg;
@@ -462,8 +478,17 @@ void MiezeMainWnd::ROIManageTriggered()
 	m_proidlg->activateWindow();
 }
 
-void MiezeMainWnd::GetActiveROI()
+void MiezeMainWnd::AntiROIManageTriggered()
 {
+	if(!m_pantiroidlg->isVisible())
+		m_pantiroidlg->show();
+	m_pantiroidlg->activateWindow();
+}
+
+void MiezeMainWnd::_GetActiveROI(bool bAntiRoi)
+{
+	RoiDlg *proidlg = bAntiRoi ? m_pantiroidlg : m_proidlg;
+
 	SubWindowBase *pWnd = GetActivePlot();
 	if(!pWnd)
 	{
@@ -472,30 +497,32 @@ void MiezeMainWnd::GetActiveROI()
 	}
 
 	pWnd = pWnd->GetActualWidget();
-	Roi* pRoi = pWnd->GetROI();
+	Roi* pRoi = pWnd->GetROI(bAntiRoi);
 	if(!pRoi)
 	{
 		QMessageBox::critical(this, "Error", "No active roi defined.");
 		return;
 	}
-	m_proidlg->SetRoi(pRoi);
+	proidlg->SetRoi(pRoi);
 }
 
-void MiezeMainWnd::SetGlobalROIForAll()
+void MiezeMainWnd::_SetGlobalROIForAll(bool bAntiRoi)
 {
-	const Roi* pRoi = m_proidlg->GetRoi();
+	RoiDlg *proidlg = bAntiRoi ? m_pantiroidlg : m_proidlg;
+	const Roi* pRoi = proidlg->GetRoi();
 
 	std::vector<SubWindowBase*> vec = GetSubWindows(1);
 	for(SubWindowBase *pWnd : vec)
 	{
-		pWnd->SetROI(pRoi);
+		pWnd->SetROI(pRoi, bAntiRoi);
 		pWnd->repaint();
 	}
 }
 
-void MiezeMainWnd::SetGlobalROIForActive()
+void MiezeMainWnd::_SetGlobalROIForActive(bool bAntiRoi)
 {
-	const Roi* pRoi = m_proidlg->GetRoi();
+	RoiDlg *proidlg = bAntiRoi ? m_pantiroidlg : m_proidlg;
+	const Roi* pRoi = proidlg->GetRoi();
 
 	SubWindowBase *pWnd = GetActivePlot();
 	if(!pWnd)
@@ -505,10 +532,18 @@ void MiezeMainWnd::SetGlobalROIForActive()
 	}
 
 	pWnd = pWnd->GetActualWidget();
-	pWnd->SetROI(pRoi);
+	pWnd->SetROI(pRoi, bAntiRoi);
 
 	pWnd->repaint();
 }
+
+void MiezeMainWnd::GetActiveROI() { _GetActiveROI(0); }
+void MiezeMainWnd::SetGlobalROIForAll() { _SetGlobalROIForAll(0); }
+void MiezeMainWnd::SetGlobalROIForActive() { _SetGlobalROIForActive(0); }
+
+void MiezeMainWnd::GetActiveAntiROI() { _GetActiveROI(1); }
+void MiezeMainWnd::SetGlobalAntiROIForAll() { _SetGlobalROIForAll(1); }
+void MiezeMainWnd::SetGlobalAntiROIForActive() { _SetGlobalROIForActive(1); }
 // --------------------------------------------------------------------------------
 
 

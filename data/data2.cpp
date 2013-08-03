@@ -247,6 +247,7 @@ bool Data2::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
 	LoadRangeXml(xml, strBase);
 	m_roi.LoadXML(xml, strBase);
+	m_antiroi.LoadXML(xml, strBase);
 
 	unsigned int uiCnt = m_iWidth*m_iHeight;
 	m_vecVals.resize(uiCnt);
@@ -280,6 +281,8 @@ bool Data2::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 
 	if(m_roi.GetNumElements())
 		m_roi.SaveXML(ostr);
+	if(m_antiroi.GetNumElements())
+		m_antiroi.SaveXML(ostr);
 
 	return 1;
 }

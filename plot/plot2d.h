@@ -89,8 +89,8 @@ protected:
 	virtual DataInterface* GetInternalData() { return &m_dat; }
 
 public:
-	virtual void SetROI(const Roi* pROI);
-	virtual Roi* GetROI();
+	virtual void SetROI(const Roi* pROI, bool bAntiRoi=0);
+	virtual Roi* GetROI(bool bAntiRoi=0);
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;

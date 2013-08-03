@@ -510,7 +510,7 @@ void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 	RefreshStatusMsgs();
 }
 
-void Plot::SetROI(const Roi* pROI)
+void Plot::SetROI(const Roi* pROI, bool bAntiRoi)
 {
 	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
 	{
@@ -518,14 +518,14 @@ void Plot::SetROI(const Roi* pROI)
 		DataInterface* pDat = &obj.dat;
 		if(!pDat) continue;
 
-		pDat->SetROI(pROI);
+		pDat->SetROI(pROI, bAntiRoi);
 	}
 }
 
-Roi* Plot::GetROI()
+Roi* Plot::GetROI(bool bAntiRoi)
 {
 	if(GetDataCount()==0) return 0;
-	return &GetData(0).dat.GetRoi();
+	return &GetData(0).dat.GetRoi(bAntiRoi);
 }
 
 bool Plot::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)

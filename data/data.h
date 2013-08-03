@@ -57,32 +57,69 @@ class RoiFlags
 {
 protected:
 	Roi m_roi;
+	Roi m_antiroi;
 
 public:
-	RoiFlags() {}
+	RoiFlags()
+	{
+		m_roi.SetName("roi");
+		m_antiroi.SetName("antiroi");
+	}
 	virtual ~RoiFlags() {}
 
-	bool IsRoiActive() const { return m_roi.IsRoiActive(); }
-	void SetRoiActive(bool bActive) { m_roi.SetRoiActive(bActive); }
+	bool IsAnyRoiActive() const
+	{
+		return m_antiroi.IsRoiActive() || m_roi.IsRoiActive();
+	}
 
-	const Roi& GetRoi() const { return m_roi; }
-	Roi& GetRoi() { return m_roi; }
+	bool IsRoiActive(bool bAntiRoi=0) const
+	{
+		return (bAntiRoi ? m_antiroi.IsRoiActive() : m_roi.IsRoiActive());
+	}
+
+	void SetRoiActive(bool bActive, bool bAntiRoi=0)
+	{
+		if(bAntiRoi)
+			m_antiroi.SetRoiActive(bActive);
+		else
+			m_roi.SetRoiActive(bActive);
+	}
+
+	const Roi& GetRoi(bool bAntiRoi=0) const
+	{
+		if(bAntiRoi)
+			return m_antiroi;
+		return m_roi;
+	}
+	Roi& GetRoi(bool bAntiRoi=0)
+	{
+		if(bAntiRoi)
+			return m_antiroi;
+		return m_roi;
+	}
 
 	bool IsInsideRoi(double dX, double dY) const
 	{
-		return m_roi.IsInside(dX, dY);
+		bool bInsideROI = m_roi.IsInside(dX, dY);
+		bool bOutsideAntiROI = !m_antiroi.IsInside(dX, dY);
+
+		return bInsideROI && bOutsideAntiROI;
 	}
 
 	void CopyRoiFlagsFrom(const RoiFlags* pDat)
 	{
 		this->m_roi = pDat->m_roi;
+		this->m_antiroi = pDat->m_antiroi;
 	}
 
-	void SetROI(const Roi* pROI)
+	void SetROI(const Roi* pROI, bool bAntiRoi=0)
 	{
 		if(!pROI) return;
-		m_roi = *pROI;
-		//m_roi.SetRoiActive(1);
+
+		if(bAntiRoi)
+			m_antiroi = *pROI;
+		else
+			m_roi = *pROI;
 	}
 };
 

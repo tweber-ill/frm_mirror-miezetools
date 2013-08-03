@@ -290,6 +290,7 @@ class Roi
 	protected:
 		std::vector<RoiElement*> m_vecRoi;
 		bool m_bActive;
+		std::string m_strName;
 
 	public:
 		Roi();
@@ -326,6 +327,8 @@ class Roi
 		void SetRoiActive(bool bActive) { m_bActive = bActive; }
 
 		void DrawRoi(QPainter& painter, const XYRange& range);
+
+		void SetName(const char* pcName) { m_strName = pcName; }
 };
 
 #endif

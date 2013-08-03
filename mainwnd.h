@@ -48,7 +48,7 @@ protected:
 
 	CombineGraphsDlg *m_pcombinedlg;
 	FitDlg *m_pfitdlg;
-	RoiDlg *m_proidlg;
+	RoiDlg *m_proidlg, *m_pantiroidlg;
 	ResoDlg *m_presdlg;
 	RadialIntDlg *m_pradialintdlg;
 	PsdPhaseCorrDlg *m_pphasecorrdlg;
@@ -94,6 +94,12 @@ protected:
 	QMdiSubWindow* FindSubWindow(SubWindowBase* pSWB);
 	std::vector<SubWindowBase*> GetSubWindows(bool bResolveActualWidget=1);
 
+
+	void _GetActiveROI(bool bAntiRoi=0);
+	void _SetGlobalROIForAll(bool bAntiRoi=0);
+	void _SetGlobalROIForActive(bool bAntiRoi=0);
+
+
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
@@ -114,6 +120,7 @@ protected slots:
 
 	void SettingsTriggered();
 	void ROIManageTriggered();
+	void AntiROIManageTriggered();
 
 	void ShowFitDlg();
 	void QuickFit(SubWindowBase* pSWB, int iFkt, int iParam=-1);
@@ -135,9 +142,15 @@ protected slots:
 	void ShowAbout();
 	void ShowBrowser();
 
+
 	void GetActiveROI();
 	void SetGlobalROIForAll();
 	void SetGlobalROIForActive();
+
+	void GetActiveAntiROI();
+	void SetGlobalAntiROIForAll();
+	void SetGlobalAntiROIForActive();
+
 
 	void ShowTimeChannels();
 	void ExtractFoils();

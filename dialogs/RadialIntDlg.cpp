@@ -146,7 +146,7 @@ void RadialIntDlg::Calc()
 	center[0] = dXStart;
 	center[1] = dYStart;
 
-	Roi roi;
+	Roi roi = *pInterp->GetROI();
 	RoiCircleRing* circ = new RoiCircleRing;
 	roi.add(circ);
 	circ->GetCenter() = center;

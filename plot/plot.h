@@ -103,8 +103,8 @@ public:
 	virtual double GetTotalCounts() const { return 0.; }
 	virtual Plot* ConvertTo1d(int iParam=0) { return (Plot*)this; }
 
-	virtual void SetROI(const Roi* pROI);
-	virtual Roi* GetROI();
+	virtual void SetROI(const Roi* pROI, bool bAntiRoi=0);
+	virtual Roi* GetROI(bool bAntiRoi=0);
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
