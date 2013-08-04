@@ -135,11 +135,6 @@ void RadialIntDlg::Calc()
 	if(dResScale != 1.)
 		pInterp->ChangeResolution(uint(iOldW*dResScale), uint(iOldH*dResScale), 1);
 
-	dXStart *= dResScale;
-	dYStart *= dResScale;
-	dRadius *= dResScale;
-	dInc *= dResScale;
-
 	Data1 dat1d;
 
 	ublas::vector<double> center(2);

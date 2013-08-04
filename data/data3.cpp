@@ -197,16 +197,20 @@ Data1 Data3::GetXYSum() const
 	uint iYStart=0, iYEnd=GetHeight();
 	uint iXStart=0, iXEnd=GetWidth();
 
-	if(IsRoiActive())
+	if(IsRoiActive(0))
 	{
 		BoundingRect br = m_roi.GetBoundingRect();
-		iXStart = br.bottomleft[0];
-		iYStart = br.bottomleft[1];
+		iXStart = GetPixelXPos(br.bottomleft[0]);
+		iYStart = GetPixelYPos(br.bottomleft[1]);
 
-		iXEnd = br.topright[0];
-		iYEnd = br.topright[1];
+		iXEnd = GetPixelXPos(br.topright[0]);
+		iYEnd = GetPixelYPos(br.topright[1]);
+
+		if(iXEnd > GetWidth()) iXEnd = GetWidth();
+		if(iYEnd > GetHeight()) iYEnd = GetHeight();
+		if(iXStart > GetWidth()) iXStart = GetWidth();
+		if(iYStart > GetHeight()) iYStart = GetHeight();
 	}
-
 
 	double* pMem = new double[dat.GetLength()*2];
 	double* dSum = pMem;
@@ -219,7 +223,7 @@ Data1 Data3::GetXYSum() const
 	{
 		for(uint iX=iXStart; iX<iXEnd; ++iX)
 		{
-			if(!IsInsideRoi(iX, iY))
+			if(!IsInsideRoi(GetRangeXPos(iX), GetRangeYPos(iY)))
 				continue;
 
 			for(uint iT=0; iT<GetDepth(); ++iT)
@@ -305,15 +309,11 @@ void Data3::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 				}
 			}
 
-	// TODO: handle range correctly
-	//if(!m_bHasRange)
-	{
-		m_dXMax = iNewWidth-1;
-		m_dYMax = iNewHeight-1;
+	//m_dXMax = iNewWidth-1;
+	//m_dYMax = iNewHeight-1;
 
-		m_iWidth = iNewWidth;
-		m_iHeight = iNewHeight;
-	}
+	m_iWidth = iNewWidth;
+	m_iHeight = iNewHeight;
 }
 
 
