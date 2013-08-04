@@ -277,7 +277,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QAction *pManageAntiROI = new QAction(this);
 	pManageAntiROI->setText("Manage Exclusive ROI...");
-	pManageAntiROI->setIcon(QIcon::fromTheme("list-add"));
+	pManageAntiROI->setIcon(QIcon::fromTheme("list-remove"));
 	pMenuROI->addAction(pManageAntiROI);
 
 

@@ -100,8 +100,13 @@ public:
 
 	bool IsInsideRoi(double dX, double dY) const
 	{
-		bool bInsideROI = m_roi.IsInside(dX, dY);
-		bool bOutsideAntiROI = !m_antiroi.IsInside(dX, dY);
+		bool bInsideROI = true;
+		if(m_roi.IsRoiActive())
+			bInsideROI = m_roi.IsInside(dX, dY);
+
+		bool bOutsideAntiROI = true;
+		if(m_antiroi.IsRoiActive())
+			bOutsideAntiROI = !m_antiroi.IsInside(dX, dY);
 
 		return bInsideROI && bOutsideAntiROI;
 	}

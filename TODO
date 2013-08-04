@@ -1,2 +1,3 @@
 * 2d fitter
 * cerr, cout and debug level consistency
+* handle ranges correctly
