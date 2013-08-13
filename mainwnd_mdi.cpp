@@ -147,6 +147,7 @@ void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
 	m_pmdi->addSubWindow(pWnd);
 	emit SubWindowAdded(pWnd);
 
+	//pWnd->RefreshPlot();
 	pWnd->show();
 }
 

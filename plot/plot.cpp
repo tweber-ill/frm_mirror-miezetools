@@ -7,6 +7,7 @@
 
 #include "plot.h"
 #include <QtGui/QPainter>
+#include <QtGui/QGridLayout>
 #include <limits>
 #include <iostream>
 #include "../helper/string.h"
@@ -19,15 +20,31 @@ Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pP
 									m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.),
 									m_bXIsLog(0), m_bYIsLog(0)
 {
+#ifdef USE_MGL
+	m_pMGL = new QMathGL(this);
+	m_pMGL->setDraw(this);
+	m_pMGL->setZoom(false);
+	m_pMGL->autoResize = 0;
+	QGridLayout *pLayout = new QGridLayout(this);
+	pLayout->addWidget(m_pMGL, 0, 0, 1, 1);
+#endif
+
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
+
+#ifndef USE_MGL
 	this->setMouseTracking(true);
+#endif
 }
 
 Plot::~Plot()
 {
 	clear();
 	if(m_pPixmap) delete m_pPixmap;
+
+#ifdef USE_MGL
+	delete m_pMGL;
+#endif
 }
 
 SubWindowBase* Plot::clone() const
@@ -52,7 +69,7 @@ SubWindowBase* Plot::clone() const
 
 QSize Plot::minimumSizeHint() const
 {
-	return QSize(320,240);
+	return QSize(400,300);
 }
 
 void Plot::estimate_minmax()
@@ -106,6 +123,8 @@ QColor Plot::GetColor(unsigned int iPlotObj) const
 
 void Plot::resizeEvent(QResizeEvent *pEvent)
 {
+	m_pMGL->adjust();
+	//m_pMGL->adjustSize();
 	paint();
 }
 
@@ -115,8 +134,79 @@ void Plot::RefreshPlot()
 	repaint();
 }
 
+#ifdef USE_MGL
+
+inline std::string get_color_string(const QColor& col)
+{
+	int r,g,b,a;
+	col.getRgb(&r,&g,&b,&a);
+
+	char pcCol[16];
+	sprintf(pcCol, "%02X%02X%02X%02X", r,g,b,a);
+	std::string strCol = pcCol;
+
+	return strCol;
+}
+
+int Plot::Draw(mglGraph *pg)
+{
+	pg->SetFontSize(3);
+	pg->SetRanges(m_dxmin, m_dxmax, m_dymin, m_dymax);
+    //pg->Grid();
+
+    pg->Box();
+    pg->Axis();
+
+	// for all plot objects
+	for(unsigned int iObj=0; iObj<m_vecObjs.size(); ++iObj)
+	{
+		const PlotObj& pltobj = m_vecObjs[iObj];
+		const Data1& obj = pltobj.dat;
+		QColor col = GetColor(iObj);
+		std::string strCol = "{x" + get_color_string(col) + "}";
+
+		unsigned int iLen = obj.GetLength();
+		mglData x(iLen), y(iLen), x_err(iLen), y_err(iLen);
+
+		//for all points
+		for(unsigned int uiPt=0; uiPt<iLen; ++uiPt)
+		{
+			x.a[uiPt] = obj.GetX(uiPt);
+			y.a[uiPt] = obj.GetY(uiPt);
+			x_err.a[uiPt] = obj.GetXErr(uiPt);
+			y_err.a[uiPt] = obj.GetYErr(uiPt);
+		}
+
+		std::string strStyle = strCol + "r1";
+
+		if(pltobj.plttype == PLOT_DATA)
+		{
+			strStyle += "#.";
+			pg->Error(x, y, x_err, y_err, strStyle.c_str(), "legend Data Points");
+		}
+		else if(pltobj.plttype == PLOT_FKT)
+		{
+			strStyle += "-";
+			pg->Plot(x, y, strStyle.c_str(), "legend Line");
+		}
+	}
+
+	pg->Puts(mglPoint(0, m_dymax + (m_dymax-m_dymin)/8.), m_strTitle.toStdString().c_str(), "b");
+    //pg->Title(m_strTitle.toStdString().c_str(), "", -1);
+    pg->Label('x', m_strXAxis.toStdString().c_str(), 0);
+    pg->Label('y', m_strYAxis.toStdString().c_str(), 0);
+
+    pg->Legend();
+	return 0;
+}
+#endif
+
+
 void Plot::paint()
 {
+#ifdef USE_MGL
+	m_pMGL->update();
+#else
 	QSize size = this->size();
 
 	if(m_pPixmap)
@@ -252,16 +342,21 @@ void Plot::paint()
 	}
 
 	painter.restore();
+#endif
 }
 
 void Plot::paintEvent (QPaintEvent *pEvent)
 {
+#if USE_MGL
+
+#else
+	QPainter painter(this);
 	if(!m_pPixmap)
 		paint();
 
-	QPainter painter(this);
 	painter.drawPixmap(0,0,*m_pPixmap);
 	mouseMoveEvent(0);
+#endif
 }
 
 void Plot::plot(unsigned int iNum, const double *px, const double *py, const double *pyerr, const double *pxerr,
@@ -428,6 +523,8 @@ void Plot::RefreshStatusMsgs()
 	emit SetStatusMsg("", 1);
 }
 
+
+#ifndef USE_MGL
 void Plot::MapToCoordSys(double dPixelX, double dPixelY, double &dX, double &dY, bool *pbInside)
 {
 	const QSize size = this->size();
@@ -509,6 +606,8 @@ void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 	emit SetStatusMsg(ostr.str().c_str(), 2);
 	RefreshStatusMsgs();
 }
+#endif
+
 
 void Plot::SetROI(const Roi* pROI, bool bAntiRoi)
 {

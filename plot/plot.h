@@ -14,6 +14,14 @@
 #include <QtGui/QPixmap>
 #include <vector>
 
+#ifdef USE_MGL
+	#include <mgl2/base_cf.h>
+	#include <mgl2/qt.h>
+	#include <mgl2/qmathgl.h>
+#else
+
+#endif
+
 #include "../subwnd.h"
 #include "../data/data.h"
 #include "../fitter/fitter.h"
@@ -36,13 +44,22 @@ struct PlotObj
 };
 
 class Plot : public SubWindowBase
+			#ifdef USE_MGL
+				, mglDraw
+			#endif
 { Q_OBJECT
 protected:
 	virtual QSize minimumSizeHint() const;
 	virtual void paintEvent(QPaintEvent *pEvent);
 	virtual void resizeEvent(QResizeEvent *pEvent);
-	virtual void mouseMoveEvent(QMouseEvent* pEvent);
 	virtual void RefreshStatusMsgs();
+
+#ifdef USE_MGL
+	QMathGL *m_pMGL;
+#else
+	void MapToCoordSys(double dPixelX, double dPixelY, double &dX, double &dY, bool *pbInside=0);
+	virtual void mouseMoveEvent(QMouseEvent* pEvent);
+#endif
 
 	QPixmap *m_pPixmap;
 
@@ -55,7 +72,6 @@ protected:
 	QString m_strXAxis, m_strYAxis, m_strTitle;
 
 	QColor GetColor(unsigned int iPlotObj) const;
-	void MapToCoordSys(double dPixelX, double dPixelY, double &dX, double &dY, bool *pbInside=0);
 
 public:
 	Plot(QWidget* pParent=0, const char* pcTitle=0);
@@ -69,6 +85,10 @@ public:
 
 	void clear();
 	void clearfkt();
+
+#ifdef USE_MGL
+	int Draw(mglGraph *pg);
+#endif
 
 	void paint();
 	virtual void RefreshPlot();
