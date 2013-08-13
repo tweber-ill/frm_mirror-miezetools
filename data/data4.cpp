@@ -144,9 +144,10 @@ Data3 Data4::GetVal(uint iD2) const
 			for(uint iX=0; iX<m_iWidth; ++iX)
 			{
 				double dVal = this->GetValRaw(iX, iY, iD, iD2);
+				double dErr = this->GetErrRaw(iX, iY, iD, iD2);
 
 				dat.SetVal(iX, iY, iD, dVal);
-				dat.SetErr(iX, iY, iD, this->GetErrRaw(iX, iY, iD, iD2));
+				dat.SetErr(iX, iY, iD, dErr);
 
 				dTotal += dVal;
 			}
@@ -223,7 +224,7 @@ Data1 Data4::GetXYSum(uint iD2) const
 			for(uint iT=0; iT<GetDepth(); ++iT)
 			{
 				dSum[iT] += GetValRaw(iX, iY, iT, iD2);
-				dErrSum[iT] += GetErrRaw(iX, iY, iT, iD2);
+				dErrSum[iT] += GetErrRaw(iX, iY, iT, iD2)*GetErrRaw(iX, iY, iT, iD2);
 			}
 		}
 	}
@@ -233,7 +234,7 @@ Data1 Data4::GetXYSum(uint iD2) const
 		dat.SetX(iT, iT);
 		dat.SetXErr(iT, 0.);
 		dat.SetY(iT, dSum[iT]);
-		dat.SetYErr(iT, dErrSum[iT]);
+		dat.SetYErr(iT, sqrt(dErrSum[iT]) /*sqrt(dSum[iT])*/);
 	}
 
 	delete[] pMem;
