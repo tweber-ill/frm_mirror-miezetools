@@ -18,8 +18,6 @@
 	#include <mgl2/base_cf.h>
 	#include <mgl2/qt.h>
 	#include <mgl2/qmathgl.h>
-#else
-
 #endif
 
 #include "../subwnd.h"
@@ -44,9 +42,9 @@ struct PlotObj
 };
 
 class Plot : public SubWindowBase
-			#ifdef USE_MGL
-				, mglDraw
-			#endif
+					#ifdef USE_MGL
+						, mglDraw
+					#endif
 { Q_OBJECT
 protected:
 	virtual QSize minimumSizeHint() const;

@@ -123,15 +123,22 @@ QColor Plot::GetColor(unsigned int iPlotObj) const
 
 void Plot::resizeEvent(QResizeEvent *pEvent)
 {
+
+#ifdef USE_MGL
 	m_pMGL->adjust();
 	//m_pMGL->adjustSize();
+#else
 	paint();
+#endif
 }
 
 void Plot::RefreshPlot()
 {
 	paint();
+
+#ifndef USE_MGL
 	repaint();
+#endif
 }
 
 #ifdef USE_MGL
@@ -150,7 +157,8 @@ inline std::string get_color_string(const QColor& col)
 
 int Plot::Draw(mglGraph *pg)
 {
-	pg->SetFontSize(3);
+	pg->LoadFont("heros");
+	//pg->SetFontSize(3.5);
 	pg->SetRanges(m_dxmin, m_dxmax, m_dymin, m_dymax);
     //pg->Grid();
 
@@ -187,11 +195,12 @@ int Plot::Draw(mglGraph *pg)
 		else if(pltobj.plttype == PLOT_FKT)
 		{
 			strStyle += "-";
-			pg->Plot(x, y, strStyle.c_str(), "legend Line");
+			std::string strLegend = "legend " + pltobj.strFkt;
+			pg->Plot(x, y, strStyle.c_str(), strLegend.c_str());
 		}
 	}
 
-	pg->Puts(mglPoint(0, m_dymax + (m_dymax-m_dymin)/8.), m_strTitle.toStdString().c_str(), "b");
+	pg->Puts(m_dxmin + (m_dxmax-m_dxmin)/2., m_dymax + (m_dymax-m_dymin)/8., m_strTitle.toStdString().c_str(), "b");
     //pg->Title(m_strTitle.toStdString().c_str(), "", -1);
     pg->Label('x', m_strXAxis.toStdString().c_str(), 0);
     pg->Label('y', m_strYAxis.toStdString().c_str(), 0);
@@ -347,7 +356,7 @@ void Plot::paint()
 
 void Plot::paintEvent (QPaintEvent *pEvent)
 {
-#if USE_MGL
+#ifdef USE_MGL
 
 #else
 	QPainter painter(this);
