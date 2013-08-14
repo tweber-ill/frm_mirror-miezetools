@@ -69,7 +69,7 @@ SubWindowBase* Plot::clone() const
 
 QSize Plot::minimumSizeHint() const
 {
-	return QSize(400,300);
+	return QSize(320,240);
 }
 
 void Plot::estimate_minmax()
@@ -347,6 +347,13 @@ void Plot::paint()
 				vecCoords.push_back(coordNext);
 			}
 			painter.drawLines(vecCoords);
+
+			QString strToolTip = "";
+			if(pltobj.strFkt != "")
+				strToolTip = ("Function: " + pltobj.strFkt).c_str();
+			else if(pltobj.strName != "")
+				strToolTip = pltobj.strName.c_str();
+			this->setToolTip(strToolTip);
 		}
 	}
 
