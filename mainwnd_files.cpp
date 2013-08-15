@@ -10,6 +10,7 @@
 #include "helper/string.h"
 #include "helper/misc.h"
 #include "helper/comp.h"
+#include "helper/file.h"
 #include "settings.h"
 #include "loader/loadtxt.h"
 #include "loader/loadnicos.h"
@@ -26,7 +27,7 @@
 
 void MiezeMainWnd::LoadFile(const std::string& _strFile)
 {
-	QTemporaryFile tmp;
+	TmpFile tmp;
 
 	std::string strFile = _strFile;
 	std::string strExt = get_fileext(strFile);
@@ -42,7 +43,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			return;
 		}
 
-		strFile = tmp.fileName().toStdString();
+		strFile = tmp.GetFileName();
 		if(!decomp_file_to_file(_strFile.c_str(), strFile.c_str()))
 		{
 			std::cerr << "Error: Cannot decompress file \""
