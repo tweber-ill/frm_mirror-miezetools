@@ -9,6 +9,7 @@
 #include "dialogs/ComboDlg.h"
 #include "helper/string.h"
 #include "helper/misc.h"
+#include "helper/comp.h"
 #include "settings.h"
 #include "loader/loadtxt.h"
 #include "loader/loadnicos.h"
@@ -18,14 +19,40 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QFileDialog>
 #include <QtCore/QSignalMapper>
+#include <QtCore/QTemporaryFile>
 
 #include <fstream>
 
 
-void MiezeMainWnd::LoadFile(const std::string& strFile)
+void MiezeMainWnd::LoadFile(const std::string& _strFile)
 {
-	std::string strFileNoDir = ::get_file(strFile);
+	QTemporaryFile tmp;
+
+	std::string strFile = _strFile;
 	std::string strExt = get_fileext(strFile);
+	if(strExt == "gz" || strExt == "bz2")
+	{
+		strExt = get_fileext2(strFile);
+
+		if(!tmp.open())
+		{
+			std::cerr << "Error: Cannot create temporary file for \""
+						<< strFile << "\"."
+						<< std::endl;
+			return;
+		}
+
+		strFile = tmp.fileName().toStdString();
+		if(!decomp_file_to_file(_strFile.c_str(), strFile.c_str()))
+		{
+			std::cerr << "Error: Cannot decompress file \""
+						<< strFile << "\"."
+						<< std::endl;
+			return;
+		}
+	}
+
+	std::string strFileNoDir = ::get_file(_strFile);
 
 	std::ostringstream ostrMsg;
 	ostrMsg << "Loading " << strFileNoDir << "...";
@@ -362,7 +389,7 @@ void MiezeMainWnd::LoadFile(const std::string& strFile)
 	}
 
 	this->SetStatusMsg("Ok.",0);
-	AddRecentFile(QString(strFile.c_str()));
+	AddRecentFile(QString(_strFile.c_str()));
 }
 
 void MiezeMainWnd::FileLoadTriggered()
@@ -371,7 +398,7 @@ void MiezeMainWnd::FileLoadTriggered()
 	QString strLastDir = pGlobals->value("main/lastdir", ".").toString();
 
 	QStringList strFiles = QFileDialog::getOpenFileNames(this, "Open data file...", strLastDir,
-					"All data files (*.dat *.sim *.pad *.tof);;TOF files (*.tof);;PAD files(*.pad);;DAT files (*.dat *.sim)",
+					"All data files (*.dat *.sim *.pad *.tof *.gz *.bz2);;TOF files (*.tof *.tof.gz *.tof.bz2);;PAD files(*.pad *.pad.gz *.pad.bz2);;DAT files (*.dat *.sim *.dat.gz *.dat.bz2)",
 					0, QFileDialog::DontUseNativeDialog);
 	if(strFiles.size() == 0)
 		return;
