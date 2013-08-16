@@ -9,7 +9,7 @@
 #define __MIEZE_INTERPOLATION__
 
 #include "../fitter.h"
-#include <math.h>
+#include <cmath>
 #include <boost/math/special_functions/binomial.hpp>
 #include <vector>
 #include <algorithm>

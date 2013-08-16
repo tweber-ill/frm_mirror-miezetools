@@ -399,7 +399,7 @@ void MiezeMainWnd::FileLoadTriggered()
 	QString strLastDir = pGlobals->value("main/lastdir", ".").toString();
 
 	QStringList strFiles = QFileDialog::getOpenFileNames(this, "Open data file...", strLastDir,
-					"All data files (*.dat *.sim *.pad *.tof *.gz *.bz2);;TOF files (*.tof *.tof.gz *.tof.bz2);;PAD files(*.pad *.pad.gz *.pad.bz2);;DAT files (*.dat *.sim *.dat.gz *.dat.bz2)",
+					"All data files (*.dat *.sim *.pad *.tof *.dat.gz *.dat.bz2 *.pad.gz *.pad.bz2 *.tof.gz *.tof.bz2);;TOF files (*.tof *.tof.gz *.tof.bz2);;PAD files(*.pad *.pad.gz *.pad.bz2);;DAT files (*.dat *.sim *.dat.gz *.dat.bz2)",
 					0, QFileDialog::DontUseNativeDialog);
 	if(strFiles.size() == 0)
 		return;

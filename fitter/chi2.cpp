@@ -6,7 +6,7 @@
  */
 
 #include <limits>
-#include <math.h>
+#include <cmath>
 
 #include "chi2.h"
 #include "../helper/misc.h"

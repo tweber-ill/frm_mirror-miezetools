@@ -12,6 +12,7 @@
 #include "../helper/string.h"
 #include "../helper/misc.h"
 #include "../helper/xml.h"
+#include "../helper/math.h"
 //#include "../data/export.h"
 
 #include <QtGui/QPainter>

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include "helper/string.h"
+#include "helper/rand.h"
 
 #ifdef Q_WS_X11
 //#include <X11/Xlib.h>
@@ -43,6 +44,7 @@ int main(int argc, char **argv)
 #endif
 	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
+	init_rand();
 	init_formulas();
 
 	int iRet = -1;

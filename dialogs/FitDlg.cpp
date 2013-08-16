@@ -13,6 +13,7 @@
 
 #include "../helper/string.h"
 #include "../helper/misc.h"
+#include "../helper/math.h"
 #include "../helper/fourier.h"
 #include "../helper/mieze.hpp"
 
@@ -31,7 +32,7 @@
 #include <iostream>
 #include <sstream>
 #include <limits>
-#include <math.h>
+#include <cmath>
 
 FitDlg::FitDlg(QWidget* pParent, QMdiArea *pmdi) : QDialog(pParent), m_pmdi(pmdi)
 {
@@ -604,8 +605,8 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 
 			if(bOk)
 			{
-				if(isnan(dC) || isinf(dC)) dC = 0.;
-				if(isnan(dPh) || isinf(dPh)) dPh = 0.;
+				if(std::isnan(dC) || std::isinf(dC)) dC = 0.;
+				if(std::isnan(dPh) || std::isinf(dPh)) dPh = 0.;
 
 				dat2_c.SetVal(iX, iY, dC);
 				dat2_c.SetErr(iX, iY, dCErr);

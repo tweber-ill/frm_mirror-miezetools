@@ -25,6 +25,7 @@ namespace fus = boost::fusion;
 #include "parser.h"
 #include "functions.h"
 
+#include "../helper/math.h"
 
 //----------------------------------------------------------------------
 // old procedural interface

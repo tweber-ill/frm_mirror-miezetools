@@ -5,7 +5,7 @@
  * Date: April 2012, 25-apr-2013
  */
 
-#include <math.h>
+#include "../../helper/math.h"
 #include <limits>
 #include <algorithm>
 #include <boost/algorithm/minmax_element.hpp>

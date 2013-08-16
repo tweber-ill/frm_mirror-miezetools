@@ -13,6 +13,7 @@
 #include <sstream>
 
 #include "../helper/misc.h"
+#include "../helper/math.h"
 #include "../helper/string.h"
 
 #define PAD_X 24

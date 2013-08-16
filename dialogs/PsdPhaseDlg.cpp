@@ -16,6 +16,7 @@
 #include "../helper/mieze.hpp"
 #include "../helper/fourier.h"
 #include "../helper/misc.h"
+#include "../helper/math.h"
 
 #include "../fitter/models/msin.h"
 

@@ -5,7 +5,7 @@
  * Date: April 2012
  */
 
-#include <math.h>
+#include <cmath>
 #include <limits>
 #include <algorithm>
 #include <sstream>

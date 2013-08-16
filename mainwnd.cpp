@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 #include "settings.h"

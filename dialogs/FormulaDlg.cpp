@@ -8,6 +8,7 @@
 #include <boost/units/io.hpp>
 #include "../helper/mieze.hpp"
 #include "../helper/string.h"
+#include "../helper/math.h"
 #include "../settings.h"
 
 #include <sstream>

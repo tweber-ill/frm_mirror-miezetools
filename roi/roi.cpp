@@ -5,7 +5,7 @@
  * @date 2011, 23-apr-2013
  */
 
-#include <math.h>
+#include "../helper/math.h"
 #include <sstream>
 #include <fstream>
 #include <iostream>
