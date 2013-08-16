@@ -7,8 +7,8 @@ QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib -lQtC
 LIBS_RESO = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS} ${LAPACK_LIBS}
 LIBS = -L/usr/lib64 -L/usr/lib/x86_64-linux-gnu -lsupc++ -lstdc++ -lm -fopenmp -lMinuit2 -lfftw3 -lboost_iostreams-mt ${QT_LIBS} ${LAPACK_LIBS}
 
-cattus: main.o mainwnd.o mainwnd_files.o mainwnd_session.o mainwnd_mdi.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o ExportDlg.o PlotPropDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o file.o comp.o
-	${CC} ${FLAGS} -o cattus main.o mainwnd.o mainwnd_files.o mainwnd_session.o mainwnd_mdi.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o ExportDlg.o PlotPropDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o file.o comp.o ${LIBS}
+cattus: main.o mainwnd.o mainwnd_files.o mainwnd_session.o mainwnd_mdi.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o ExportDlg.o PlotPropDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o file.o comp.o rand.o
+	${CC} ${FLAGS} -o cattus main.o mainwnd.o mainwnd_files.o mainwnd_session.o mainwnd_mdi.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o ExportDlg.o PlotPropDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o file.o comp.o rand.o ${LIBS}
 	strip cattus
 
 reso: settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o
@@ -120,6 +120,9 @@ comp.o: helper/comp.cpp helper/comp.h
 
 file.o: helper/file.cpp helper/file.h
 	${CC} ${FLAGS} -c -o file.o helper/file.cpp
+
+rand.o: helper/rand.cpp helper/rand.h
+	${CC} ${FLAGS} -c -o rand.o helper/rand.cpp
 
 
 loadcasc.o: loader/loadcasc.cpp loader/loadcasc.h
