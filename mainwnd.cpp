@@ -136,28 +136,36 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pShowT = new QAction(this);
 	pShowT->setText("Show Time Channels");
 
+	QAction *pSumFoils = new QAction(this);
+	pSumFoils->setText("Sum all Foils / Time Channels");
+
 	QAction *pExportPy = new QAction(this);
 	pExportPy->setText("Export as Python Script...");
 
 	QAction *pPlotProp = new QAction(this);
 	pPlotProp->setText("Plot Properties...");
 
+
 	m_pMenu1d = new QMenu(this);
 	m_pMenu1d->addAction(pExportPy);
 	m_pMenu1d->addSeparator();
 	m_pMenu1d->addAction(pPlotProp);
+
 
 	m_pMenu2d = new QMenu(this);
 	m_pMenu2d->addAction(pExportPy);
 	m_pMenu2d->addSeparator();
 	m_pMenu2d->addAction(pPlotProp);
 
+
 	m_pMenu3d = new QMenu(this);
 	m_pMenu3d->addAction(pExportPy);
 	m_pMenu3d->addSeparator();
 	m_pMenu3d->addAction(pShowT);
+	m_pMenu3d->addAction(pSumFoils);
 	m_pMenu3d->addSeparator();
 	m_pMenu3d->addAction(pPlotProp);
+
 
 	m_pMenu4d = new QMenu(this);
 	m_pMenu4d->addAction(pExportPy);
@@ -165,9 +173,6 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QAction *pExtractFoils = new QAction(m_pMenu4d);
 	pExtractFoils->setText("Extract Foils");
-
-	QAction *pSumFoils = new QAction(m_pMenu4d);
-	pSumFoils->setText("Sum all Foils / Time Channels");
 
 	m_pMenu4d->addAction(pExtractFoils);
 	m_pMenu4d->addAction(pShowT);
