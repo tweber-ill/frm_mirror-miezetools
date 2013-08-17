@@ -40,6 +40,7 @@ public:
 	virtual double GetTotalCounts() const { return m_dat4.GetTotal(); }
 
 	virtual Plot* ConvertTo1d(int iFoil);
+	virtual Plot2d* ConvertTo2d(int iFoil=-1);
 	virtual Plot3d* ConvertTo3d(int iFoil=-1);
 
 	virtual SubWindowBase* clone() const;
@@ -80,6 +81,7 @@ public:
 	virtual void SetLabel(LabelType iWhich, const char* pcLab);
 
 	virtual Plot* ConvertTo1d(int iFoil=-1) { return m_pPlot->ConvertTo1d(iFoil); }
+	virtual Plot2d* ConvertTo2d(int iFoil=-1) { return m_pPlot->ConvertTo2d(iFoil); }
 	virtual Plot3d* ConvertTo3d(int iFoil=-1) { return m_pPlot->ConvertTo3d(iFoil); }
 
 	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false)

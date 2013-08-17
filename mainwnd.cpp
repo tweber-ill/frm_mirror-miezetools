@@ -143,34 +143,37 @@ MiezeMainWnd::MiezeMainWnd()
 	pPlotProp->setText("Plot Properties...");
 
 	m_pMenu1d = new QMenu(this);
-	m_pMenu1d->addAction(pPlotProp);
-	m_pMenu1d->addSeparator();
 	m_pMenu1d->addAction(pExportPy);
+	m_pMenu1d->addSeparator();
+	m_pMenu1d->addAction(pPlotProp);
 
 	m_pMenu2d = new QMenu(this);
-	m_pMenu2d->addAction(pPlotProp);
-	m_pMenu2d->addSeparator();
 	m_pMenu2d->addAction(pExportPy);
+	m_pMenu2d->addSeparator();
+	m_pMenu2d->addAction(pPlotProp);
 
 	m_pMenu3d = new QMenu(this);
-	m_pMenu3d->addAction(pPlotProp);
+	m_pMenu3d->addAction(pExportPy);
 	m_pMenu3d->addSeparator();
 	m_pMenu3d->addAction(pShowT);
 	m_pMenu3d->addSeparator();
-	m_pMenu3d->addAction(pExportPy);
-
+	m_pMenu3d->addAction(pPlotProp);
 
 	m_pMenu4d = new QMenu(this);
-	m_pMenu4d->addAction(pPlotProp);
+	m_pMenu4d->addAction(pExportPy);
 	m_pMenu4d->addSeparator();
 
 	QAction *pExtractFoils = new QAction(m_pMenu4d);
 	pExtractFoils->setText("Extract Foils");
+
+	QAction *pSumFoils = new QAction(m_pMenu4d);
+	pSumFoils->setText("Sum all Foils / Time Channels");
+
 	m_pMenu4d->addAction(pExtractFoils);
 	m_pMenu4d->addAction(pShowT);
-
+	m_pMenu4d->addAction(pSumFoils);
 	m_pMenu4d->addSeparator();
-	m_pMenu4d->addAction(pExportPy);
+	m_pMenu4d->addAction(pPlotProp);
 
 
 
@@ -386,6 +389,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QObject::connect(pShowT, SIGNAL(triggered()), this, SLOT(ShowTimeChannels()));
 	QObject::connect(pExtractFoils, SIGNAL(triggered()), this, SLOT(ExtractFoils()));
+	QObject::connect(pSumFoils, SIGNAL(triggered()), this, SLOT(SumFoils()));
 	QObject::connect(pPlotProp, SIGNAL(triggered()), this, SLOT(PlotPropertiesTriggered()));
 	QObject::connect(pExportPy, SIGNAL(triggered()), this, SLOT(FileExportPyTriggered()));
 	QObject::connect(pExportPlots, SIGNAL(triggered()), this, SLOT(ShowExportDlg()));
@@ -948,6 +952,18 @@ void MiezeMainWnd::ExtractFoils()
 
 		AddSubWindow(pWrap);
 	}
+}
+
+void MiezeMainWnd::SumFoils()
+{
+	SubWindowBase* pSWB = GetActivePlot();
+	if(!pSWB) return;
+	pSWB = pSWB->GetActualWidget();
+	if(pSWB->GetType()!=PLOT_4D && !pSWB->GetType()!=PLOT_3D)
+		return;
+
+	Plot2d* pPlot2d = pSWB->ConvertTo2d();
+	AddSubWindow(pPlot2d);
 }
 
 void MiezeMainWnd::ShowTimeChannels()

@@ -19,6 +19,8 @@ protected:
 	double m_dMin, m_dMax;
 	double m_dTotal;	// sum of all values
 
+	std::vector<double> m_vecPhases;
+
 public:
 	Data4(uint iW=128, uint iH=128, uint iD=16, uint iD2=6,
 				const double* pDat=0, const double *pErr=0);
@@ -42,6 +44,11 @@ public:
 	void SetErr(uint iX, uint iY, uint iD, uint iD2, double dVal);
 	void SetVals(const double *pDat, const double *pErr=0);
 	void SetVals(uint iD2, const double *pDat, const double *pErr=0);
+
+	void SetHasPhases(bool bHas) { m_vecPhases.resize(bHas ? m_iDepth2 : 0);  }
+	bool HasPhases() const { return (m_vecPhases.size()==m_iDepth2); }
+	const std::vector<double>& GetPhases() const { return m_vecPhases; }
+	void SetPhases(const std::vector<double>& vec) { m_vecPhases = vec; }
 
 	double GetMin() const { return m_dMin; }
 	double GetMax() const { return m_dMax; }

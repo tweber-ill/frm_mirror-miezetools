@@ -112,7 +112,10 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 		for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 			vecFoils.push_back(dat4.GetXYSum(iFoil));
 
-		dat = FitData::mieze_sum_foils(vecFoils);
+		const std::vector<double> *pvecPhases = 0;
+		if(dat4.HasPhases())
+			pvecPhases = &dat4.GetPhases();
+		dat = FitData::mieze_sum_foils(vecFoils, pvecPhases);
 	}
 	else
 	{
@@ -138,6 +141,39 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 
 	pPlot->SetLabels(/*pPlot4d->GetZStr().toAscii().data()*/"t", "I");
 	pPlot->SetTitle("");
+
+	return pPlot;
+}
+
+Plot2d* Plot4d::ConvertTo2d(int iFoil)
+{
+	std::ostringstream ostrTitle;
+	ostrTitle << windowTitle().toStdString() << " -> ";
+
+	const Data4& dat4 = this->GetData();
+	Data2 dat2;
+	dat2.CopyRoiFlagsFrom(&dat4);
+	dat2.SetZero();
+
+	if(iFoil<0)
+	{
+		ostrTitle << "foil sum";
+
+		for(unsigned int iFoil=0; iFoil<dat4.GetDepth2(); ++iFoil)
+			for(unsigned int iTC=0; iTC<dat4.GetDepth(); ++iTC)
+				dat2.Add(dat4.GetVal(iFoil, iTC));
+	}
+	else
+	{
+		ostrTitle << "foil " << iFoil;
+
+		for(unsigned int iTC=0; iTC<dat4.GetDepth(); ++iTC)
+			dat2.Add(dat4.GetVal(iTC, iFoil));
+	}
+
+	Plot2d* pPlot = new Plot2d(0, ostrTitle.str().c_str(), m_bCountData);
+	pPlot->plot(dat2);
+	pPlot->SetLabels(GetXStr().toStdString().c_str(), GetYStr().toStdString().c_str(), "I");
 
 	return pPlot;
 }

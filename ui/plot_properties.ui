@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>371</width>
-    <height>318</height>
+    <width>425</width>
+    <height>413</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -244,6 +244,41 @@
          <string>Logarithmic z Scale</string>
         </property>
        </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupMIEZE">
+     <property name="title">
+      <string>MIEZE</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="1" colspan="2">
+       <widget class="QComboBox" name="comboRef"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelRef">
+        <property name="text">
+         <string>Elastic Reference:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelPhases">
+        <property name="text">
+         <string>Phases between Foils:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="editPhases"/>
       </item>
      </layout>
     </widget>

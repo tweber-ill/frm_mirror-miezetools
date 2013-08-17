@@ -39,6 +39,25 @@ void Data2::SetZero()
 	m_dMin = m_dMax = m_dTotal = 0.;
 }
 
+void Data2::Add(const Data2& dat)
+{
+	m_dMin = std::numeric_limits<double>::max();
+	m_dMax = -m_dMin;
+	m_dTotal = 0.;
+
+	for(uint iY=0; iY<m_iHeight; ++iY)
+		for(uint iX=0; iX<m_iWidth; ++iX)
+		{
+			const double dNewVal = GetVal(iX, iY)+dat.GetVal(iX, iY);
+			const double dNewErr = GetErr(iX, iY)+dat.GetErr(iX, iY);
+
+			SetVal(iX, iY, dNewVal);
+			SetErr(iX, iY, dNewErr);
+
+			m_dTotal += dNewVal;
+		}
+}
+
 void Data2::SetSize(uint iWidth, uint iHeight)
 {
 	if(m_iWidth==iWidth && m_iHeight==iHeight)

@@ -68,6 +68,7 @@ public:
 	virtual double GetTotalCounts() const = 0;
 
 	virtual Plot* ConvertTo1d(int iParam=-1) { return 0; }
+	virtual Plot2d* ConvertTo2d(int iParam=-1) { return 0; }
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return 0; }
 
 

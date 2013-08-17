@@ -6,8 +6,9 @@
  */
 
 #include "data4.h"
-
 #include "../helper/math.h"
+#include "../helper/string.h"
+
 #include <limits>
 #include <boost/algorithm/minmax_element.hpp>
 
@@ -357,6 +358,9 @@ bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
 	m_dTotal = xml.Query<double>((strBase+"total").c_str(), 0.);
 
+	std::string strPhases = xml.QueryString((strBase+"phases").c_str(), "");
+	::get_tokens<double>(strPhases, ",; ", m_vecPhases);
+
 	return 1;
 }
 
@@ -374,6 +378,10 @@ bool Data4::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 	ostr << "<total> " << m_dTotal << " </total>\n";
 	ostr << "<depth> " << m_iDepth << " </depth>\n";
 	ostr << "<depth2> " << m_iDepth2 << " </depth2>\n";
+	ostr << "<phases> ";
+	for(double dPhase : m_vecPhases)
+		ostr << dPhase << ", ";
+	ostr << " </phases>\n";
 
 	SaveRangeXml(ostr);
 

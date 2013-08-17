@@ -154,6 +154,7 @@ protected slots:
 
 	void ShowTimeChannels();
 	void ExtractFoils();
+	void SumFoils();
 	void PlotPropertiesTriggered();
 
 public:

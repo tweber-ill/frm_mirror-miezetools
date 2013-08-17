@@ -37,7 +37,7 @@ class FitData
 {
 public:
 	static bool fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt);
-	static Data1 mieze_sum_foils(const std::vector<Data1>& vecFoils);
+	static Data1 mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::vector<double>* pvecFoilPhases=0);
 };
 
 #endif

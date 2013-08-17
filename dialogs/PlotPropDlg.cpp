@@ -9,6 +9,7 @@
 #include "../plot/plot2d.h"
 #include "../plot/plot3d.h"
 #include "../plot/plot4d.h"
+#include "../helper/string.h"
 
 PlotPropDlg::PlotPropDlg(QWidget* pParent)
 				: QDialog(pParent), m_pCurPlot(0)
@@ -43,6 +44,7 @@ void PlotPropDlg::SubWindowActivated(SubWindowBase* pSWB)
 		editTLabel->setEnabled(false);
 		editFoilLabel->setEnabled(false);
 		checkLogZ->setEnabled(false);
+		groupMIEZE->setEnabled(false);
 	}
 	else if(m_pCurPlot->GetType() == PLOT_2D ||
 			m_pCurPlot->GetType() == PLOT_3D ||
@@ -51,6 +53,7 @@ void PlotPropDlg::SubWindowActivated(SubWindowBase* pSWB)
 		groupXYRanges->setEnabled(true);
 		editZLabel->setEnabled(true);
 		checkLogZ->setEnabled(true);
+		groupMIEZE->setEnabled(false);
 
 		Plot2d *pPlot2d = (Plot2d*)pSWB->GetActualWidget();
 		checkLogZ->setChecked(pPlot2d->GetLog());
@@ -66,6 +69,7 @@ void PlotPropDlg::SubWindowActivated(SubWindowBase* pSWB)
 		{
 			editTLabel->setEnabled(true);
 			editFoilLabel->setEnabled(false);
+			groupMIEZE->setEnabled(true);
 
 			pRange = &((Plot3d*)pPlot2d)->GetData();
 		}
@@ -73,8 +77,28 @@ void PlotPropDlg::SubWindowActivated(SubWindowBase* pSWB)
 		{
 			editTLabel->setEnabled(true);
 			editFoilLabel->setEnabled(true);
+			groupMIEZE->setEnabled(true);
 
+			const Data4& dat4 = ((Plot4d*)pPlot2d)->GetData();
 			pRange = &((Plot4d*)pPlot2d)->GetData();
+
+			// TODO: Get foil phases shifts automatically from elastic reference TOF
+			if(dat4.HasPhases())
+			{
+				std::ostringstream ostrPhases;
+				for(unsigned int iPhase=0; iPhase<dat4.GetDepth2(); ++iPhase)
+				{
+					ostrPhases << dat4.GetPhases()[iPhase];
+					if(iPhase < dat4.GetDepth2()-1)
+						ostrPhases << ", ";
+				}
+
+				editPhases->setText(ostrPhases.str().c_str());
+			}
+			else
+			{
+				editPhases->setText("");
+			}
 		}
 	}
 
@@ -133,11 +157,32 @@ void PlotPropDlg::SaveSettings()
 		pPlot2d->SetLog(checkLogZ->isChecked());
 
 		if(m_pCurPlot->GetType() == PLOT_2D)
+		{
 			pRange = &pPlot2d->GetData2();
+		}
 		else if(m_pCurPlot->GetType() == PLOT_3D)
+		{
 			pRange = &((Plot3d*)pPlot2d)->GetData();
+		}
 		else if(m_pCurPlot->GetType() == PLOT_4D)
+		{
+			Data4& dat4 = ((Plot4d*)pPlot2d)->GetData();
 			pRange = &((Plot4d*)pPlot2d)->GetData();
+
+			std::string strPhases = editPhases->text().toStdString();
+			std::vector<double> vecPhases;
+			::get_tokens<double>(strPhases, ",; ", vecPhases);
+
+			bool bHasPhases = (vecPhases.size() != 0);
+			dat4.SetHasPhases(bHasPhases);
+			if(bHasPhases)
+			{
+				while(vecPhases.size() < dat4.GetDepth2())
+					vecPhases.push_back(0.);
+
+				dat4.SetPhases(vecPhases);
+			}
+		}
 
 
 		if(pRange)

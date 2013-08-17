@@ -86,7 +86,7 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 	return bOk;
 }
 
-Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils)
+Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::vector<double>* pvecFoilPhases)
 {
 	if(vecFoils.size() == 0)
 	{
@@ -114,23 +114,30 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils)
 	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 	{
 		pdPhases[iFoil] = 0.;
-
 		const Data1 *dat = &vecFoils[iFoil];
-		FitDataParams params;
-		params.iFkt = FIT_MIEZE_SINE;
-		FunctionModel *pFkt = 0;
-		bool bOk = FitData::fit(*dat, params, &pFkt);
-		MiezeSinModel *pModel = (MiezeSinModel*) pFkt;
 
-		if(bOk && pModel)
-			pdPhases[iFoil] = pModel->GetPhase();
+		if(pvecFoilPhases)
+		{
+			pdPhases[iFoil] = (*pvecFoilPhases)[iFoil];
+		}
+		else
+		{
+			FitDataParams params;
+			params.iFkt = FIT_MIEZE_SINE;
+			FunctionModel *pFkt = 0;
+			bool bOk = FitData::fit(*dat, params, &pFkt);
+			MiezeSinModel *pModel = (MiezeSinModel*) pFkt;
 
-		//std::cout << "fit: " << pModel->print(1) << std::endl;
+			if(bOk && pModel)
+				pdPhases[iFoil] = pModel->GetPhase();
+
+			//std::cout << "fit: " << pModel->print(1) << std::endl;
+			if(pModel) delete pModel;
+		}
+
 		double dCnts = dat->SumY();
 		dTotalCnts += dCnts;
 		dMeanPhase += pdPhases[iFoil] * dCnts;
-
-		if(pModel) delete pModel;
 	}
 	dMeanPhase /= dTotalCnts;
 	dMeanPhase = fmod(dMeanPhase, 2.*M_PI);

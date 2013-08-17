@@ -198,7 +198,10 @@ void RadialIntDlg::Calc()
 					foils.push_back(dat1);
 				}
 
-				dat1 = FitData::mieze_sum_foils(foils);
+				const std::vector<double> *pvecPhases = 0;
+				if(dat.HasPhases())
+					pvecPhases = &dat.GetPhases();
+				dat1 = FitData::mieze_sum_foils(foils, pvecPhases);
 			}
 
 			FitDataParams params;

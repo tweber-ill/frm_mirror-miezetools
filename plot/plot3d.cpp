@@ -116,6 +116,28 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 	return pPlot;
 }
 
+Plot2d* Plot3d::ConvertTo2d(int iFoil)
+{
+	std::ostringstream ostrTitle;
+	ostrTitle << windowTitle().toStdString() << " -> ";
+
+	const Data3& dat3 = this->GetData();
+	Data2 dat2;
+	dat2.CopyRoiFlagsFrom(&dat3);
+	dat2.SetZero();
+
+	ostrTitle << "sum";
+
+	for(unsigned int iTC=0; iTC<dat3.GetDepth(); ++iTC)
+		dat2.Add(dat3.GetVal(iFoil));
+
+	Plot2d* pPlot = new Plot2d(0, ostrTitle.str().c_str(), m_bCountData);
+	pPlot->plot(dat2);
+	pPlot->SetLabels(GetXStr().toStdString().c_str(), GetYStr().toStdString().c_str(), "I");
+
+	return pPlot;
+}
+
 
 bool Plot3d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {

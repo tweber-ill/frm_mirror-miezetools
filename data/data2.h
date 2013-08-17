@@ -25,6 +25,7 @@ public:
 	virtual DataType GetType() const { return DATA_2D; }
 
 	void SetZero();
+	void Add(const Data2& dat);
 
 	uint GetWidth() const { return m_iWidth; }
 	uint GetHeight() const { return m_iHeight; }
