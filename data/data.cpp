@@ -6,6 +6,9 @@
  */
 
 #include "data.h"
+#include "../helper/comp.h"
+#include "../helper/file.h"
+#include <fstream>
 
 void load_xml_vecs(unsigned int iNumVecs,
 						std::vector<double>** pvecs,
@@ -23,7 +26,64 @@ void load_xml_vecs(unsigned int iNumVecs,
 			bool bHasBlobIdx = 0;
 			qint64 iBlobIdx = xml.Query<qint64>((strBase + "blob_" + pstrs[iObj]).c_str(), 0, &bHasBlobIdx);
 			if(bHasBlobIdx)
-				blob.copy<double>(iBlobIdx, qint64(pvecs[iObj]->size()), pvecs[iObj]->begin());
+			{
+				bool bCompressed = xml.Query<bool>((strBase + "blob_" + pstrs[iObj] + "_compressed").c_str(), 0);
+
+				if(bCompressed)
+				{
+					qint64 iLenComp = xml.Query<qint64>((strBase + "blob_" + pstrs[iObj] + "_size").c_str(), 0);
+					void *pvMemComp = blob.map(iBlobIdx, iLenComp);
+					void *pvMemUncomp;
+					unsigned int iLenUncomp = 0;
+
+					TmpFile tmp;
+					if(!tmp.open())
+					{
+						std::cerr << "Error: Cannot open temporary file for blob loading." << std::endl;
+						continue;
+					}
+
+					std::string strTmpFile = tmp.GetFileName();
+					std::ofstream ofstrTmp(strTmpFile, std::ios::binary);
+
+					//if(!::decomp_mem_to_mem(pvMemComp, (unsigned int)iLenComp, pvMemUncomp, iLenUncomp))
+					if(!::decomp_mem_to_stream(pvMemComp, (unsigned int)iLenComp, ofstrTmp))
+						std::cerr << "Error: Cannot decompress data in blob." << std::endl;
+
+					blob.unmap(pvMemComp);
+					ofstrTmp.close();
+
+
+					std::ifstream ifstrTmp(strTmpFile, std::ios::binary);
+					for(unsigned int iElem=0; iElem<pvecs[iObj]->size(); ++iElem)
+					{
+						double d;
+						ifstrTmp.read((char*)&d, sizeof d);
+						(*pvecs[iObj])[iElem] = d;
+					}
+					ifstrTmp.close();
+
+					/*
+					if(iLenUncomp/sizeof(double) != pvecs[iObj]->size())
+						std::cerr << "Error: Uncompressed stream has wrong size." << std::endl;
+
+					// take the smaller of the two sizes
+					unsigned int iNumElems = iLenUncomp/sizeof(double);
+					if(pvecs[iObj]->size() < iNumElems)
+						iNumElems = pvecs[iObj]->size();
+
+					const double *pdDat = (const double*)pvMemUncomp;
+					for(unsigned int iElem=0; iElem<iNumElems; ++iElem)
+						(*pvecs[iObj])[iElem] = pdDat[iElem];
+
+					delete[] pvMemUncomp;
+					*/
+				}
+				else
+				{
+					blob.copy<double>(iBlobIdx, qint64(pvecs[iObj]->size()), pvecs[iObj]->begin());
+				}
+			}
 			else
 				std::cerr << "Error: Blob usage enabled, but no blob index given!"
 						  << std::endl;
@@ -53,13 +113,52 @@ void save_xml_vecs(unsigned int iNumVecs,
 	{
 		if(bSaveInBlob)
 		{
+			bool bCompress = (pvecs[iObj]->size() > 1024);
+
 			qint64 iBlobIdx = ostrBlob.tellp();
-			for(double d : *pvecs[iObj])
-				ostrBlob.write((char*)&d, sizeof(d));
+
+			if(!bCompress)
+			{
+				for(double d : *pvecs[iObj])
+					ostrBlob.write((char*)&d, sizeof(d));
+			}
+			else
+			{
+				TmpFile tmp;
+				if(!tmp.open())
+				{
+					std::cerr << "Error: Cannot open temporary file for blob saving." << std::endl;
+					continue;
+				}
+
+				std::string strTmpFile = tmp.GetFileName();
+
+				std::ofstream ofstrTmp(strTmpFile, std::ios::binary);
+				for(double d : *pvecs[iObj])
+					ofstrTmp.write((char*)&d, sizeof(d));
+				ofstrTmp.close();
+
+				//std::ofstream ofstrTst("/home/tweber/tst.000", std::ios::binary);
+
+				std::ifstream ifstrTmp(strTmpFile, std::ios::binary);
+				if(!::comp_stream_to_stream(ifstrTmp, ostrBlob))
+					std::cerr << "Error: Cannot compress data in blob." << std::endl;
+				ofstrTmp.close();
+			}
+
+			qint64 iBlobIdxNew = ostrBlob.tellp();
 
 			ostr << "<" << "blob_" << pstrs[iObj] << "> ";
 			ostr << iBlobIdx;
 			ostr << " </" << "blob_" << pstrs[iObj] << ">\n";
+
+			ostr << "<" << "blob_" << pstrs[iObj] << "_size" << "> ";
+			ostr << (iBlobIdxNew - iBlobIdx);
+			ostr << " </" << "blob_" << pstrs[iObj] << "_size" << ">\n";
+
+			ostr << "<" << "blob_" << pstrs[iObj] << "_compressed" << "> ";
+			ostr << bCompress;
+			ostr << " </" << "blob_" << pstrs[iObj] << "_compressed" << ">\n";
 		}
 		else
 		{
