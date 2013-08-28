@@ -37,6 +37,7 @@ static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 	}
 }
 
+
 int main(int argc, char **argv)
 {
 #ifdef Q_WS_X11
