@@ -10,11 +10,17 @@
 
 #include <QtCore/QFile>
 #include <vector>
+#include <map>
+#include "../helper/string.h"
+
 
 class PadFile
 {
 protected:
 	QFile m_file;
+	StringMap m_params;
+
+	void LoadParams();
 
 public:
 	PadFile(const char* pcFile);
@@ -33,6 +39,9 @@ class TofFile
 {
 protected:
 	QFile m_file;
+	StringMap m_params;
+
+	void LoadParams();
 
 public:
 	TofFile(const char* pcFile);

@@ -13,9 +13,14 @@
 #include <iostream>
 
 
-PadFile::PadFile(const char* pcFile) : m_file(QString(pcFile))
+PadFile::PadFile(const char* pcFile)
+		: m_file(QString(pcFile)),
+		  m_params(":", "#")
 {
 	m_file.open(QIODevice::ReadOnly);
+
+	if(IsOpen())
+		LoadParams();
 }
 
 PadFile::~PadFile()
@@ -31,6 +36,25 @@ unsigned int PadFile::GetWidth()
 unsigned int PadFile::GetHeight()
 {
 	return Settings::Get<unsigned int>("casc/y_res");
+}
+
+void PadFile::LoadParams()
+{
+	qint64 iDataLen = qint64(GetWidth()*GetHeight()*sizeof(int));
+	qint64 iFileLen = m_file.size();
+	qint64 iParamLen = iFileLen-iDataLen;
+
+	if(iParamLen > 0)
+	{
+		const char* pcParams = (char*)m_file.map(iDataLen, iParamLen);
+
+		std::string strParams;
+		strParams.assign(pcParams, std::size_t(iParamLen));
+
+		m_params.ParseString(strParams);
+
+		m_file.unmap((uchar*)pcParams);
+	}
 }
 
 const unsigned int* PadFile::GetData()
@@ -58,13 +82,39 @@ void PadFile::ReleaseData(const unsigned int *pv)
 
 
 
-TofFile::TofFile(const char* pcFile) : m_file(QString(pcFile))
+TofFile::TofFile(const char* pcFile)
+		: m_file(QString(pcFile)),
+		  m_params(":", "#")
 {
 	m_file.open(QIODevice::ReadOnly);
+
+	if(IsOpen())
+		LoadParams();
 }
 
 TofFile::~TofFile()
 {}
+
+void TofFile::LoadParams()
+{
+	qint64 iDataLen = qint64(GetWidth()*GetHeight()*GetTcCnt()*GetFoilCnt()*sizeof(int));
+	qint64 iFileLen = m_file.size();
+	qint64 iParamLen = iFileLen-iDataLen;
+
+	if(iParamLen > 0)
+	{
+		const char* pcParams = (char*)m_file.map(iDataLen, iParamLen);
+
+		std::string strParams;
+		strParams.assign(pcParams, std::size_t(iParamLen));
+
+		//std::cout << strParams << std::endl;
+
+		m_params.ParseString(strParams);
+
+		m_file.unmap((uchar*)pcParams);
+	}
+}
 
 unsigned int TofFile::GetWidth()
 { return PadFile::GetWidth(); }
