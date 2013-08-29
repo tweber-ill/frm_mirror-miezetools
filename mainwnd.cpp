@@ -304,7 +304,7 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuWindows->addAction(pWndList);
 
 	QAction *pInfoWnd = new QAction(this);
-	pInfoWnd->setText("Toggle Info");
+	pInfoWnd->setText("Toggle Info Pane");
 	pMenuWindows->addAction(pInfoWnd);
 
 	pMenuWindows->addSeparator();

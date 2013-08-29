@@ -48,7 +48,7 @@ public:
 		strLibs += "\n";
 
 		this->labelTitle->setText("Cattus");
-		this->labelVersion->setText("Version 0.3");
+		this->labelVersion->setText("Version 0.4");
 		this->labelAuthor->setText("Written by Tobias Weber, 2012-2013");
 		this->labelBuild->setText(strBuild);
 		this->labelDate->setText(strDate);
