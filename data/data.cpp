@@ -33,8 +33,6 @@ void load_xml_vecs(unsigned int iNumVecs,
 				{
 					qint64 iLenComp = xml.Query<qint64>((strBase + "blob_" + pstrs[iObj] + "_size").c_str(), 0);
 					void *pvMemComp = blob.map(iBlobIdx, iLenComp);
-					void *pvMemUncomp;
-					unsigned int iLenUncomp = 0;
 
 					TmpFile tmp;
 					if(!tmp.open())
@@ -46,7 +44,6 @@ void load_xml_vecs(unsigned int iNumVecs,
 					std::string strTmpFile = tmp.GetFileName();
 					std::ofstream ofstrTmp(strTmpFile, std::ios::binary);
 
-					//if(!::decomp_mem_to_mem(pvMemComp, (unsigned int)iLenComp, pvMemUncomp, iLenUncomp))
 					if(!::decomp_mem_to_stream(pvMemComp, (unsigned int)iLenComp, ofstrTmp))
 						std::cerr << "Error: Cannot decompress data in blob." << std::endl;
 
@@ -62,22 +59,6 @@ void load_xml_vecs(unsigned int iNumVecs,
 						(*pvecs[iObj])[iElem] = d;
 					}
 					ifstrTmp.close();
-
-					/*
-					if(iLenUncomp/sizeof(double) != pvecs[iObj]->size())
-						std::cerr << "Error: Uncompressed stream has wrong size." << std::endl;
-
-					// take the smaller of the two sizes
-					unsigned int iNumElems = iLenUncomp/sizeof(double);
-					if(pvecs[iObj]->size() < iNumElems)
-						iNumElems = pvecs[iObj]->size();
-
-					const double *pdDat = (const double*)pvMemUncomp;
-					for(unsigned int iElem=0; iElem<iNumElems; ++iElem)
-						(*pvecs[iObj])[iElem] = pdDat[iElem];
-
-					delete[] pvMemUncomp;
-					*/
 				}
 				else
 				{

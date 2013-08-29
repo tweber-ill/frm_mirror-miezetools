@@ -103,6 +103,8 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		pPlot->plot_manual();
 		pPlot->SetLabels("x pixels", "y pixels", "");
 
+		pPlot->GetData().SetParamMap(tof.GetParamMap());
+
 		AddSubWindow(pPlotWrapper);
 	}
 	else if(is_equal(strExt, "pad"))
@@ -132,6 +134,8 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		pPlot->plot(iW, iH, pdDat);
 		pPlot->SetLabels("x pixels", "y pixels", "");
 
+		pPlot->GetData2().SetParamMap(pad.GetParamMap());
+
 		delete[] pdDat;
 
 		AddSubWindow(pPlot);
@@ -146,10 +150,14 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			return;
 		}
 
+
 		TxtType dattype = pdat->GetFileType();
 
 		if(dattype == MCSTAS_DATA)
 		{
+			StringMap mapStr;
+			mapStr.SetMap(vecmap_to_map<std::string>(pdat->GetCommMap()));
+
 			//dat.SetMapVal<int>("which-col-is-x", 0);
 			//dat.SetMapVal<int>("which-col-is-y", 1);
 			//dat.SetMapVal<int>("which-col-is-yerr", 2);
@@ -209,8 +217,10 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				pPlot->SetXIsLog(bXLog);
 				pPlot->SetYIsLog(bYLog);
 
-				delete pdat1d;
+				if(pPlot->GetDataCount()>=1)
+					pPlot->GetData(0).dat.SetParamMap(mapStr);
 
+				delete pdat1d;
 				AddSubWindow(pPlot);
 			}
 			else if(iArrayDim == 2)
@@ -252,6 +262,8 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				bool bXLog=0, bYLog=0;
 				pdat2d->GetLogScale(bXLog, bYLog);
 				dat2.SetXYLog(bXLog, bYLog);
+
+				pPlot->GetData2().SetParamMap(mapStr);
 
 				delete[] pDat;
 				delete[] pErr;
@@ -303,6 +315,8 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				pdat3d->GetLogScale(bXLog, bYLog);
 				dat3.SetXYLog(bXLog, bYLog);
 
+				pPlot->GetData().SetParamMap(mapStr);
+
 				delete[] pDat;
 				delete[] pErr;
 				delete pdat3d;
@@ -313,6 +327,9 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		else if(dattype == NICOS_DATA)
 		{
 			NicosData * pnicosdat = new NicosData(*pdat);
+			StringMap mapStr;
+			mapStr.SetMap(vecmap_to_map<std::string>(pdat->GetCommMap()));
+
 			::autodeleter<NicosData> _a0(pnicosdat);
 			const std::string strCtrName = Settings::Get<QString>("nicos/counter_name").toStdString();
 
@@ -374,6 +391,9 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			std::string strPlotTitle;
 			pPlot->SetLabels(strLabX.c_str(), strLabY.c_str());
 			pPlot->SetTitle(strPlotTitle.c_str());
+
+			if(pPlot->GetDataCount()>=1)
+				pPlot->GetData(0).dat.SetParamMap(mapStr);
 
 			AddSubWindow(pPlot);
 		}

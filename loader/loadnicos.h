@@ -13,6 +13,9 @@
 
 class NicosData
 {
+	private:
+		static void FilterComments(LoadTxt::t_mapComm& mapComm);
+
 	protected:
 		const LoadTxt& m_data;
 		bool m_bOk;

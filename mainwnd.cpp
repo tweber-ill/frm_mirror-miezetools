@@ -43,6 +43,7 @@
 
 MiezeMainWnd::MiezeMainWnd()
 					: m_pmdi(new QMdiArea(this)),
+					  m_pinfo(new InfoDock(this)),
 					  m_iPlotCnt(1),
 					  m_pcombinedlg(0), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)),
@@ -54,6 +55,7 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_pexportdlg(0)
 {
 	this->setWindowTitle(WND_TITLE);
+	this->addDockWidget(Qt::RightDockWidgetArea, m_pinfo);
 	m_proidlg->setWindowTitle("Inclusive ROI");
 	m_pantiroidlg->setWindowTitle("Exclusive ROI");
 
@@ -63,6 +65,9 @@ MiezeMainWnd::MiezeMainWnd()
 	//m_pmdi->setTabPosition(QTabWidget::South);
 	m_pmdi->setViewMode(QMdiArea::SubWindowView);
 	m_pmdi->setOption(QMdiArea::DontMaximizeSubWindowOnActivation, 1);
+	m_pmdi->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_pmdi->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
 	this->setCentralWidget(m_pmdi);
 
 
@@ -295,8 +300,12 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuWindows->setTitle("Windows");
 
 	QAction *pWndList = new QAction(this);
-	pWndList->setText("List...");
+	pWndList->setText("List Windows...");
 	pMenuWindows->addAction(pWndList);
+
+	QAction *pInfoWnd = new QAction(this);
+	pInfoWnd->setText("Toggle Info");
+	pMenuWindows->addAction(pInfoWnd);
 
 	pMenuWindows->addSeparator();
 
@@ -425,6 +434,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(m_pantiroidlg, SIGNAL(SetRoiForAll()), this, SLOT(SetGlobalAntiROIForAll()));
 
 
+	QObject::connect(pInfoWnd, SIGNAL(triggered()), this, SLOT(ToggleInfoWindow()));
 	QObject::connect(pWndList, SIGNAL(triggered()), this, SLOT(ShowListWindowsDlg()));
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
@@ -458,6 +468,9 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pformuladlg) delete m_pformuladlg;
 	if(m_pplotpropdlg) delete m_pplotpropdlg;
 	if(m_pexportdlg) delete m_pexportdlg;
+
+	if(m_pinfo) delete m_pinfo;
+	if(m_pmdi) delete m_pmdi;
 }
 
 
@@ -620,6 +633,14 @@ void MiezeMainWnd::ShowListWindowsDlg()
 		for(auto wnd : lstWnds)
 			std::cout << wnd->windowTitle().toStdString() << std::endl;
 	}*/
+}
+
+void MiezeMainWnd::ToggleInfoWindow()
+{
+	if(!m_pinfo->isVisible())
+		m_pinfo->show();
+	else
+		m_pinfo->hide();
 }
 
 void MiezeMainWnd::ShowCombineGraphsDlg()

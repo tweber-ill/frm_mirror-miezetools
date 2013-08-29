@@ -126,6 +126,8 @@ void MiezeMainWnd::SubWindowChanged()
 		bSignal = 0;
 	}
 
+	m_pinfo->SetMiscParams(pSWB->GetDataInterface()->GetParamMap());
+
 	if(bSignal)
 		emit SubWindowActivated(pSWB);
 }

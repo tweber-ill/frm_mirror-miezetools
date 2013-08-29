@@ -32,6 +32,8 @@ public:
 	bool IsOpen() const;
 	const unsigned int* GetData();
 	void ReleaseData(const unsigned int *pv);
+
+	const StringMap& GetParamMap() { return m_params; }
 };
 
 
@@ -56,6 +58,8 @@ public:
 	bool IsOpen() const;
 	const unsigned int* GetData(unsigned int iFoil);
 	void ReleaseData(const unsigned int *pv);
+
+	const StringMap& GetParamMap() { return m_params; }
 };
 
 #endif

@@ -15,6 +15,7 @@
 #include "helper/xml.h"
 #include "helper/blob.h"
 
+class DataInterface;
 class Plot;
 class Plot2d;
 class Plot3d;
@@ -56,6 +57,8 @@ signals:
 public:
 	SubWindowBase(QWidget* pParent=0) : QWidget(pParent) {}
 	virtual ~SubWindowBase() { emit WndDestroyed(this); }
+
+	virtual const DataInterface* GetDataInterface() const = 0;
 
 	virtual SubWindowType GetType() const = 0;
 	virtual SubWindowBase* GetActualWidget() { return this; }

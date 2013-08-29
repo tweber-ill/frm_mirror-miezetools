@@ -20,6 +20,7 @@ namespace ublas = boost::numeric::ublas;
 #include "../roi/roi.h"
 #include "../helper/xml.h"
 #include "../helper/blob.h"
+#include "../helper/string.h"
 
 enum DataType
 {
@@ -131,6 +132,9 @@ public:
 
 class DataInterface : public RoiFlags
 {
+protected:
+	StringMap m_mapData;
+
 public:
 	DataInterface() {}
 	virtual ~DataInterface() {}
@@ -138,6 +142,9 @@ public:
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return false; }
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return false; }
+
+	const StringMap& GetParamMap() const { return m_mapData; }
+	void SetParamMap(const StringMap& mapParam) { m_mapData = mapParam; }
 };
 
 

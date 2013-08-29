@@ -530,7 +530,7 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 
 void Plot2d::SetROI(const Roi* pROI, bool bAntiRoi)
 {
-	DataInterface* pDat = GetInternalData();
+	DataInterface* pDat = GetDataInterface();
 	if(!pDat) return;
 
 	pDat->SetROI(pROI, bAntiRoi);
@@ -539,7 +539,7 @@ void Plot2d::SetROI(const Roi* pROI, bool bAntiRoi)
 
 Roi* Plot2d::GetROI(bool bAntiRoi)
 {
-	DataInterface* pDat = GetInternalData();
+	DataInterface* pDat = GetDataInterface();
 	if(!pDat) return 0;
 
 	return &pDat->GetRoi(bAntiRoi);

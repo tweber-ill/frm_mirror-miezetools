@@ -9,6 +9,25 @@
 
 #include <algorithm>
 
+
+void NicosData::FilterComments(LoadTxt::t_mapComm& mapComm)
+{
+	LoadTxt::t_mapComm::iterator iter;
+	for(iter=mapComm.begin(); iter!=mapComm.end();)
+	{
+		const std::string& strKey = (*iter).first;
+
+		if(begins_with(strKey, "##"))
+		{
+			mapComm.erase(iter);
+			iter = mapComm.begin();
+			continue;
+		}
+
+		++iter;
+	}
+}
+
 NicosData::NicosData(const LoadTxt& data) : m_data(data), m_bOk(0)
 {
 	const std::vector<std::string>& strAux = m_data.GetAuxStrings();
@@ -20,6 +39,9 @@ NicosData::NicosData(const LoadTxt& data) : m_data(data), m_bOk(0)
 
 	//for(auto str : m_vecColNames) std::cout << str << std::endl;
 	//for(auto str : m_vecColUnits) std::cout << str << std::endl;
+
+	LoadTxt& dat = const_cast<LoadTxt&>(data);
+	FilterComments(dat.GetCommMap());
 
 	m_bOk = 1;
 }

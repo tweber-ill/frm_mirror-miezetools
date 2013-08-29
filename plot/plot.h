@@ -100,6 +100,13 @@ public:
 	const PlotObj& GetData(unsigned int iIdx=0) const { return m_vecObjs[iIdx]; }
 	PlotObj& GetData(unsigned int iIdx=0) { return m_vecObjs[iIdx]; }
 
+	virtual const DataInterface* GetDataInterface() const
+	{
+		if(GetDataCount()>0)
+			return &GetData(0).dat;
+		return 0;
+	}
+
 	void SetLabels(const char* pcX, const char* pcY)
 	{
 		m_strXAxis = QString(pcX);

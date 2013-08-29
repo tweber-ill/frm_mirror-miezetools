@@ -31,6 +31,7 @@
 #include "dialogs/FormulaDlg.h"
 #include "dialogs/PlotPropDlg.h"
 #include "dialogs/ExportDlg.h"
+#include "dialogs/InfoDock.h"
 
 #define MAX_RECENT_FILES 32
 #define WND_TITLE "Cattus, a MIEZE toolset"
@@ -45,6 +46,7 @@ class MiezeMainWnd : public QMainWindow
 { Q_OBJECT
 protected:
 	QMdiArea *m_pmdi;
+	InfoDock *m_pinfo;
 
 	CombineGraphsDlg *m_pcombinedlg;
 	FitDlg *m_pfitdlg;
@@ -113,6 +115,7 @@ protected slots:
 
 	void UpdateSubWndList();
 	void ShowListWindowsDlg();
+	void ToggleInfoWindow();
 
 	void ShowCombineGraphsDlg();
 	void IntAlongY();

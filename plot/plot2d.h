@@ -109,8 +109,8 @@ public:
 	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false);
 	virtual PlotInfo GetPlotInfo() const;
 
-protected:
-	virtual DataInterface* GetInternalData() { return &m_dat; }
+	virtual const DataInterface* GetDataInterface() const { return &m_dat; }
+	virtual DataInterface* GetDataInterface() { return &m_dat; }
 
 public:
 	virtual void SetROI(const Roi* pROI, bool bAntiRoi=0);

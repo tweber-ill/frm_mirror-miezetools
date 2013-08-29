@@ -201,6 +201,8 @@ void MiezeMainWnd::UpdateRecentSessionMenu()
 		QSignalMapper *pSigs = new QSignalMapper(this);
 		pSigs->setMapping(pRec, pRec->text());
 		QObject::connect(pRec, SIGNAL(triggered()), pSigs, SLOT(map()));
+
+		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), m_pmdi, SLOT(closeAllSubWindows()));
 		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), this, SLOT(LoadSession(const QString&)));
 	}
 }
