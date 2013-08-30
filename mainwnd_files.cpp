@@ -106,6 +106,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		pPlot->GetData().SetParamMap(tof.GetParamMap());
 
 		AddSubWindow(pPlotWrapper);
+		pPlotWrapper->GetActualWidget()->RefreshPlot();
 	}
 	else if(is_equal(strExt, "pad"))
 	{
@@ -139,6 +140,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		delete[] pdDat;
 
 		AddSubWindow(pPlot);
+		pPlot->GetActualWidget()->RefreshPlot();
 	}
 	else if(is_equal(strExt, "dat") || is_equal(strExt, "sim"))
 	{
@@ -426,8 +428,12 @@ void MiezeMainWnd::FileLoadTriggered()
 
 	m_strLastXColumn = "";
 	bool bDirSet=false;
+
+	unsigned int iFile = 0;
 	for(const QString& strFile : strFiles)
 	{
+		std::cout << "Loading " << (iFile+1) << " of " << strFiles.size() << "." << std::endl;
+
 		if(strFile == "")
 			continue;
 
@@ -441,6 +447,7 @@ void MiezeMainWnd::FileLoadTriggered()
 		}
 
 		LoadFile(strFile1);
+		++iFile;
 	}
 }
 

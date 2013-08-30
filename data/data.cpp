@@ -76,31 +76,11 @@ void load_xml_vecs(unsigned int iNumVecs,
 					qint64 iLenComp = xml.Query<qint64>((strBase + "blob_" + pstrs[iObj] + "_size").c_str(), 0);
 					void *pvMemComp = blob.map(iBlobIdx, iLenComp);
 
-					TmpFile tmp;
-					if(!tmp.open())
-					{
-						std::cerr << "Error: Cannot open temporary file for blob loading." << std::endl;
-						continue;
-					}
-
-					std::string strTmpFile = tmp.GetFileName();
-					std::ofstream ofstrTmp(strTmpFile, std::ios::binary);
-
-					if(!::decomp_mem_to_stream(pvMemComp, (unsigned int)iLenComp, ofstrTmp))
+					double *pdMemUncomp = pvecs[iObj]->data();
+					if(!::decomp_mem_to_mem_fix(pvMemComp, (unsigned int)iLenComp, (void*)pdMemUncomp, pvecs[iObj]->size()*sizeof(double)))
 						std::cerr << "Error: Cannot decompress data in blob." << std::endl;
 
 					blob.unmap(pvMemComp);
-					ofstrTmp.close();
-
-
-					std::ifstream ifstrTmp(strTmpFile, std::ios::binary);
-					for(unsigned int iElem=0; iElem<pvecs[iObj]->size(); ++iElem)
-					{
-						double d;
-						ifstrTmp.read((char*)&d, sizeof d);
-						(*pvecs[iObj])[iElem] = d;
-					}
-					ifstrTmp.close();
 				}
 				else
 				{
@@ -147,26 +127,8 @@ void save_xml_vecs(unsigned int iNumVecs,
 			}
 			else
 			{
-				TmpFile tmp;
-				if(!tmp.open())
-				{
-					std::cerr << "Error: Cannot open temporary file for blob saving." << std::endl;
-					continue;
-				}
-
-				std::string strTmpFile = tmp.GetFileName();
-
-				std::ofstream ofstrTmp(strTmpFile, std::ios::binary);
-				for(double d : *pvecs[iObj])
-					ofstrTmp.write((char*)&d, sizeof(d));
-				ofstrTmp.close();
-
-				//std::ofstream ofstrTst("/home/tweber/tst.000", std::ios::binary);
-
-				std::ifstream ifstrTmp(strTmpFile, std::ios::binary);
-				if(!::comp_stream_to_stream(ifstrTmp, ostrBlob))
+				if(!comp_mem_to_stream((void*)pvecs[iObj]->data(), pvecs[iObj]->size()*sizeof(double), ostrBlob/*, COMP_BZ2*/))
 					std::cerr << "Error: Cannot compress data in blob." << std::endl;
-				ofstrTmp.close();
 			}
 
 			qint64 iBlobIdxNew = ostrBlob.tellp();

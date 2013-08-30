@@ -6,8 +6,11 @@
 
 #include <QtCore/QMetaType>
 #include <QtGui/QApplication>
+//#include <QtGui/QCleanlooksStyle>
 #include <iostream>
+#include <fstream>
 #include <string>
+
 #include "helper/string.h"
 #include "helper/rand.h"
 
@@ -40,6 +43,13 @@ static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 
 int main(int argc, char **argv)
 {
+	/*
+	std::ofstream ofstrErr("cerr.log");
+	std::cerr.rdbuf(ofstrErr.rdbuf());
+	std::ofstream ofstrOut("cout.log");
+	std::cout.rdbuf(ofstrOut.rdbuf());
+	*/
+
 #ifdef Q_WS_X11
 	XInitThreads();
 #endif
@@ -53,6 +63,8 @@ int main(int argc, char **argv)
 	{
 		QSettings *pGlobals = Settings::GetGlobals();
 		QApplication a(argc, argv);
+		//std::cout << a.type() << std::endl;
+		//a.setStyle(new QCleanlooksStyle);
 
 		MiezeMainWnd wnd;
 		SettingsDlg::set_global_defaults();

@@ -39,6 +39,8 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 
 	for(unsigned int iWnd=0; iWnd<iWndCnt; ++iWnd)
 	{
+		std::cout << "Loading " << (iWnd+1) << " of " << iWndCnt << "." << std::endl;
+
 		std::ostringstream ostrSWBase;
 		ostrSWBase << strBase << "window_" << iWnd << "/";
 		std::string strSWBase = ostrSWBase.str();
@@ -116,6 +118,8 @@ void MiezeMainWnd::SessionSaveTriggered()
 
 	for(SubWindowBase *pWnd : vecWnd)
 	{
+		std::cout << "Saving " << (iWnd+1) << " of " << vecWnd.size() << "." << std::endl;
+
 		std::ostringstream ostrMsg;
 		ostrMsg << "Saving \"" << pWnd->windowTitle().toStdString() << "\"...";
 		this->SetStatusMsg(ostrMsg.str().c_str(), 0);

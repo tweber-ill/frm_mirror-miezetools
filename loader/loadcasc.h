@@ -53,6 +53,7 @@ public:
 	static unsigned int GetHeight();
 	static unsigned int GetFoilCnt();
 	static unsigned int GetTcCnt();
+	static unsigned int GetImgCnt();
 	static std::vector<unsigned int> GetStartIndices();
 
 	bool IsOpen() const;

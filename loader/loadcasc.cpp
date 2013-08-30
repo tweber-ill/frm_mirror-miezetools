@@ -97,7 +97,7 @@ TofFile::~TofFile()
 
 void TofFile::LoadParams()
 {
-	qint64 iDataLen = qint64(GetWidth()*GetHeight()*GetTcCnt()*GetFoilCnt()*sizeof(int));
+	qint64 iDataLen = qint64(GetWidth()*GetHeight()*GetImgCnt()*sizeof(int));
 	qint64 iFileLen = m_file.size();
 	qint64 iParamLen = iFileLen-iDataLen;
 
@@ -107,11 +107,9 @@ void TofFile::LoadParams()
 
 		std::string strParams;
 		strParams.assign(pcParams, std::size_t(iParamLen));
-
 		//std::cout << strParams << std::endl;
 
 		m_params.ParseString(strParams);
-
 		m_file.unmap((uchar*)pcParams);
 	}
 }
@@ -130,6 +128,15 @@ unsigned int TofFile::GetFoilCnt()
 unsigned int TofFile::GetTcCnt()
 {
 	return Settings::Get<unsigned int>("casc/tc_cnt");
+}
+
+// total images, including non-used ones between half-spaces
+unsigned int TofFile::GetImgCnt()
+{
+	std::vector<unsigned int> vecStartIndices = GetStartIndices();
+	unsigned int iLastIdx = *vecStartIndices.rbegin();
+
+	return iLastIdx+GetTcCnt();
 }
 
 std::vector<unsigned int> TofFile::GetStartIndices()

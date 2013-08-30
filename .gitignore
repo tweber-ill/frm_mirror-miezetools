@@ -9,3 +9,6 @@ Debug/*
 Release/*
 ui/*.h
 cattus
+perf.data
+perf.data.old
+gmon.out

@@ -123,6 +123,8 @@ void Data4::SetVals(uint iD2, const double *pDat, const double *pErr)
 
 				m_dTotal += dVal;
 			}
+
+	//RecalcMinMaxTotal();
 }
 
 void Data4::SetErr(uint iX, uint iY, uint iD, uint iD2, double dVal)
