@@ -280,7 +280,9 @@ bool Data2::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
 	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
 	m_dTotal = xml.Query<double>((strBase+"total").c_str(), 0.);
-	return 1;
+
+
+	return DataInterface::LoadXML(xml, blob, strBase);;
 }
 
 bool Data2::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
@@ -303,5 +305,5 @@ bool Data2::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 	if(m_antiroi.GetNumElements())
 		m_antiroi.SaveXML(ostr);
 
-	return 1;
+	return DataInterface::SaveXML(ostr, ostrBlob);
 }

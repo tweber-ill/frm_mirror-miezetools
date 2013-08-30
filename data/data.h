@@ -140,8 +140,8 @@ public:
 	virtual ~DataInterface() {}
 	virtual DataType GetType() const = 0;
 
-	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return false; }
-	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return false; }
+	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 
 	const StringMap& GetParamMap() const { return m_mapData; }
 	void SetParamMap(const StringMap& mapParam) { m_mapData = mapParam; }

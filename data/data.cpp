@@ -10,6 +10,48 @@
 #include "../helper/file.h"
 #include <fstream>
 
+
+bool DataInterface::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+{
+	bool bHasBlobIdx = 0;
+	qint64 iBlobIdx = xml.Query<qint64>((strBase + "misc_params_idx").c_str(), 0, &bHasBlobIdx);
+	if(!bHasBlobIdx)
+		return false;
+
+	qint64 iBlobLen = xml.Query<qint64>((strBase + "misc_params_size").c_str(), 0, &bHasBlobIdx);
+	if(!bHasBlobIdx)
+		return false;
+
+	void *pvMem = blob.map(iBlobIdx, iBlobLen);
+	if(!pvMem)
+	{
+		std::cerr << "Error: Cannot map misc parameters from blob memory." << std::endl;
+		return false;
+	}
+
+	bool bOk = m_mapData.Deserialize(pvMem, (unsigned int)iBlobLen);
+
+	blob.unmap(pvMem);
+	return bOk;
+}
+
+bool DataInterface::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
+{
+	qint64 iBlobIdx = ostrBlob.tellp();
+	ostr << "<misc_params_idx> " << iBlobIdx
+			<< " </misc_params_idx>\n";
+
+	if(!m_mapData.Serialize(ostrBlob))
+		return false;
+
+	qint64 iBlobIdxNew = ostrBlob.tellp();
+	ostr << "<misc_params_size> "  << (iBlobIdxNew-iBlobIdx)
+		 << " </misc_params_size>\n";
+
+	return true;
+}
+
+
 void load_xml_vecs(unsigned int iNumVecs,
 						std::vector<double>** pvecs,
 						const std::string* pstrs,

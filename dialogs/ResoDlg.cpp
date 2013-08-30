@@ -104,7 +104,7 @@ void EllipseDlg::SetParams(const PopParams& pop, const CNResults& res)
 
 
 	Xml xmlparams;
-	bool bXMLLoaded = xmlparams.Load("res.conf");
+	bool bXMLLoaded = xmlparams.Load("res/res.conf");
 	bool bCenterOn0 = xmlparams.Query<bool>("/res/center_around_origin", 0);
 
 	for(unsigned int iEll=0; iEll<4; ++iEll)
@@ -248,7 +248,7 @@ void EllipseDlg3D::SetParams(const PopParams& pop, const CNResults& res)
 	const int iIntOrRem[] = {2, 3};
 
 	Xml xmlparams;
-	bool bXMLLoaded = xmlparams.Load("res.conf");
+	bool bXMLLoaded = xmlparams.Load("res/res.conf");
 	bool bCenterOn0 = xmlparams.Query<bool>("/res/center_around_origin", 0);
 
 	ublas::vector<double> Q_avg = res.Q_avg;
@@ -847,8 +847,8 @@ void ResoDlg::SaveFile()
 	QString strLastDir = pGlobals->value("reso/lastdir", ".").toString();
 
 	QString strFile = QFileDialog::getSaveFileName(this, "Save resolution file...", strLastDir,
-					"RES files (*.res *.RES);;All files (*.*)",
-					0, QFileDialog::DontUseNativeDialog);
+					"RES files (*.res *.RES);;All files (*.*)"/*,
+					0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile.length() == 0)
 		return;
 
@@ -894,8 +894,8 @@ void ResoDlg::LoadFile()
 	QString strLastDir = pGlobals->value("reso/lastdir", ".").toString();
 
 	QString strFile = QFileDialog::getOpenFileName(this, "Open resolution file...", strLastDir,
-					"RES files (*.res *.RES);;All files (*.*)",
-					0, QFileDialog::DontUseNativeDialog);
+					"RES files (*.res *.RES);;All files (*.*)"/*,
+					0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile.length() == 0)
 		return;
 

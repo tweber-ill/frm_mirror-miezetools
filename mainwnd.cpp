@@ -942,8 +942,7 @@ void MiezeMainWnd::FileExportPyTriggered()
 	QString strLastDir = pGlobals->value("main/lastdir_py", ".").toString();
 
 	QString strFile = QFileDialog::getSaveFileName(this, "Save as Python file...", strLastDir,
-					"Python files (*.py)",
-					0, QFileDialog::DontUseNativeDialog);
+					"Python files (*.py)"/*,0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile == "")
 		return;
 

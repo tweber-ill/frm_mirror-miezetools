@@ -87,7 +87,7 @@ void MiezeMainWnd::SessionLoadTriggered()
 	QSettings *pGlobals = Settings::GetGlobals();
 	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
 	QString strFile = QFileDialog::getOpenFileName(this, "Load Session...", strLastDir,
-					"Session Files (*.cattus)", 0, QFileDialog::DontUseNativeDialog);
+					"Session Files (*.cattus)"/*, 0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile == "")
 		return;
 
@@ -150,7 +150,7 @@ void MiezeMainWnd::SessionSaveAsTriggered()
 	QSettings *pGlobals = Settings::GetGlobals();
 	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
 	QString strFile = QFileDialog::getSaveFileName(this, "Save Session as...", strLastDir,
-					"Session Files (*.cattus)", 0, QFileDialog::DontUseNativeDialog);
+					"Session Files (*.cattus)"/*, 0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile == "")
 		return;
 

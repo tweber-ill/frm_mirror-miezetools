@@ -216,8 +216,8 @@ void RoiDlg::LoadRoi()
 	QString strLastDir = pGlobals->value("main/lastdir_roi", ".").toString();
 
 	QString strFile = QFileDialog::getOpenFileName(this, "Open ROI file...", strLastDir,
-					"ROI files (*.roi *.ROI);;All files (*.*)",
-					0, QFileDialog::DontUseNativeDialog);
+					"ROI files (*.roi *.ROI);;All files (*.*)"/*,
+					0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile.length() == 0)
 		return;
 
@@ -247,8 +247,8 @@ void RoiDlg::SaveRoi()
 	QString strLastDir = pGlobals->value("main/lastdir_roi", ".").toString();
 
 	QString strFile = QFileDialog::getSaveFileName(this, "Save ROI file...", strLastDir,
-					"ROI files (*.roi *.ROI);;All files (*.*)",
-					0, QFileDialog::DontUseNativeDialog);
+					"ROI files (*.roi *.ROI);;All files (*.*)"/*,
+					0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile.length() == 0)
 		return;
 

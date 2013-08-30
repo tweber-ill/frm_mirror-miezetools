@@ -144,8 +144,8 @@ void ExportDlg::Export()
 
 	QString strFile = QFileDialog::getSaveFileName(this,
 					"Save as Python file...", strLastDir,
-					"Python files (*.py)", 0,
-					QFileDialog::DontUseNativeDialog);
+					"Python files (*.py)"/*, 0,
+					QFileDialog::DontUseNativeDialog*/);
 	if(strFile == "")
 		return;
 
