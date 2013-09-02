@@ -42,6 +42,11 @@ class MiezeSinModel : public FunctionModel
 		double GetAmpErr() const { return m_damperr; }
 		double GetPhaseErr() const { return m_dphaseerr; }
 		double GetOffsErr() const { return m_doffserr; }
+
+		const char* GetModelName() const { return "mieze_sine"; }
+		virtual std::vector<std::string> GetParamNames() const;
+		virtual std::vector<double> GetParamValues() const;
+		virtual std::vector<double> GetParamErrors() const;
 };
 
 

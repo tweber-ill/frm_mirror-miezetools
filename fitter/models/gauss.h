@@ -48,6 +48,11 @@ class GaussModel : public FunctionModel
 
 		void Normalize();
 		bool IsNormalized() const { return m_bNormalized; }
+
+		const char* GetModelName() const { return "gaussian"; }
+		virtual std::vector<std::string> GetParamNames() const;
+		virtual std::vector<double> GetParamValues() const;
+		virtual std::vector<double> GetParamErrors() const;
 };
 
 
@@ -100,6 +105,11 @@ class MultiGaussModel : public FunctionModel
 
 		void Normalize();
 		bool IsNormalized() const { return m_bNormalized; }
+
+		const char* GetModelName() const { return "multi_gaussian"; }
+		virtual std::vector<std::string> GetParamNames() const;
+		virtual std::vector<double> GetParamValues() const;
+		virtual std::vector<double> GetParamErrors() const;
 
 		friend bool get_multigauss(unsigned int iLen,
 				const double *px, const double *py, const double *pdy,

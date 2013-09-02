@@ -156,12 +156,15 @@ Data3 Data4::GetVal(uint iD2) const
 			}
 
 	dat.SetTotal(dTotal);
+	dat.CopyParamMapsFrom(this);
+
 	return dat;
 }
 
 Data2 Data4::GetVal(uint iD, uint iD2) const
 {
 	Data2 dat(m_iWidth, m_iHeight);
+	dat.CopyParamMapsFrom(this);
 	dat.CopyXYRangeFrom(this);
 	dat.CopyRoiFlagsFrom(this);
 
@@ -183,12 +186,14 @@ Data2 Data4::GetVal(uint iD, uint iD2) const
 		}
 
 	dat.SetTotal(dTotal);
+
 	return dat;
 }
 
 Data1 Data4::GetXYSum(uint iD2) const
 {
 	Data1 dat;
+	dat.CopyParamMapsFrom(this);
 	dat.SetLength(this->GetDepth());
 
 	uint iYStart=0, iYEnd=GetHeight();
@@ -241,12 +246,14 @@ Data1 Data4::GetXYSum(uint iD2) const
 	}
 
 	delete[] pMem;
+
 	return dat;
 }
 
 Data1 Data4::GetXYD2(uint iX, uint iY, uint iD2) const
 {
 	Data1 dat;
+	dat.CopyParamMapsFrom(this);
 	dat.SetLength(this->GetDepth());
 
 	for(uint iT=0; iT<GetDepth(); ++iT)

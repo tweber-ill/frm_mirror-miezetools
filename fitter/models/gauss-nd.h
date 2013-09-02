@@ -28,6 +28,8 @@ class GaussModel_nd : public FunctionModel_nd
 		virtual double operator()(const double* x) const;
 		virtual FunctionModel_nd* copy() const;
 		virtual std::string print(bool bFillInSyms=true) const;
+
+		const char* GetModelName() const { return "gaussian_ndim"; }
 };
 
 int get_gauss_nd(unsigned int uiDim, unsigned int iLen,

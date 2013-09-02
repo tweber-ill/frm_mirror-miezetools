@@ -29,6 +29,11 @@ class FunctionModel
 		virtual std::string print(bool bFillInSyms=true) const = 0;
 
 		virtual ~FunctionModel();
+
+		virtual const char* GetModelName() const = 0;
+		virtual std::vector<std::string> GetParamNames() const = 0;
+		virtual std::vector<double> GetParamValues() const = 0;
+		virtual std::vector<double> GetParamErrors() const = 0;
 };
 
 // interface for n dimensional function
@@ -60,6 +65,7 @@ class FunctionModel_param
 
 		// t = 0..1
 		virtual boost::numeric::ublas::vector<double> operator()(double t) const = 0;
+		virtual const char* GetModelName() const = 0;
 };
 
 

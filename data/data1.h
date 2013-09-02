@@ -22,6 +22,9 @@ protected:
 public:
 	Data1(uint uiNum=0, const double* pValsX=0, const double* pValsY=0,
 								const double *pErrsY=0, const double *pErrsX=0);
+	//Data1(const Data1& dat);
+	//const Data1& operator=(const Data1&);
+
 	virtual ~Data1() {}
 	virtual DataType GetType() const { return DATA_1D; }
 
@@ -70,7 +73,7 @@ public:
 	double SumY() const;
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob, bool bSaveActualData=1) const;
 };
 
 #endif

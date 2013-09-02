@@ -133,7 +133,8 @@ public:
 class DataInterface : public RoiFlags
 {
 protected:
-	StringMap m_mapData;
+	StringMap m_mapDynData;
+	StringMap m_mapStatData;
 
 public:
 	DataInterface() {}
@@ -143,8 +144,18 @@ public:
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 
-	const StringMap& GetParamMap() const { return m_mapData; }
-	void SetParamMap(const StringMap& mapParam) { m_mapData = mapParam; }
+	StringMap& GetParamMapDyn() { return m_mapDynData; }
+	const StringMap& GetParamMapDyn() const { return m_mapDynData; }
+	void SetParamMapDyn(const StringMap& mapParam) { m_mapDynData = mapParam; }
+
+	const StringMap& GetParamMapStat() const { return m_mapStatData; }
+	void SetParamMapStat(const StringMap& mapParam) { m_mapStatData = mapParam; }
+
+	void CopyParamMapsFrom(const DataInterface* pInt)
+	{
+		this->m_mapStatData = pInt->m_mapStatData;
+		this->m_mapDynData = pInt->m_mapDynData;
+	};
 };
 
 

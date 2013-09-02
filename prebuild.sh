@@ -42,5 +42,6 @@ moc dialogs/RadialIntDlg.h -o dialogs/RadialIntDlg.moc
 moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
 moc dialogs/PlotPropDlg.h -o dialogs/PlotPropDlg.moc
 moc dialogs/ExportDlg.h -o dialogs/ExportDlg.moc
+moc dialogs/InfoDock.h -o dialogs/InfoDock.moc
 
 echo -e "\n"

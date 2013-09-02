@@ -14,6 +14,7 @@
 #include "roi/roi.h"
 #include "helper/xml.h"
 #include "helper/blob.h"
+#include "helper/string.h"
 
 class DataInterface;
 class Plot;
@@ -53,6 +54,8 @@ signals:
 	void DataLoaded();
 
 	void WndDestroyed(SubWindowBase *pThis);
+
+	void ParamsChanged(const StringMap& mapStr);
 
 public:
 	SubWindowBase(QWidget* pParent=0) : QWidget(pParent) {}

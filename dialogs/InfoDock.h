@@ -19,6 +19,7 @@
 
 class InfoWidget : public QWidget, public Ui::InfoWidget
 {
+Q_OBJECT
 protected:
 
 public:
@@ -29,6 +30,7 @@ public:
 
 class InfoDock : public QDockWidget
 {
+Q_OBJECT
 protected:
 	InfoWidget m_widget;
 
@@ -36,7 +38,12 @@ public:
 	InfoDock(QWidget* pParent);
 	virtual ~InfoDock();
 
-	void SetMiscParams(const StringMap& mapStr);
+	// static parameters (instrument specific)
+	void SetParamsStat(const StringMap& mapStr);
+
+public slots:
+	// dynamic parameters
+	void SetParamsDyn(const StringMap& mapStr);
 };
 
 

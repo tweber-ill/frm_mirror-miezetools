@@ -103,7 +103,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		pPlot->plot_manual();
 		pPlot->SetLabels("x pixels", "y pixels", "");
 
-		pPlot->GetData().SetParamMap(tof.GetParamMap());
+		pPlot->GetData().SetParamMapStat(tof.GetParamMap());
 
 		AddSubWindow(pPlotWrapper);
 		pPlotWrapper->GetActualWidget()->RefreshPlot();
@@ -135,7 +135,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		pPlot->plot(iW, iH, pdDat);
 		pPlot->SetLabels("x pixels", "y pixels", "");
 
-		pPlot->GetData2().SetParamMap(pad.GetParamMap());
+		pPlot->GetData2().SetParamMapStat(pad.GetParamMap());
 
 		delete[] pdDat;
 
@@ -220,7 +220,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				pPlot->SetYIsLog(bYLog);
 
 				if(pPlot->GetDataCount()>=1)
-					pPlot->GetData(0).dat.SetParamMap(mapStr);
+					pPlot->GetData(0).dat.SetParamMapStat(mapStr);
 
 				delete pdat1d;
 				AddSubWindow(pPlot);
@@ -265,7 +265,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				pdat2d->GetLogScale(bXLog, bYLog);
 				dat2.SetXYLog(bXLog, bYLog);
 
-				pPlot->GetData2().SetParamMap(mapStr);
+				pPlot->GetData2().SetParamMapStat(mapStr);
 
 				delete[] pDat;
 				delete[] pErr;
@@ -317,7 +317,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				pdat3d->GetLogScale(bXLog, bYLog);
 				dat3.SetXYLog(bXLog, bYLog);
 
-				pPlot->GetData().SetParamMap(mapStr);
+				pPlot->GetData().SetParamMapStat(mapStr);
 
 				delete[] pDat;
 				delete[] pErr;
@@ -395,7 +395,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			pPlot->SetTitle(strPlotTitle.c_str());
 
 			if(pPlot->GetDataCount()>=1)
-				pPlot->GetData(0).dat.SetParamMap(mapStr);
+				pPlot->GetData(0).dat.SetParamMapStat(mapStr);
 
 			AddSubWindow(pPlot);
 		}

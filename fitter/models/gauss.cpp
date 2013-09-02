@@ -90,6 +90,7 @@ std::string GaussModel::print(bool bFillInSyms) const
 	return ostr.str();
 }
 
+
 bool GaussModel::SetParams(const std::vector<double>& vecParams)
 {
 	m_amp = vecParams[0];
@@ -132,6 +133,26 @@ void GaussModel::Normalize()
 		m_bNormalized = true;
 	}
 }
+
+std::vector<std::string> GaussModel::GetParamNames() const
+{
+	std::vector<std::string> vecNames = {"amp", "sigma", "offs"};
+	return vecNames;
+}
+
+std::vector<double> GaussModel::GetParamValues() const
+{
+	std::vector<double> vecVals = { m_amp, m_spread, m_offs };
+	return vecVals;
+}
+
+std::vector<double> GaussModel::GetParamErrors() const
+{
+	std::vector<double> vecErrs = { m_amperr, m_spreaderr, m_offserr };
+	return vecErrs;
+}
+
+
 
 
 bool get_gauss(unsigned int iLen,
@@ -425,6 +446,51 @@ std::string MultiGaussModel::print(bool bFillInSyms) const
 	}
 	return ostr.str();
 }
+
+std::vector<std::string> MultiGaussModel::GetParamNames() const
+{
+	std::vector<std::string> vecNames;
+
+	for(unsigned int i=0; i<m_vecParams.size(); ++i)
+	{
+		std::ostringstream ostrAmp, ostrSigma;
+		ostrAmp << "amp_" << i;
+		ostrSigma << "sigma_" << i;
+
+		vecNames.push_back(ostrAmp.str());
+		vecNames.push_back(ostrSigma.str());
+	}
+
+	vecNames.push_back("offs");
+	return vecNames;
+}
+
+std::vector<double> MultiGaussModel::GetParamValues() const
+{
+	std::vector<double> vecVals;
+	for(unsigned int i=0; i<m_vecParams.size(); ++i)
+	{
+		vecVals.push_back(m_vecParams[i].m_amp);
+		vecVals.push_back(m_vecParams[i].m_spread);
+	}
+	vecVals.push_back(m_offs);
+
+	return vecVals;
+}
+
+std::vector<double> MultiGaussModel::GetParamErrors() const
+{
+	std::vector<double> vecVals;
+	for(unsigned int i=0; i<m_vecParams.size(); ++i)
+	{
+		vecVals.push_back(m_vecParams[i].m_amperr);
+		vecVals.push_back(m_vecParams[i].m_spreaderr);
+	}
+	vecVals.push_back(m_offserr);
+
+	return vecVals;
+}
+
 
 bool MultiGaussModel::SetParams(const std::vector<double>& vecParams)
 {

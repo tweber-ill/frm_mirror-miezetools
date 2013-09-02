@@ -160,6 +160,8 @@ protected slots:
 	void SumFoils();
 	void PlotPropertiesTriggered();
 
+	void PlotParamsDynChanged(const StringMap&);
+
 public:
 	MiezeMainWnd();
 	virtual ~MiezeMainWnd();

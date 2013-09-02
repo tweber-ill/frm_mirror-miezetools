@@ -30,6 +30,13 @@ FreeFktModel::FreeFktModel(const char* pcExp)
 	{
 		std::string strExpression = pcExp;
 		m_parser.ParseExpression(strExpression);
+
+		for(const Symbol& sym : m_parser.GetSymbols())
+		{
+			m_vecParamNames.push_back(sym.strIdent);
+			m_vecParamVals.push_back(sym.dVal);
+			m_vecParamErrs.push_back(0.);
+		}
 	}
 }
 
@@ -84,7 +91,6 @@ std::string FreeFktModel::print(bool bFillInSyms) const
 {
 	return m_parser.GetExpression(bFillInSyms, false);
 }
-
 
 
 
@@ -242,6 +248,7 @@ bool get_freefit(unsigned int iLen,
 	const ROOT::Minuit2::FunctionMinimum& lastmini = *minis.rbegin();
 
 
+	std::vector<std::string> vecParamNames;
 	for(Symbol& sym : syms)
 	{
 		vecFittedNames.push_back(sym.strIdent);
@@ -251,15 +258,20 @@ bool get_freefit(unsigned int iLen,
 		double dErr = lastmini.UserState().Error(sym.strIdent.c_str());
 		dErr = fabs(dErr);
 
+		vecParamNames.push_back(sym.strIdent);
 		vecFittedParams.push_back(dVal);
 		vecFittedErrs.push_back(dErr);
+
 
 		// also write found values back into the symbol table
 		sym.dVal = dVal;
 	}
-
 	
+
 	*pFinalModel = new FreeFktModel(freemod);
+	(*pFinalModel)->m_vecParamNames = vecParamNames;
+	(*pFinalModel)->m_vecParamVals = vecFittedParams;
+	(*pFinalModel)->m_vecParamErrs = vecFittedErrs;
 
 	if(iFitterVerbosity >= 3)
 	{

@@ -112,6 +112,7 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 
 	pPlot->SetLabels(/*pPlot3d->GetZStr().toAscii().data()*/"t", "I");
 	pPlot->SetTitle("");
+	pPlot->GetData(0).dat.CopyParamMapsFrom(&GetData());
 
 	return pPlot;
 }
@@ -123,6 +124,8 @@ Plot2d* Plot3d::ConvertTo2d(int iFoil)
 
 	const Data3& dat3 = this->GetData();
 	Data2 dat2;
+	dat2.CopyParamMapsFrom(&dat3);
+	dat2.CopyXYRangeFrom(&dat3);
 	dat2.CopyRoiFlagsFrom(&dat3);
 	dat2.SetZero();
 

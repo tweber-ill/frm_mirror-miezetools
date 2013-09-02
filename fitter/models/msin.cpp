@@ -88,6 +88,22 @@ double MiezeSinModel::GetContrastErr() const
 	return dErr;
 }
 
+std::vector<std::string> MiezeSinModel::GetParamNames() const
+{
+	std::vector<std::string> m_vecNames = {"amp", "freq", "phase", "offs", "contrast"};
+	return m_vecNames;
+}
+std::vector<double> MiezeSinModel::GetParamValues() const
+{
+	std::vector<double> vecVals = {GetAmp(), GetFreq(), GetPhase(), GetOffs(), GetContrast() };
+	return vecVals;
+}
+std::vector<double> MiezeSinModel::GetParamErrors() const
+{
+	std::vector<double> vecVals = {GetAmpErr(), GetFreqErr(), GetPhaseErr(), GetOffsErr(), GetContrastErr() };
+	return vecVals;
+}
+
 bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 					const double* px, const double* py, const double *pdy,
 					MiezeSinModel** pmodel)

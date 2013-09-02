@@ -141,6 +141,7 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 
 	pPlot->SetLabels(/*pPlot4d->GetZStr().toAscii().data()*/"t", "I");
 	pPlot->SetTitle("");
+	pPlot->GetData(0).dat.CopyParamMapsFrom(&GetData());
 
 	return pPlot;
 }
@@ -152,6 +153,8 @@ Plot2d* Plot4d::ConvertTo2d(int iFoil)
 
 	const Data4& dat4 = this->GetData();
 	Data2 dat2;
+	dat2.CopyParamMapsFrom(&dat4);
+	dat2.CopyXYRangeFrom(&dat4);
 	dat2.CopyRoiFlagsFrom(&dat4);
 	dat2.SetZero();
 
@@ -185,6 +188,8 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 
 	const Data4& dat4 = this->GetData();
 	Data3 dat3;
+	dat3.CopyParamMapsFrom(&dat4);
+	dat3.CopyXYRangeFrom(&dat4);
 	dat3.CopyRoiFlagsFrom(&dat4);
 
 	if(iFoil<0)

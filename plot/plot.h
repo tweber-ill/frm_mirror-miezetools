@@ -23,6 +23,7 @@
 #include "../subwnd.h"
 #include "../data/data.h"
 #include "../fitter/fitter.h"
+#include "../helper/string.h"
 
 enum PlotType
 {
@@ -33,8 +34,8 @@ enum PlotType
 struct PlotObj
 {
 	Data1 dat;
-	std::string strName;
-	std::string strFkt;
+	//std::string strName;
+	//std::string strFkt;
 	PlotType plttype;
 
 	bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
@@ -69,6 +70,8 @@ protected:
 	bool m_bXIsLog, m_bYIsLog;
 	QString m_strXAxis, m_strYAxis, m_strTitle;
 
+	StringMap m_mapMerged;
+
 	QColor GetColor(unsigned int iPlotObj) const;
 
 public:
@@ -77,7 +80,7 @@ public:
 
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
 	void plot(const Data1& dat, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
-	void plot_fkt(const FunctionModel& fkt, int iObj=-1);
+	void plot_fkt(const FunctionModel& fkt, int iObj=-1, bool bKeepObj=false);
 	void replot_fkts();
 	void plot_param(const FunctionModel_param& fkt, int iObj=-1);
 
@@ -99,6 +102,9 @@ public:
 	unsigned int GetDataCount() const { return m_vecObjs.size(); }
 	const PlotObj& GetData(unsigned int iIdx=0) const { return m_vecObjs[iIdx]; }
 	PlotObj& GetData(unsigned int iIdx=0) { return m_vecObjs[iIdx]; }
+
+	void MergeParamMaps();
+	const StringMap& GetParamMapDynMerged() { return m_mapMerged; }
 
 	virtual const DataInterface* GetDataInterface() const
 	{

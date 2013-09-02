@@ -48,6 +48,8 @@ class FreeFktModel_nd : public FunctionModel_nd
 
 		bool IsOk() const
 		{ return m_parser.IsOk(); }
+
+		const char* GetModelName() const { return "user_defined_ndim"; }
 };
 
 bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,

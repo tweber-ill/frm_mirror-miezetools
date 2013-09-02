@@ -17,6 +17,9 @@ class FreeFktModel : public FunctionModel
 {
 	protected:
 		Parser m_parser;
+		std::vector<std::string> m_vecParamNames;
+		std::vector<double> m_vecParamVals;
+		std::vector<double> m_vecParamErrs;
 
 	public:
 		FreeFktModel();
@@ -40,8 +43,21 @@ class FreeFktModel : public FunctionModel
 		std::vector<Symbol>& GetSymbols()
 		{ return m_parser.GetSymbols(); }
 
-		bool IsOk() const
-		{ return m_parser.IsOk(); }
+		bool IsOk() const { return m_parser.IsOk(); }
+
+		const char* GetModelName() const { return "user_defined"; }
+		virtual std::vector<std::string> GetParamNames() const { return m_vecParamNames; }
+		virtual std::vector<double> GetParamValues() const { return m_vecParamVals; }
+		virtual std::vector<double> GetParamErrors() const { return m_vecParamErrs; }
+
+
+		friend bool get_freefit(unsigned int iLen,
+				const double* px, const double* py, const double* pdy,
+				const char* pcExp, const char* pcLimits, const char* pcHints,
+				std::vector<std::string>& vecFittedNames,
+				std::vector<double>& vecFittedParams,
+				std::vector<double>& vecFittedErrs,
+				FreeFktModel** pFinalModel);
 };
 
 void freefit_get_hint(const std::string& strIdent, double& dHint, double &dErr,

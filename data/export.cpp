@@ -92,7 +92,7 @@ static bool export_single_plot_py(const SubWindowBase *pSWB, std::ostream& ofstr
 						<< ")\n\n";
 
 				ofstr << "plt.legend([" << strPlotName << "[0]], [\""
-						<< obj.strFkt
+						<< obj.dat.GetParamMapDyn()["function"]
 						<< "\"], loc='best')\n\n";
 			}
 

@@ -96,11 +96,15 @@ void MiezeMainWnd::SubWindowChanged()
 	SubWindowBase* pSWB = (SubWindowBase*)pWnd->widget();
 	bool bSignal = 1;
 
+	const StringMap *pMapOverride = 0;
+
 	if(pSWB->GetType() == PLOT_1D)
 	{
 		pMenuPlot->clear();
 		pMenuPlot->addActions(m_pMenu1d->actions());
 		pMenuPlot->setEnabled(1);
+
+		pMapOverride = &((Plot*)pSWB)->GetParamMapDynMerged();
 	}
 	else if(pSWB->GetType() == PLOT_2D)
 	{
@@ -126,10 +130,32 @@ void MiezeMainWnd::SubWindowChanged()
 		bSignal = 0;
 	}
 
-	m_pinfo->SetMiscParams(pSWB->GetDataInterface()->GetParamMap());
+	if(pMapOverride)
+		m_pinfo->SetParamsDyn(*pMapOverride);
+	else
+		m_pinfo->SetParamsDyn(pSWB->GetDataInterface()->GetParamMapDyn());
+	m_pinfo->SetParamsStat(pSWB->GetDataInterface()->GetParamMapStat());
 
 	if(bSignal)
 		emit SubWindowActivated(pSWB);
+}
+
+void MiezeMainWnd::PlotParamsDynChanged(const StringMap&)
+{
+	SubWindowBase *pSWB = GetActivePlot(1);
+	if(!pSWB)
+		return;
+
+
+	const StringMap *pMapOverride = 0;
+
+	if(pSWB->GetType() == PLOT_1D)
+		pMapOverride = &((Plot*)pSWB)->GetParamMapDynMerged();
+
+	if(pMapOverride)
+		m_pinfo->SetParamsDyn(*pMapOverride);
+	else
+		m_pinfo->SetParamsDyn(pSWB->GetDataInterface()->GetParamMapDyn());
 }
 
 void MiezeMainWnd::SubWindowDestroyed(SubWindowBase *pSWB)
@@ -145,6 +171,7 @@ void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
 	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
 	QObject::connect(pWnd, SIGNAL(WndDestroyed(SubWindowBase*)), this, SLOT(SubWindowDestroyed(SubWindowBase*)));
 	QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
+	QObject::connect(pActualWidget, SIGNAL(ParamsChanged(const StringMap&)), this, SLOT(PlotParamsDynChanged(const StringMap&)));
 
 	m_pmdi->addSubWindow(pWnd);
 	emit SubWindowAdded(pWnd);

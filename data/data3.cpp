@@ -151,6 +151,7 @@ void Data3::SetVals(const double* pDat, const double *pErr)
 Data2 Data3::GetVal(uint iT) const
 {
 	Data2 dat(m_iWidth, m_iHeight);
+	dat.CopyParamMapsFrom(this);
 	dat.CopyXYRangeFrom(this);
 	dat.CopyRoiFlagsFrom(this);
 
@@ -173,6 +174,7 @@ Data2 Data3::GetVal(uint iT) const
 Data1 Data3::GetXY(uint iX, uint iY) const
 {
 	Data1 dat;
+	dat.CopyParamMapsFrom(this);
 	dat.SetLength(this->GetDepth());
 
 	for(uint iT=0; iT<GetDepth(); ++iT)
@@ -192,6 +194,7 @@ Data1 Data3::GetXY(uint iX, uint iY) const
 Data1 Data3::GetXYSum() const
 {
 	Data1 dat;
+	dat.CopyParamMapsFrom(this);
 	dat.SetLength(this->GetDepth());
 
 	uint iYStart=0, iYEnd=GetHeight();

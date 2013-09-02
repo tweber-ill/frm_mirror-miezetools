@@ -29,6 +29,28 @@ Data1::Data1(uint uiNum, const double* pValsX, const double* pValsY,
 	}
 }
 
+/*Data1::Data1(const Data1& dat)
+{
+	this->operator=(dat);
+}
+
+const Data1& Data1::operator=(const Data1& dat)
+{
+	this->CopyParamMapsFrom(&dat);
+
+	this->m_vecValsX = dat.m_vecValsX;
+	this->m_vecValsY = dat.m_vecValsY;
+	this->m_vecErrsX = dat.m_vecErrsX;
+	this->m_vecErrsY = dat.m_vecErrsY;
+
+	this->m_vecValsXRoiTmp = dat.m_vecValsXRoiTmp;
+	this->m_vecValsYRoiTmp = dat.m_vecValsYRoiTmp;
+	this->m_vecErrsXRoiTmp = dat.m_vecErrsXRoiTmp;
+	this->m_vecErrsYRoiTmp = dat.m_vecErrsYRoiTmp;
+
+	return *this;
+}*/
+
 void Data1::clear()
 {
 	m_vecValsX.clear();
@@ -153,16 +175,19 @@ bool Data1::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	return DataInterface::LoadXML(xml, blob, strBase);
 }
 
-bool Data1::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
+bool Data1::SaveXML(std::ostream& ostr, std::ostream& ostrBlob, bool bSaveActualData) const
 {
 	ostr << "<length> " << m_vecValsX.size() << "</length>\n";
 
-	const bool bSaveInBlob = (m_vecValsX.size() > BLOB_SIZE);
+	if(bSaveActualData)
+	{
+		const bool bSaveInBlob = (m_vecValsX.size() > BLOB_SIZE);
 
-	const std::vector<double>* vecs[] = {&m_vecValsX, &m_vecValsY, &m_vecErrsX, &m_vecErrsY};
-	std::string strs[] = {"x", "y", "x_err", "y_err"};
+		const std::vector<double>* vecs[] = {&m_vecValsX, &m_vecValsY, &m_vecErrsX, &m_vecErrsY};
+		std::string strs[] = {"x", "y", "x_err", "y_err"};
 
-	save_xml_vecs(4, vecs, strs, ostr, ostrBlob, bSaveInBlob);
+		save_xml_vecs(4, vecs, strs, ostr, ostrBlob, bSaveInBlob);
+	}
 
 	if(m_roi.GetNumElements())
 		m_roi.SaveXML(ostr);

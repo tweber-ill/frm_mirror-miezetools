@@ -101,6 +101,8 @@ class Bezier : public FunctionModel_param
 		virtual ~Bezier();
 
 		virtual boost::numeric::ublas::vector<double> operator()(double t) const;
+
+		virtual const char* GetModelName() const { return "bezier"; };
 };
 
 
@@ -116,6 +118,8 @@ class BSpline : public FunctionModel_param
 		virtual ~BSpline();
 
 		virtual boost::numeric::ublas::vector<double> operator()(double t) const;
+
+		virtual const char* GetModelName() const { return "bspline"; };
 };
 
 

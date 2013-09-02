@@ -348,11 +348,14 @@ void Plot::paint()
 			}
 			painter.drawLines(vecCoords);
 
+			const std::string& strFkt = pltobj.dat.GetParamMapDyn()["function"];
+			const std::string& strName = pltobj.dat.GetParamMapDyn()["function_symbolic"];
+
 			QString strToolTip = "";
-			if(pltobj.strFkt != "")
-				strToolTip = ("Function: " + pltobj.strFkt).c_str();
-			else if(pltobj.strName != "")
-				strToolTip = pltobj.strName.c_str();
+			if(strFkt != "")
+				strToolTip = ("Function: " + strFkt).c_str();
+			else if(strName != "")
+				strToolTip = strName.c_str();
 			this->setToolTip(strToolTip);
 		}
 	}
@@ -387,7 +390,7 @@ void Plot::plot(const Data1& dat, PlotType plttype, const char* pcLegend)
 	pltobj.dat = dat;
 	pltobj.plttype = plttype;
 	if(pcLegend)
-		pltobj.strName = std::string(pcLegend);
+		pltobj.dat.GetParamMapDyn()["function_symbolic"] = pcLegend;
 
 	m_vecObjs.push_back(pltobj);
 
@@ -400,9 +403,11 @@ void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 	const uint iCnt = 512;
 
 	PlotObj pltobj;
-	pltobj.plttype = PLOT_FKT;
-	pltobj.strName = "interpolation";
 	Data1& dat = pltobj.dat;
+	pltobj.plttype = PLOT_FKT;
+	StringMap& mapStr = dat.GetParamMapDyn();
+	mapStr["function_type"] = fkt.GetModelName();
+
 
 	dat.SetLength(iCnt);
 	for(uint iX=0; iX<iCnt; ++iX)
@@ -428,18 +433,50 @@ void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 
 	estimate_minmax();
 	RefreshStatusMsgs();
+
+	MergeParamMaps();
+	emit(ParamsChanged(m_mapMerged));
 }
 
-void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
+void Plot::plot_fkt(const FunctionModel& fkt, int iObj, bool bKeepObj)
 {
 	const uint iCnt = 512;
+	PlotObj* pltobj = 0;
 
-	PlotObj pltobj;
-	pltobj.plttype = PLOT_FKT;
-	pltobj.strName = fkt.print(0);
-	pltobj.strFkt = fkt.print(1);
-	Data1& dat = pltobj.dat;
+	if(bKeepObj)
+	{
+		if(iObj<0 || iObj>=m_vecObjs.size())
+		{
+			std::cerr << "Error: Invalid plot index selected." << std::endl;
+			return;
+		}
+		pltobj = &m_vecObjs[iObj];
+	}
+	else
+	{
+		pltobj = new PlotObj;
+	}
 
+	pltobj->plttype = PLOT_FKT;
+	Data1& dat = pltobj->dat;
+
+	if(!bKeepObj)
+	{
+		StringMap& mapStr = dat.GetParamMapDyn();
+		mapStr["function_type"] = fkt.GetModelName();
+		mapStr["function_symbolic"] = fkt.print(0);
+		mapStr["function"] = fkt.print(1);
+
+		std::vector<std::string> vecParamNames = fkt.GetParamNames();
+		std::vector<double> vecParamVals = fkt.GetParamValues();
+		std::vector<double> vecParamErrs = fkt.GetParamErrors();
+		for(unsigned int iParam=0; iParam<vecParamNames.size(); ++iParam)
+		{
+			std::ostringstream ostrParam;
+			ostrParam << vecParamVals[iParam] << " +- " << vecParamErrs[iParam];
+			mapStr[std::string("param_") + vecParamNames[iParam]] = ostrParam.str();
+		}
+	}
 
 	double dxmin=m_dxmin, dxmax=m_dxmax;
 	bool bFirstLoop = 1;
@@ -476,20 +513,29 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj)
 		dat.SetY(iX, fkt(dX));
 	}
 
-	if(iObj<0)
+	if(!bKeepObj)
 	{
-		clearfkt();
-		m_vecObjs.push_back(pltobj);
-	}
-	else
-	{
-		if(m_vecObjs.size() < iObj+1)
-			m_vecObjs.resize(iObj+1);
-		m_vecObjs[iObj] = pltobj;
+		if(iObj<0)
+		{
+			clearfkt();
+			m_vecObjs.push_back(*pltobj);
+		}
+		else
+		{
+			if(m_vecObjs.size() < iObj+1)
+				m_vecObjs.resize(iObj+1);
+			m_vecObjs[iObj] = *pltobj;
+		}
 	}
 
 	estimate_minmax();
 	RefreshStatusMsgs();
+
+	MergeParamMaps();
+	emit(ParamsChanged(m_mapMerged));
+
+	if(!bKeepObj)
+		delete pltobj;
 }
 
 
@@ -499,15 +545,24 @@ void Plot::replot_fkts()
 #ifndef NO_PARSER
 	for(unsigned int iDat=0; iDat<GetDataCount(); ++iDat)
 	{
-		PlotObj& obj1 = GetData(iDat);
-		trim(obj1.strFkt);
-
-		if(obj1.plttype == PLOT_FKT && obj1.strFkt!="")
+		const PlotObj& obj1 = GetData(iDat);
+		if(obj1.plttype == PLOT_FKT)
 		{
-			FreeFktModel fkt(obj1.strFkt.c_str());
-			plot_fkt(fkt, iDat);
+			const StringMap& mapStr = obj1.dat.GetParamMapDyn();
+
+			const std::string& strFkt = mapStr["function"];
+			//std::cout << "--------\n" << mapStr << "--------\n" << std::endl;
+
+			if(strFkt != "")
+			{
+				FreeFktModel fkt(strFkt.c_str());
+				plot_fkt(fkt, iDat, true);
+			}
 		}
 	}
+
+	//MergeParamMaps();
+	//emit(ParamsChanged(m_mapMerged));
 #else
 	std::cerr << "Error: Parser not linked." << std::endl;
 #endif
@@ -530,6 +585,17 @@ void Plot::clear()
 {
 	m_vecObjs.clear();
 	this->repaint();
+}
+
+void Plot::MergeParamMaps()
+{
+	std::vector<const StringMap*> vecMaps;
+	vecMaps.reserve(m_vecObjs.size());
+
+	for(const PlotObj& obj : m_vecObjs)
+		vecMaps.push_back(&obj.dat.GetParamMapDyn());
+
+	m_mapMerged.MergeFrom(vecMaps);
 }
 
 void Plot::RefreshStatusMsgs()
@@ -655,6 +721,8 @@ bool Plot::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 
 		obj.LoadXML(xml, blob, strObjBase);
 		m_vecObjs.push_back(obj);
+
+		//std::cout << m_vecObjs[m_vecObjs.size()-1].dat.GetParamMapDyn() << std::endl;
 	}
 
 	std::string strXLab = xml.QueryString((strBase + "x_label").c_str(), "x");
@@ -675,6 +743,7 @@ bool Plot::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_dymin = xml.Query<double>((strBase + "y_min").c_str(), m_dymin);
 	m_dymax = xml.Query<double>((strBase + "y_max").c_str(), m_dymax);
 
+	//MergeParamMaps();
 	replot_fkts();
 	//RefreshStatusMsgs();
 	//RefreshPlot();
@@ -714,6 +783,8 @@ bool Plot::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 
 bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
+	bool bOk = dat.LoadXML(xml, blob, strBase + "data/");
+
 	std::string strType = xml.QueryString((strBase + "type").c_str(), "data");
 	if(strType == "data")
 		plttype = PLOT_DATA;
@@ -725,16 +796,35 @@ bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 		std::cerr << "Error: Unknown plot object type: \"" << strType << "\"." << std::endl;
 	}
 
-	strName = xml.QueryString((strBase + "name").c_str(), "");
-	strFkt = xml.QueryString((strBase + "function").c_str(), "");
+	std::string strName = xml.QueryString((strBase + "name").c_str(), "");
+	trim(strName);
+	if(strName != "")
+	{
+		std::cerr << "Warning: Deprecated field in data file \"name\" overrides settings in data object."
+				 << std::endl;
 
-	bool bOk = dat.LoadXML(xml, blob, strBase + "data/");
+		dat.GetParamMapDyn()["function_symbolic"] = strName;
+	}
+
+	std::string strFkt = xml.QueryString((strBase + "function").c_str(), "");
+	trim(strFkt);
+	if(strFkt != "")
+	{
+		std::cerr << "Warning: Deprecated field in data file \"function\" overrides settings in data object."
+				 << std::endl;
+
+		dat.GetParamMapDyn()["function"] = strFkt;
+	}
+
 	return bOk;
 }
 
 bool PlotObj::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
 	bool bSaveDat = 1;
+
+	const std::string& strFkt = dat.GetParamMapDyn()["function"];
+	const std::string& strName = dat.GetParamMapDyn()["function_symbolic"];
 
 	std::string strType = "unknown";
 	switch(plttype)
@@ -750,15 +840,12 @@ bool PlotObj::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 	}
 
 	ostr << "<type> " << strType << " </type>\n";
-	ostr << "<name> " << strName << " </name>\n";
-	ostr << "<function> " << strFkt << " </function>\n";
+	//ostr << "<name> " << strName << " </name>\n";
+	//ostr << "<function> " << strFkt << " </function>\n";
 
-	if(bSaveDat)
-	{
-		ostr << "<data>\n";
-		dat.SaveXML(ostr, ostrBlob);
-		ostr << "</data>\n";
-	}
+	ostr << "<data>\n";
+	dat.SaveXML(ostr, ostrBlob, bSaveDat);
+	ostr << "</data>\n";
 	return 1;
 }
 

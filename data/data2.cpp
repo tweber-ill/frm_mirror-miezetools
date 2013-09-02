@@ -170,6 +170,7 @@ Data1 Data2::SumY() const
 		dat1.SetYErr(iX, sqrt(dVal));
 	}
 
+	dat1.CopyParamMapsFrom(this);
 	return dat1;
 }
 

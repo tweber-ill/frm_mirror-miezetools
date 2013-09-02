@@ -13,40 +13,80 @@
 
 bool DataInterface::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 {
+	// static parameters
 	bool bHasBlobIdx = 0;
-	qint64 iBlobIdx = xml.Query<qint64>((strBase + "misc_params_idx").c_str(), 0, &bHasBlobIdx);
+	qint64 iBlobIdx = xml.Query<qint64>((strBase + "stat_params_idx").c_str(), 0, &bHasBlobIdx);
 	if(!bHasBlobIdx)
 		return false;
 
-	qint64 iBlobLen = xml.Query<qint64>((strBase + "misc_params_size").c_str(), 0, &bHasBlobIdx);
+	qint64 iBlobLen = xml.Query<qint64>((strBase + "stat_params_size").c_str(), 0, &bHasBlobIdx);
 	if(!bHasBlobIdx)
 		return false;
 
 	void *pvMem = blob.map(iBlobIdx, iBlobLen);
 	if(!pvMem)
 	{
+		std::cerr << "Error: Cannot map static parameters from blob memory." << std::endl;
+		return false;
+	}
+
+	bool bOk0 = m_mapStatData.Deserialize(pvMem, (unsigned int)iBlobLen);
+
+	blob.unmap(pvMem);
+
+
+
+	// dynamic parameters
+	bHasBlobIdx = 0;
+	iBlobIdx = xml.Query<qint64>((strBase + "dyn_params_idx").c_str(), 0, &bHasBlobIdx);
+	if(!bHasBlobIdx)
+		return false;
+
+	iBlobLen = xml.Query<qint64>((strBase + "dyn_params_size").c_str(), 0, &bHasBlobIdx);
+	if(!bHasBlobIdx)
+		return false;
+
+	pvMem = blob.map(iBlobIdx, iBlobLen);
+	if(!pvMem)
+	{
 		std::cerr << "Error: Cannot map misc parameters from blob memory." << std::endl;
 		return false;
 	}
 
-	bool bOk = m_mapData.Deserialize(pvMem, (unsigned int)iBlobLen);
-
+	bool bOk1 = m_mapDynData.Deserialize(pvMem, (unsigned int)iBlobLen);
+	//std::cout << m_mapDynData << std::endl;
 	blob.unmap(pvMem);
-	return bOk;
+
+
+	return bOk0 && bOk1;
 }
 
 bool DataInterface::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 {
+	// static parameters
 	qint64 iBlobIdx = ostrBlob.tellp();
-	ostr << "<misc_params_idx> " << iBlobIdx
-			<< " </misc_params_idx>\n";
+	ostr << "<stat_params_idx> " << iBlobIdx
+			<< " </stat_params_idx>\n";
 
-	if(!m_mapData.Serialize(ostrBlob))
+	if(!m_mapStatData.Serialize(ostrBlob))
 		return false;
 
 	qint64 iBlobIdxNew = ostrBlob.tellp();
-	ostr << "<misc_params_size> "  << (iBlobIdxNew-iBlobIdx)
-		 << " </misc_params_size>\n";
+	ostr << "<stat_params_size> "  << (iBlobIdxNew-iBlobIdx)
+		 << " </stat_params_size>\n";
+
+
+	// dynamic parameters
+	iBlobIdx = ostrBlob.tellp();
+	ostr << "<dyn_params_idx> " << iBlobIdx
+			<< " </dyn_params_idx>\n";
+
+	if(!m_mapDynData.Serialize(ostrBlob))
+		return false;
+
+	iBlobIdxNew = ostrBlob.tellp();
+	ostr << "<dyn_params_size> "  << (iBlobIdxNew-iBlobIdx)
+		 << " </dyn_params_size>\n";
 
 	return true;
 }
