@@ -208,7 +208,10 @@ void RoiDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	}
 }
 
-void RoiDlg::SetRoiActive(bool bActive) { m_roi.SetRoiActive(bActive); }
+void RoiDlg::SetRoiActive(bool bActive)
+{
+	m_roi.SetRoiActive(bActive);
+}
 
 void RoiDlg::LoadRoi()
 {

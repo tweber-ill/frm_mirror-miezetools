@@ -54,6 +54,7 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_pplotpropdlg(0),
 					  m_pexportdlg(0)
 {
+	this->setWindowIcon(QIcon("res/mainicon.png"));
 	this->setWindowTitle(WND_TITLE);
 	this->addDockWidget(Qt::RightDockWidgetArea, m_pinfo);
 	m_proidlg->setWindowTitle("Inclusive ROI");

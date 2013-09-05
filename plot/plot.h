@@ -113,6 +113,11 @@ public:
 		return 0;
 	}
 
+	virtual DataInterface* GetDataInterface()
+	{
+		return const_cast<DataInterface*>(const_cast<const Plot*>(this)->GetDataInterface());
+	}
+
 	void SetLabels(const char* pcX, const char* pcY)
 	{
 		m_strXAxis = QString(pcX);

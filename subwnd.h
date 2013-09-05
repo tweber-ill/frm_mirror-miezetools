@@ -62,6 +62,7 @@ public:
 	virtual ~SubWindowBase() { emit WndDestroyed(this); }
 
 	virtual const DataInterface* GetDataInterface() const = 0;
+	virtual DataInterface* GetDataInterface() = 0;
 
 	virtual SubWindowType GetType() const = 0;
 	virtual SubWindowBase* GetActualWidget() { return this; }

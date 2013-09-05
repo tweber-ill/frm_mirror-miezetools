@@ -533,13 +533,16 @@ void Plot2d::SetROI(const Roi* pROI, bool bAntiRoi)
 	DataInterface* pDat = GetDataInterface();
 	if(!pDat) return;
 
+	//if(pDat == &GetData2())
+	//	std::cout << "is plot 2d" << std::endl;
+
 	pDat->SetROI(pROI, bAntiRoi);
 	GetData2().SetROI(pROI, bAntiRoi);
 }
 
 Roi* Plot2d::GetROI(bool bAntiRoi)
 {
-	DataInterface* pDat = GetDataInterface();
+	DataInterface* pDat = this->GetDataInterface();
 	if(!pDat) return 0;
 
 	return &pDat->GetRoi(bAntiRoi);

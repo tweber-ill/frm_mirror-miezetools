@@ -52,9 +52,7 @@ public:
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 
 	virtual const DataInterface* GetDataInterface() const { return &m_dat4; }
-
-protected:
-	virtual DataInterface* GetInternalData() { return &m_dat4; }
+	virtual DataInterface* GetDataInterface() { return &m_dat4; }
 };
 
 
@@ -87,6 +85,7 @@ public:
 	virtual Plot3d* ConvertTo3d(int iFoil=-1) { return m_pPlot->ConvertTo3d(iFoil); }
 
 	virtual const DataInterface* GetDataInterface() const { return m_pPlot->GetDataInterface(); }
+	virtual DataInterface* GetDataInterface() { return m_pPlot->GetDataInterface(); }
 
 	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false)
 	{ m_pPlot->ChangeResolution(iNewWidth, iNewHeight, bKeepTotalCounts); }
