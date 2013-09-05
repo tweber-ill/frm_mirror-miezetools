@@ -1,0 +1,29 @@
+tau * Delta E / hbar = Delta phi
+
+
+
+
+totales Diff beider Seiten:
+
+E = 1/2 m v_2^2 - 1/2 m v_1^2
+Delta E = dE/dv_1*dv_1 + dE/dv_2*dv_2 = m v_2 dv_2 - m v_1 dv_1
+
+phi = 2*(t_d - L_1/v_1 - L_b/v_1 - L_s/v_2)*(omega_2-omega_1) + 2*omega_2*L_1/v_1
+Delta phi = dphi/dv_1 * dv_1 + dphi/dv_2 * dv_2
+Delta phi = 2*(L_1/v_1^2 * dv_1 + L_b/v_1^2 * dv_1 + L_s/v_2^2 * dv_2)*(omega_2-omega_1) - 2*omega_2*L_1/v_1^2 * dv_1
+
+
+tau/hbar Delta E = Delta phi
+=>
+tau/hbar m v_2 dv_2 = 2 * (omega_2-omega_1) * L_s/v_2^2 * dv_2
+tau/hbar m v_1 dv_1 = -2 * (omega_2-omega_1) * (L_1/v_1^2 * dv_1 + L_b/v_1^2 * dv_1) - 2*omega_2*L_1/v_1^2 * dv_1
+
+=>
+tau/hbar m = 2 * (omega_2-omega_1) * L_s/v_2^3
+tau/hbar m = -2 * (omega_2-omega_1) * (L_1/v_1^3 + L_b/v_1^3) - 2*omega_2*L_1/v_1^3
+
+=>
+L_s/v_2^3 = -(L_1/v_1^3 + L_b/v_1^3) - omega_2/(omega_2-omega_1)*L_1/v_1^3
+L_s = -((L_1 + L_b) - omega_2/(omega_2-omega_1)*L_1) * v_2^3 / v_1^3
+L_s = -(L_1 + L_b - omega_2/(omega_2-omega_1)*L_1) * v_2^3 / v_1^3
+L_s = (omega_1/(omega_2-omega_1)*L_1 - L_b) * v_2^3/v_1^3
