@@ -6,74 +6,75 @@
 #include <mgl2/qt.h>
 
 
-// http://mathworld.wolfram.com/Helix.html
-ublas::vector<double> helix_vec(double r, double c, double t)
-{
-	ublas::vector<double> vec(3);
-
-	vec[0] = r * cos(t);
-	vec[1] = r * sin(t);
-	vec[2] = c * t;
-
-	return vec;
-}
-
-/*
-ublas::vector<double> helices_vec(double r, double c, const ublas::vector<double>& vecPos)
-{
-	ublas::vector<double> vec = ublas::zero_vector<double>(3);
-
-	const int iCnt = 3;
-	for(int i=0; i<iCnt; ++i)
+ublas::vector<double> helix_vec(double r, double c, const ublas::vector<double>& vecCoord)
+{	
+	static std::vector<ublas::matrix<double> > matrices;
+	static std::vector<ublas::matrix<double> > inv_matrices;
+	
+	static bool bMatricesInited = 0;
+	if(!bMatricesInited)
 	{
-		ublas::vector<double> vecT(3);
-		vecT[0] = 0.;
-		vecT[1] = 0.;
-		vecT[2] = 1.;
+		const double dAngles[3] = {0., 120., 240.};
+		
+		for(double dAngle : dAngles)
+		{
+			dAngle = dAngle/180.*M_PI;
 
-		double dAngle = 2.*M_PI * double(i)/double(iCnt);
-
-		ublas::matrix<double> mat = rotation_matrix_3d_x<double>(dAngle);
-		ublas::vector<double> vecTRot = ublas::prod(mat, vecT);
-		double dTProj = ublas::inner_prod(vecPos, vecTRot);
-
-		ublas::vector<double> vecHelix = helix_vec(r, c, dTProj);
-
-		//double dAnglePos = acos(ublas::inner_prod(vecPos, vecTRot));
-		mat = rotation_matrix_3d_x<double>(dAngle);
-		vecT[0] = 0.;
-		vecT[1] = 0.;
-		vecT[2] = dTProj;
-
-		vecHelix += vecT;
-		vecHelix = ublas::prod(mat, vecHelix);
-		vecT = ublas::prod(mat, vecT);
-		vecHelix -= vecT;
-
-		vec += vecHelix;
+			ublas::matrix<double> matRotNeg = rotation_matrix_3d_x<double>(-dAngle);
+			ublas::matrix<double> matRotPos = rotation_matrix_3d_x<double>(dAngle);
+			
+			matrices.push_back(matRotPos);
+			inv_matrices.push_back(matRotNeg);
+		}
+		
+		bMatricesInited = 1;
 	}
+	
 
-	return vec;
+	ublas::vector<double> vecRet = ublas::zero_vector<double>(3);
+
+	for(int iMatrix=0; iMatrix<matrices.size(); ++iMatrix)
+	{
+		const ublas::matrix<double>& matRotNeg = inv_matrices[iMatrix];
+		const ublas::matrix<double>& matRotPos = matrices[iMatrix];
+
+		ublas::vector<double> vecCoordRot = ublas::prod(matRotNeg, vecCoord);
+
+		ublas::vector<double> vec(3);
+
+		vec[0] = r * cos(vecCoordRot[2]);
+		vec[1] = r * sin(vecCoordRot[2]);
+		vec[2] = /*c * vecCoordRot[2]*/ 0.;
+
+		vec = ublas::prod(matRotPos, vec);
+
+		vecRet += vec;
+	}
+	return vecRet;
 }
-*/
+
 
 int draw(mglGraph *gr)
 {
-	const int iCnt = 16;
+	const int iCnt = 64;
 	mglData datx, daty, datz;
 
 	datx.Create(iCnt, iCnt, iCnt);
 	daty.Create(iCnt, iCnt, iCnt);
 	datz.Create(iCnt, iCnt, iCnt);
 
-	double r = 1;
-	double c = 0.05;
-	const double dScale = 1;
+	double r = 1.;
+	double c = 1.;
+	
+	const double dTScale = 4.;
+	const double dXScale = 24.;
+	const double dYScale = 24.;
+	
+	const double dScale2 = 0.5;
 
 	for(int iZ=0; iZ<iCnt; ++iZ)
 	{
-		double dT = double(iZ)/double(iCnt-1) * 2.*M_PI - M_PI;
-		ublas::vector<double> vec = helix_vec(r, c, dT);
+		double dT = double(iZ)/double(iCnt-1) * 2.*M_PI;
 
 		for(int iY=0; iY<iCnt; ++iY)
 		{
@@ -83,10 +84,18 @@ int draw(mglGraph *gr)
 			{
 				double dX = double(iX)/double(iCnt-1);
 
+				ublas::vector<double> vecCoord(3);
+				vecCoord[0] = dXScale*dX;
+				vecCoord[1] = dYScale*dY;
+				vecCoord[2] = dTScale*dT;
+
+				ublas::vector<double> vec = helix_vec(r, c, vecCoord);
+
+
 				int iIdx = iX + iY*iCnt + iZ*iCnt*iCnt;
-				datx.a[iIdx] = dScale*vec[0];
-				daty.a[iIdx] = dScale*vec[1];
-				datz.a[iIdx] = dScale*vec[2];
+				datx.a[iIdx] = dScale2 * vec[0];
+				daty.a[iIdx] = dScale2 * vec[1];
+				datz.a[iIdx] = dScale2 * vec[2];
 			}
 		}
 	}
