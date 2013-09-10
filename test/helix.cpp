@@ -2,19 +2,31 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 #include <mgl2/qt.h>
 
 
-ublas::vector<double> helix_vec(double r, double c, const ublas::vector<double>& vecCoord)
+ublas::vector<double> helix_vec(double r, double c, const ublas::vector<double>& vecCoord, double dAngleScale=1.)
 {	
 	static std::vector<ublas::matrix<double> > matrices;
 	static std::vector<ublas::matrix<double> > inv_matrices;
-	
+
 	static bool bMatricesInited = 0;
+	static double dLastAngleScale = 1.;
+
+	if(dAngleScale != dLastAngleScale)
+	{
+		bMatricesInited = 0;
+		dLastAngleScale = dAngleScale;
+	}
+	
 	if(!bMatricesInited)
 	{
-		const double dAngles[3] = {0., 120., 240.};
+		matrices.clear();
+		inv_matrices.clear();
+
+		const double dAngles[3] = {0., dAngleScale*120., dAngleScale*240.};
 		
 		for(double dAngle : dAngles)
 		{
@@ -56,43 +68,49 @@ ublas::vector<double> helix_vec(double r, double c, const ublas::vector<double>&
 
 int draw(mglGraph *gr)
 {
-	const int iCnt = 64;
+	const int iCntX = 8;
+	const int iCntY = 96;
+	const int iCntZ = 96;
+	
 	mglData datx, daty, datz;
 
-	datx.Create(iCnt, iCnt, iCnt);
-	daty.Create(iCnt, iCnt, iCnt);
-	datz.Create(iCnt, iCnt, iCnt);
+	datx.Create(iCntX, iCntY, iCntZ);
+	daty.Create(iCntX, iCntY, iCntZ);
+	datz.Create(iCntX, iCntY, iCntZ);
 
 	double r = 1.;
 	double c = 1.;
 	
 	const double dTScale = 4.;
-	const double dXScale = 24.;
-	const double dYScale = 24.;
+	const double dXScale = 1.;
+	const double dYScale = 16.;
 	
-	const double dScale2 = 0.5;
+	const double dScale2 = 0.2;
 
-	for(int iZ=0; iZ<iCnt; ++iZ)
+	static double dAngleScale = 1.;
+	//std::cout << "angle scale: " << dAngleScale << std::endl;
+
+	for(int iZ=0; iZ<iCntZ; ++iZ)
 	{
-		double dT = double(iZ)/double(iCnt-1) * 2.*M_PI;
+		double dT = double(iZ)/double(iCntZ-1) * 2.*M_PI;
 
-		for(int iY=0; iY<iCnt; ++iY)
+		for(int iY=0; iY<iCntY; ++iY)
 		{
-			double dY = double(iY)/double(iCnt-1);
+			double dY = double(iY)/double(iCntY-1);
 
-			for(int iX=0; iX<iCnt; ++iX)
+			for(int iX=0; iX<iCntX; ++iX)
 			{
-				double dX = double(iX)/double(iCnt-1);
+				double dX = double(iX)/double(iCntX-1);
 
 				ublas::vector<double> vecCoord(3);
 				vecCoord[0] = dXScale*dX;
 				vecCoord[1] = dYScale*dY;
 				vecCoord[2] = dTScale*dT;
 
-				ublas::vector<double> vec = helix_vec(r, c, vecCoord);
+				ublas::vector<double> vec = helix_vec(r, c, vecCoord, dAngleScale);
 
 
-				int iIdx = iX + iY*iCnt + iZ*iCnt*iCnt;
+				int iIdx = iX + iY*iCntX + iZ*iCntX*iCntY;
 				datx.a[iIdx] = dScale2 * vec[0];
 				daty.a[iIdx] = dScale2 * vec[1];
 				datz.a[iIdx] = dScale2 * vec[2];
@@ -100,22 +118,48 @@ int draw(mglGraph *gr)
 		}
 	}
 
+	//dAngleScale += 0.005;
+
+
+	gr->Rotate(0, 0, 90);
 
 	//gr->Plot(datx, daty, datz, "");
 	//gr->Vect(datx, daty, datz, "");
 	gr->Vect3(datx, daty, datz, "fx");
 
-	//gr->SetRanges(0, 1, 0, 1, 0, 1);
+
+/*
+	static int iNum = -1;
+	++iNum;
+	std::ostringstream ostrName;
+	ostrName << "frame_";
+
+	ostrName.width(5);
+	char cFill = ostrName.fill('0');
+	ostrName <<  iNum;
+
+	ostrName.fill(cFill);
+	ostrName << ".png";
+	gr->WritePNG(ostrName.str().c_str());
+*/
 	return 0;
 }
 
 
+// gcc -march=native -O2 -o helix helix.cpp -lstdc++ -lm -lmgl-qt -lmgl -std=c++11
+// ffmpeg -r 10 -b 1800 -i frame_%05d.png  -q:v 0 -r 25 -ab 320k movie.mp4
 int main(int argc, char **argv)
 {
-	mglQT *pMGL;
-	pMGL = new mglQT(draw);
+	mglQT *pMGL = new mglQT(draw);
 	pMGL->Run();
 	delete pMGL;
+
+	/*
+	for(int iFrame=0; iFrame<=200; ++iFrame)
+	{
+		mglGraph graph(1920, 1080);
+		draw(&graph);
+	}*/
 
 	return 0;
 }
