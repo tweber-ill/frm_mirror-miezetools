@@ -85,10 +85,11 @@ int draw(mglGraph *gr)
 	const double dXScale = 1.;
 	const double dYScale = 16.;
 	
-	const double dScale2 = 0.2;
+	const double dScale2 = 0.15;
 
-	static double dAngleScale = 1.;
-	//std::cout << "angle scale: " << dAngleScale << std::endl;
+	static double dAngleScale = 0.;
+	std::cout << "angle scale: " << dAngleScale << std::endl;
+
 
 	for(int iZ=0; iZ<iCntZ; ++iZ)
 	{
@@ -109,7 +110,6 @@ int draw(mglGraph *gr)
 
 				ublas::vector<double> vec = helix_vec(r, c, vecCoord, dAngleScale);
 
-
 				int iIdx = iX + iY*iCntX + iZ*iCntX*iCntY;
 				datx.a[iIdx] = dScale2 * vec[0];
 				daty.a[iIdx] = dScale2 * vec[1];
@@ -118,17 +118,31 @@ int draw(mglGraph *gr)
 		}
 	}
 
-	//dAngleScale += 0.005;
+
+	std::ostringstream ostrTitle;
+	ostrTitle << "Helix angles: ";
+	ostrTitle.width(3);
+	ostrTitle << int(120.*dAngleScale);
+	ostrTitle << " deg, ";
+	ostrTitle.width(3);
+	ostrTitle << int(240.*dAngleScale);
+	ostrTitle << " deg";
+	//gr->Title(ostrTitle.str().c_str());
+	gr->Puts(0.5, 0.78, ostrTitle.str().c_str());
 
 
-	gr->Rotate(0, 0, 90);
 
-	//gr->Plot(datx, daty, datz, "");
+	gr->Zoom(0.15,0.15,0.85,0.85);
+
+	//gr->Rotate(0, 0, 90);
+	gr->Rotate(0, 45, -55);
+
 	//gr->Vect(datx, daty, datz, "");
 	gr->Vect3(datx, daty, datz, "fx");
 
 
-/*
+
+
 	static int iNum = -1;
 	++iNum;
 	std::ostringstream ostrName;
@@ -139,27 +153,31 @@ int draw(mglGraph *gr)
 	ostrName <<  iNum;
 
 	ostrName.fill(cFill);
-	ostrName << ".png";
-	gr->WritePNG(ostrName.str().c_str());
-*/
+	ostrName << ".jpg";
+	gr->WriteJPEG(ostrName.str().c_str());
+
+
+	dAngleScale += 0.005;
+
 	return 0;
 }
 
 
 // gcc -march=native -O2 -o helix helix.cpp -lstdc++ -lm -lmgl-qt -lmgl -std=c++11
-// ffmpeg -r 10 -b 1800 -i frame_%05d.png  -q:v 0 -r 25 -ab 320k movie.mp4
+// ffmpeg -r 10 -b 1800 -i frame_%05d.jpg  -q:v 0 -r 25 -ab 320k movie.mp4
 int main(int argc, char **argv)
 {
+	/*
 	mglQT *pMGL = new mglQT(draw);
 	pMGL->Run();
 	delete pMGL;
+	*/
 
-	/*
 	for(int iFrame=0; iFrame<=200; ++iFrame)
 	{
-		mglGraph graph(1920, 1080);
+		mglGraph graph(0, 1920, 1080);
 		draw(&graph);
-	}*/
+	}
 
 	return 0;
 }
