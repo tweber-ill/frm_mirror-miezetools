@@ -164,7 +164,6 @@ Data3 Data4::GetVal(uint iD2) const
 Data2 Data4::GetVal(uint iD, uint iD2) const
 {
 	Data2 dat(m_iWidth, m_iHeight);
-	dat.CopyParamMapsFrom(this);
 	dat.CopyXYRangeFrom(this);
 	dat.CopyRoiFlagsFrom(this);
 
@@ -186,6 +185,7 @@ Data2 Data4::GetVal(uint iD, uint iD2) const
 		}
 
 	dat.SetTotal(dTotal);
+	dat.CopyParamMapsFrom(this);
 
 	return dat;
 }

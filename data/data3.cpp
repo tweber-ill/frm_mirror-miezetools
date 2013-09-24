@@ -69,8 +69,8 @@ void Data3::Add(const Data3& dat)
 		for(uint iY=0; iY<m_iHeight; ++iY)
 			for(uint iX=0; iX<m_iWidth; ++iX)
 			{
-				const double dNewVal = GetVal(iX, iY, iT)+dat.GetVal(iX, iY, iT);
-				const double dNewErr = GetErr(iX, iY, iT)+dat.GetErr(iX, iY, iT);
+				const double dNewVal = GetValRaw(iX, iY, iT)+dat.GetValRaw(iX, iY, iT);
+				const double dNewErr = GetErrRaw(iX, iY, iT)+dat.GetErrRaw(iX, iY, iT);
 
 				SetVal(iX, iY, iT, dNewVal);
 				SetErr(iX, iY, iT, dNewErr);

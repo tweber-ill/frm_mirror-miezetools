@@ -48,8 +48,8 @@ void Data2::Add(const Data2& dat)
 	for(uint iY=0; iY<m_iHeight; ++iY)
 		for(uint iX=0; iX<m_iWidth; ++iX)
 		{
-			const double dNewVal = GetVal(iX, iY)+dat.GetVal(iX, iY);
-			const double dNewErr = GetErr(iX, iY)+dat.GetErr(iX, iY);
+			const double dNewVal = GetValRaw(iX, iY)+dat.GetValRaw(iX, iY);
+			const double dNewErr = GetErrRaw(iX, iY)+dat.GetErrRaw(iX, iY);
 
 			SetVal(iX, iY, dNewVal);
 			SetErr(iX, iY, dNewErr);

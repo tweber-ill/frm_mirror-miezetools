@@ -164,7 +164,7 @@ Plot2d* Plot4d::ConvertTo2d(int iFoil)
 
 		for(unsigned int iFoil=0; iFoil<dat4.GetDepth2(); ++iFoil)
 			for(unsigned int iTC=0; iTC<dat4.GetDepth(); ++iTC)
-				dat2.Add(dat4.GetVal(iFoil, iTC));
+				dat2.Add(dat4.GetVal(iTC, iFoil));
 	}
 	else
 	{
