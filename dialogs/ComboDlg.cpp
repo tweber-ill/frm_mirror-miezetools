@@ -13,8 +13,8 @@ int ComboDlg::GetSelectedValue() const { return comboValues->currentIndex(); }
 
 void ComboDlg::SetValues(const std::vector<std::string>& vec)
 {
-		for(const std::string& str : vec)
-			this->comboValues->addItem(QString(str.c_str()));
+	for(const std::string& str : vec)
+		this->comboValues->addItem(QString(str.c_str()));
 }
 
 #include "ComboDlg.moc"

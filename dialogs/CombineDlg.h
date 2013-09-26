@@ -21,10 +21,13 @@ protected:
 
 protected:
 	Plot* CreatePlot(const std::string& strTitle, QWidget* pPlotParent=0) const;
+	void UpdateCommonParams();
 
 protected slots:
 	void AddItemSelected();
 	void RemoveItemSelected();
+
+	void TypeChanged();
 
 	void ButtonBoxClicked(QAbstractButton*);
 

@@ -51,10 +51,10 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 		if(iLen >= 2)
 			bOk = ::get_mieze_contrast(dFreq, dNumOsc, iLen, px, py, pyerr, &pModel);
 
-		if(pModel)
-			std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
-						<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
-						<< std::endl;
+		//if(pModel)
+		//	std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
+		//				<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
+		//				<< std::endl;
 		*pFkt = pModel;
 	}
 	else if(params.iFkt == FIT_GAUSSIAN) 			// Gaussian
@@ -77,11 +77,11 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 		return false;
 	}
 
-	if(*pFkt)
+	/*if(*pFkt)
 	{
 		std::cout << "Fit " << (bOk ? "ok" : "failed" ) << ": "
 					<< **pFkt << std::endl;
-	}
+	}*/
 
 	return bOk;
 }
@@ -94,6 +94,7 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 		return Data1();
 	}
 
+	const bool bShiftToMeanPhase = 0;
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 	const unsigned int iNumFoils = vecFoils.size();
 	const unsigned int iNumTC = vecFoils[0].GetLength();
@@ -107,9 +108,11 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 		pdyTotal[iTc] = pdyerrTotal[iTc] = 0.;
 
 	double *pdPhases = new double[iNumTC];
+	double *pdPhaseErrs = new double[iNumTC];
 	autodeleter<double> _a7(pdPhases, 1);
+	autodeleter<double> _a7err(pdPhaseErrs, 1);
 
-	double dMeanPhase=0.;
+	double dMeanPhase = 0.;
 	double dTotalCnts = 0.;
 	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 	{
@@ -129,7 +132,10 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 			MiezeSinModel *pModel = (MiezeSinModel*) pFkt;
 
 			if(bOk && pModel)
+			{
 				pdPhases[iFoil] = pModel->GetPhase();
+				pdPhaseErrs[iFoil] = pModel->GetPhaseErr();
+			}
 
 			//std::cout << "fit: " << pModel->print(1) << std::endl;
 			if(pModel) delete pModel;
@@ -137,10 +143,27 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 
 		double dCnts = dat->SumY();
 		dTotalCnts += dCnts;
-		dMeanPhase += pdPhases[iFoil] * dCnts;
+
+		if(bShiftToMeanPhase)
+			dMeanPhase += pdPhases[iFoil] * dCnts;
 	}
-	dMeanPhase /= dTotalCnts;
-	dMeanPhase = fmod(dMeanPhase, 2.*M_PI);
+
+	std::cout << "Phases of foils: ";
+	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
+		std::cout << pdPhases[iFoil] << ", ";
+	std::cout << "\nDifferences: ";
+	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
+		std::cout << (pdPhases[iFoil]-pdPhases[0]) << ", ";
+	std::cout << "\nErrors: ";
+	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
+		std::cout << pdPhaseErrs[iFoil] << ", ";
+	std::cout << std::endl;
+
+	if(bShiftToMeanPhase)
+	{
+		dMeanPhase /= dTotalCnts;
+		dMeanPhase = fmod(dMeanPhase, 2.*M_PI);
+	}
 
 	double *pdxFoil = new double[iNumTC];
 	double *pdyFoil = new double[iNumTC];

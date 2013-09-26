@@ -494,9 +494,9 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 		{
 			MiezeSinModel *pModel = (MiezeSinModel*)pFkt;
 
-			std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
-							<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
-							<< std::endl;
+			//std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
+			//				<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
+			//				<< std::endl;
 
 			std::ostringstream ostrTitle;
 			ostrTitle.precision(3);
@@ -748,8 +748,8 @@ void FitDlg::DoFit()
 
 			 if(pModel)
 			 {
-                 std::cout << "Fit " << (bOk ? "ok" : "failed") << ": " 
-                            << *pModel << std::endl;
+                 //std::cout << "Fit " << (bOk ? "ok" : "failed") << ": "
+                 //           << *pModel << std::endl;
 
 				 if(bUpdateHints)
 				 {
