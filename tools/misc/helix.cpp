@@ -1,4 +1,4 @@
-#include "../helper/linalg.h"
+#include "../../helper/linalg.h"
 #include <vector>
 #include <cmath>
 #include <iostream>

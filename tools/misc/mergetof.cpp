@@ -3,9 +3,9 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../helper/file.h"
-#include "../helper/string.h"
-#include "../helper/comp.h"
+#include "../../helper/file.h"
+#include "../../helper/string.h"
+#include "../../helper/comp.h"
 
 
 int main(int argc, char** argv)
