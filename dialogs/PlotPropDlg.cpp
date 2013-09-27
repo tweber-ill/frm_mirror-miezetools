@@ -35,6 +35,12 @@ void PlotPropDlg::SubWindowActivated(SubWindowBase* pSWB)
 	editTLabel->setText(m_pCurPlot->GetLabel(LABEL_T).c_str());
 	editFoilLabel->setText(m_pCurPlot->GetLabel(LABEL_F).c_str());
 
+
+	const StringMap* pmapParams = m_pCurPlot->GetParamMapDyn();
+	if(pmapParams)
+		editTau->setText((*pmapParams)["param_tau"].c_str());
+
+
 	XYRange *pRange = 0;
 
 	if(m_pCurPlot->GetType() == PLOT_1D)
@@ -143,6 +149,16 @@ void PlotPropDlg::SaveSettings()
 	m_pCurPlot->SetLabel(LABEL_T, editTLabel->text().toStdString().c_str());
 	m_pCurPlot->SetLabel(LABEL_F, editFoilLabel->text().toStdString().c_str());
 	m_pCurPlot->setWindowTitle(editWindowTitle->text());
+
+
+
+	std::string strTau = editTau->text().trimmed().toStdString();
+	StringMap *pmapParams = const_cast<StringMap*>(m_pCurPlot->GetParamMapDyn());
+
+	if(pmapParams && strTau != "")
+		(*pmapParams)["param_tau"] = strTau;
+
+
 
 	if(m_pCurPlot->GetType() == PLOT_1D)
 	{

@@ -5,12 +5,12 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.debug.321083479" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -72,6 +72,8 @@
 									<listOptionValue builtIn="false" value="lapack"/>
 									<listOptionValue builtIn="false" value="lapacke"/>
 								</option>
+								<option id="gnu.cpp.link.option.debugging.prof.648168492" name="Generate prof information (-p)" superClass="gnu.cpp.link.option.debugging.prof" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.debugging.gprof.1585346416" name="Generate gprof information (-pg)" superClass="gnu.cpp.link.option.debugging.gprof" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2083585386" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -82,8 +84,18 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.321083479.264183761" name="/" resourcePath="tools/misc">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.226860539" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1447676512" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1734708344"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1861217287" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.2080782866" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.970502121" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.145692831"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1295098146" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1435330755" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514"/>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
-						<entry excluding="script|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tools/misc|script|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -93,12 +105,12 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.release.1616845256" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -169,8 +181,18 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.1616845256.1262076143" name="/" resourcePath="tools/misc">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.1822004476" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.752011353" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1060114624"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.103582341" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.109884437" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.403162853" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release.2100629918"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.355124187" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.346119555"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1526033468" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162"/>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
-						<entry excluding="test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tools/misc|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

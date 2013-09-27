@@ -95,6 +95,11 @@ public:
 		info.iWidth = info.iHeight = 0;
 		return info;
 	}
+
+
+public:			// helper
+	const StringMap* GetParamMapDyn() const;
+	const StringMap* GetParamMapStat() const;
 };
 
 #endif

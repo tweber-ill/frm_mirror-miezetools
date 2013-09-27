@@ -54,11 +54,12 @@ void CombineGraphsDlg::TypeChanged()
 	comboParam->setEnabled(bParam);
 }
 
+
 // create a set of all parameters common to all selected plots
 void CombineGraphsDlg::UpdateCommonParams()
 {
-	std::vector<std::string> vecParams;
-	bool bFirstParam = 1;
+	std::vector<std::string> vecParams, vecParamsStat;
+	bool bFirstParam = 1, bFirstParamStat = 1;;
 
 	for(int iCur=0; iCur<listGraphs->count(); ++iCur)
 	{
@@ -68,20 +69,8 @@ void CombineGraphsDlg::UpdateCommonParams()
 			continue;
 		pSWB = pSWB->GetActualWidget();
 
-		const DataInterface *pIf = pSWB->GetDataInterface();
-		if(!pIf)
-		{
-			vecParams.clear();
-			break;
-		}
 
-
-		const StringMap* pParams = 0;
-		if(pSWB->GetType() == PLOT_1D)
-			pParams = &((Plot*)pSWB)->GetParamMapDynMerged();
-		if(!pParams)
-			pParams = &pIf->GetParamMapDyn();
-
+		const StringMap* pParams = pSWB->GetParamMapDyn();
 		if(pParams)
 		{
 			std::vector<std::string> vecParams1 = vecParams;
@@ -102,13 +91,43 @@ void CombineGraphsDlg::UpdateCommonParams()
 		else
 		{
 			vecParams.clear();
-			break;
+		}
+
+
+		const StringMap* pParamsStat = pSWB->GetParamMapStat();
+		if(pParamsStat)
+		{
+			std::vector<std::string> vecParams1Stat = vecParamsStat;
+			std::vector<std::string> vecParams2Stat = pParams->GetKeys();
+
+			if(bFirstParamStat)
+			{
+				vecParams1Stat = vecParams2Stat;
+				bFirstParamStat = 0;
+			}
+
+			vecParamsStat.resize(std::min(vecParams1Stat.size(), vecParams2Stat.size()));
+
+			std::set_intersection(vecParams1Stat.begin(), vecParams1Stat.end(),
+								vecParams2Stat.begin(), vecParams2Stat.end(),
+								vecParamsStat.begin());
+		}
+		else
+		{
+			vecParamsStat.clear();
 		}
 	}
 
 
+
+	std::vector<std::string> vecParamsTotal;
+	vecParamsTotal.resize(std::max(vecParams.size(), vecParamsStat.size()));
+	std::set_union(vecParams.begin(), vecParams.end(),
+					vecParamsStat.begin(), vecParamsStat.end(),
+					vecParamsTotal.begin());
+
 	QStringList lst;
-	for(std::string& str : vecParams)
+	for(std::string& str : vecParamsTotal)
 	{
 		if(str.substr(0,6) == "param_")
 			lst.append(str.c_str());
@@ -213,22 +232,19 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 			continue;
 		pSWB = pSWB->GetActualWidget();
 
-		const StringMap* pParams = 0;
-		const DataInterface *pIf = pSWB->GetDataInterface();
-		if(pIf)
-		{
-			if(pSWB->GetType() == PLOT_1D)
-				pParams = &((Plot*)pSWB)->GetParamMapDynMerged();
-			if(!pParams)
-				pParams = &pIf->GetParamMapDyn();
-		}
-
+		const StringMap* pParams = pSWB->GetParamMapDyn();
+		const StringMap* pParamsStat = pSWB->GetParamMapStat();
 
 		if(checkUseXParam->isChecked() && pParams)
 		{
 			std::string strXParam = comboXParam->currentText().toStdString();
 
-			std::string strXVal = (*pParams)[strXParam];
+			std::string strXVal;
+			if(pParams && pParams->HasKey(strXParam))
+				strXVal = (*pParams)[strXParam];
+			else if(pParamsStat && pParamsStat->HasKey(strXParam))
+				strXVal = (*pParamsStat)[strXParam];
+
 			double dXErr = 0.;
 			get_val_and_err(strXVal, pdX[iCur], dXErr);
 			strLabX = strXParam;
@@ -281,12 +297,14 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 
 		else if(iComboIdx == COMBINE_TYPE_PARAM)
 		{
-			if(!pParams)
-				continue;
-
 			std::string strParam = comboParam->currentText().toStdString();
 
-			std::string strVal = (*pParams)[strParam];
+			std::string strVal;
+			if(pParams && pParams->HasKey(strParam))
+				strVal = (*pParams)[strParam];
+			else if(pParamsStat && pParamsStat->HasKey(strParam))
+				strVal = (*pParamsStat)[strParam];
+
 			get_val_and_err(strVal, pdY[iCur], pdYErr[iCur]);
 			strLabY = strParam;
 		}
@@ -323,7 +341,7 @@ void CombineGraphsDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::ApplyRole ||
 	   buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
 	{
-		Plot* pPlot = CreatePlot("combined graph", this);
+		Plot* pPlot = CreatePlot("Combined Graph", this);
 		emit AddSubWindow(pPlot);
 	}
 	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::RejectRole)

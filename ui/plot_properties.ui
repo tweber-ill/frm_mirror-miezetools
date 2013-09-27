@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>425</width>
-    <height>413</height>
+    <width>384</width>
+    <height>429</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -260,25 +260,35 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="1" colspan="2">
+      <item row="1" column="1" colspan="2">
        <widget class="QComboBox" name="comboRef"/>
       </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="labelRef">
         <property name="text">
          <string>Elastic Reference:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="labelPhases">
         <property name="text">
          <string>Phases between Foils:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QLineEdit" name="editPhases"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelTau">
+        <property name="text">
+         <string>Spin-echo Time (ps):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="editTau"/>
       </item>
      </layout>
     </widget>
