@@ -55,7 +55,7 @@ InfoDock::InfoDock(QWidget* pParent)
 			: QDockWidget(pParent), m_widget(this)
 {
 	setWidget(&m_widget);
-	setWindowTitle("Infos");
+	setWindowTitle("Info Panel");
 
 	/*
 	std::map<std::string, std::string> map;
