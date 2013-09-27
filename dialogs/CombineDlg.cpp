@@ -116,6 +116,9 @@ void CombineGraphsDlg::UpdateCommonParams()
 
 	comboParam->clear();
 	comboParam->addItems(lst);
+
+	comboXParam->clear();
+	comboXParam->addItems(lst);
 }
 
 void CombineGraphsDlg::AddItemSelected()
@@ -196,7 +199,7 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 	double *pdYErr = new double[iCnt];
 
 	const int iComboIdx = comboType->currentIndex();
-	std::string strLabY;
+	std::string strLabX, strLabY;
 
 	for(int iCur=0; iCur<iCnt; ++iCur)
 	{
@@ -210,7 +213,31 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 			continue;
 		pSWB = pSWB->GetActualWidget();
 
-		pdX[iCur] = double(iCur)/double(iCnt-1) * (dXMax - dXMin) + dXMin;
+		const StringMap* pParams = 0;
+		const DataInterface *pIf = pSWB->GetDataInterface();
+		if(pIf)
+		{
+			if(pSWB->GetType() == PLOT_1D)
+				pParams = &((Plot*)pSWB)->GetParamMapDynMerged();
+			if(!pParams)
+				pParams = &pIf->GetParamMapDyn();
+		}
+
+
+		if(checkUseXParam->isChecked() && pParams)
+		{
+			std::string strXParam = comboXParam->currentText().toStdString();
+
+			std::string strXVal = (*pParams)[strXParam];
+			double dXErr = 0.;
+			get_val_and_err(strXVal, pdX[iCur], dXErr);
+			strLabX = strXParam;
+		}
+		else
+		{
+			pdX[iCur] = double(iCur)/double(iCnt-1) * (dXMax - dXMin) + dXMin;
+			strLabX = editXLab->text().toStdString();
+		}
 
 		if(iComboIdx == COMBINE_TYPE_COUNTS)
 		{
@@ -254,19 +281,8 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 
 		else if(iComboIdx == COMBINE_TYPE_PARAM)
 		{
-			const DataInterface *pIf = pSWB->GetDataInterface();
-			if(!pIf)
-				continue;
-
-			const StringMap* pParams = 0;
-			if(pSWB->GetType() == PLOT_1D)
-				pParams = &((Plot*)pSWB)->GetParamMapDynMerged();
-			if(!pParams)
-				pParams = &pIf->GetParamMapDyn();
-
 			if(!pParams)
 				continue;
-
 
 			std::string strParam = comboParam->currentText().toStdString();
 
@@ -290,8 +306,7 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 	pPlot->plot(iCnt, pdX, pdY, pdYErr);
 
 
-	std::string strLabX, strPlotTitle;
-	strLabX = editXLab->text().toStdString();
+	std::string strPlotTitle;
 	strPlotTitle = editTitle->text().toStdString();
 
 

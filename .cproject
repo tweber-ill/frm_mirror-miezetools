@@ -5,12 +5,12 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.debug.321083479" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -30,6 +30,10 @@
 									<listOptionValue builtIn="false" value="/usr/include/qt4"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/Qt"/>
+									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\lib\gcc\x86_64-pc-cygwin\4.8.1\include\c++&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\lib\gcc\x86_64-pc-cygwin\4.8.1\include\c++\x86_64-pc-cygwin&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\usr\include\qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\usr\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.warnings.extrawarn.1401833705" name="Extra warnings (-Wextra)" superClass="gnu.cpp.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1402570564" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
@@ -78,16 +82,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.321083479.1460628360" name="/" resourcePath="script">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1239290154" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.408239892" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1734708344"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1153046961" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.588660746" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1160141534" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.145692831"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1652351349" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1301326585" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514"/>
-						</toolChain>
-					</folderInfo>
 					<sourceEntries>
 						<entry excluding="script|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
@@ -99,12 +93,12 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.release.1616845256" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -125,6 +119,10 @@
 									<listOptionValue builtIn="false" value="/usr/include/qt4"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/Qt"/>
+									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\lib\gcc\x86_64-pc-cygwin\4.8.1\include\c++&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\lib\gcc\x86_64-pc-cygwin\4.8.1\include\c++\x86_64-pc-cygwin&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\usr\include\qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\cygwin64\usr\include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.warnings.extrawarn.702310296" name="Extra warnings (-Wextra)" superClass="gnu.cpp.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1048370712" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def"/>
