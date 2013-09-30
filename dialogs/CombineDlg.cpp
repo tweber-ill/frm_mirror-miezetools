@@ -341,7 +341,7 @@ void CombineGraphsDlg::ButtonBoxClicked(QAbstractButton* pBtn)
 	if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::ApplyRole ||
 	   buttonBox->buttonRole(pBtn) == QDialogButtonBox::AcceptRole)
 	{
-		Plot* pPlot = CreatePlot("Combined Graph", this);
+		Plot* pPlot = CreatePlot("Combined Graph", this->parentWidget());
 		emit AddSubWindow(pPlot);
 	}
 	else if(buttonBox->buttonRole(pBtn) == QDialogButtonBox::RejectRole)

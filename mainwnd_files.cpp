@@ -451,6 +451,18 @@ void MiezeMainWnd::FileLoadTriggered()
 	}
 }
 
+void MiezeMainWnd::CloseAllTriggered()
+{
+	// TODO: save dialog
+	m_pmdi->closeAllSubWindows();
+}
+
+void MiezeMainWnd::CloseAllTriggeredWithRetain()
+{
+	if(!m_pRetainSession->isChecked())
+		CloseAllTriggered();
+}
+
 
 // --------------------------------------------------------------------------------
 // recent files

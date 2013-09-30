@@ -43,5 +43,6 @@ moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
 moc dialogs/PlotPropDlg.h -o dialogs/PlotPropDlg.moc
 moc dialogs/ExportDlg.h -o dialogs/ExportDlg.moc
 moc dialogs/InfoDock.h -o dialogs/InfoDock.moc
+moc dialogs/NormDlg.h -o dialogs/NormDlg.moc
 
 echo -e "\n"

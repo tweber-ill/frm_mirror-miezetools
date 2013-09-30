@@ -30,8 +30,10 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 	Blob blob((strSess+".blob").c_str());
 	bool bHasBlob = blob.IsOpen();
 
-	//m_pmdi->closeAllSubWindows();
-	m_strCurSess = strSess;
+	//CloseAllTriggeredWithRetain();
+
+	if(!m_pRetainSession->isChecked())
+		m_strCurSess = strSess;
 
 	std::string strBase = "/cattus_session/";
 	m_iPlotCnt = xml.Query<unsigned int>((strBase + "plot_counter").c_str(), 0);
@@ -39,7 +41,9 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 
 	for(unsigned int iWnd=0; iWnd<iWndCnt; ++iWnd)
 	{
-		std::cout << "Loading " << (iWnd+1) << " of " << iWndCnt << "." << std::endl;
+		std::ostringstream ostrLoading;
+		ostrLoading << "Loading " << (iWnd+1) << " of " << iWndCnt << ".";
+		SetStatusMsg(ostrLoading.str().c_str(), 2);
 
 		std::ostringstream ostrSWBase;
 		ostrSWBase << strBase << "window_" << iWnd << "/";
@@ -93,7 +97,7 @@ void MiezeMainWnd::SessionLoadTriggered()
 	if(strFile == "")
 		return;
 
-	m_pmdi->closeAllSubWindows();
+	CloseAllTriggeredWithRetain();
 	LoadSession(strFile.toStdString());
 }
 
@@ -206,7 +210,7 @@ void MiezeMainWnd::UpdateRecentSessionMenu()
 		pSigs->setMapping(pRec, pRec->text());
 		QObject::connect(pRec, SIGNAL(triggered()), pSigs, SLOT(map()));
 
-		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), m_pmdi, SLOT(closeAllSubWindows()));
+		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), this, SLOT(CloseAllTriggeredWithRetain()));
 		QObject::connect(pSigs, SIGNAL(mapped(const QString&)), this, SLOT(LoadSession(const QString&)));
 	}
 }

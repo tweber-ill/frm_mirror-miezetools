@@ -52,7 +52,8 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_pradialintdlg(0),
 					  m_pformuladlg(0),
 					  m_pplotpropdlg(0),
-					  m_pexportdlg(0)
+					  m_pexportdlg(0),
+					  m_pnormdlg(0)
 {
 	this->setWindowIcon(QIcon("res/mainicon.png"));
 	this->setWindowTitle(WND_TITLE);
@@ -106,6 +107,7 @@ MiezeMainWnd::MiezeMainWnd()
 	pMenuFile->addMenu(m_pMenuLoadRecentSession);
 
 
+
 	QAction *pSaveSess = new QAction(this);
 	pSaveSess->setText("Save Session");
 	pSaveSess->setIcon(QIcon::fromTheme("document-save"));
@@ -119,6 +121,12 @@ MiezeMainWnd::MiezeMainWnd()
 
 
 	pMenuFile->addSeparator();
+
+	m_pRetainSession = new QAction(this);
+	m_pRetainSession->setText("Retain Current Session");
+	m_pRetainSession->setCheckable(1);
+	pMenuFile->addAction(m_pRetainSession);
+
 
 	QAction *pSettings = new QAction(this);
 	pSettings->setText("Settings...");
@@ -257,6 +265,10 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pPhaseCorr = new QAction(this);
 	pPhaseCorr->setText("PSD Phase Correction...");
 	pMenuTools->addAction(pPhaseCorr);
+
+	QAction *pNorm = new QAction(this);
+	pNorm->setText("Normalize Plot...");
+	pMenuTools->addAction(pNorm);
 
 	pMenuTools->addSeparator();
 
@@ -402,6 +414,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pSaveSess, SIGNAL(triggered()), this, SLOT(SessionSaveTriggered()));
 	QObject::connect(pSaveSessAs, SIGNAL(triggered()), this, SLOT(SessionSaveAsTriggered()));
 
+	QObject::connect(pNorm, SIGNAL(triggered()), this, SLOT(NormalizeTriggered()));
 	QObject::connect(pShowT, SIGNAL(triggered()), this, SLOT(ShowTimeChannels()));
 	QObject::connect(pExtractFoils, SIGNAL(triggered()), this, SLOT(ExtractFoils()));
 	QObject::connect(pSumFoils, SIGNAL(triggered()), this, SLOT(SumFoils()));
@@ -439,7 +452,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pWndList, SIGNAL(triggered()), this, SLOT(ShowListWindowsDlg()));
 	QObject::connect(pWndTile, SIGNAL(triggered()), m_pmdi, SLOT(tileSubWindows()));
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
-	QObject::connect(pCloseAll, SIGNAL(triggered()), m_pmdi, SLOT(closeAllSubWindows()));
+	QObject::connect(pCloseAll, SIGNAL(triggered()), this, SLOT(CloseAllTriggered()));
 
 	QObject::connect(pReso, SIGNAL(triggered()), this, SLOT(ShowReso()));
 	QObject::connect(pPhaseCorr, SIGNAL(triggered()), this, SLOT(ShowPSDPhaseCorr()));
@@ -1028,6 +1041,24 @@ void MiezeMainWnd::PlotPropertiesTriggered()
 
 	m_pplotpropdlg->show();
 	m_pplotpropdlg->activateWindow();
+}
+
+void MiezeMainWnd::NormalizeTriggered()
+{
+	if(!m_pnormdlg)
+	{
+		m_pnormdlg = new NormDlg(this);
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pnormdlg, SLOT(SubWindowRemoved(SubWindowBase*)));
+		QObject::connect(this, SIGNAL(SubWindowAdded(SubWindowBase*)), m_pnormdlg, SLOT(SubWindowAdded(SubWindowBase*)));
+		QObject::connect(m_pnormdlg, SIGNAL(AddSubWindow(SubWindowBase*)), this, SLOT(AddSubWindow(SubWindowBase*)));
+
+		std::vector<SubWindowBase*> vec = GetSubWindows(0);
+		for(SubWindowBase *pWnd : vec)
+			m_pnormdlg->SubWindowAdded(pWnd);
+	}
+
+	m_pnormdlg->show();
+	m_pnormdlg->activateWindow();
 }
 // --------------------------------------------------------------------------------
 

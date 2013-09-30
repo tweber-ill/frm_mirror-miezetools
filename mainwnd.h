@@ -32,6 +32,7 @@
 #include "dialogs/PlotPropDlg.h"
 #include "dialogs/ExportDlg.h"
 #include "dialogs/InfoDock.h"
+#include "dialogs/NormDlg.h"
 
 #define MAX_RECENT_FILES 32
 #define WND_TITLE "Cattus, a MIEZE toolset"
@@ -48,6 +49,8 @@ protected:
 	QMdiArea *m_pmdi;
 	InfoDock *m_pinfo;
 
+	QAction *m_pRetainSession;
+
 	CombineGraphsDlg *m_pcombinedlg;
 	FitDlg *m_pfitdlg;
 	RoiDlg *m_proidlg, *m_pantiroidlg;
@@ -57,6 +60,7 @@ protected:
 	FormulaDlg *m_pformuladlg;
 	PlotPropDlg *m_pplotpropdlg;
 	ExportDlg *m_pexportdlg;
+	NormDlg *m_pnormdlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -105,6 +109,9 @@ protected:
 protected slots:
 	void SubWindowChanged();
 	void FileLoadTriggered();
+
+	void CloseAllTriggeredWithRetain();
+	void CloseAllTriggered();
 
 	void SessionLoadTriggered();
 	void SessionSaveTriggered();
@@ -159,6 +166,7 @@ protected slots:
 	void ExtractFoils();
 	void SumFoils();
 	void PlotPropertiesTriggered();
+	void NormalizeTriggered();
 
 	void PlotParamsDynChanged(const StringMap&);
 
