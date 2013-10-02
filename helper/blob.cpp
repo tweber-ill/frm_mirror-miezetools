@@ -40,3 +40,11 @@ void Blob::unmap(void *pv)
 {
 	m_file.unmap((uchar*)pv);
 }
+
+
+void Blob::memcpy(qint64 iStart, qint64 iLen, void* pvStart)
+{
+	void* p = map(iStart, iLen);
+	::memcpy(pvStart, p, iLen);
+	unmap(p);
+}

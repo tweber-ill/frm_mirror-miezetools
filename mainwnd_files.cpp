@@ -55,10 +55,6 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 
 	std::string strFileNoDir = ::get_file(_strFile);
 
-	std::ostringstream ostrMsg;
-	ostrMsg << "Loading " << strFileNoDir << "...";
-	this->SetStatusMsg(ostrMsg.str().c_str(),0);
-
 	if(is_equal(strExt, "tof"))
 	{
 		TofFile tof(strFile.c_str());
@@ -432,12 +428,17 @@ void MiezeMainWnd::FileLoadTriggered()
 	unsigned int iFile = 0;
 	for(const QString& strFile : strFiles)
 	{
-		std::cout << "Loading " << (iFile+1) << " of " << strFiles.size() << "." << std::endl;
+		std::string strFile1 = strFile.toStdString();
+		std::string strFileNoDir = ::get_file(strFile1);
+
+		std::ostringstream ostrMsg;
+		ostrMsg << "Loading " << (iFile+1) << " of " << strFiles.size() << ": "
+				<< strFileNoDir << ".";
+		this->SetStatusMsg(ostrMsg.str().c_str(), 2);
 
 		if(strFile == "")
 			continue;
 
-		std::string strFile1 = strFile.toStdString();
 		std::string strExt = get_fileext(strFile1);
 
 		if(!bDirSet)

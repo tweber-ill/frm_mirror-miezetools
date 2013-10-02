@@ -20,6 +20,7 @@ protected:
 	double m_dTotal;	// sum of all values
 
 	std::vector<double> m_vecPhases;
+	bool m_bUseErrs;
 
 public:
 	Data4(uint iW=128, uint iH=128, uint iD=16, uint iD2=6,

@@ -36,6 +36,19 @@ class Blob
 
 			unmap((void*)p);
 		}
+
+		template<typename T>
+		void vec_push_back(qint64 iStart, qint64 iLenInT, std::vector<T>& vec)
+		{
+			T* p = (T*)map(iStart, iLenInT*sizeof(T));
+
+			for(qint64 i=0; i<iLenInT; ++i)
+				vec.push_back(T(p[i]));
+
+			unmap((void*)p);
+		}
+
+		void memcpy(qint64 iStart, qint64 iLen, void* pvStart);
 };
 
 #endif

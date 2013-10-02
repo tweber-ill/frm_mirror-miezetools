@@ -123,7 +123,7 @@ Plot2d* Plot3d::ConvertTo2d(int iFoil)
 	ostrTitle << windowTitle().toStdString() << " -> ";
 
 	const Data3& dat3 = this->GetData();
-	Data2 dat2;
+	Data2 dat2(dat3.GetWidth(), dat3.GetHeight());
 	dat2.CopyParamMapsFrom(&dat3);
 	dat2.CopyXYRangeFrom(&dat3);
 	dat2.CopyRoiFlagsFrom(&dat3);

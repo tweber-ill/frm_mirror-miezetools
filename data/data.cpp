@@ -124,7 +124,9 @@ void load_xml_vecs(unsigned int iNumVecs,
 				}
 				else
 				{
-					blob.copy<double>(iBlobIdx, qint64(pvecs[iObj]->size()), pvecs[iObj]->begin());
+					//blob.copy<double>(iBlobIdx, qint64(pvecs[iObj]->size()), pvecs[iObj]->begin());
+					//blob.vec_push_back<double>(iBlobIdx, qint64(pvecs[iObj]->size()), *pvecs[iObj]);
+					blob.memcpy(iBlobIdx, pvecs[iObj]->size()*sizeof(double), pvecs[iObj]->data());
 				}
 			}
 			else

@@ -163,7 +163,7 @@ void MiezeMainWnd::SubWindowDestroyed(SubWindowBase *pSWB)
 	emit SubWindowRemoved(pSWB);
 }
 
-void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
+void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd, bool bShow)
 {
 	if(!pWnd) return;
 
@@ -176,8 +176,11 @@ void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd)
 	m_pmdi->addSubWindow(pWnd);
 	emit SubWindowAdded(pWnd);
 
-	//pWnd->RefreshPlot();
-	pWnd->show();
+	if(bShow)
+	{
+		//pWnd->RefreshPlot();
+		pWnd->show();
+	}
 }
 
 SubWindowBase* MiezeMainWnd::GetActivePlot(bool bResolveWidget)

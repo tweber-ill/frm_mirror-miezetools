@@ -17,7 +17,8 @@ Data4::Data4(uint iW, uint iH, uint iD, uint iD2, const double* pDat, const doub
 			: m_iDepth(0), m_iDepth2(0),
 			  m_dTotal(0.),
 			  m_dMin(std::numeric_limits<double>::max()),
-			  m_dMax(-std::numeric_limits<double>::max())
+			  m_dMax(-std::numeric_limits<double>::max()),
+			  m_bUseErrs(pErr!=0)
 
 {
 	this->SetSize(iW, iH, iD, iD2);
@@ -60,7 +61,8 @@ void Data4::SetSize(uint iWidth, uint iHeight, uint iDepth, uint iDepth2)
 	m_iDepth2 = iDepth2;
 
 	m_vecVals.resize(m_iWidth * m_iHeight * m_iDepth * m_iDepth2);
-	m_vecErrs.resize(m_iWidth * m_iHeight * m_iDepth * m_iDepth2);
+	if(m_bUseErrs)
+		m_vecErrs.resize(m_iWidth * m_iHeight * m_iDepth * m_iDepth2);
 }
 
 double Data4::GetValRaw(uint iX, uint iY, uint iD, uint iD2) const
@@ -72,9 +74,12 @@ double Data4::GetValRaw(uint iX, uint iY, uint iD, uint iD2) const
 
 double Data4::GetErrRaw(uint iX, uint iY, uint iD, uint iD2) const
 {
-	return m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight +
+	if(m_bUseErrs)
+		return m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight +
 	                 	 	 iD*m_iWidth*m_iHeight +
 	                 	 	 iY*m_iWidth + iX];
+	else
+		return 0.;
 }
 
 double Data4::GetVal(uint iX, uint iY, uint iD, uint iD2) const
@@ -129,9 +134,10 @@ void Data4::SetVals(uint iD2, const double *pDat, const double *pErr)
 
 void Data4::SetErr(uint iX, uint iY, uint iD, uint iD2, double dVal)
 {
-	m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight +
-	          	  	  iD*m_iWidth*m_iHeight +
-	          	  	  iY*m_iWidth + iX] = dVal;
+	if(m_bUseErrs)
+		m_vecErrs[iD2*m_iDepth*m_iWidth*m_iHeight +
+						  iD*m_iWidth*m_iHeight +
+						  iY*m_iWidth + iX] = dVal;
 }
 
 
@@ -274,10 +280,12 @@ Data1 Data4::GetXYD2(uint iX, uint iY, uint iD2) const
 void Data4::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
 {
 	std::vector<double> vecVals = m_vecVals;
-	std::vector<double> vecErrs = m_vecErrs;
+	std::vector<double> vecErrs;
+	if(m_bUseErrs) vecErrs = m_vecErrs;
 
 	m_vecVals.resize(m_iDepth2*m_iDepth*iNewWidth*iNewHeight);
-	m_vecErrs.resize(m_iDepth2*m_iDepth*iNewWidth*iNewHeight);
+	if(m_bUseErrs)
+		m_vecErrs.resize(m_iDepth2*m_iDepth*iNewWidth*iNewHeight);
 
 	double dAreaFactor = double(m_iWidth*m_iHeight)/double(iNewWidth*iNewHeight);
 
@@ -327,12 +335,14 @@ void Data4::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 					const uint iNewIdx = iF*m_iDepth*iNewWidth*iNewHeight + iT*iNewWidth*iNewHeight + iY*iNewWidth + iX;
 
 					m_vecVals[iNewIdx] = bilinear_interp<double>(dx0y0, dx1y0, dx0y1, dx1y1, dX, dY);
-					m_vecErrs[iNewIdx] = bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
+					if(m_bUseErrs)
+						m_vecErrs[iNewIdx] = bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
 
 					if(bKeepTotalCounts)
 					{
 						m_vecVals[iNewIdx] *= dAreaFactor;
-						m_vecErrs[iNewIdx] *= dAreaFactor;
+						if(m_bUseErrs)
+							m_vecErrs[iNewIdx] *= dAreaFactor;
 					}
 				}
 
@@ -350,18 +360,20 @@ bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	LoadRangeXml(xml, strBase);
 	m_iDepth = xml.Query<unsigned int>((strBase+"depth").c_str(), 0);
 	m_iDepth2 = xml.Query<unsigned int>((strBase+"depth2").c_str(), 0);
+	m_bUseErrs = xml.Query<int>((strBase+"use_errs").c_str(), 0);
 
 	m_roi.LoadXML(xml, strBase);
 	m_antiroi.LoadXML(xml, strBase);
 
 	unsigned int uiCnt = m_iWidth*m_iHeight*m_iDepth*m_iDepth2;
 	m_vecVals.resize(uiCnt);
-	m_vecErrs.resize(uiCnt);
+	if(m_bUseErrs)
+		m_vecErrs.resize(uiCnt);
 
 	std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
 	std::string strs[] = {"vals", "errs"};
 
-	load_xml_vecs(2, vecs, strs, xml, strBase, blob);
+	load_xml_vecs(m_bUseErrs?2:1, vecs, strs, xml, strBase, blob);
 
 	m_dMin = xml.Query<double>((strBase+"min").c_str(), 0.);
 	m_dMax = xml.Query<double>((strBase+"max").c_str(), 0.);
@@ -380,13 +392,14 @@ bool Data4::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 	const std::vector<double>* vecs[] = {&m_vecVals, &m_vecErrs};
 	std::string strs[] = {"vals", "errs"};
 
-	save_xml_vecs(2, vecs, strs, ostr, ostrBlob, bSaveInBlob);
+	save_xml_vecs(m_bUseErrs?2:1, vecs, strs, ostr, ostrBlob, bSaveInBlob);
 
 	ostr << "<min> " << m_dMin << " </min>\n";
 	ostr << "<max> " << m_dMax << " </max>\n";
 	ostr << "<total> " << m_dTotal << " </total>\n";
 	ostr << "<depth> " << m_iDepth << " </depth>\n";
 	ostr << "<depth2> " << m_iDepth2 << " </depth2>\n";
+	ostr << "<use_errs> " << m_bUseErrs << " </use_errs>\n";
 	ostr << "<phases> ";
 	for(double dPhase : m_vecPhases)
 		ostr << dPhase << ", ";

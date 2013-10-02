@@ -69,7 +69,7 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 		if(pSWB)
 		{
 			pSWB->LoadXML(xml, blob, strSWBase);
-			AddSubWindow(pSWB);
+			AddSubWindow(pSWB, 0);
 
 			QMdiSubWindow *pSubWnd = FindSubWindow(pSWB);
 
@@ -78,6 +78,7 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 				pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
 
 			pSWB->GetActualWidget()->RefreshPlot();
+			pSWB->show();
 		}
 	}
 
@@ -122,11 +123,10 @@ void MiezeMainWnd::SessionSaveTriggered()
 
 	for(SubWindowBase *pWnd : vecWnd)
 	{
-		std::cout << "Saving " << (iWnd+1) << " of " << vecWnd.size() << "." << std::endl;
-
-		std::ostringstream ostrMsg;
-		ostrMsg << "Saving \"" << pWnd->windowTitle().toStdString() << "\"...";
-		this->SetStatusMsg(ostrMsg.str().c_str(), 0);
+		std::ostringstream ostrSaving;
+		ostrSaving << "Saving " << (iWnd+1) << " of " << vecWnd.size() << ": "
+				<< pWnd->windowTitle().toStdString() << ".";
+		SetStatusMsg(ostrSaving.str().c_str(), 2);
 
 		pWnd = pWnd->GetActualWidget();
 		ofstr << "\n\n";

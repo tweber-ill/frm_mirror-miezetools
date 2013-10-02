@@ -180,7 +180,7 @@ public:
 
 public slots:
 	void SetStatusMsg(const char* pcMsg, int iPos);
-	void AddSubWindow(SubWindowBase* pWnd);
+	void AddSubWindow(SubWindowBase* pWnd, bool bShow=1);
 	void LoadFile(const QString& strFile);
 	void LoadSession(const QString& strFile);
 

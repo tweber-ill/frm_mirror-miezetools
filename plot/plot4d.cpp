@@ -152,7 +152,7 @@ Plot2d* Plot4d::ConvertTo2d(int iFoil)
 	ostrTitle << windowTitle().toStdString() << " -> ";
 
 	const Data4& dat4 = this->GetData();
-	Data2 dat2;
+	Data2 dat2(dat4.GetWidth(), dat4.GetHeight());
 	dat2.CopyParamMapsFrom(&dat4);
 	dat2.CopyXYRangeFrom(&dat4);
 	dat2.CopyRoiFlagsFrom(&dat4);
@@ -187,7 +187,7 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 	ostrTitle << windowTitle().toStdString() << " -> ";
 
 	const Data4& dat4 = this->GetData();
-	Data3 dat3;
+	Data3 dat3(dat4.GetWidth(), dat4.GetHeight(), dat4.GetDepth());
 	dat3.CopyParamMapsFrom(&dat4);
 	dat3.CopyXYRangeFrom(&dat4);
 	dat3.CopyRoiFlagsFrom(&dat4);

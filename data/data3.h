@@ -19,6 +19,8 @@ protected:
 	double m_dMin, m_dMax;
 	double m_dTotal;	// sum of all values
 
+	bool m_bUseErrs;
+
 public:
 	Data3(uint iW=128, uint iH=128, uint iD=16,
 				const double* pDat=0, const double *pErr=0);
