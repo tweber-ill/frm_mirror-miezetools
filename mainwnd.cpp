@@ -627,7 +627,7 @@ void MiezeMainWnd::SetStatusMsg(const char* pcMsg, int iPos)
 	if(pLabel->text() != strMsg)
 	{
 		pLabel->setText(pcMsg);
-		//pLabel->repaint();
+		pLabel->repaint();
 	}
 }
 

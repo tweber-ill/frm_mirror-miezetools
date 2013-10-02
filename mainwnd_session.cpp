@@ -15,8 +15,48 @@
 #include <QtCore/QSignalMapper>
 
 #include <fstream>
+#include <algorithm>
+#include <thread>
+//#include <chrono>
+#include <unistd.h>
+
 
 // --------------------------------------------------------------------------------
+
+static void session_load_progress_thread(std::vector<int>* pvecProgress, bool* pbRunning, MiezeMainWnd *pWnd)
+{
+	while(*pbRunning)
+	{
+		unsigned int iLoaded = std::count(pvecProgress->begin(), pvecProgress->end(), 1);
+		unsigned int iTotal = pvecProgress->size();
+
+		std::ostringstream ostrLoading;
+		ostrLoading << "Loaded " << iLoaded << " of " << iTotal << ".";
+		pWnd->SetStatusMsg(ostrLoading.str().c_str(), 2);
+
+		// all plots loaded
+		if(iLoaded >= iTotal)
+			break;
+
+		usleep(500);
+
+		//std::chrono::duration<int, std::milli> sleeptime(250);
+		//std::this_thread::sleep_for(sleeptime);
+	}
+}
+
+static void session_load_thread(Xml* xml, Blob* blob,
+								const std::vector<std::string>* vecBase,
+								const std::vector<unsigned int>* vecWndIdx,
+								SubWindowBase **pSWBs, int *piProgress)
+{
+	for(unsigned int iWnd : *vecWndIdx)
+	{
+		pSWBs[iWnd]->LoadXML(*xml, *blob, (*vecBase)[iWnd]);
+		piProgress[iWnd] = 1;
+	}
+}
+
 // session loading/saving
 void MiezeMainWnd::LoadSession(const std::string& strSess)
 {
@@ -28,10 +68,8 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 	}
 
 	Blob blob((strSess+".blob").c_str());
-	bool bHasBlob = blob.IsOpen();
 
 	//CloseAllTriggeredWithRetain();
-
 	if(!m_pRetainSession->isChecked())
 		m_strCurSess = strSess;
 
@@ -39,49 +77,100 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 	m_iPlotCnt = xml.Query<unsigned int>((strBase + "plot_counter").c_str(), 0);
 	unsigned int iWndCnt = xml.Query<unsigned int>((strBase + "window_counter").c_str(), 0);
 
+
+	std::vector<std::string> vecSWBase, vecSWType;
+	SubWindowBase** pSWBs = new SubWindowBase*[iWndCnt];
+
+	unsigned int iNumThreads = std::thread::hardware_concurrency();
+	if(iNumThreads==0) iNumThreads = 1;
+	std::vector<std::vector<unsigned int> > vecWndForThreads;
+	vecWndForThreads.resize(iNumThreads);
+
+
+	unsigned int iCurThread = 0;
 	for(unsigned int iWnd=0; iWnd<iWndCnt; ++iWnd)
 	{
-		std::ostringstream ostrLoading;
-		ostrLoading << "Loading " << (iWnd+1) << " of " << iWndCnt << ".";
-		SetStatusMsg(ostrLoading.str().c_str(), 2);
-
 		std::ostringstream ostrSWBase;
 		ostrSWBase << strBase << "window_" << iWnd << "/";
 		std::string strSWBase = ostrSWBase.str();
 		std::string strSWType = xml.QueryString((strSWBase + "type").c_str(), "");
+		vecSWBase.push_back(strSWBase);
+		vecSWType.push_back(strSWType);
 
+		QMdiArea *pMdi = GetMdiArea();
 		SubWindowBase *pSWB = 0;
 		if(strSWType == "plot_1d")
-			pSWB = new Plot(m_pmdi);
+			pSWB = new Plot(pMdi);
 		else if(strSWType == "plot_2d")
-			pSWB = new Plot2d(m_pmdi);
+			pSWB = new Plot2d(pMdi);
 		else if(strSWType == "plot_3d")
-			pSWB = new Plot3dWrapper(m_pmdi);
+			pSWB = new Plot3dWrapper(pMdi);
 		else if(strSWType == "plot_4d")
-			pSWB = new Plot4dWrapper(m_pmdi);
+			pSWB = new Plot4dWrapper(pMdi);
 		else
 		{
 			std::cerr << "Error: Unknown plot type: \"" << strSWType << "\"."
 						<< std::endl;
 			continue;
 		}
+		pSWBs[iWnd] = pSWB;
 
-		if(pSWB)
+		vecWndForThreads[iCurThread].push_back(iWnd);
+		if(++iCurThread >= iNumThreads)
+			iCurThread = 0;
+	}
+
+
+	std::vector<std::thread*> vecThreads;
+	std::vector<int> vecProgress(iWndCnt);
+
+	bool bProgressRunning = 1;
+	std::thread thProgress = std::thread(session_load_progress_thread,
+											&vecProgress, &bProgressRunning,
+											this);
+
+	for(unsigned int iTh=0; iTh<iNumThreads; ++iTh)
+	{
+		if(vecWndForThreads[iTh].size() != 0)
 		{
-			pSWB->LoadXML(xml, blob, strSWBase);
-			AddSubWindow(pSWB, 0);
-
-			QMdiSubWindow *pSubWnd = FindSubWindow(pSWB);
-
-			std::string strGeo = xml.QueryString((strSWBase+"geo").c_str(), "");
-			if(pSubWnd && strGeo != "")
-				pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
-
-			pSWB->GetActualWidget()->RefreshPlot();
-			pSWB->show();
+			std::thread *pTh = new std::thread(session_load_thread, &xml, &blob,
+												&vecSWBase, &vecWndForThreads[iTh],
+												pSWBs, vecProgress.data());
+			vecThreads.push_back(pTh);
 		}
 	}
 
+	for(unsigned int iTh=0; iTh<vecThreads.size(); ++iTh)
+	{
+		vecThreads[iTh]->join();
+		delete vecThreads[iTh];
+	}
+
+	bProgressRunning = 0;
+	thProgress.detach();
+	thProgress.~thread();
+
+
+	for(unsigned int iWnd=0; iWnd<iWndCnt; ++iWnd)
+	{
+		SubWindowBase *pSWB = pSWBs[iWnd];
+		if(!pSWB) continue;
+
+		AddSubWindow(pSWB, 0);
+		QMdiSubWindow *pSubWnd = FindSubWindow(pSWB);
+
+		const std::string& strSWBase = vecSWBase[iWnd];
+		std::string strGeo = xml.QueryString((strSWBase+"geo").c_str(), "");
+		if(pSubWnd && strGeo != "")
+			pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
+
+		pSWB->GetActualWidget()->RefreshPlot();
+		pSWB->show();
+	}
+
+	delete[] pSWBs;
+
+	SetStatusMsg("Session loaded.", 2);
 	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
 
 	QSettings *pGlobals = Settings::GetGlobals();

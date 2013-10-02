@@ -407,7 +407,6 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		delete pdat;
 	}
 
-	this->SetStatusMsg("Ok.",0);
 	AddRecentFile(QString(_strFile.c_str()));
 }
 

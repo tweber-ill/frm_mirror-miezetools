@@ -167,6 +167,8 @@ void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd, bool bShow)
 {
 	if(!pWnd) return;
 
+	m_mutex.lock();
+
 	pWnd->setParent(m_pmdi);
 	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
 	QObject::connect(pWnd, SIGNAL(WndDestroyed(SubWindowBase*)), this, SLOT(SubWindowDestroyed(SubWindowBase*)));
@@ -175,6 +177,8 @@ void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd, bool bShow)
 
 	m_pmdi->addSubWindow(pWnd);
 	emit SubWindowAdded(pWnd);
+
+	m_mutex.unlock();
 
 	if(bShow)
 	{

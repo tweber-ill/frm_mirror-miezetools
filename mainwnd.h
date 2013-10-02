@@ -15,6 +15,7 @@
 
 #include <vector>
 #include <string>
+#include <mutex>
 
 #include "subwnd.h"
 #include "plot/plot.h"
@@ -46,6 +47,8 @@ enum InterpFkt
 class MiezeMainWnd : public QMainWindow
 { Q_OBJECT
 protected:
+	std::mutex m_mutex;
+
 	QMdiArea *m_pmdi;
 	InfoDock *m_pinfo;
 
@@ -96,7 +99,6 @@ protected:
 
 
 	std::string m_strCurSess;
-
 	QMdiSubWindow* FindSubWindow(SubWindowBase* pSWB);
 	std::vector<SubWindowBase*> GetSubWindows(bool bResolveActualWidget=1);
 
@@ -177,6 +179,8 @@ public:
 	void LoadFile(const std::string& strFile);
 	void LoadSession(const std::string& strFile);
 	void MakePlot(const Data1& dat, const std::string& strTitle);
+
+	QMdiArea* GetMdiArea() { return m_pmdi; }
 
 public slots:
 	void SetStatusMsg(const char* pcMsg, int iPos);

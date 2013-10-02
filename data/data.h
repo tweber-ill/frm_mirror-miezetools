@@ -11,8 +11,8 @@
 typedef unsigned int uint;
 typedef unsigned char uchar;
 
-#include<vector>
-#include<algorithm>
+#include <vector>
+#include <algorithm>
 
 #include <boost/numeric/ublas/matrix.hpp>
 namespace ublas = boost::numeric::ublas;
