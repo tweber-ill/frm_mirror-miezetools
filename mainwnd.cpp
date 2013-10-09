@@ -53,7 +53,8 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_pformuladlg(0),
 					  m_pplotpropdlg(0),
 					  m_pexportdlg(0),
-					  m_pnormdlg(0)
+					  m_pnormdlg(0),
+					  m_platticedlg(0)
 {
 	this->setWindowIcon(QIcon("res/mainicon.png"));
 	this->setWindowTitle(WND_TITLE);
@@ -350,6 +351,10 @@ MiezeMainWnd::MiezeMainWnd()
 	pFormulas->setText("Formulas...");
 	pMenuCalc->addAction(pFormulas);
 
+	QAction *pLattice = new QAction(this);
+	pLattice->setText("Lattice...");
+	pMenuCalc->addAction(pLattice);
+
 	QAction *pPSDPhase = new QAction(this);
 	pPSDPhase->setText("Flat PSD Phases...");
 	pMenuCalc->addAction(pPSDPhase);
@@ -458,6 +463,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pPhaseCorr, SIGNAL(triggered()), this, SLOT(ShowPSDPhaseCorr()));
 	QObject::connect(pPSDPhase, SIGNAL(triggered()), this, SLOT(CalcPSDPhases()));
 	QObject::connect(pFormulas, SIGNAL(triggered()), this, SLOT(ShowFormulas()));
+	QObject::connect(pLattice, SIGNAL(triggered()), this, SLOT(ShowLatticeCalc()));
 
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
 	QObject::connect(pBrowser, SIGNAL(triggered()), this, SLOT(ShowBrowser()));
@@ -480,6 +486,7 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pphasecorrdlg) delete m_pphasecorrdlg;
 	if(m_pradialintdlg) delete m_pradialintdlg;
 	if(m_pformuladlg) delete m_pformuladlg;
+	if(m_platticedlg) delete m_platticedlg;
 	if(m_pplotpropdlg) delete m_pplotpropdlg;
 	if(m_pexportdlg) delete m_pexportdlg;
 
@@ -910,6 +917,15 @@ void MiezeMainWnd::ShowFormulas()
 
 	m_pformuladlg->show();
 	m_pformuladlg->activateWindow();
+}
+
+void MiezeMainWnd::ShowLatticeCalc()
+{
+	if(!m_platticedlg)
+		m_platticedlg = new LatticeDlg(this);
+
+	m_platticedlg->show();
+	m_platticedlg->activateWindow();
 }
 
 void MiezeMainWnd::ShowPSDPhaseCorr()

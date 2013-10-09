@@ -30,6 +30,7 @@
 #include "dialogs/PsdPhaseDlg.h"
 #include "dialogs/RadialIntDlg.h"
 #include "dialogs/FormulaDlg.h"
+#include "dialogs/LatticeDlg.h"
 #include "dialogs/PlotPropDlg.h"
 #include "dialogs/ExportDlg.h"
 #include "dialogs/InfoDock.h"
@@ -64,6 +65,7 @@ protected:
 	PlotPropDlg *m_pplotpropdlg;
 	ExportDlg *m_pexportdlg;
 	NormDlg *m_pnormdlg;
+	LatticeDlg *m_platticedlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -150,6 +152,7 @@ protected slots:
 	void ShowPSDPhaseCorr();
 	void CalcPSDPhases();
 	void ShowFormulas();
+	void ShowLatticeCalc();
 
 	void ShowAbout();
 	void ShowBrowser();

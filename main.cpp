@@ -66,6 +66,9 @@ int main(int argc, char **argv)
 		//std::cout << a.type() << std::endl;
 		//a.setStyle(new QCleanlooksStyle);
 
+		::setlocale(LC_ALL, "C");
+		QLocale::setDefault(QLocale::English);
+
 		MiezeMainWnd wnd;
 		SettingsDlg::set_global_defaults();
 

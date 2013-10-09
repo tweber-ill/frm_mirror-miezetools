@@ -40,6 +40,7 @@ moc dialogs/ResoDlg.h -o dialogs/ResoDlg.moc
 moc dialogs/PsdPhaseDlg.h -o dialogs/PsdPhaseDlg.moc
 moc dialogs/RadialIntDlg.h -o dialogs/RadialIntDlg.moc
 moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
+moc dialogs/LatticeDlg.h -o dialogs/LatticeDlg.moc
 moc dialogs/PlotPropDlg.h -o dialogs/PlotPropDlg.moc
 moc dialogs/ExportDlg.h -o dialogs/ExportDlg.moc
 moc dialogs/InfoDock.h -o dialogs/InfoDock.moc
