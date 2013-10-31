@@ -52,6 +52,7 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_pradialintdlg(0),
 					  m_pformuladlg(0),
 					  m_pplotpropdlg(0),
+					  m_prebindlg(0),
 					  m_pexportdlg(0),
 					  m_pnormdlg(0),
 					  m_platticedlg(0)
@@ -160,9 +161,14 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pPlotProp = new QAction(this);
 	pPlotProp->setText("Plot Properties...");
 
+	QAction *pRebin = new QAction(this);
+	pRebin->setText("Rebin...");
+
 
 	m_pMenu1d = new QMenu(this);
 	m_pMenu1d->addAction(pExportPy);
+	m_pMenu1d->addSeparator();
+	m_pMenu1d->addAction(pRebin);
 	m_pMenu1d->addSeparator();
 	m_pMenu1d->addAction(pPlotProp);
 
@@ -424,6 +430,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pExtractFoils, SIGNAL(triggered()), this, SLOT(ExtractFoils()));
 	QObject::connect(pSumFoils, SIGNAL(triggered()), this, SLOT(SumFoils()));
 	QObject::connect(pPlotProp, SIGNAL(triggered()), this, SLOT(PlotPropertiesTriggered()));
+	QObject::connect(pRebin, SIGNAL(triggered()), this, SLOT(RebinTriggered()));
 	QObject::connect(pExportPy, SIGNAL(triggered()), this, SLOT(FileExportPyTriggered()));
 	QObject::connect(pExportPlots, SIGNAL(triggered()), this, SLOT(ShowExportDlg()));
 
@@ -488,6 +495,7 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pformuladlg) delete m_pformuladlg;
 	if(m_platticedlg) delete m_platticedlg;
 	if(m_pplotpropdlg) delete m_pplotpropdlg;
+	if(m_prebindlg) delete m_prebindlg;
 	if(m_pexportdlg) delete m_pexportdlg;
 
 	if(m_pinfo) delete m_pinfo;
@@ -1075,6 +1083,22 @@ void MiezeMainWnd::NormalizeTriggered()
 
 	m_pnormdlg->show();
 	m_pnormdlg->activateWindow();
+}
+
+
+void MiezeMainWnd::RebinTriggered()
+{
+	if(!m_prebindlg)
+	{
+		m_prebindlg = new RebinDlg(this);
+		QObject::connect(this, SIGNAL(SubWindowActivated(SubWindowBase*)), m_prebindlg, SLOT(SubWindowActivated(SubWindowBase*)));
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_prebindlg, SLOT(SubWindowRemoved(SubWindowBase*)));
+
+		m_prebindlg->SubWindowActivated(GetActivePlot(0));
+	}
+
+	m_prebindlg->show();
+	m_prebindlg->activateWindow();
 }
 // --------------------------------------------------------------------------------
 

@@ -28,6 +28,11 @@ public:
 	virtual ~Data1() {}
 	virtual DataType GetType() const { return DATA_1D; }
 
+	const double* GetXPtr() const { return m_vecValsX.data(); }
+	const double* GetYPtr() const { return m_vecValsY.data(); }
+	const double* GetXErrPtr() const { return m_vecErrsX.data(); }
+	const double* GetYErrPtr() const { return m_vecErrsY.data(); }
+
 	double GetX(uint iX) const { return m_vecValsX[iX]; }
 	double GetY(uint iY) const { return m_vecValsY[iY]; }
 	double GetXErr(uint iX) const { return m_vecErrsX[iX]; }

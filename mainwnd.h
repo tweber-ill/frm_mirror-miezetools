@@ -32,6 +32,7 @@
 #include "dialogs/FormulaDlg.h"
 #include "dialogs/LatticeDlg.h"
 #include "dialogs/PlotPropDlg.h"
+#include "dialogs/RebinDlg.h"
 #include "dialogs/ExportDlg.h"
 #include "dialogs/InfoDock.h"
 #include "dialogs/NormDlg.h"
@@ -63,6 +64,7 @@ protected:
 	PsdPhaseCorrDlg *m_pphasecorrdlg;
 	FormulaDlg *m_pformuladlg;
 	PlotPropDlg *m_pplotpropdlg;
+	RebinDlg *m_prebindlg;
 	ExportDlg *m_pexportdlg;
 	NormDlg *m_pnormdlg;
 	LatticeDlg *m_platticedlg;
@@ -120,6 +122,8 @@ protected slots:
 	void SessionLoadTriggered();
 	void SessionSaveTriggered();
 	void SessionSaveAsTriggered();
+
+	void RebinTriggered();
 
 	void FileExportPyTriggered();
 	void ShowExportDlg();

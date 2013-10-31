@@ -42,6 +42,7 @@ moc dialogs/RadialIntDlg.h -o dialogs/RadialIntDlg.moc
 moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
 moc dialogs/LatticeDlg.h -o dialogs/LatticeDlg.moc
 moc dialogs/PlotPropDlg.h -o dialogs/PlotPropDlg.moc
+moc dialogs/RebinDlg.h -o dialogs/RebinDlg.moc
 moc dialogs/ExportDlg.h -o dialogs/ExportDlg.moc
 moc dialogs/InfoDock.h -o dialogs/InfoDock.moc
 moc dialogs/NormDlg.h -o dialogs/NormDlg.moc
