@@ -443,10 +443,9 @@ void FormulaDlg::CalcPlane()
 
 	m_pPlanePlot->clear();
 
-	std::vector<double> vecQ;
-	std::vector<double> vecE;
-	vecQ.reserve(NUM_POINTS);
-	vecE.reserve(NUM_POINTS);
+	std::vector<double> vecQ[2], vecE[2];
+	vecQ[0].reserve(NUM_POINTS); vecE[0].reserve(NUM_POINTS);
+	vecQ[1].reserve(NUM_POINTS); vecE[1].reserve(NUM_POINTS);
 
 	units::quantity<units::si::plane_angle> twotheta = dAngle * units::si::radians;
 
@@ -462,14 +461,23 @@ void FormulaDlg::CalcPlane()
 
 			if(!::isnan(_dQ) && !::isnan(_dE) && !::isinf(_dQ) && !::isinf(_dE))
 			{
-				vecQ.push_back(Q * angstrom);
-				vecE.push_back(dE / one_meV);
+				vecQ[iSign].push_back(Q * angstrom);
+				vecE[iSign].push_back(dE / one_meV);
 			}
 		}
 	}
 
-	//sort_2(vecQ.begin(), vecQ.end(), vecE.begin());
-	m_pPlanePlot->plot(vecQ.size(), vecQ.data(), vecE.data());
+	std::vector<double> _vecQ;
+	std::vector<double> _vecE;
+
+	_vecQ.insert(_vecQ.end(), vecQ[0].rbegin(), vecQ[0].rend());
+	_vecE.insert(_vecE.end(), vecE[0].rbegin(), vecE[0].rend());
+
+	_vecQ.insert(_vecQ.end(), vecQ[1].begin(), vecQ[1].end());
+	_vecE.insert(_vecE.end(), vecE[1].begin(), vecE[1].end());
+
+
+	m_pPlanePlot->plot(_vecQ.size(), _vecQ.data(), _vecE.data());
 	m_pPlanePlot->RefreshPlot();
 }
 
