@@ -37,6 +37,7 @@ protected slots:
 	void CalcPlane();
 	void FixedKiKfToggled();
 	void PyExport();
+	void SetPlaneStatusMsg(const char* pcMsg, int iPos);
 
 public:
 	FormulaDlg(QWidget* pParent);

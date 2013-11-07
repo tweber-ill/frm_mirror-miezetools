@@ -418,6 +418,7 @@ void FormulaDlg::setupPlanePlotter()
 
 
 	QObject::connect(btnPython, SIGNAL(clicked(bool)), this, SLOT(PyExport()));
+	QObject::connect(m_pPlanePlot, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetPlaneStatusMsg(const char*, int)));
 }
 
 void FormulaDlg::FixedKiKfToggled()
@@ -495,6 +496,15 @@ void FormulaDlg::PyExport()
 		strFile1 += ".py";
 
 	export_py(strFile1.c_str(), m_pPlanePlot);
+}
+
+void FormulaDlg::SetPlaneStatusMsg(const char* pcMsg, int iPos)
+{
+	if(!pcMsg)
+		return;
+
+	if(iPos == 2)
+		labelPlaneStatus->setText(pcMsg);
 }
 
 // --------------------------------------------------------------------------------
