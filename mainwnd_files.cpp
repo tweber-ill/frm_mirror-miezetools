@@ -22,6 +22,8 @@
 #include <QtCore/QSignalMapper>
 #include <QtCore/QTemporaryFile>
 
+#include "data/export.h"
+
 #include <fstream>
 
 
@@ -514,3 +516,49 @@ void MiezeMainWnd::LoadFile(const QString& strFile)
 	m_strLastXColumn = "";
 	LoadFile(strFile.toStdString());
 }
+
+
+
+
+// --------------------------------------------------------------------------------
+// export
+void MiezeMainWnd::ShowExportDlg()
+{
+	if(!m_pexportdlg)
+	{
+		m_pexportdlg = new ExportDlg(this, m_pmdi);
+		QObject::connect(this, SIGNAL(SubWindowRemoved(SubWindowBase*)), m_pexportdlg, SLOT(SubWindowRemoved(SubWindowBase*)));
+	}
+
+	m_pexportdlg->show();
+	m_pexportdlg->activateWindow();
+}
+
+void MiezeMainWnd::FileExportPyTriggered()
+{
+	const SubWindowBase *pSWB = GetActivePlot();
+	if(!pSWB)
+	{
+		QMessageBox::critical(this, "Error", "No active plot.");
+		return;
+	}
+
+	QSettings *pGlobals = Settings::GetGlobals();
+	QString strLastDir = pGlobals->value("main/lastdir_py", ".").toString();
+
+	QString strFile = QFileDialog::getSaveFileName(this, "Save as Python file...", strLastDir,
+					"Python files (*.py)"/*,0, QFileDialog::DontUseNativeDialog*/);
+	if(strFile == "")
+		return;
+
+	std::string strFile1 = strFile.toStdString();
+	std::string strExt = get_fileext(strFile1);
+	if(strExt != "py")
+		strFile1 += ".py";
+
+	if(export_py(strFile1.c_str(), pSWB))
+		pGlobals->setValue("main/lastdir_py", QString(::get_dir(strFile1).c_str()));
+	else
+		QMessageBox::critical(this, "Error", "Export to Python failed.");
+}
+// --------------------------------------------------------------------------------

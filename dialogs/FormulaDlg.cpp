@@ -9,14 +9,19 @@
 #include "../helper/mieze.hpp"
 #include "../helper/string.h"
 #include "../helper/math.h"
+#include "../helper/misc.h"
 #include "../settings.h"
+#include "../data/export.h"
 
 #include <sstream>
 #include <iostream>
 
-FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent)
+#include <QtGui/QFileDialog>
+
+FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 {
 	setupUi(this);
+	setupPlanePlotter();
 	setupConstants();
 
 	QObject::connect(editNeutronLam, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronLam()));
@@ -45,10 +50,13 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent)
 
 	CalcNeutronLam();
 	CalcMIEZE();
+	CalcPlane();
 }
 
 FormulaDlg::~FormulaDlg()
-{}
+{
+	if(m_pPlanePlot) delete m_pPlanePlot;
+}
 
 void FormulaDlg::setupConstants()
 {
@@ -387,6 +395,102 @@ void FormulaDlg::CalcMIEZE()
 
 	labelResult->setText(ostrResult.str().c_str());
 }
+
+
+// --------------------------------------------------------------------------------
+// scattering plane
+
+void FormulaDlg::setupPlanePlotter()
+{
+	m_pPlanePlot = new Plot(this);
+	m_pPlanePlot->SetLabel(LABEL_X, "Q (1/A)");
+	m_pPlanePlot->SetLabel(LABEL_Y, "E (meV)");
+
+	QGridLayout *pGrid = new QGridLayout(framePlanePlot);
+	pGrid->addWidget(m_pPlanePlot, 0, 0, 1, 1);
+
+
+	QObject::connect(radioFixedKi, SIGNAL(toggled(bool)), this, SLOT(FixedKiKfToggled()));
+
+	std::vector<QDoubleSpinBox*> vecSpinBoxes = {spinEiEf, spinMinQ, spinMaxQ, spinAngle};
+	for(QDoubleSpinBox* pSpin : vecSpinBoxes)
+		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcPlane()));
+
+
+	QObject::connect(btnPython, SIGNAL(clicked(bool)), this, SLOT(PyExport()));
+}
+
+void FormulaDlg::FixedKiKfToggled()
+{
+	if(radioFixedKi->isChecked())
+		labelFixedKiKf->setText("E_i (meV):");
+	else
+		labelFixedKiKf->setText("E_f (meV):");
+
+	CalcPlane();
+}
+
+void FormulaDlg::CalcPlane()
+{
+	const unsigned int NUM_POINTS = 512;
+
+	double dMinQ = spinMinQ->value();
+	double dMaxQ = spinMaxQ->value();
+	double dAngle = spinAngle->value() / 180. * M_PI;
+
+	units::quantity<units::si::energy> EiEf = spinEiEf->value() * one_meV;
+
+
+	m_pPlanePlot->clear();
+
+	std::vector<double> vecQ;
+	std::vector<double> vecE;
+	vecQ.reserve(NUM_POINTS);
+	vecE.reserve(NUM_POINTS);
+
+	units::quantity<units::si::plane_angle> twotheta = dAngle * units::si::radians;
+
+	for(unsigned int iPt=0; iPt<NUM_POINTS; ++iPt)
+	{
+		for(unsigned int iSign=0; iSign<=1; ++iSign)
+		{
+			units::quantity<units::si::wavenumber> Q = (dMinQ + (dMaxQ - dMinQ)/double(NUM_POINTS)*double(iPt)) /angstrom;
+			units::quantity<units::si::energy> dE = ::kinematic_plane(radioFixedKi->isChecked(), iSign, EiEf, Q, twotheta);
+
+			double _dQ = Q * angstrom;
+			double _dE = dE / one_meV;
+
+			if(!::isnan(_dQ) && !::isnan(_dE) && !::isinf(_dQ) && !::isinf(_dE))
+			{
+				vecQ.push_back(Q * angstrom);
+				vecE.push_back(dE / one_meV);
+			}
+		}
+	}
+
+	//sort_2(vecQ.begin(), vecQ.end(), vecE.begin());
+	m_pPlanePlot->plot(vecQ.size(), vecQ.data(), vecE.data());
+	m_pPlanePlot->RefreshPlot();
+}
+
+
+void FormulaDlg::PyExport()
+{
+	QString strFile = QFileDialog::getSaveFileName(this, "Save as Python file...", "",
+					"Python files (*.py)"/*,0, QFileDialog::DontUseNativeDialog*/);
+	if(strFile == "")
+		return;
+
+	std::string strFile1 = strFile.toStdString();
+	std::string strExt = get_fileext(strFile1);
+	if(strExt != "py")
+		strFile1 += ".py";
+
+	export_py(strFile1.c_str(), m_pPlanePlot);
+}
+
+// --------------------------------------------------------------------------------
+
 
 void FormulaDlg::accept()
 {
