@@ -1,0 +1,184 @@
+/*
+ * new TAS-MIEZE instrument
+ * @author tweber
+ * @date 25-nov-13
+ */
+
+DEFINE INSTRUMENT test
+	(
+		// source
+		double dLam = 5.0, 
+		double dDeltaLam = 0.1
+	)
+
+
+DECLARE
+%{
+	int bAbsorbNonScattered = 1;
+
+	// monochromator
+	double dMonoD = 3.355;
+	double dMonoScatterSense = 1.;
+	double dDistSrcMono = 1.;
+	double dMonoTheta = 63.4, dMonoTwoTheta = 126.8;
+	double dMonoWidth = 0.2, dMonoHeight = 0.2;
+
+	// sample
+	double dDistMonoSample = 1.;
+	double dSampleTheta=0., dSampleTwoTheta = 0.;
+	double dSampleScatterSense = 1.;
+
+	// analyser
+	double dAnaD = 3.355;
+	double dAnaScatterSense = -1.;
+	double dDistSampleAna = 1.;
+	double dAnaTheta=0., dAnaTwoTheta = 0.;
+	double dAnaWidth = 0.2, dAnaHeight = 0.2;
+
+	// detector
+	double dDistAnaDet = 1.;
+	double dDetWidth = 0.4, dDetHeight = 0.4;
+%}
+
+
+
+INITIALIZE
+%{
+	dMonoTheta = dMonoScatterSense*asin(dLam / (2.*dMonoD)) / M_PI * 180.;
+	dMonoTwoTheta = dMonoTheta * 2.;
+
+	printf("Monochromator: theta=%f, 2theta=%f\n", dMonoTheta, dMonoTwoTheta);
+
+
+	dAnaTheta = dAnaScatterSense*asin(dLam / (2.*dAnaD)) / M_PI * 180.;
+	dAnaTwoTheta = dAnaTheta * 2.;
+%}
+
+
+
+
+
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+	 	AT (0,0,0) ABSOLUTE
+
+
+
+//----------------------------------------------------------------------------------------------------
+// source
+
+COMPONENT Source = Source_simple(
+	yheight = 0.01, xwidth = 0.01, focus_xw = dMonoWidth*0.5, focus_yh = dMonoHeight*0.5,
+	lambda0 = dLam, dlambda = dDeltaLam, gauss = 1, dist = dDistSrcMono)
+		AT (0, 0, 0) RELATIVE Origin
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// monochromator
+
+COMPONENT MonoAxisBegin = Arm()
+	AT (0, 0, dDistSrcMono) RELATIVE Source
+
+COMPONENT Mono_flat = Monochromator_flat(
+	zwidth = dMonoWidth, yheight = dMonoHeight, mosaich = 30, mosaicv = 30,
+	r0 = 1, DM = dMonoD)
+  		AT (0, 0, 0) RELATIVE MonoAxisBegin
+	  	ROTATED (0, dMonoTheta, 0) RELATIVE MonoAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
+COMPONENT MonoAxisEnd = Arm()
+	AT (0, 0, 0) RELATIVE MonoAxisBegin
+	ROTATED (0, dMonoTwoTheta, 0) RELATIVE MonoAxisBegin
+
+
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// sample
+
+COMPONENT SampleAxisBegin = Arm()
+	AT (0, 0, dDistMonoSample) RELATIVE MonoAxisEnd
+
+
+
+COMPONENT SampleAxisEnd = Arm()
+	AT (0, 0, 0) RELATIVE SampleAxisBegin
+	ROTATED (0, dSampleTwoTheta, 0) RELATIVE SampleAxisBegin
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// analyser
+
+COMPONENT AnaAxisBegin = Arm()
+	AT (0, 0, dDistSampleAna) RELATIVE SampleAxisEnd
+
+COMPONENT Ana_flat = Monochromator_flat(
+	zwidth = dAnaWidth, yheight = dAnaHeight, mosaich = 30, mosaicv = 30,
+	r0 = 1, DM = dAnaD)
+  		AT (0, 0, 0) RELATIVE AnaAxisBegin
+	  	ROTATED (0, dAnaTheta, 0) RELATIVE AnaAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
+COMPONENT AnaAxisEnd = Arm()
+	AT (0, 0, 0) RELATIVE AnaAxisBegin
+	ROTATED (0, dAnaTwoTheta, 0) RELATIVE AnaAxisBegin
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// detector
+
+COMPONENT DetAxis = Arm()
+	AT (0, 0, dDistAnaDet) RELATIVE AnaAxisEnd
+
+
+/*
+COMPONENT lam = L_monitor(
+	nL = 64, filename = "lam", xwidth = dDetWidth, yheight = dDetHeight,
+	Lmin = 0, Lmax = 10, restore_neutron = 1)
+		AT (0, 0, 0) RELATIVE DetAxis
+*/
+
+COMPONENT psd = PSD_monitor(
+	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
+	xwidth = dDetWidth, yheight = dDetHeight)
+		AT (0, 0, 0) RELATIVE DetAxis
+
+//----------------------------------------------------------------------------------------------------
+
+
+FINALLY
+%{
+%}
+
+
+END
+
+
