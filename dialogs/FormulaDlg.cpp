@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <map>
 
 #include <QtGui/QFileDialog>
 
@@ -31,6 +32,7 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 	QObject::connect(editNeutronT, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronT()));
 
 
+	//--------------------------------------------------------------------------------
 	m_vecSpins = {spinLam, spinF1, spinF2, spinL1, spinLb, spinE};
 	m_vecSpinNames = {"formulas/mieze/lam", "formulas/mieze/f1", "formulas/mieze/f2", "formulas/mieze/L1", "formulas/mieze/Lb", "formulas/mieze/E"};
 
@@ -44,13 +46,26 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 		pSpin->setValue(Settings::Get<double>(strName.c_str()));
 	}
 
-
 	for(QDoubleSpinBox* pSpinBox : m_vecSpins)
 		QObject::connect(pSpinBox, SIGNAL(valueChanged(double)), this, SLOT(CalcMIEZE()));
+	//--------------------------------------------------------------------------------
+
+
+	//--------------------------------------------------------------------------------
+	tablePowderLines->horizontalHeader()->setVisible(true);
+	tablePowderLines->setColumnWidth(1, 256);
+
+	QObject::connect(spinCellD, SIGNAL(valueChanged(double)), this, SLOT(CalcPowderLines()));
+	QObject::connect(spinCellLam, SIGNAL(valueChanged(double)), this, SLOT(CalcPowderLines()));
+	QObject::connect(spinMaxHKL, SIGNAL(valueChanged(int)), this, SLOT(CalcPowderLines()));
+	QObject::connect(comboCell, SIGNAL(currentIndexChanged(int)), this, SLOT(CalcPowderLines()));
+	//--------------------------------------------------------------------------------
+
 
 	CalcNeutronLam();
 	CalcMIEZE();
 	CalcPlane();
+	CalcPowderLines();
 }
 
 FormulaDlg::~FormulaDlg()
@@ -460,7 +475,7 @@ void FormulaDlg::CalcPlane()
 			double _dQ = Q * angstrom;
 			double _dE = dE / one_meV;
 
-			if(!::isnan(_dQ) && !::isnan(_dE) && !::isinf(_dQ) && !::isinf(_dE))
+			if(!std::isnan(_dQ) && !std::isnan(_dE) && !std::isinf(_dQ) && !std::isinf(_dE))
 			{
 				vecQ[iSign].push_back(Q * angstrom);
 				vecE[iSign].push_back(dE / one_meV);
@@ -506,6 +521,88 @@ void FormulaDlg::SetPlaneStatusMsg(const char* pcMsg, int iPos)
 	if(iPos == 2)
 		labelPlaneStatus->setText(pcMsg);
 }
+
+// --------------------------------------------------------------------------------
+
+
+static inline bool is_peak_allowed_sc(int ih, int ik, int il)
+{
+	return true;
+}
+
+static inline bool is_peak_allowed_fcc(int ih, int ik, int il)
+{
+	return ((is_even(ih) && is_even(ik) && is_even(il)) || (is_odd(ih) && is_odd(ik) && is_odd(il)));
+}
+
+static inline bool is_peak_allowed_bcc(int ih, int ik, int il)
+{
+	return is_even(ih + ik + il);
+}
+
+
+static double calc_d_cubic(int ih, int ik, int il, double da)
+{
+        return da/std::sqrt(double(ih*ih) + double(ik*ik) + double(il*il));
+}
+
+// n lam = 2d sin th
+// asin(n lam / (2d)) = th
+static double get_bragg_angle(int ih, int ik, int il, double dLam, double da)
+{
+        double d = calc_d_cubic(ih, ik, il, da);
+        double dTwotheta = std::asin(dLam / (2.*d)) * 2.;
+        return dTwotheta;
+}
+
+void FormulaDlg::CalcPowderLines()
+{
+	const double dLam = spinCellLam->value();
+	const double da = spinCellD->value();
+	const int iMaxHKL = spinMaxHKL->value();
+
+	bool (*is_peak_allowed_all[])(int, int, int) = {is_peak_allowed_sc, is_peak_allowed_fcc, is_peak_allowed_bcc};
+
+	int iIdx = comboCell->currentIndex();
+	bool (*is_peak_allowed)(int, int, int) = is_peak_allowed_all[iIdx];
+
+
+	std::map<std::string, std::string> mapPeaks;
+
+	for(int ih=0; ih<iMaxHKL; ++ih)
+		for(int ik=0; ik<iMaxHKL; ++ik)
+			for(int il=0; il<iMaxHKL; ++il)
+			{
+				if(ih==0 && ik==0 && il ==0) continue;
+				if(!is_peak_allowed(ih, ik, il)) continue;
+
+				double dAngle = get_bragg_angle(ih, ik, il, dLam, da) / M_PI * 180.;
+				std::ostringstream ostrAngle;
+				ostrAngle.precision(6);
+				ostrAngle << dAngle;
+
+				std::ostringstream ostrPeak;
+				ostrPeak << "(" << ih << " " << ik << " " << il << ") ";
+
+				mapPeaks[ostrAngle.str()] += ostrPeak.str();
+			}
+
+	tablePowderLines->setRowCount(mapPeaks.size());
+	int iRow = 0;
+	for(const auto& pair : mapPeaks)
+	{
+		//std::cout << pair.first << ": " << pair.second << std::endl;
+		for(int iCol=0; iCol<2; ++iCol)
+		if(!tablePowderLines->item(iRow, iCol))
+			tablePowderLines->setItem(iRow, iCol, new QTableWidgetItem());
+
+		tablePowderLines->item(iRow, 0)->setText(pair.first.c_str());
+		tablePowderLines->item(iRow, 1)->setText(pair.second.c_str());
+
+		++iRow;
+	}
+}
+
 
 // --------------------------------------------------------------------------------
 

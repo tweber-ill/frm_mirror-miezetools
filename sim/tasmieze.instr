@@ -4,7 +4,7 @@
  * @date 25-nov-13
  */
 
-DEFINE INSTRUMENT test
+DEFINE INSTRUMENT TasMieze
 	(
 		// source
 		double dLam = 5.0, 

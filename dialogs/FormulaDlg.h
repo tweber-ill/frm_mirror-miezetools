@@ -39,6 +39,8 @@ protected slots:
 	void PyExport();
 	void SetPlaneStatusMsg(const char* pcMsg, int iPos);
 
+	void CalcPowderLines();
+
 public:
 	FormulaDlg(QWidget* pParent);
 	virtual ~FormulaDlg();

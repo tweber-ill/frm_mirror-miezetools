@@ -12,3 +12,7 @@ cattus
 perf.data
 perf.data.old
 gmon.out
+sim/*.sim
+sim/tasmieze.c
+sim/tasmieze
+sim/tasmieze.out
