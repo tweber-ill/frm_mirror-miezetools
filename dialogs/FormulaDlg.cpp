@@ -16,6 +16,7 @@
 #include <sstream>
 #include <iostream>
 #include <map>
+#include <vector>
 
 #include <QtGui/QFileDialog>
 
@@ -555,6 +556,19 @@ static double get_bragg_angle(int ih, int ik, int il, double dLam, double da)
         return dTwotheta;
 }
 
+
+struct PowderLine
+{
+	std::string strAngle;
+	double dAngle;
+	std::string strPeaks;
+
+	static bool comp(const PowderLine& line1, const PowderLine& line2)
+	{
+		return (line1.dAngle <= line2.dAngle);
+	}
+};
+
 void FormulaDlg::CalcPowderLines()
 {
 	const double dLam = spinCellLam->value();
@@ -577,6 +591,8 @@ void FormulaDlg::CalcPowderLines()
 				if(!is_peak_allowed(ih, ik, il)) continue;
 
 				double dAngle = get_bragg_angle(ih, ik, il, dLam, da) / M_PI * 180.;
+				if(std::isnan(dAngle) || std::isinf(dAngle)) continue;
+
 				std::ostringstream ostrAngle;
 				ostrAngle.precision(6);
 				ostrAngle << dAngle;
@@ -587,19 +603,36 @@ void FormulaDlg::CalcPowderLines()
 				mapPeaks[ostrAngle.str()] += ostrPeak.str();
 			}
 
-	tablePowderLines->setRowCount(mapPeaks.size());
-	int iRow = 0;
+	std::vector<PowderLine> vecPowderLines;
+
 	for(const auto& pair : mapPeaks)
+	{
+		PowderLine powderline;
+		powderline.strAngle = pair.first;
+		powderline.strPeaks = pair.second;
+
+		std::istringstream istrAngle(pair.first);
+		istrAngle >> powderline.dAngle;
+
+		vecPowderLines.push_back(powderline);
+	}
+	std::sort(vecPowderLines.begin(), vecPowderLines.end(), PowderLine::comp);
+
+
+	const int iNumRows = vecPowderLines.size();
+	tablePowderLines->setRowCount(iNumRows);
+
+	for(int iRow=0; iRow<iNumRows; ++iRow)
 	{
 		//std::cout << pair.first << ": " << pair.second << std::endl;
 		for(int iCol=0; iCol<2; ++iCol)
-		if(!tablePowderLines->item(iRow, iCol))
-			tablePowderLines->setItem(iRow, iCol, new QTableWidgetItem());
+		{
+			if(!tablePowderLines->item(iRow, iCol))
+				tablePowderLines->setItem(iRow, iCol, new QTableWidgetItem());
+		}
 
-		tablePowderLines->item(iRow, 0)->setText(pair.first.c_str());
-		tablePowderLines->item(iRow, 1)->setText(pair.second.c_str());
-
-		++iRow;
+		tablePowderLines->item(iRow, 0)->setText(vecPowderLines[iRow].strAngle.c_str());
+		tablePowderLines->item(iRow, 1)->setText(vecPowderLines[iRow].strPeaks.c_str());
 	}
 }
 
