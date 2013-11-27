@@ -16,10 +16,12 @@ LatticeDlg::LatticeDlg(QWidget* pParent) : QDialog(pParent)
 	m_vecEditReal.push_back(editVec1);
 	m_vecEditReal.push_back(editVec2);
 	m_vecEditReal.push_back(editVec3);
+	m_vecEditReal.push_back(editVec4);
 
 	m_vecEditRecip.push_back(editRVec1);
 	m_vecEditRecip.push_back(editRVec2);
 	m_vecEditRecip.push_back(editRVec3);
+	m_vecEditRecip.push_back(editRVec4);
 
 	for(QLineEdit* pEdit : m_vecEditReal)
 		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)),
@@ -38,23 +40,47 @@ LatticeDlg::~LatticeDlg()
 
 static void CalcRealRecip(const std::vector<QLineEdit*>& vecEditIn,
 						const std::vector<QLineEdit*>& vecEditOut,
-						QLabel* pLabIn=0, QLabel* pLabOut=0)
+						QLabel* pLabIn=0, QLabel* pLabOut=0, QLabel* pLabelStatus=0)
 {
-	ublas::matrix<double> matReal(3,3);
-	for(unsigned int iVec=0; iVec<3; ++iVec)
+	std::vector<double> vecVals0;
+	get_tokens<double>(vecEditIn[0]->text().toStdString(), " ,;\t", vecVals0);
+	unsigned int iDim = vecVals0.size();
+	const unsigned int iMaxDim = vecEditIn.size();
+	if(iDim > iMaxDim) iDim = iMaxDim;
+
+	for(unsigned int iVec=0; iVec<iDim; ++iVec)
+	{
+		vecEditIn[iVec]->setEnabled(true);
+		vecEditOut[iVec]->setEnabled(true);
+	}
+	for(unsigned int iVec=iDim; iVec<iMaxDim; ++iVec)
+	{
+		vecEditIn[iVec]->setEnabled(false);
+		vecEditOut[iVec]->setEnabled(false);
+	}
+
+	if(pLabelStatus)
+	{
+		std::ostringstream ostrDim;
+		ostrDim << iDim << "D Lattice";
+		pLabelStatus->setText(ostrDim.str().c_str());
+	}
+
+	ublas::matrix<double> matReal(iDim, iDim);
+	for(unsigned int iVec=0; iVec<iDim; ++iVec)
 	{
 		std::string strVec = vecEditIn[iVec]->text().toStdString();
 		std::vector<double> vecVals;
 		get_tokens<double>(strVec, " ,;\t", vecVals);
-		while(vecVals.size() < 3) vecVals.push_back(0.);
+		while(vecVals.size() < iDim) vecVals.push_back(0.);
 
-		for(unsigned int iComp=0; iComp<3; ++iComp)
+		for(unsigned int iComp=0; iComp<iDim; ++iComp)
 			matReal(iComp, iVec) = vecVals[iComp];
 	}
 
 	if(pLabIn)
 	{
-		double dVol = get_volume_3(matReal);
+		double dVol = get_volume(matReal);
 		pLabIn->setText(QString::number(dVol));
 	}
 
@@ -65,7 +91,7 @@ static void CalcRealRecip(const std::vector<QLineEdit*>& vecEditIn,
 
 	ublas::matrix<double> matRecip = 2.*M_PI*matInv;
 
-	if(matRecip.size1()!=3 || matRecip.size2()!=3)
+	if(matRecip.size1()!=iDim || matRecip.size2()!=iDim)
 	{
 		for(QLineEdit* pEdit : vecEditOut)
 			pEdit->setText("invalid");
@@ -75,19 +101,19 @@ static void CalcRealRecip(const std::vector<QLineEdit*>& vecEditIn,
 
 	if(pLabOut)
 	{
-		double dVol = get_volume_3(matRecip);
+		double dVol = get_volume(matRecip);
 		pLabOut->setText(QString::number(dVol));
 	}
 
 
-	for(unsigned int iVec=0; iVec<3; ++iVec)
+	for(unsigned int iVec=0; iVec<iDim; ++iVec)
 	{
 		std::ostringstream ostrVec;
 
-		for(unsigned int iComp=0; iComp<3; ++iComp)
+		for(unsigned int iComp=0; iComp<iDim; ++iComp)
 		{
 			ostrVec << matRecip(iComp, iVec);
-			if(iComp<2) ostrVec << ", ";
+			if(iComp<iDim-1) ostrVec << ", ";
 		}
 
 		vecEditOut[iVec]->setText(ostrVec.str().c_str());
@@ -96,12 +122,12 @@ static void CalcRealRecip(const std::vector<QLineEdit*>& vecEditIn,
 
 void LatticeDlg::CalcRecip()
 {
-	CalcRealRecip(m_vecEditReal, m_vecEditRecip, labelVol, labelRVol);
+	CalcRealRecip(m_vecEditReal, m_vecEditRecip, labelVol, labelRVol, labelDim);
 }
 
 void LatticeDlg::CalcReal()
 {
-	CalcRealRecip(m_vecEditRecip, m_vecEditReal, labelRVol, labelVol);
+	CalcRealRecip(m_vecEditRecip, m_vecEditReal, labelRVol, labelVol, labelDim);
 }
 
 

@@ -54,7 +54,7 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 
 	//--------------------------------------------------------------------------------
 	tablePowderLines->horizontalHeader()->setVisible(true);
-	tablePowderLines->setColumnWidth(1, 256);
+	tablePowderLines->setColumnWidth(1, 250);
 
 	QObject::connect(spinCellD, SIGNAL(valueChanged(double)), this, SLOT(CalcPowderLines()));
 	QObject::connect(spinCellLam, SIGNAL(valueChanged(double)), this, SLOT(CalcPowderLines()));
