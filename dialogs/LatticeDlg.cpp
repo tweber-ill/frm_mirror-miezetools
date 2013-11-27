@@ -47,6 +47,7 @@ static void CalcRealRecip(const std::vector<QLineEdit*>& vecEditIn,
 	unsigned int iDim = vecVals0.size();
 	const unsigned int iMaxDim = vecEditIn.size();
 	if(iDim > iMaxDim) iDim = iMaxDim;
+	if(iDim < 1) iDim = 1;
 
 	for(unsigned int iVec=0; iVec<iDim; ++iVec)
 	{
