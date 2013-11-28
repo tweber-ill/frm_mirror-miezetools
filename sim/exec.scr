@@ -1,0 +1,14 @@
+#!./hermelin
+
+main()
+{
+	INSTR = "tasmieze.instr";
+
+	BASE = "--ncount=1e6";
+	LAM = "dLam=5.0 dDeltaLam=0.1";
+
+	strParams = BASE + " " + LAM;
+
+	exec("rm -f tasmieze.c tasmieze.out");
+	exec("mcrun-2.0", INSTR, strParams);
+}

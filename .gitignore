@@ -9,10 +9,15 @@ Debug/*
 Release/*
 ui/*.h
 cattus
+script/hermelin
 perf.data
 perf.data.old
 gmon.out
 sim/*.sim
+sim/**/*.sim
 sim/tasmieze.c
 sim/tasmieze
 sim/tasmieze.out
+script/tokens.h
+script/script.tab.cc
+
