@@ -17,11 +17,12 @@ DECLARE
 	int bAbsorbNonScattered = 1;
 
 	// monochromator
-	double dMonoD = 3.355;
+	bool bMonoIdeal = 0;
+	double dMonoD = 6.79;
 	double dMonoScatterSense = 1.;
 	double dDistSrcMono = 1.;
 	double dMonoTheta = 63.4, dMonoTwoTheta = 126.8;
-	double dMonoWidth = 0.2, dMonoHeight = 0.2;
+	double dMonoWidth = 0.2, dMonoHeight = 0.2, dMonoDepth = 0.005;
 
 	// sample
 	double dDistMonoSample = 1.;
@@ -29,11 +30,12 @@ DECLARE
 	double dSampleScatterSense = 1.;
 
 	// analyser
-	double dAnaD = 3.355;
+	bool bAnaIdeal = 0;
+	double dAnaD = 6.79;
 	double dAnaScatterSense = -1.;
 	double dDistSampleAna = 1.;
 	double dAnaTheta=0., dAnaTwoTheta = 0.;
-	double dAnaWidth = 0.2, dAnaHeight = 0.2;
+	double dAnaWidth = 0.2, dAnaHeight = 0.2, dAnaDepth = 0.005;
 
 	// detector
 	double dDistAnaDet = 1.;
@@ -44,14 +46,17 @@ DECLARE
 
 INITIALIZE
 %{
-	dMonoTheta = dMonoScatterSense*asin(dLam / (2.*dMonoD)) / M_PI * 180.;
+	double dOrder = 2.;
+	dMonoTheta = dMonoScatterSense*asin(dOrder*dLam / (2.*dMonoD)) / M_PI * 180.;
 	dMonoTwoTheta = dMonoTheta * 2.;
 
-	printf("Monochromator: theta=%f, 2theta=%f\n", dMonoTheta, dMonoTwoTheta);
 
-
-	dAnaTheta = dAnaScatterSense*asin(dLam / (2.*dAnaD)) / M_PI * 180.;
+	dAnaTheta = dAnaScatterSense*asin(dOrder*dLam / (2.*dAnaD)) / M_PI * 180.;
 	dAnaTwoTheta = dAnaTheta * 2.;
+
+
+	printf("Monochromator: theta=%f, 2theta=%f\n", dMonoTheta, dMonoTwoTheta);
+	printf("Analyser: theta=%f, 2theta=%f\n", dAnaTheta, dAnaTwoTheta);
 %}
 
 
@@ -86,8 +91,9 @@ COMPONENT MonoAxisBegin = Arm()
 	AT (0, 0, dDistSrcMono) RELATIVE Source
 
 COMPONENT Mono_flat = Monochromator_flat(
-	zwidth = dMonoWidth, yheight = dMonoHeight, mosaich = 30, mosaicv = 30,
+	zwidth = dMonoWidth, yheight = dMonoHeight, mosaich = 10, mosaicv = 10,
 	r0 = 1, DM = dMonoD)
+		WHEN(bMonoIdeal == 1)
   		AT (0, 0, 0) RELATIVE MonoAxisBegin
 	  	ROTATED (0, dMonoTheta, 0) RELATIVE MonoAxisBegin
 		EXTEND
@@ -95,6 +101,25 @@ COMPONENT Mono_flat = Monochromator_flat(
 			if(bAbsorbNonScattered && !SCATTERED)
 				ABSORB;
 		%}
+
+COMPONENT Mono_crystal = Single_crystal(
+	reflections = "C_graphite.lau", 
+	xwidth = dMonoWidth, yheight = dMonoHeight, zdepth = dMonoDepth, 
+	delta_d_d = 1e-4, mosaic = 10, recip_cell = 0, barns = 0, 
+	ax = 2.464, ay = 0, az = 0, 
+	bx = 0, by = 2.464, bz = 0, 
+	cx = 0, cy = 0, cz = dMonoD,
+	sigma_abs = 0.0035, sigma_inc = 0.001, 
+	order = 0, RX = 0, RY = 0, RZ = 0)
+		WHEN(bMonoIdeal == 0)
+		AT (0, 0, 0) RELATIVE MonoAxisBegin
+		ROTATED (0, 90+dMonoTheta, 0) RELATIVE MonoAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
 
 COMPONENT MonoAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE MonoAxisBegin
@@ -133,8 +158,9 @@ COMPONENT AnaAxisBegin = Arm()
 	AT (0, 0, dDistSampleAna) RELATIVE SampleAxisEnd
 
 COMPONENT Ana_flat = Monochromator_flat(
-	zwidth = dAnaWidth, yheight = dAnaHeight, mosaich = 30, mosaicv = 30,
+	zwidth = dAnaWidth, yheight = dAnaHeight, mosaich = 10, mosaicv = 10,
 	r0 = 1, DM = dAnaD)
+		WHEN(bAnaIdeal == 1)
   		AT (0, 0, 0) RELATIVE AnaAxisBegin
 	  	ROTATED (0, dAnaTheta, 0) RELATIVE AnaAxisBegin
 		EXTEND
@@ -142,6 +168,25 @@ COMPONENT Ana_flat = Monochromator_flat(
 			if(bAbsorbNonScattered && !SCATTERED)
 				ABSORB;
 		%}
+
+COMPONENT Ana_crystal = Single_crystal(
+	reflections = "C_graphite.lau", 
+	xwidth = dAnaWidth, yheight = dAnaHeight, zdepth = dAnaDepth, 
+	delta_d_d = 1e-4, mosaic = 10, recip_cell = 0, barns = 0, 
+	ax = 2.464, ay = 0, az = 0, 
+	bx = 0, by = 2.464, bz = 0, 
+	cx = 0, cy = 0, cz = dAnaD,
+	sigma_abs = 0.0035, sigma_inc = 0.001, 
+	order = 0, RX = 0, RY = 0, RZ = 0)
+		WHEN(bAnaIdeal == 0)
+		AT (0, 0, 0) RELATIVE AnaAxisBegin
+		ROTATED (0, 90+dAnaTheta, 0) RELATIVE AnaAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
 
 COMPONENT AnaAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE AnaAxisBegin
@@ -180,5 +225,6 @@ FINALLY
 
 
 END
+
 
 
