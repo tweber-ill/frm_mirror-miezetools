@@ -1,0 +1,115 @@
+/*
+ * Laue test instrument
+ * @author tweber
+ * @date 02-dec-13
+ */
+
+DEFINE INSTRUMENT Laue
+	(
+		// source
+		double dLam = 15.0, 
+		double dDeltaLam = 10.0
+	)
+
+
+DECLARE
+%{
+	int bAbsorbNonScattered = 1;
+	double dSampleWidth = 0.01, dSampleHeight = 0.01, dSampleDepth = 0.005;
+	double dDistSrcSample = 1.;
+	
+	double dDetWidth = 0.5;
+	double dDetHeight = 0.5;
+	double dDistSampleDet = 0.2;
+%}
+
+
+
+INITIALIZE
+%{
+%}
+
+
+
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+	 	AT (0,0,0) ABSOLUTE
+
+
+
+//----------------------------------------------------------------------------------------------------
+// source
+
+COMPONENT Source = Source_simple(
+	yheight = 0.01, xwidth = 0.01, focus_xw = dSampleWidth*0.5, focus_yh = dSampleHeight*0.5,
+	lambda0 = dLam, dlambda = dDeltaLam, gauss = 1, dist = dDistSrcSample)
+		AT (0, 0, 0) RELATIVE Origin
+
+//----------------------------------------------------------------------------------------------------
+
+COMPONENT SampleArm = Arm()
+        AT (0, 0, dDistSrcSample) RELATIVE Source
+
+/*
+COMPONENT Sample_flat = Monochromator_flat(
+	zwidth = dSampleWidth, yheight = dSampleHeight, mosaich = 10, mosaicv = 10,
+	r0 = 1, DM = dMonoD)
+  		AT (0, 0, 0) RELATIVE SampleArm
+	  	ROTATED (0, 90, 0) RELATIVE SampleArm
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+*/
+
+COMPONENT Sample_crystal = Single_crystal(
+	reflections = "C_graphite.lau", 
+	xwidth = dSampleWidth, yheight = dSampleHeight, zdepth = dSampleDepth, 
+	delta_d_d = 1e-4, mosaic = 10, recip_cell = 0, barns = 0, 
+	ax = 2.464, ay = 0, az = 0, 
+	bx = 0, by = 2.464, bz = 0, 
+	cx = 0, cy = 0, cz = 6.79,
+	aa = 0, bb = 0, cc = 120,
+	sigma_abs = 0.0035, sigma_inc = 0.001, 
+	order = 0, RX = 0, RY = 0, RZ = 0)
+		AT (0, 0, 0) RELATIVE SampleArm
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
+/*
+COMPONENT Sample_powder = PowderN(
+	reflections = "C_graphite.lau", 
+	yheight = dSampleHeight, xwidth = dSampleWidth, zdepth = dSampleDepth, 
+	pack = 1, Vc = 0, sigma_abs = 0.0035, sigma_inc = 0.001,
+	Delta_d = 1e-4, DW = 0, nb_atoms = 1, barns = 0)
+		AT (0, 0, 0) RELATIVE SampleArm
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+*/
+
+COMPONENT psd = PSD_monitor(
+	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
+	xwidth = dDetWidth, yheight = dDetHeight)
+		AT (0, 0, dDistSampleDet) RELATIVE SampleArm
+
+//----------------------------------------------------------------------------------------------------
+
+
+FINALLY
+%{
+%}
+
+
+END
+
+
+
