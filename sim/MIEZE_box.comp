@@ -1,0 +1,189 @@
+/*
+ * A combination of
+ *  - a polarizer,
+ *  - two RF coils (either bootstrap or normal) and
+ *  - an analyzer
+ *
+ * Author: Tobias Weber
+ * Date: May 2012
+ */
+
+DEFINE COMPONENT MIEZE_box
+DEFINITION PARAMETERS (int N=1)		// 1: normal coils, 2: boostrap coils
+SETTING PARAMETERS (double xmin=0, double xmax=0, double ymin=0, double ymax=0, 
+		    double xwidth=0.1, double yheight=0.1,
+                    double L1=1.,
+                    double f1=100000., double f2=200000., 
+                    double coil_thickness=0, double coil_tilt=0)
+DECLARE
+%{
+    double my_len(const double *pd)
+    {
+    	return sqrt(pd[0]*pd[0] + pd[1]*pd[1] + pd[2]*pd[2]);
+    }
+    
+    double my_inner(const double *pd0, const double *pd1)
+    {
+    	return pd0[0]*pd1[0] + pd0[1]*pd1[1] + pd0[2]*pd1[2];
+    }
+    
+    double my_dist(const double *pd0, const double *pd1)
+    {
+    	double dSub[3];
+    	dSub[0] = pd0[0]-pd1[0];
+    	dSub[1] = pd0[1]-pd1[1];
+    	dSub[2] = pd0[2]-pd1[2];
+    	
+    	return my_len(dSub);
+    }
+ 
+    // line-plane intersection
+    // see: http://en.wikipedia.org/wiki/Line-plane_intersection   
+    double my_intersect(const double* pdLdir, const double* pdLoffs,
+    			const double* pdPnorm, const double* pdPoffs)
+    {
+    	double doffs[3];
+    	doffs[0] = pdPoffs[0]-pdLoffs[0];
+    	doffs[1] = pdPoffs[1]-pdLoffs[1];
+    	doffs[2] = pdPoffs[2]-pdLoffs[2];
+    	
+    	double d = my_inner(doffs, pdPnorm);
+    	d /= my_inner(pdLdir, pdPnorm);
+    	
+    	return d;
+    }
+
+    void my_intersect_pos(const double* vec_pos, const double* vec_dir, double d0, 
+    			  double *pos)
+    {
+    	pos[0] = vec_pos[0] + d0*vec_dir[0];
+    	pos[1] = vec_pos[1] + d0*vec_dir[1];
+    	pos[2] = vec_pos[2] + d0*vec_dir[2];
+    }
+%}
+
+INITIALIZE
+%{
+    if (ymin > ymax) {
+        // swap
+        double ytmp = ymin;
+        ymin = ymax;
+        ymax = ytmp;
+    }
+    if (xmin > xmax) {
+        // swap
+        double xtmp = xmin;
+        xmin = xmax;
+        xmax = xtmp;
+    }
+
+    if (yheight > 0) {
+        ymax = yheight/2.;
+        ymin = -yheight/2.;
+    } else
+        yheight = ymax-ymin;
+
+    if (xwidth > 0) {
+        xmax = xwidth/2.;
+        xmin = -xwidth/2.;
+    } else
+        xwidth = xmax-xmin;
+
+%}
+
+TRACE
+%{
+    const double omega1 = 2.*M_PI * f1;
+    const double omega2 = 2.*M_PI * f2;
+    const double alpha = (double)(N)*2.;
+
+    //--------------------------------------------------------------------------
+    // polarizer
+    sx = 1.;
+    sy = 0.;
+    sz = 0.;
+
+
+    //--------------------------------------------------------------------------
+    // flipper coils
+    // formula 14 from [Keller 2000]:
+    // freq after a coil: phi = 2*omega*t - phi0 + omega*tau
+    // 					  with tau = time spent in coil
+
+    // formula 107 from [Keller 2000]
+    //double phi_n = 2.*N*omega2*(t + L1/vz) - 2.*N*omega1*t;
+
+
+    double vec_dir[3] = {vx, vy, vz};
+    double vec_pos[3] = {x, y, z};
+
+
+    double ds = (coil_tilt==0. ? 0. : sin(coil_tilt/180.*M_PI));
+    double dc = (coil_tilt==0. ? 1. : cos(coil_tilt/180.*M_PI));
+
+
+    // intersect with plane of first coil
+            
+    double p0_offs[3] = {0., 0., 0.};
+    double p0_norm[3] = {ds, 0., dc};
+ 
+    double d0 = my_intersect(vec_dir, vec_pos, p0_norm, p0_offs);
+    double pos0[3];
+    my_intersect_pos(vec_pos, vec_dir, d0, pos0);
+
+    if (pos0[0]<xmin || pos0[0]>xmax || pos0[1]<ymin || pos0[1]>ymax)
+    	ABSORB;
+    
+    
+    
+    // intersect with plane of second coil
+        
+    double p1_offs[3] = {0., 0., L1};
+    double p1_norm[3] = {ds, 0., dc};
+                 
+    double d1 = my_intersect(vec_dir, vec_pos, p1_norm, p1_offs);
+    double pos1[3];
+    my_intersect_pos(vec_pos, vec_dir, d1, pos1);
+
+    if (pos1[0]<xmin || pos1[0]>xmax || pos1[1]<ymin || pos1[1]>ymax)
+	ABSORB;
+
+    double length_in_box = my_dist(pos0, pos1);
+    //printf("length in box: %f\n", length_in_box);
+                             
+
+    //printf("d0 = %f, t_0 = %f -> ", d0, t);
+    PROP_DT(d0);
+    //if(t<0.) printf("%f\n", t);
+
+    double v = my_len(vec_dir);
+    double phi_n = alpha*t*(omega2-omega1) + alpha*omega2*length_in_box/v;
+    if(coil_thickness > 0.)
+    	phi_n += 0.5*alpha*coil_thickness/v*(omega2-omega1);
+
+    // move neutron to the end of the mieze box
+    //PROP_DT(L1/v);
+    PROP_DT(d1-d0);
+    //printf("d1 = %f, d1*v = %f\n", d1, d1*v);
+
+    sx = cos(phi_n);
+    sy = 0.;
+    sz = sin(phi_n);
+
+
+
+    //--------------------------------------------------------------------------
+    // analyzer
+    // transmission probability: formula 112 in [Keller 2000]
+    p *= 0.5 * (1. + sx);
+
+    SCATTER;
+%}
+
+MCDISPLAY
+%{
+    magnify("xy");
+    box(xmin+xwidth/2., ymin+yheight/2., 0, xwidth, yheight, L1);
+%}
+
+END

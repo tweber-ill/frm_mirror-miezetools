@@ -5,11 +5,11 @@
  */
 
 DEFINE INSTRUMENT TasMieze
-	(
-		// source
-		double dLam = 5.0, 
-		double dDeltaLam = 0.1
-	)
+(
+	// source
+	double dLam = 5.0, 
+	double dDeltaLam = 0.1
+)
 
 
 DECLARE
@@ -24,7 +24,7 @@ DECLARE
 	double dMonoWidth = 0.2, dMonoHeight = 0.2, dMonoDepth = 0.005;
 
 	// sample
-	double dDistMonoSample = 1.;
+	double dDistMonoSample = 2.;
 	double dSampleD = 6.79;
 	double dSampleTheta=0., dSampleTwoTheta = 0.;
 	double dSampleWidth = 0.2, dSampleHeight = 0.2, dSampleDepth = 0.005;
@@ -35,6 +35,19 @@ DECLARE
 	double dDistSampleAna = 1.;
 	double dAnaTheta=0., dAnaTwoTheta = 0.;
 	double dAnaWidth = 0.2, dAnaHeight = 0.2, dAnaDepth = 0.005;
+
+	// MIEZE
+	bool bMiezeIdeal = 1;
+	double dDistMonoMieze = 0.5;
+	double dMiezeWidth = 0.35, dMiezeHeight = 0.35;
+	double dMiezeL1 = 0.9;
+	double dMiezeF1 = 46000., dMiezeF2 = 61920.;
+	double dMiezeCoilThick = 0.;
+	double dMiezeCoilTilt = 0.;
+	
+	int iMiezeNumCoils = 1;
+	double dMiezeNumOsc = 2.;
+	double dMiezeFm = 2.*double(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
 
 	// detector
 	double dDistAnaDet = 1.;
@@ -60,10 +73,23 @@ INITIALIZE
 	dAnaTheta = dAnaScatterSense*asin(dAnaOrder*dLam / (2.*dAnaD)) / M_PI * 180.;
 	dAnaTwoTheta = dAnaTheta * 2.;
 
-
+	printf("--------------------------------------------------------------------------------\n");
 	printf("Monochromator: theta_m=%f, 2theta_m=%f\n", dMonoTheta, dMonoTwoTheta);
 	printf("Sample: theta_s=%f, 2theta_s=%f\n", dSampleTheta, dSampleTwoTheta);
 	printf("Analyser: theta_a=%f, 2thetaa_=%f\n", dAnaTheta, dAnaTwoTheta);
+
+
+
+	double dMiezeLs = dDistSampleAna + dDistAnaDet;
+	double dMiezeL2 = dMiezeLs + dDistMonoSample - dMiezeL1 - dDistMonoMieze;
+	double dMiezeLb = dMiezeL2 - dMiezeLs;
+
+	// for Mieze Box component: Origin is at center
+	dDistMonoMieze += dMiezeL1/2.;
+
+	printf("MIEZE: L1=%f, L2=%f, Ls=%f, Lb=%f, f1=%f, f2=%f\n", 
+		dMiezeL1, dMiezeL2, dMiezeLs, dMiezeLb, dMiezeF1, dMiezeF2);
+	printf("--------------------------------------------------------------------------------\n");
 %}
 
 
@@ -133,6 +159,27 @@ COMPONENT MonoAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE MonoAxisBegin
 	ROTATED (0, dMonoTwoTheta, 0) RELATIVE MonoAxisBegin
 
+
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// MIEZE
+COMPONENT MiezeBox = MIEZE_box(N=1,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, 
+	L1 = dMiezeL1,
+	f1 = dMiezeF1, f2 = dMiezeF2, coil_thickness = dMiezeCoilThick,
+	coil_tilt = dMiezeCoilTilt)
+		WHEN(bMiezeIdeal == 1)
+		AT (0, 0, dDistMonoMieze) RELATIVE MonoAxisEnd
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
 
 
 //----------------------------------------------------------------------------------------------------
@@ -242,6 +289,22 @@ COMPONENT psd = PSD_monitor(
 	xwidth = dDetWidth, yheight = dDetHeight)
 		AT (0, 0, 0) RELATIVE DetAxis
 
+/*
+COMPONENT osc = Osc_monitor(
+	nchan=64, filename="osc",
+	xwidth = dDetWidth, yheight = dDetHeight, geo = 0,
+	period = dMiezeNumOsc/dMiezeFm,
+	restore_neutron = 1)
+		AT (0, 0, 0) RELATIVE DetAxis
+*/
+
+COMPONENT oscpsd = Osc_PSD_monitor(
+	nchan=16, nx=64, ny=64, filename="oscpsd",
+	xwidth = dDetWidth, yheight = dDetHeight, geo = 0,
+	period = dMiezeNumOsc/dMiezeFm, num_osc = dMiezeNumOsc,
+	restore_neutron = 1)
+		AT (0, 0, 0) RELATIVE DetAxis
+
 //----------------------------------------------------------------------------------------------------
 
 
@@ -251,6 +314,8 @@ FINALLY
 
 
 END
+
+
 
 
 
