@@ -25,11 +25,19 @@ public:
 	{}
 
 	void SetCurFile(const char* pcStr);
-	void SetLabel(const char* pcStr);
 	void SetTitle(const char* pcStr);
+
+	void SetLabel(const char* pcStr);
+	void SetLabelY(const char* pcStr);
+
 	void SetValues(const std::vector<std::string>& vec);
+	void SetValuesY(const std::vector<std::string>& vec);
+
+	void SelectValue(const std::string& str);
+	void SelectValueY(const std::string& str);
 
 	int GetSelectedValue() const;
+	int GetSelectedValueY() const;
 
 public slots:
 };

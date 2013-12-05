@@ -331,10 +331,10 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			mapStr.SetMap(vecmap_to_map<std::string>(pdat->GetCommMap()));
 
 			::autodeleter<NicosData> _a0(pnicosdat);
-			const std::string strCtrName = Settings::Get<QString>("nicos/counter_name").toStdString();
+			std::string strCtrName = Settings::Get<QString>("nicos/counter_name").toStdString();
 
 			bool bSelectNewXColumn = 0;
-			int iX = 0;
+			int iX = 0, iY = 0;
 			if(m_strLastXColumn.length())
 			{
 				iX = pnicosdat->GetColIdx(m_strLastXColumn);
@@ -348,19 +348,28 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			{
 				ComboDlg dlg(this);
 				dlg.SetCurFile(strFileNoDir.c_str());
+
 				dlg.SetValues(pnicosdat->GetColNames());
+				dlg.SetValuesY(pnicosdat->GetColNames());
+
+				dlg.SelectValue(pnicosdat->TryFindScanVar(pdat->GetCommMap()));
+				dlg.SelectValueY(strCtrName);
+
 				dlg.SetLabel("Select x value: ");
+				dlg.SetLabelY("Select y value: ");
 
 				if(dlg.exec() == QDialog::Accepted)
 				{
 					iX = dlg.GetSelectedValue();
+					iY = dlg.GetSelectedValueY();
 					m_strLastXColumn = pnicosdat->GetColName(iX);
+					strCtrName = pnicosdat->GetColName(iY);
 				}
 				else
 					return;
 			}
 
-			int iY = pnicosdat->GetColIdx(strCtrName);
+			iY = pnicosdat->GetColIdx(strCtrName);
 			const double *pdx = pnicosdat->GetColumn(iX);
 			const double *pdy = pnicosdat->GetColumn(iY);
 			double *pdyerr = new double[pnicosdat->GetDim()];

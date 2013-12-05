@@ -45,6 +45,8 @@ class NicosData
 		const std::string& GetColUnit(unsigned int iIdx) const;
 
 		int GetColIdx(const std::string& strName) const;
+
+		std::string TryFindScanVar(LoadTxt::t_mapComm& mapComm) const;
 };
 
 

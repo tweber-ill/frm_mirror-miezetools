@@ -136,19 +136,19 @@ void GaussModel::Normalize()
 
 std::vector<std::string> GaussModel::GetParamNames() const
 {
-	std::vector<std::string> vecNames = {"amp", "sigma", "offs"};
+	std::vector<std::string> vecNames = {"amp", "sigma", "x0", "offs"};
 	return vecNames;
 }
 
 std::vector<double> GaussModel::GetParamValues() const
 {
-	std::vector<double> vecVals = { m_amp, m_spread, m_offs };
+	std::vector<double> vecVals = { m_amp, m_spread, m_x0, m_offs };
 	return vecVals;
 }
 
 std::vector<double> GaussModel::GetParamErrors() const
 {
-	std::vector<double> vecErrs = { m_amperr, m_spreaderr, m_offserr };
+	std::vector<double> vecErrs = { m_amperr, m_spreaderr, m_x0err, m_offserr };
 	return vecErrs;
 }
 
@@ -453,12 +453,14 @@ std::vector<std::string> MultiGaussModel::GetParamNames() const
 
 	for(unsigned int i=0; i<m_vecParams.size(); ++i)
 	{
-		std::ostringstream ostrAmp, ostrSigma;
+		std::ostringstream ostrAmp, ostrSigma, ostrX0;
 		ostrAmp << "amp_" << i;
 		ostrSigma << "sigma_" << i;
+		ostrX0 << "x0_" << i;
 
 		vecNames.push_back(ostrAmp.str());
 		vecNames.push_back(ostrSigma.str());
+		vecNames.push_back(ostrX0.str());
 	}
 
 	vecNames.push_back("offs");
@@ -472,6 +474,7 @@ std::vector<double> MultiGaussModel::GetParamValues() const
 	{
 		vecVals.push_back(m_vecParams[i].m_amp);
 		vecVals.push_back(m_vecParams[i].m_spread);
+		vecVals.push_back(m_vecParams[i].m_x0);
 	}
 	vecVals.push_back(m_offs);
 
@@ -485,6 +488,7 @@ std::vector<double> MultiGaussModel::GetParamErrors() const
 	{
 		vecVals.push_back(m_vecParams[i].m_amperr);
 		vecVals.push_back(m_vecParams[i].m_spreaderr);
+		vecVals.push_back(m_vecParams[i].m_x0err);
 	}
 	vecVals.push_back(m_offserr);
 

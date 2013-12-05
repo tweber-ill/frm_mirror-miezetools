@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>290</width>
-    <height>94</height>
+    <width>305</width>
+    <height>126</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
    <item row="1" column="1">
     <widget class="QComboBox" name="comboValues"/>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="4" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -37,7 +37,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -67,8 +67,23 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="comboValuesY"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelValuesY">
+     <property name="text">
+      <string>Select value:</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>comboValues</tabstop>
+  <tabstop>comboValuesY</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

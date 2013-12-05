@@ -80,3 +80,25 @@ int NicosData::GetColIdx(const std::string& strName) const
 
 	return iter-m_vecColNames.begin();
 }
+
+std::string NicosData::TryFindScanVar(LoadTxt::t_mapComm& mapComm) const
+{
+	LoadTxt::t_mapComm::iterator iter = mapComm.find("info");
+	if(iter == mapComm.end())
+		return "";
+	if(iter->second.size() < 1)
+		return "";
+
+	// e.g. cscan(sgy, 0, 0.4, 10, 2)
+	std::string strScan = iter->second[0];
+	std::size_t iPos0 = strScan.find('(');
+	std::size_t iPos1 = strScan.find(',');
+	if(iPos0==std::string::npos || iPos1==std::string::npos || iPos1<iPos0)
+		return "";
+
+	std::string strVar = strScan.substr(iPos0+1,iPos1-iPos0-1);
+	::trim(strVar);
+	//std::cout << "Scan-Var: " << strVar << std::endl;
+
+	return strVar;
+}
