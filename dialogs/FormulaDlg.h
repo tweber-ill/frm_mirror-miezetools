@@ -34,6 +34,9 @@ protected slots:
 	void CalcNeutronE();
 	void CalcNeutronT();
 
+	void CalcBraggDirect();
+	void CalcBraggReciprocal();
+
 	void CalcPlane();
 	void FixedKiKfToggled();
 	void PyExport();

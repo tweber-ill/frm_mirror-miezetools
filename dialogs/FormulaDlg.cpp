@@ -33,6 +33,24 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 	QObject::connect(editNeutronT, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronT()));
 
 
+
+	std::vector<QLineEdit*> editsDir = {editBraggDirN, editBraggDirLam, editBraggDirD, editBraggDirTT};
+	std::vector<QLineEdit*> editsReci = {editBraggReciN, editBraggReciLam, editBraggReciQ, editBraggReciTT};
+	std::vector<QRadioButton*> radioDir = {/*radioBraggDirN,*/ radioBraggDirLam, radioBraggDirD, radioBraggDirTT};
+	std::vector<QRadioButton*> radioReci = {/*radioBraggReciN,*/ radioBraggReciLam, radioBraggReciQ, radioBraggReciTT};
+
+	for(QLineEdit* pEdit : editsDir)
+		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcBraggDirect()));
+	for(QLineEdit* pEdit : editsReci)
+		QObject::connect(pEdit, SIGNAL(textEdited(const QString&)), this, SLOT(CalcBraggReciprocal()));
+	for(QRadioButton* pRadio : radioDir)
+		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(CalcBraggDirect()));
+	for(QRadioButton* pRadio : radioReci)
+		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(CalcBraggReciprocal()));
+
+
+
+
 	//--------------------------------------------------------------------------------
 	m_vecSpins = {spinLam, spinF1, spinF2, spinL1, spinLb, spinE};
 	m_vecSpinNames = {"formulas/mieze/lam", "formulas/mieze/f1", "formulas/mieze/f2", "formulas/mieze/L1", "formulas/mieze/Lb", "formulas/mieze/E"};
@@ -64,6 +82,8 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 
 
 	CalcNeutronLam();
+	CalcBraggDirect();
+	CalcBraggReciprocal();
 	CalcMIEZE();
 	CalcPlane();
 	CalcPowderLines();
@@ -369,6 +389,77 @@ void FormulaDlg::CalcNeutronT()
 	editNeutronE->setText(ostrE.str().c_str());
 }
 
+
+void FormulaDlg::CalcBraggDirect()
+{
+	std::string strN = editBraggDirN->text().toStdString();
+	std::string strLam = editBraggDirLam->text().toStdString();
+	std::string strD = editBraggDirD->text().toStdString();
+	std::string strTT = editBraggDirTT->text().toStdString();
+
+	int iOrder = str_to_var<int>(strN);
+	units::quantity<units::si::length> lam = get_length(strLam);
+	units::quantity<units::si::length> d = get_length(strD);
+	units::quantity<units::si::plane_angle> tt = get_angle(strTT);
+
+	std::ostringstream ostrOut;
+
+	if(radioBraggDirLam->isChecked())
+	{
+		lam = ::bragg_real_lam(d, tt, double(iOrder));
+		ostrOut << lam;
+		editBraggDirLam->setText(ostrOut.str().c_str());
+	}
+	else if(radioBraggDirD->isChecked())
+	{
+		d = ::bragg_real_d(lam, tt, double(iOrder));
+		ostrOut << d;
+		editBraggDirD->setText(ostrOut.str().c_str());
+	}
+	else if(radioBraggDirTT->isChecked())
+	{
+		tt = ::bragg_real_twotheta(d, lam, double(iOrder));
+		ostrOut << double(tt/units::si::radian) / M_PI * 180. << " deg";
+		editBraggDirTT->setText(ostrOut.str().c_str());
+	}
+}
+
+void FormulaDlg::CalcBraggReciprocal()
+{
+	std::string strN = editBraggReciN->text().toStdString();
+	std::string strLam = editBraggReciLam->text().toStdString();
+	std::string strQ = editBraggReciQ->text().toStdString();
+	std::string strTT = editBraggReciTT->text().toStdString();
+
+	int iOrder = str_to_var<int>(strN);
+	units::quantity<units::si::length> lam = get_length(strLam);
+	units::quantity<units::si::wavenumber> Q = get_wavenumber(strQ);
+	units::quantity<units::si::plane_angle> tt = get_angle(strTT);
+
+	std::ostringstream ostrOut;
+
+	if(radioBraggReciLam->isChecked())
+	{
+		lam = ::bragg_recip_lam(Q, tt, double(iOrder));
+		ostrOut << lam;
+		editBraggReciLam->setText(ostrOut.str().c_str());
+	}
+	else if(radioBraggReciQ->isChecked())
+	{
+		Q = ::bragg_recip_Q(lam, tt, double(iOrder));
+		ostrOut << Q;
+		editBraggReciQ->setText(ostrOut.str().c_str());
+	}
+	else if(radioBraggReciTT->isChecked())
+	{
+		tt = ::bragg_recip_twotheta(Q, lam, double(iOrder));
+		ostrOut << double(tt/units::si::radian) / M_PI * 180. << " deg";
+		editBraggReciTT->setText(ostrOut.str().c_str());
+	}
+}
+
+
+// --------------------------------------------------------------------------------
 
 void FormulaDlg::CalcMIEZE()
 {
