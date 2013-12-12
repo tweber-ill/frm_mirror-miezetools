@@ -23,9 +23,9 @@
 							<tool command="g++" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.239543259" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.527919592" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.other.other.982403098" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.982403098" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1776715981" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/include/c++/4.7"/>
+									<listOptionValue builtIn="false" value="/usr/include/c++/4.8"/>
 									<listOptionValue builtIn="false" value="/usr/local/cuda/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/qt4"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
@@ -59,6 +59,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.848003280" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="QtGui"/>
+									<listOptionValue builtIn="false" value="GL"/>
 									<listOptionValue builtIn="false" value="boost_iostreams"/>
 									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="QtOpenGL"/>
@@ -82,16 +83,6 @@
 							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.440427117" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
-						</toolChain>
-					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.321083479.1733063929" name="/" resourcePath="sim">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1640421703" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.755883341" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1734708344"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.657719533" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1782803124" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.818946908" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.145692831"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.399584513" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1663219626" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
@@ -124,9 +115,9 @@
 								<option id="gnu.cpp.compiler.exe.release.option.optimization.level.578867388" name="Optimization Level" superClass="gnu.cpp.compiler.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.1041524707" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.optimization.flags.1842715409" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags" value="-floop-parallelize-all -ftree-parallelize-loops=4" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.other.other.1556194018" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.1556194018" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++11" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.26320680" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/include/c++/4.7"/>
+									<listOptionValue builtIn="false" value="/usr/include/c++/4.8"/>
 									<listOptionValue builtIn="false" value="/usr/local/cuda/include"/>
 									<listOptionValue builtIn="false" value="/usr/include/qt4"/>
 									<listOptionValue builtIn="false" value="/usr/local/include"/>
@@ -158,6 +149,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.1439036568" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="QtGui"/>
+									<listOptionValue builtIn="false" value="GL"/>
 									<listOptionValue builtIn="false" value="boost_iostreams"/>
 									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="QtOpenGL"/>
@@ -179,16 +171,6 @@
 							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1979032693" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
-						</toolChain>
-					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.1616845256.88531249" name="/" resourcePath="sim">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.1199563821" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1225797718" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1060114624"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.535409355" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.829358364" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.282317860" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release.2100629918"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.570634508" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.346119555"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.812039680" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
