@@ -14,7 +14,8 @@
 
 
 Data4::Data4(uint iW, uint iH, uint iD, uint iD2, const double* pDat, const double *pErr)
-			: m_iDepth(0), m_iDepth2(0),
+			: DataInterface(),
+			  m_iDepth(0), m_iDepth2(0),
 			  m_dTotal(0.),
 			  m_dMin(std::numeric_limits<double>::max()),
 			  m_dMax(-std::numeric_limits<double>::max()),
@@ -353,9 +354,9 @@ void Data4::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 					}
 				}
 
-
-	//m_dXMax = iNewWidth-1;
-	//m_dYMax = iNewHeight-1;
+	// TODO: handle range correctly (also in radial integration)
+	m_dXMax = iNewWidth-1;
+	m_dYMax = iNewHeight-1;
 
 	m_iWidth = iNewWidth;
 	m_iHeight = iNewHeight;

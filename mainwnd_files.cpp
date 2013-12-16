@@ -105,6 +105,12 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 
 		AddSubWindow(pPlotWrapper);
 		pPlotWrapper->GetActualWidget()->RefreshPlot();
+
+
+		/*SubWindowBase *pSWB = pPlot->clone();
+		pSWB->ChangeResolution(512,512,1);
+		AddSubWindow(pSWB);
+		pSWB->GetActualWidget()->RefreshPlot();*/
 	}
 	else if(is_equal(strExt, "pad"))
 	{

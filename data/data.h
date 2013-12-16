@@ -137,7 +137,7 @@ protected:
 	StringMap m_mapStatData;
 
 public:
-	DataInterface() {}
+	DataInterface() : RoiFlags() {}
 	virtual ~DataInterface() {}
 	virtual DataType GetType() const = 0;
 

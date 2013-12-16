@@ -13,7 +13,7 @@
 
 
 Data2::Data2(uint iW, uint iH, const double* pDat, const double *pErr)
-			: m_dTotal(0.),
+			: DataInterface(), m_dTotal(0.),
 			  	  m_dMin(std::numeric_limits<double>::max()),
 			  	  m_dMax(-std::numeric_limits<double>::max())
 

@@ -139,6 +139,10 @@ void RadialIntDlg::Calc()
 		dYStart *= dResScale;
 		dRadius *= dResScale;
 		dInc *= dResScale;
+
+		Roi *pAntiRoi = pInterp->GetROI(1);
+		if(pAntiRoi)
+			pInterp->GetROI(1)->Scale(dResScale);
 	}
 
 	Data1 dat1d;

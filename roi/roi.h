@@ -34,6 +34,8 @@ struct BoundingRect
 	{
 		bottomleft[0] = bottomleft[1] = topright[0] = topright[1] = 0.;
 	}
+
+	void Scale(double dScale);
 };
 
 
@@ -94,6 +96,9 @@ class RoiElement
 		/// is point (iX, iY) inside elementzy
 		virtual bool IsInBoundingRect(double dX, double dY) const;
 
+		// scale ROI element
+		virtual void Scale(double dScale) = 0;
+
 		virtual void draw(QPainter& painter, const XYRange& range);
 };
 
@@ -112,6 +117,7 @@ class RoiRect : public RoiElement
 		RoiRect(const RoiRect& rect);
 
 		virtual bool IsInside(double dX, double dY) const;
+		virtual void Scale(double dScale);
 
 		virtual std::string GetName() const;
 
@@ -141,6 +147,7 @@ class RoiCircle : public RoiElement
 
 		virtual void CalculateBoundingRect();
 		virtual bool IsInside(double dX, double dY) const;
+		virtual void Scale(double dScale);
 
 		virtual std::string GetName() const;
 
@@ -174,6 +181,7 @@ class RoiEllipse : public RoiElement
 
 		virtual void CalculateBoundingRect();
 		virtual bool IsInside(double dX, double dY) const;
+		virtual void Scale(double dScale);
 
 		virtual std::string GetName() const;
 
@@ -204,6 +212,7 @@ class RoiCircleRing : public RoiElement
 
 		virtual void CalculateBoundingRect();
 		virtual bool IsInside(double dX, double dY) const;
+		virtual void Scale(double dScale);
 
 		virtual std::string GetName() const;
 
@@ -238,6 +247,7 @@ class RoiCircleSegment : public RoiCircleRing
 
 		virtual void CalculateBoundingRect();
 		virtual bool IsInside(double dX, double dY) const;
+		virtual void Scale(double dScale);
 
 		virtual std::string GetName() const;
 
@@ -265,6 +275,7 @@ class RoiPolygon : public RoiElement
 		RoiPolygon(const RoiPolygon& elem);
 
 		virtual bool IsInside(double dX, double dY) const;
+		virtual void Scale(double dScale);
 
 		virtual std::string GetName() const;
 
@@ -329,6 +340,8 @@ class Roi
 		void DrawRoi(QPainter& painter, const XYRange& range);
 
 		void SetName(const char* pcName) { m_strName = pcName; }
+
+		void Scale(double dScale);
 };
 
 #endif

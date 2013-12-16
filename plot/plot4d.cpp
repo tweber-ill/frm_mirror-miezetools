@@ -88,7 +88,8 @@ void Plot4d::RefreshStatusMsgs()
 void Plot4d::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
 {
 	m_dat4.ChangeResolution(iNewWidth, iNewHeight, bKeepTotalCounts);
-	RefreshPlot();
+
+	RefreshTFSlice(m_iCurT, m_iCurF);
 }
 
 

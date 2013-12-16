@@ -36,6 +36,12 @@ void BoundingRect::AddVertex(const ublas::vector<double>& vertex)
 	topright[1] = std::max(topright[1], vertex[1]);
 }
 
+void BoundingRect::Scale(double dScale)
+{
+	bottomleft *= dScale;
+	topright *= dScale;
+}
+
 
 //------------------------------------------------------------------------------
 // RoiElement
@@ -134,6 +140,14 @@ RoiRect::RoiRect() : m_bottomleft(2), m_topright(2), m_dAngle(0.)
 RoiRect::RoiRect(const RoiRect& rect)
 {
 	*this = rect;
+}
+
+void RoiRect::Scale(double dScale)
+{
+	m_bottomleft *= dScale;
+	m_topright *= dScale;
+
+	CalculateBoundingRect();
 }
 
 bool RoiRect::IsInside(double dX, double dY) const
@@ -284,6 +298,14 @@ RoiCircle::RoiCircle(const RoiCircle& elem)
 	*this = elem;
 }
 
+void RoiCircle::Scale(double dScale)
+{
+	m_vecCenter *= dScale;
+	m_dRadius *= dScale;
+
+	CalculateBoundingRect();
+}
+
 bool RoiCircle::IsInside(double dX, double dY) const
 {
 	double dX_0 = dX - m_vecCenter[0];
@@ -411,6 +433,15 @@ RoiEllipse::RoiEllipse() : m_vecCenter(2), m_dRadiusX(0.), m_dRadiusY(0.)
 RoiEllipse::RoiEllipse(const RoiEllipse& elem)
 {
 	*this = elem;
+}
+
+void RoiEllipse::Scale(double dScale)
+{
+	m_vecCenter *= dScale;
+	m_dRadiusX *= dScale;
+	m_dRadiusY *= dScale;
+
+	CalculateBoundingRect();
 }
 
 bool RoiEllipse::IsInside(double dX, double dY) const
@@ -557,6 +588,15 @@ RoiCircleRing::RoiCircleRing()
 RoiCircleRing::RoiCircleRing(const RoiCircleRing& elem)
 {
 	*this = elem;
+}
+
+void RoiCircleRing::Scale(double dScale)
+{
+	m_vecCenter *= dScale;
+	m_dInnerRadius *= dScale;
+	m_dOuterRadius *= dScale;
+
+	CalculateBoundingRect();
 }
 
 bool RoiCircleRing::IsInside(double dX, double dY) const
@@ -725,6 +765,16 @@ RoiCircleSegment::RoiCircleSegment(const RoiCircleSegment& elem)
 				: RoiCircleRing()
 {
 	*this = elem;
+}
+
+void RoiCircleSegment::Scale(double dScale)
+{
+	RoiCircleRing::Scale(dScale);
+
+	m_dBeginAngle *= dScale;
+	m_dEndAngle *= dScale;
+
+	CalculateBoundingRect();
 }
 
 bool RoiCircleSegment::IsInside(double dX, double dY) const
@@ -914,6 +964,14 @@ class RoiPolygonArrayAdaptor
 			return m_pPoly->GetVertex(i)[m_iCoord];
 		}
 };
+
+void RoiPolygon::Scale(double dScale)
+{
+	for(ublas::vector<double>& vec : m_vertices)
+		vec *= dScale;
+
+	CalculateBoundingRect();
+}
 
 bool RoiPolygon::IsInside(double dX, double dY) const
 {
@@ -1286,6 +1344,15 @@ void Roi::DrawRoi(QPainter& painter, const XYRange& range)
 	{
 		RoiElement& elem = GetElement(iElem);
 		elem.draw(painter, range);
+	}
+}
+
+void Roi::Scale(double dScale)
+{
+	for(unsigned int iElem=0; iElem<GetNumElements(); ++iElem)
+	{
+		RoiElement& elem = GetElement(iElem);
+		elem.Scale(dScale);
 	}
 }
 
