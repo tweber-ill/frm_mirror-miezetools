@@ -260,6 +260,8 @@ void Data2::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 		m_iWidth = iNewWidth;
 		m_iHeight = iNewHeight;
 	}
+
+	RecalcMinMaxTotal();
 }
 
 

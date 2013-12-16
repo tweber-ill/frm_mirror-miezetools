@@ -304,10 +304,18 @@ void Data3::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 				double dx1y0 = vecVals[iOldIdx + iY0*m_iWidth + iX1];
 				double dx1y1 = vecVals[iOldIdx + iY1*m_iWidth + iX1];
 
-				double dx0y0_err = vecErrs[iOldIdx + iY0*m_iWidth + iX0];
-				double dx0y1_err = vecErrs[iOldIdx + iY1*m_iWidth + iX0];
-				double dx1y0_err = vecErrs[iOldIdx + iY0*m_iWidth + iX1];
-				double dx1y1_err = vecErrs[iOldIdx + iY1*m_iWidth + iX1];
+				double dx0y0_err = 0.;
+				double dx0y1_err = 0.;
+				double dx1y0_err = 0.;
+				double dx1y1_err = 0.;
+
+				if(vecErrs.size())
+				{
+					dx0y0_err = vecErrs[iOldIdx + iY0*m_iWidth + iX0];
+					dx0y1_err = vecErrs[iOldIdx + iY1*m_iWidth + iX0];
+					dx1y0_err = vecErrs[iOldIdx + iY0*m_iWidth + iX1];
+					dx1y1_err = vecErrs[iOldIdx + iY1*m_iWidth + iX1];
+				}
 
 				const uint iNewIdx = iT*iNewWidth*iNewHeight + iY*iNewWidth + iX;
 
@@ -328,6 +336,8 @@ void Data3::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 
 	m_iWidth = iNewWidth;
 	m_iHeight = iNewHeight;
+
+	RecalcMinMaxTotal();
 }
 
 

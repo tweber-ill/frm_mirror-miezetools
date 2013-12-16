@@ -130,10 +130,16 @@ void RadialIntDlg::Calc()
 	PlotInfo info = pSWB->GetPlotInfo();
 	uint iOldW = info.iWidth;
 	uint iOldH = info.iHeight;
-	const double dResScale = spinScale->value();;
+	const double dResScale = spinScale->value();
 
 	if(dResScale != 1.)
+	{
 		pInterp->ChangeResolution(uint(iOldW*dResScale), uint(iOldH*dResScale), 1);
+		dXStart *= dResScale;
+		dYStart *= dResScale;
+		dRadius *= dResScale;
+		dInc *= dResScale;
+	}
 
 	Data1 dat1d;
 

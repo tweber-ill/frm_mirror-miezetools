@@ -983,6 +983,9 @@ void MiezeMainWnd::SumFoils()
 		return;
 
 	Plot2d* pPlot2d = pSWB->ConvertTo2d();
+
+	// test
+	//pPlot2d->ChangeResolution(512,512,1);
 	AddSubWindow(pPlot2d);
 }
 

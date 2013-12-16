@@ -148,6 +148,7 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 			dMeanPhase += pdPhases[iFoil] * dCnts;
 	}
 
+	/*
 	std::cout << "Phases of foils: ";
 	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 		std::cout << pdPhases[iFoil] << ", ";
@@ -158,6 +159,7 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 		std::cout << pdPhaseErrs[iFoil] << ", ";
 	std::cout << std::endl;
+	*/
 
 	if(bShiftToMeanPhase)
 	{

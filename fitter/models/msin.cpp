@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <boost/algorithm/minmax_element.hpp>
 #include <sstream>
+#include <fstream>
 
 #include <Minuit2/FCNBase.h>
 #include <Minuit2/FunctionMinimum.h>
@@ -108,6 +109,12 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 					const double* px, const double* py, const double *pdy,
 					MiezeSinModel** pmodel)
 {
+	/*std::ofstream ofstrDbg("/tmp/msin_dbg.dat");
+	for(unsigned int iDbg=0; iDbg<iLen; ++iDbg)
+		ofstrDbg << px[iDbg] << " " << py[iDbg] << " " << pdy[iDbg] << "\n";
+	ofstrDbg.flush();
+	ofstrDbg.close();*/
+
 	if(dNumOsc<0.)
 	{
 		if(iFitterVerbosity >= 2)

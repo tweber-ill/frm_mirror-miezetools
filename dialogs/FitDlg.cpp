@@ -582,6 +582,12 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 
 			dat1.ToArray<double>(px, py, pyerr);
 
+			// errors are not necessarily filled in...
+			if(pPlot3d->IsCountData())
+			{
+				for(unsigned int iErr=0; iErr<iTCnt; ++iErr)
+					pyerr[iErr] = std::sqrt(py[iErr]);
+			}
 			double dC=0., dCErr=0., dPh=0., dPhErr=0.;
 
 			if(iFkt == FIT_MIEZE_SINE_PIXELWISE)
