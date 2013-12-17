@@ -8,8 +8,8 @@
 #include <thread>
 #include <boost/units/io.hpp>
 
-#include "../helper/math.h"
-#include "../helper/mieze.hpp"
+#include "../../helper/math.h"
+#include "../../helper/mieze.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -30,7 +30,8 @@ void calc_red(double* pdRed, const length& w, const length& h, const length& d,
 	*pdRed = dRed;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 	const t_time sec = 1. * units::si::second;
 	const length meter = 1. * units::si::meter;
 	const angle rad = 1. * units::si::radian;
@@ -70,8 +71,10 @@ int main(int argc, char** argv) {
 
 	unsigned int iSize = vecTaus.size() * vecTT.size();
 	unsigned int iCur = 0;
-	for (const t_time& tau : vecTaus) {
-		for (const angle& twotheta : vecTT) {
+	for (const t_time& tau : vecTaus)
+	{
+		for (const angle& twotheta : vecTT)
+		{
 			std::cout << "\rPoint " << ++iCur << " of " << iSize << ": "
 					<< "tau=" << tau << ", twotheta=" << twotheta << ", ";
 			std::cout.flush();

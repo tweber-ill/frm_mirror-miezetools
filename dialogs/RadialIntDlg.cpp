@@ -91,6 +91,10 @@ void RadialIntDlg::SetSubWindows(std::vector<SubWindowBase*> vecSWB)
 
 void RadialIntDlg::AutoCalc()
 {
+	const bool bAutoCalc = false;
+
+	if(!bAutoCalc) return;
+	if(!this->isVisible()) return;
 
 	int iSrcIdx = comboSrc->currentIndex();
 	if(iSrcIdx<0)
@@ -100,6 +104,8 @@ void RadialIntDlg::AutoCalc()
 	}
 
 	const SubWindowBase* pSWB = m_vecPlots[iSrcIdx];
+	if(!pSWB)
+		return;
 
 	// no automatic calculation for large data sets
 	if(pSWB->GetType()==PLOT_4D || pSWB->GetType()==PLOT_3D)

@@ -470,6 +470,10 @@ void MiezeMainWnd::FileLoadTriggered()
 
 void MiezeMainWnd::CloseAllTriggered()
 {
+	// safety check
+	for(SubWindowBase *pSWB : GetSubWindows(0))
+		emit SubWindowRemoved(pSWB);
+
 	// TODO: save dialog
 	m_pmdi->closeAllSubWindows();
 }
