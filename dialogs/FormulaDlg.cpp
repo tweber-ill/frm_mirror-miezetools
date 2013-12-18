@@ -545,7 +545,6 @@ void FormulaDlg::setupDebyePlotter()
 	QGridLayout *pGrid = new QGridLayout(framePlanePlot_deb);
 	pGrid->addWidget(m_pDebyePlot, 0, 0, 1, 1);
 
-
 	std::vector<QDoubleSpinBox*> vecSpinBoxes = {spinAMU_deb, spinTD_deb, spinT_deb, spinMinQ_deb, spinMaxQ_deb};
 	for(QDoubleSpinBox* pSpin : vecSpinBoxes)
 		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcDebye()));
@@ -574,25 +573,36 @@ void FormulaDlg::CalcDebye()
 	temp T_D = spinTD_deb->value() * kelvin;
 	mass M = spinAMU_deb->value() * amu;
 
+
 	m_pDebyePlot->clear();
 
 	std::vector<double> vecQ, vecDeb;
 	vecQ.reserve(NUM_POINTS);
 	vecDeb.reserve(NUM_POINTS);
 
+	bool bHasZetaSq = 0;
+
 	for(unsigned int iPt=0; iPt<NUM_POINTS; ++iPt)
 	{
 		units::quantity<units::si::wavenumber> Q = (dMinQ + (dMaxQ - dMinQ)/double(NUM_POINTS)*double(iPt)) / angstrom;
 		double dDWF = 0.;
+		auto zetasq = 1.*angstrom*angstrom;
 
 		if(T <= T_D)
-			dDWF = ::debye_waller_low_T(T_D, T, M, Q);
+			dDWF = ::debye_waller_low_T(T_D, T, M, Q, &zetasq);
 		else
-			dDWF = ::debye_waller_high_T(T_D, T, M, Q);
-
-		double _dQ = Q * angstrom;
+			dDWF = ::debye_waller_high_T(T_D, T, M, Q, &zetasq);
 
 		vecQ.push_back(Q * angstrom);
+
+		if(!bHasZetaSq)
+		{
+			std::string strZetaSq = var_to_str(units::sqrt(zetasq));
+			editZetaSq->setText(strZetaSq.c_str());
+
+			bHasZetaSq = 1;
+		}
+
 		vecDeb.push_back(dDWF);
 	}
 

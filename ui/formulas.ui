@@ -761,7 +761,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="3">
+       <item row="4" column="0" colspan="3">
         <widget class="QFrame" name="framePlanePlot_deb">
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -771,17 +771,31 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
+       <item row="5" column="2">
         <widget class="QPushButton" name="btnPython_deb">
          <property name="text">
           <string>Export to Python...</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2">
+       <item row="5" column="0" colspan="2">
         <widget class="QLabel" name="labelDebyeStatus">
          <property name="text">
           <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QLabel" name="label_24">
+         <property name="text">
+          <string>RMS Atomic Displacement:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QLineEdit" name="editZetaSq">
+         <property name="enabled">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -860,9 +874,15 @@
   <tabstop>spinCellLam</tabstop>
   <tabstop>spinMaxHKL</tabstop>
   <tabstop>tablePowderLines</tabstop>
+  <tabstop>spinAMU_deb</tabstop>
+  <tabstop>spinTD_deb</tabstop>
+  <tabstop>spinT_deb</tabstop>
+  <tabstop>spinMinQ_deb</tabstop>
+  <tabstop>spinMaxQ_deb</tabstop>
+  <tabstop>btnPython_deb</tabstop>
   <tabstop>tableConst</tabstop>
-  <tabstop>buttonBox</tabstop>
   <tabstop>tabWidget</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections>
