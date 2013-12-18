@@ -20,10 +20,11 @@ class FormulaDlg : public QDialog, Ui::FormulaDlg
 protected:
 	std::vector<QDoubleSpinBox*> m_vecSpins;
 	std::vector<std::string> m_vecSpinNames;
-	Plot *m_pPlanePlot;
+	Plot *m_pPlanePlot, *m_pDebyePlot;
 
 	void setupConstants();
 	void setupPlanePlotter();
+	void setupDebyePlotter();
 
 protected slots:
 	void CalcMIEZE();
@@ -41,6 +42,10 @@ protected slots:
 	void FixedKiKfToggled();
 	void PyExport();
 	void SetPlaneStatusMsg(const char* pcMsg, int iPos);
+
+	void CalcDebye();
+	void PyExportDebye();
+	void SetDebyeStatusMsg(const char* pcMsg, int iPos);
 
 	void CalcPowderLines();
 

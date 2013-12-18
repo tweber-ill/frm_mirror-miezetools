@@ -24,6 +24,7 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 {
 	setupUi(this);
 	setupPlanePlotter();
+	setupDebyePlotter();
 	setupConstants();
 
 	QObject::connect(editNeutronLam, SIGNAL(textEdited(const QString&)), this, SLOT(CalcNeutronLam()));
@@ -86,6 +87,7 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 	CalcBraggReciprocal();
 	CalcMIEZE();
 	CalcPlane();
+	CalcDebye();
 	CalcPowderLines();
 }
 
@@ -505,6 +507,102 @@ void FormulaDlg::CalcMIEZE()
 
 
 // --------------------------------------------------------------------------------
+// debye waller factor
+
+static inline void export_python(const Plot* pPlot, QWidget* pWid=0)
+{
+	QString strFile = QFileDialog::getSaveFileName(pWid, "Save as Python file...", "",
+					"Python files (*.py)"/*,0, QFileDialog::DontUseNativeDialog*/);
+	if(strFile == "")
+		return;
+
+	std::string strFile1 = strFile.toStdString();
+	std::string strExt = get_fileext(strFile1);
+	if(strExt != "py")
+		strFile1 += ".py";
+
+	::export_py(strFile1.c_str(), pPlot);
+}
+
+void FormulaDlg::PyExportDebye()
+{
+	export_python(m_pDebyePlot, this);
+}
+
+void FormulaDlg::SetDebyeStatusMsg(const char* pcMsg, int iPos)
+{
+	if(!pcMsg) return;
+	if(iPos == 2)
+		labelDebyeStatus->setText(pcMsg);
+}
+
+void FormulaDlg::setupDebyePlotter()
+{
+	m_pDebyePlot = new Plot(this);
+	m_pDebyePlot->SetLabel(LABEL_X, "Q (1/A)");
+	m_pDebyePlot->SetLabel(LABEL_Y, "Debye-Waller Factor");
+
+	QGridLayout *pGrid = new QGridLayout(framePlanePlot_deb);
+	pGrid->addWidget(m_pDebyePlot, 0, 0, 1, 1);
+
+
+	std::vector<QDoubleSpinBox*> vecSpinBoxes = {spinAMU_deb, spinTD_deb, spinT_deb, spinMinQ_deb, spinMaxQ_deb};
+	for(QDoubleSpinBox* pSpin : vecSpinBoxes)
+		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcDebye()));
+
+
+	QObject::connect(btnPython_deb, SIGNAL(clicked(bool)), this, SLOT(PyExportDebye()));
+	QObject::connect(m_pDebyePlot, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetDebyeStatusMsg(const char*, int)));
+}
+
+void FormulaDlg::CalcDebye()
+{
+	typedef units::quantity<units::si::length> length;
+	typedef units::quantity<units::si::temperature> temp;
+	typedef units::quantity<units::si::mass> mass;
+	typedef units::quantity<units::si::wavenumber> wavenum;
+
+    const temp kelvin = 1. * units::si::kelvin;
+    const mass amu = co::m_u;
+
+	const unsigned int NUM_POINTS = 512;
+
+	double dMinQ = spinMinQ_deb->value();
+	double dMaxQ = spinMaxQ_deb->value();
+
+	temp T = spinT_deb->value() * kelvin;
+	temp T_D = spinTD_deb->value() * kelvin;
+	mass M = spinAMU_deb->value() * amu;
+
+	m_pDebyePlot->clear();
+
+	std::vector<double> vecQ, vecDeb;
+	vecQ.reserve(NUM_POINTS);
+	vecDeb.reserve(NUM_POINTS);
+
+	for(unsigned int iPt=0; iPt<NUM_POINTS; ++iPt)
+	{
+		units::quantity<units::si::wavenumber> Q = (dMinQ + (dMaxQ - dMinQ)/double(NUM_POINTS)*double(iPt)) / angstrom;
+		double dDWF = 0.;
+
+		if(T <= T_D)
+			dDWF = ::debye_waller_low_T(T_D, T, M, Q);
+		else
+			dDWF = ::debye_waller_high_T(T_D, T, M, Q);
+
+		double _dQ = Q * angstrom;
+
+		vecQ.push_back(Q * angstrom);
+		vecDeb.push_back(dDWF);
+	}
+
+	m_pDebyePlot->plot(vecQ.size(), vecQ.data(), vecDeb.data());
+	m_pDebyePlot->RefreshPlot();
+}
+
+
+
+// --------------------------------------------------------------------------------
 // scattering plane
 
 void FormulaDlg::setupPlanePlotter()
@@ -592,24 +690,12 @@ void FormulaDlg::CalcPlane()
 
 void FormulaDlg::PyExport()
 {
-	QString strFile = QFileDialog::getSaveFileName(this, "Save as Python file...", "",
-					"Python files (*.py)"/*,0, QFileDialog::DontUseNativeDialog*/);
-	if(strFile == "")
-		return;
-
-	std::string strFile1 = strFile.toStdString();
-	std::string strExt = get_fileext(strFile1);
-	if(strExt != "py")
-		strFile1 += ".py";
-
-	export_py(strFile1.c_str(), m_pPlanePlot);
+	export_python(m_pPlanePlot, this);
 }
 
 void FormulaDlg::SetPlaneStatusMsg(const char* pcMsg, int iPos)
 {
-	if(!pcMsg)
-		return;
-
+	if(!pcMsg) return;
 	if(iPos == 2)
 		labelPlaneStatus->setText(pcMsg);
 }

@@ -67,13 +67,13 @@ int main(int argc, char** argv)
 	const angle rad = 1. * units::si::radian;
 	const freq Hz = 1. / sec;
 
-	length lam = 10e-10 * meter;
-	length L1 = 15. * meter;
-	length L2 = 15. * meter;
-	length Lb = 5. * meter;
-	length d = 0.001 * meter;
+	length lam = 15e-10 * meter;
+	length L1 = 16. * meter;
+	length L2 = 16. * meter;
+	length Lb = 3. * meter;
+	length d = 2e-6 * meter;
 
-	std::vector<t_time> vecTaus = linspace<t_time>(0.01e-9 * sec, 30e-9 * sec, 32);
+	std::vector<t_time> vecTaus = linspace<t_time>(0.01e-9 * sec, 10e-6 * sec, 128);
 
 	std::ofstream ofstr("dred.dat");
 	std::ofstream ofstr2("dred2.dat");
