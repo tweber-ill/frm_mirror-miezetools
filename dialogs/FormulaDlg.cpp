@@ -73,7 +73,9 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 
 	//--------------------------------------------------------------------------------
 	tablePowderLines->horizontalHeader()->setVisible(true);
-	tablePowderLines->setColumnWidth(1, 250);
+	tablePowderLines->setColumnWidth(0, 64);
+	tablePowderLines->setColumnWidth(1, 64);
+	tablePowderLines->setColumnWidth(2, 250);
 
 	QObject::connect(spinCellD, SIGNAL(valueChanged(double)), this, SLOT(CalcPowderLines()));
 	QObject::connect(spinCellLam, SIGNAL(valueChanged(double)), this, SLOT(CalcPowderLines()));
@@ -723,6 +725,22 @@ static inline bool is_peak_allowed_fcc(int ih, int ik, int il)
 	return ((is_even(ih) && is_even(ik) && is_even(il)) || (is_odd(ih) && is_odd(ik) && is_odd(il)));
 }
 
+static bool mixed_even_and_odd(int ih, int ik, int il)
+{
+	bool bHasEven = is_even(ih) || is_even(ik) || is_even(il);
+	bool bHasOdd = is_odd(ih) || is_odd(ik) || is_odd(il);
+
+	return bHasEven && bHasOdd;
+}
+
+static inline bool is_peak_allowed_diamond(int ih, int ik, int il)
+{
+	if(mixed_even_and_odd(ih,ik,il))
+		return false;
+
+	return !(is_even(ih+ik+il) && ((ih+ik+il)%4 != 0));
+}
+
 static inline bool is_peak_allowed_bcc(int ih, int ik, int il)
 {
 	return is_even(ih + ik + il);
@@ -748,6 +766,8 @@ struct PowderLine
 {
 	std::string strAngle;
 	double dAngle;
+
+	std::string strQ;
 	std::string strPeaks;
 
 	static bool comp(const PowderLine& line1, const PowderLine& line2)
@@ -762,7 +782,7 @@ void FormulaDlg::CalcPowderLines()
 	const double da = spinCellD->value();
 	const int iMaxHKL = spinMaxHKL->value();
 
-	bool (*is_peak_allowed_all[])(int, int, int) = {is_peak_allowed_sc, is_peak_allowed_fcc, is_peak_allowed_bcc};
+	bool (*is_peak_allowed_all[])(int, int, int) = {is_peak_allowed_sc, is_peak_allowed_fcc, is_peak_allowed_bcc, is_peak_allowed_diamond};
 
 	int iIdx = comboCell->currentIndex();
 	bool (*is_peak_allowed)(int, int, int) = is_peak_allowed_all[iIdx];
@@ -800,6 +820,8 @@ void FormulaDlg::CalcPowderLines()
 
 		std::istringstream istrAngle(pair.first);
 		istrAngle >> powderline.dAngle;
+		double dQ = ::bragg_recip_Q(dLam*angstrom, powderline.dAngle/180.*M_PI*units::si::radians, 1.)*angstrom;
+		powderline.strQ = var_to_str(dQ);
 
 		vecPowderLines.push_back(powderline);
 	}
@@ -812,14 +834,15 @@ void FormulaDlg::CalcPowderLines()
 	for(int iRow=0; iRow<iNumRows; ++iRow)
 	{
 		//std::cout << pair.first << ": " << pair.second << std::endl;
-		for(int iCol=0; iCol<2; ++iCol)
+		for(int iCol=0; iCol<3; ++iCol)
 		{
 			if(!tablePowderLines->item(iRow, iCol))
 				tablePowderLines->setItem(iRow, iCol, new QTableWidgetItem());
 		}
 
 		tablePowderLines->item(iRow, 0)->setText(vecPowderLines[iRow].strAngle.c_str());
-		tablePowderLines->item(iRow, 1)->setText(vecPowderLines[iRow].strPeaks.c_str());
+		tablePowderLines->item(iRow, 1)->setText(vecPowderLines[iRow].strQ.c_str());
+		tablePowderLines->item(iRow, 2)->setText(vecPowderLines[iRow].strPeaks.c_str());
 	}
 }
 

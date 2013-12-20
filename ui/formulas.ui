@@ -563,6 +563,11 @@
            <string>bcc</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Diamond</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="1" column="0">
@@ -596,6 +601,11 @@
          <column>
           <property name="text">
            <string>Angle (deg)</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Q (1/A)</string>
           </property>
          </column>
          <column>
