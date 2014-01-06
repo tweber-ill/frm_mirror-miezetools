@@ -1,0 +1,74 @@
+__init__()
+{
+	global h = 2.*pi*hbar;
+}
+
+plot_msin(num_osc, C, phase, amp, offs, dat)
+{
+	x = linspace(min(dat[0]), max(dat[0]), 64);
+	xosc = linspace(0, num_osc*2*pi, 64);
+	y = amp*sin(xosc + phase) + offs;
+
+	param = map();
+	param["style"] = "line";
+	param["title"] = "Contrast: " + C + ", Phase: " + phase;
+	plot(dat, [x,y,param]);
+}
+
+
+# f2/f1 = L1/L2 + 1;
+#
+# f2-f1 = tau / (2. * Ls * h) * (m_n * v^3);	| : f1
+# f2/f1 = tau / (2. * Ls * h * f1) * (m_n * v^3) + 1;
+#
+# L2/L1 / (2*Ls*h) * (m_n *v^3 * tau) = f1;
+
+mieze_f2(L1, L2, f1)
+{
+	return (L1/L2 + 1.)*f1;
+}
+
+mieze_fm(tau, Ls, lam)
+{
+	p = h/lam;
+	v = p / m_n;
+	fm = tau / (Ls * h) * (m_n * vÂ^3);
+	return fm;
+}
+
+mieze_f1f2(L1, L2, Ls, lam, tau)
+{
+	p = h/lam;
+	v = p / m_n;
+
+	f1 = L2/L1 / (2 * Ls * h) * (m_n *v^3 * tau);
+	f2 = (L1/L2 + 1.)*f1;
+
+	return [f1, f2];
+}
+
+# test
+# main() { print(mieze_f1f2(1., 2., 0.8, 10e-10, 25e-12)); }
+
+contrast(num_osc, datxy)
+{
+	data = datxy[1];
+	len = vec_size(data);
+
+	data_fft = fft(data);
+	real = 2.*data_fft[0][num_osc] / len;
+	imag = 2.*data_fft[1][num_osc] / len;
+
+	amp = sqrt(real^2 + imag^2);
+	offs = data_fft[0][0] / len;
+
+	phase = atan2(imag, real) + pi/2. - 2.*pi/2.*num_osc/len;
+	if(phase less 0.)
+		phase = phase - 2.*pi;
+
+	C = amp / offs;
+#	print("Contrast: " + C + ", Phase: " + phase + ", Amplitude: " + amp + ", Offset: " + offs);
+
+	plot_msin(num_osc, C, phase, amp, offs, datxy);	
+	return [C, phase, amp, offs];
+}

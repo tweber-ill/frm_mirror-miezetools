@@ -175,15 +175,17 @@ void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd, bool bShow)
 	QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
 	QObject::connect(pActualWidget, SIGNAL(ParamsChanged(const StringMap&)), this, SLOT(PlotParamsDynChanged(const StringMap&)));
 
-	m_pmdi->addSubWindow(pWnd);
+	QMdiSubWindow* pSubWnd = m_pmdi->addSubWindow(pWnd);
 	emit SubWindowAdded(pWnd);
 
 	m_mutex.unlock();
 
 	if(bShow)
 	{
+		//pSubWnd->resize(320,240);
+		pSubWnd->show();
 		//pWnd->RefreshPlot();
-		pWnd->show();
+		//std::cout << "subwindow added" << std::endl;
 	}
 }
 

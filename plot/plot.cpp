@@ -6,8 +6,11 @@
  */
 
 #include "plot.h"
+#include <QtCore/QVector>
+#include <QtCore/QPoint>
 #include <QtGui/QPainter>
 #include <QtGui/QGridLayout>
+#include <QtGui/QFrame>
 #include <limits>
 #include <iostream>
 #include "../helper/string.h"
@@ -17,22 +20,18 @@
 #define PAD_Y 18
 
 Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pPixmap(0),
-									m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.),
-									m_bXIsLog(0), m_bYIsLog(0)
-{
-#ifdef USE_MGL
-	m_pMGL = new QMathGL(this);
-	m_pMGL->setDraw(this);
-	m_pMGL->setZoom(false);
-	m_pMGL->autoResize = 0;
-	QGridLayout *pLayout = new QGridLayout(this);
-	pLayout->addWidget(m_pMGL, 0, 0, 1, 1);
+						m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.),
+						m_bXIsLog(0), m_bYIsLog(0)
+#ifdef USE_GPL
+	, m_pGPLWidget(0), m_pGPLInst(0)
 #endif
-
+{
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
 
-#ifndef USE_MGL
+#ifdef USE_GP
+	GPL_Init();
+#e�lse
 	this->setMouseTracking(true);
 #endif
 }
@@ -42,10 +41,54 @@ Plot::~Plot()
 	clear();
 	if(m_pPixmap) delete m_pPixmap;
 
-#ifdef USE_MGL
-	delete m_pMGL;
+#ifdef USE_GPL
+	GPL_Deinit();
 #endif
 }
+
+
+#ifdef USE_GPL
+
+void Plot::GPL_Init()
+{
+	GPL_Deinit();
+
+        m_pGPLWidget = new QtGnuplotWidget(0,0,this);
+	//m_pGPLWidget->setGeometry(0,0,320,240);
+	QDataStream strIn;
+	m_pGPLWidget->processEvent(GEDesactivate, strIn);
+	m_pGPLInst = new QtGnuplotInstance(/*m_pGPLWidget*/);
+
+        //connect(m_pGPLInst, SIGNAL(gnuplotOutput(const QString&)), this, SLOT(Coord_Output(const QString&)));
+        connect(m_pGPLWidget, SIGNAL(statusTextChanged(const QString&)), this, SLOT(Coord_Output(const QString&)));
+
+	QGridLayout *pLayout = new QGridLayout(this);
+
+	//m_pGPLWidget->processEvent(GESetWidgetSize, dstrSize);
+	//m_pGPLWidget->processEvent(GESetSceneSize, dstrSize);
+	m_pGPLWidget->processEvent(GEActivate, strIn);
+
+	m_pGPLWidget->resize(298,218);
+	m_pGPLInst->setWidget(m_pGPLWidget);
+	pLayout->addWidget(m_pGPLWidget,0,0,1,1);
+
+	/*QSize oldsize(-1,-1);
+	QSize newsize(320,240);
+	QResizeEvent evt(newsize, oldsize);
+	resizeEvent(&evt);*/
+}
+
+void Plot::GPL_Deinit()
+{
+        if(m_pGPLWidget) delete m_pGPLWidget;
+        if(m_pGPLInst) delete m_pGPLInst;
+
+	m_pGPLWidget = 0;
+	m_pGPLInst = 0;
+}
+
+#endif
+
 
 SubWindowBase* Plot::clone() const
 {
@@ -67,10 +110,8 @@ SubWindowBase* Plot::clone() const
 	return pPlot;
 }
 
-QSize Plot::minimumSizeHint() const
-{
-	return QSize(320,240);
-}
+
+QSize Plot::minimumSizeHint() const { return QSize(320,240); }
 
 void Plot::estimate_minmax()
 {
@@ -121,27 +162,35 @@ QColor Plot::GetColor(unsigned int iPlotObj) const
 	return cols[iPlotObj % cols.size()];
 }
 
+
 void Plot::resizeEvent(QResizeEvent *pEvent)
 {
-
-#ifdef USE_MGL
-	m_pMGL->adjust();
-	//m_pMGL->adjustSize();
-#else
+#ifndef USE_GPL
 	paint();
 #endif
+	//qDebug() << "plotter resizeEvent: " << pEvent->size();
+
+/*
+        QString strW = QString::number(m_pGPLWidget->size().width());
+        QString strH = QString::number(m_pGPLWidget->size().height());
+        (*m_pGPLInst) << "set term qt widget \"" << m_pGPLWidget->serverName() << "\" size "
+                        << strW << "," << strH << "\n";
+	//(*m_pGPLInst) << "replot\n";
+*/
+
+	QWidget::resizeEvent(pEvent);
 }
 
 void Plot::RefreshPlot()
 {
 	paint();
 
-#ifndef USE_MGL
+#ifndef USE_GPL
 	repaint();
 #endif
 }
 
-#ifdef USE_MGL
+#ifdef USE_GPL
 
 inline std::string get_color_string(const QColor& col)
 {
@@ -155,15 +204,17 @@ inline std::string get_color_string(const QColor& col)
 	return strCol;
 }
 
-int Plot::Draw(mglGraph *pg)
+void Plot::GPL_Draw()
 {
-	pg->LoadFont("heros");
-	//pg->SetFontSize(3.5);
-	pg->SetRanges(m_dxmin, m_dxmax, m_dymin, m_dymax);
-    //pg->Grid();
+	if(!m_pGPLInst || !m_pGPLWidget)
+		GPL_Init();
 
-    pg->Box();
-    pg->Axis();
+	QDataStream strIn;
+	m_pGPLWidget->processEvent(GEDesactivate, strIn);
+
+	(*m_pGPLInst) << "set grid\n";
+	//pg->SetRanges(m_dxmin, m_dxmax, m_dymin, m_dymax);
+
 
 	// for all plot objects
 	for(unsigned int iObj=0; iObj<m_vecObjs.size(); ++iObj)
@@ -174,15 +225,15 @@ int Plot::Draw(mglGraph *pg)
 		std::string strCol = "{x" + get_color_string(col) + "}";
 
 		unsigned int iLen = obj.GetLength();
-		mglData x(iLen), y(iLen), x_err(iLen), y_err(iLen);
+		QVector<QPointF> qvecPts;
+		//qvecPts.reserve(iLen);
 
 		//for all points
 		for(unsigned int uiPt=0; uiPt<iLen; ++uiPt)
 		{
-			x.a[uiPt] = obj.GetX(uiPt);
-			y.a[uiPt] = obj.GetY(uiPt);
-			x_err.a[uiPt] = obj.GetXErr(uiPt);
-			y_err.a[uiPt] = obj.GetYErr(uiPt);
+			qvecPts << QPointF(obj.GetX(uiPt), obj.GetY(uiPt));
+			//x_err.a[uiPt] = obj.GetXErr(uiPt);
+			//y_err.a[uiPt] = obj.GetYErr(uiPt);
 		}
 
 		std::string strStyle = strCol + "r1";
@@ -190,31 +241,37 @@ int Plot::Draw(mglGraph *pg)
 		if(pltobj.plttype == PLOT_DATA)
 		{
 			strStyle += "#.";
-			pg->Error(x, y, x_err, y_err, strStyle.c_str(), "legend Data Points");
+			//pg->Error(x, y, x_err, y_err, strStyle.c_str(), "legend Data Points");
 		}
 		else if(pltobj.plttype == PLOT_FKT)
 		{
 			strStyle += "-";
-			std::string strLegend = "legend " + pltobj.strFkt;
-			pg->Plot(x, y, strStyle.c_str(), strLegend.c_str());
+			//std::string strLegend = "legend " + pltobj.strFkt;
+			//pg->Plot(x, y, strStyle.c_str(), strLegend.c_str());
 		}
+
+		(*m_pGPLInst) << "plot '-'\n";
+		(*m_pGPLInst) << qvecPts;
 	}
 
-	pg->Puts(m_dxmin + (m_dxmax-m_dxmin)/2., m_dymax + (m_dymax-m_dymin)/8., m_strTitle.toStdString().c_str(), "b");
-    //pg->Title(m_strTitle.toStdString().c_str(), "", -1);
-    pg->Label('x', m_strXAxis.toStdString().c_str(), 0);
-    pg->Label('y', m_strYAxis.toStdString().c_str(), 0);
+	//pg->Puts(m_dxmin + (m_dxmax-m_dxmin)/2., m_dymax + (m_dymax-m_dymin)/8., m_strTitle.toStdString().c_str(), "b");
 
-    pg->Legend();
-	return 0;
+	(*m_pGPLInst) << "set title \"" << m_strTitle << "\"\n";
+	(*m_pGPLInst) << "set xlabel \"" << m_strXAxis << "\"\n";
+	(*m_pGPLInst) << "set ylabel \"" << m_strYAxis << "\"\n";
+
+	if(m_bXIsLog) (*m_pGPLInst) << "set logscale x\n";
+	if(m_bYIsLog) (*m_pGPLInst) << "set logscale y\n";
+
+	m_pGPLWidget->processEvent(GEActivate, strIn);
 }
 #endif
 
 
 void Plot::paint()
 {
-#ifdef USE_MGL
-	m_pMGL->update();
+#ifdef USE_GPL
+	GPL_Draw();
 #else
 	QSize size = this->size();
 
@@ -366,9 +423,7 @@ void Plot::paint()
 
 void Plot::paintEvent (QPaintEvent *pEvent)
 {
-#ifdef USE_MGL
-
-#else
+#ifndef USE_GPL
 	QPainter painter(this);
 	if(!m_pPixmap)
 		paint();
@@ -396,6 +451,10 @@ void Plot::plot(const Data1& dat, PlotType plttype, const char* pcLegend)
 
 	estimate_minmax();
 	RefreshStatusMsgs();
+
+#ifdef USE_GPL
+	RefreshPlot();
+#endif
 }
 
 void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
@@ -436,6 +495,10 @@ void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
 
 	MergeParamMaps();
 	emit(ParamsChanged(m_mapMerged));
+
+#ifdef USE_GPL
+	RefreshPlot();
+#endif
 }
 
 void Plot::plot_fkt(const FunctionModel& fkt, int iObj, bool bKeepObj)
@@ -536,6 +599,10 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj, bool bKeepObj)
 
 	if(!bKeepObj)
 		delete pltobj;
+
+#ifdef USE_GPL
+	RefreshPlot();
+#endif
 }
 
 
@@ -606,7 +673,16 @@ void Plot::RefreshStatusMsgs()
 }
 
 
-#ifndef USE_MGL
+
+void Plot::Coord_Output(const QString& str)
+{
+	emit SetStatusMsg(str.toStdString().c_str(), 2);
+	RefreshStatusMsgs();
+}
+
+
+#ifndef USE_GPL
+
 void Plot::MapToCoordSys(double dPixelX, double dPixelY, double &dX, double &dY, bool *pbInside)
 {
 	const QSize size = this->size();
@@ -685,8 +761,7 @@ void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 	std::ostringstream ostr;
 	ostr << "(" << dX << ", " << dY << ")";
 
-	emit SetStatusMsg(ostr.str().c_str(), 2);
-	RefreshStatusMsgs();
+	Coord_Output(ostr.str().c_str());
 }
 #endif
 
@@ -873,6 +948,14 @@ void Plot::SetLabel(LabelType iWhich, const char* pcLab)
 		return;
 
 	RefreshPlot();
+}
+
+void Plot::SaveImageAs() const
+{
+#ifdef USE_GPL
+	if(m_pGPLWidget)
+		m_pGPLWidget->exportToPdf();
+#endif
 }
 
 #include "plot.moc"

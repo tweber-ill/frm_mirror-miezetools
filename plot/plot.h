@@ -14,10 +14,9 @@
 #include <QtGui/QPixmap>
 #include <vector>
 
-#ifdef USE_MGL
-	#include <mgl2/base_cf.h>
-	#include <mgl2/qt.h>
-	#include <mgl2/qmathgl.h>
+#ifdef USE_GPL
+	#include <QtGnuplotInstance.h>
+	#include <QtGnuplotWidget.h>
 #endif
 
 #include "../subwnd.h"
@@ -43,18 +42,23 @@ struct PlotObj
 };
 
 class Plot : public SubWindowBase
-					#ifdef USE_MGL
-						, mglDraw
-					#endif
 { Q_OBJECT
+protected slots:
+	void Coord_Output(const QString&);
+
 protected:
 	virtual QSize minimumSizeHint() const;
 	virtual void paintEvent(QPaintEvent *pEvent);
 	virtual void resizeEvent(QResizeEvent *pEvent);
 	virtual void RefreshStatusMsgs();
 
-#ifdef USE_MGL
-	QMathGL *m_pMGL;
+#ifdef USE_GPL
+	QtGnuplotInstance *m_pGPLInst;
+	QtGnuplotWidget *m_pGPLWidget;
+
+	void GPL_Init();
+	void GPL_Deinit();
+	void GPL_Draw();
 #else
 	void MapToCoordSys(double dPixelX, double dPixelY, double &dX, double &dY, bool *pbInside=0);
 	virtual void mouseMoveEvent(QMouseEvent* pEvent);
@@ -86,10 +90,6 @@ public:
 
 	void clear();
 	void clearfkt();
-
-#ifdef USE_MGL
-	int Draw(mglGraph *pg);
-#endif
 
 	void paint();
 	virtual void RefreshPlot();
@@ -144,6 +144,8 @@ public:
 
 	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
+
+	virtual void SaveImageAs() const;
 };
 
 

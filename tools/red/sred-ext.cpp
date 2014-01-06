@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 	length Lb = 5. * meter;
 	length w = 0.01 * meter;
 	length h = 0.01 * meter;
-	length d = 0.001 * meter;
+	length d = 0.005 * meter;
 
 	length a = 2.464e-10 * meter;		// McStas graphite file: C_graphite.lau
 	length c = 6.711e-10 * meter;
@@ -56,8 +56,8 @@ int main(int argc, char** argv)
 	std::cout << "Mean free path (length for 1/e intensity): " /*ca. 1 cm*/ << (1./mu) << std::endl;
 	std::cout << "\n";
 
-	std::vector<t_time> vecTaus = linspace<t_time>(0.01e-9 * sec, 30e-9 * sec, 32);
-	std::vector<angle> vecTT = linspace<angle>(0. * rad, (M_PI / 2. + M_PI / 4.) * rad, 32);
+	std::vector<t_time> vecTaus = linspace<t_time>(0.01e-9 * sec, 10e-9 * sec, 8);
+	std::vector<angle> vecTT = linspace<angle>(0.01 * rad, M_PI / 4. * rad, 8);
 
 	std::ofstream ofstr("sred_ext.dat");
 
@@ -86,8 +86,7 @@ int main(int argc, char** argv)
 			std::cout.flush();
 
 			freq fm = ::mieze_tau_fm(tau, L2 - Lb, lam);
-			angle theta_s = (twotheta/2. - M_PI/2. * rad);
-			double dRed = std::fabs(mieze_reduction_sample_cuboid_extinction(w,h,d, mu, fm, lam, twotheta, theta_s));
+			double dRed = std::fabs(mieze_reduction_sample_cuboid_extinction(w,h,d, mu, fm, lam, twotheta, 32));
 
 			std::cout << "C = " << dRed << "        ";
 			ofstr << dRed << " ";

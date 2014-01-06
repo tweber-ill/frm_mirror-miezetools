@@ -158,6 +158,9 @@ MiezeMainWnd::MiezeMainWnd()
 	QAction *pExportPy = new QAction(this);
 	pExportPy->setText("Export as Python Script...");
 
+	QAction *pSaveImgAs = new QAction(this);
+	pSaveImgAs->setText("Save Image...");
+
 	QAction *pPlotProp = new QAction(this);
 	pPlotProp->setText("Plot Properties...");
 
@@ -166,6 +169,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 
 	m_pMenu1d = new QMenu(this);
+	m_pMenu1d->addAction(pSaveImgAs);
 	m_pMenu1d->addAction(pExportPy);
 	m_pMenu1d->addSeparator();
 	m_pMenu1d->addAction(pRebin);
@@ -174,12 +178,14 @@ MiezeMainWnd::MiezeMainWnd()
 
 
 	m_pMenu2d = new QMenu(this);
+	m_pMenu2d->addAction(pSaveImgAs);
 	m_pMenu2d->addAction(pExportPy);
 	m_pMenu2d->addSeparator();
 	m_pMenu2d->addAction(pPlotProp);
 
 
 	m_pMenu3d = new QMenu(this);
+	m_pMenu3d->addAction(pSaveImgAs);
 	m_pMenu3d->addAction(pExportPy);
 	m_pMenu3d->addSeparator();
 	m_pMenu3d->addAction(pShowT);
@@ -189,6 +195,7 @@ MiezeMainWnd::MiezeMainWnd()
 
 
 	m_pMenu4d = new QMenu(this);
+	m_pMenu4d->addAction(pSaveImgAs);
 	m_pMenu4d->addAction(pExportPy);
 	m_pMenu4d->addSeparator();
 
@@ -431,6 +438,7 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pSumFoils, SIGNAL(triggered()), this, SLOT(SumFoils()));
 	QObject::connect(pPlotProp, SIGNAL(triggered()), this, SLOT(PlotPropertiesTriggered()));
 	QObject::connect(pRebin, SIGNAL(triggered()), this, SLOT(RebinTriggered()));
+	QObject::connect(pSaveImgAs, SIGNAL(triggered()), this, SLOT(FileExportTriggered()));
 	QObject::connect(pExportPy, SIGNAL(triggered()), this, SLOT(FileExportPyTriggered()));
 	QObject::connect(pExportPlots, SIGNAL(triggered()), this, SLOT(ShowExportDlg()));
 

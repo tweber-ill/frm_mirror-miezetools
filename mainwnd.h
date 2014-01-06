@@ -125,6 +125,7 @@ protected slots:
 
 	void RebinTriggered();
 
+	void FileExportTriggered();
 	void FileExportPyTriggered();
 	void ShowExportDlg();
 

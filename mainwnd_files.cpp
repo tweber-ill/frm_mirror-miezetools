@@ -209,7 +209,6 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				std::string strTitle = GetPlotTitle(strFileNoDir);
 
 				Plot *pPlot = new Plot(m_pmdi, strTitle.c_str());
-
 				pPlot->plot(pdat1d->GetDim(), pdx, pdy, pdyerr);
 
 				std::string strLabX, strLabY, strPlotTitle;
@@ -551,6 +550,18 @@ void MiezeMainWnd::ShowExportDlg()
 
 	m_pexportdlg->show();
 	m_pexportdlg->activateWindow();
+}
+
+void MiezeMainWnd::FileExportTriggered()
+{
+	const SubWindowBase *pSWB = GetActivePlot();
+        if(!pSWB)  
+        {
+                QMessageBox::critical(this, "Error", "No active plot.");
+                return;
+        }
+
+	pSWB->SaveImageAs();
 }
 
 void MiezeMainWnd::FileExportPyTriggered()

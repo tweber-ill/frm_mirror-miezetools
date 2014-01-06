@@ -25,7 +25,7 @@ void calc_red(double* pdRed, const length& w, const length& h, const length& d,
 		const freq& fm, const length& lam, const angle& twotheta,
 		const angle& theta_s)
 {
-	double dRed = std::fabs(mieze_reduction_sample_cuboid(w, h, d, fm, lam, twotheta, theta_s));
+	double dRed = std::fabs(mieze_reduction_sample_cuboid(w, h, d, fm, lam, twotheta, theta_s, 100));
 	//std::cout << dRed << std::endl;
 	*pdRed = dRed;
 }

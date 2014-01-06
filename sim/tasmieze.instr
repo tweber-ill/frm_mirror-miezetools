@@ -8,7 +8,23 @@ DEFINE INSTRUMENT TasMieze
 (
 	// source
 	double dLam = 5.0, 
-	double dDeltaLam = 0.1
+	double dDeltaLam = 0.1,
+
+	// MIEZE
+	double dMiezeL1 = 0.9,
+	double dMiezeF1 = 46000.0, 
+	double dMiezeF2 = 61920.0,
+	double dDistMonoMieze = 0.5,
+
+	// sample
+	double dDistMonoSample = 2.0,
+
+	// analyser
+	double dAnaDepth = 0.005,
+	double dDistSampleAna = 1.0,
+
+	// detector
+	double dDistAnaDet = 1.0
 )
 
 
@@ -21,37 +37,32 @@ DECLARE
 	double dMonoD = 6.79;
 	double dDistSrcMono = 1.;
 	double dMonoTheta = 63.4, dMonoTwoTheta = 126.8;
-	double dMonoWidth = 0.2, dMonoHeight = 0.2, dMonoDepth = 0.005;
+	double dMonoWidth = 0.005, dMonoHeight = 0.005, dMonoDepth = 0.001;
 
 	// sample
-	double dDistMonoSample = 2.;
 	double dSampleD = 6.79;
 	double dSampleTheta=0., dSampleTwoTheta = 0.;
-	double dSampleWidth = 0.2, dSampleHeight = 0.2, dSampleDepth = 0.005;
+	double dSampleWidth = 0.05, dSampleHeight = 0.05, dSampleDepth = 0.001;
 
 	// analyser
 	bool bAnaIdeal = 0;
 	double dAnaD = 6.79;
-	double dDistSampleAna = 1.;
 	double dAnaTheta=0., dAnaTwoTheta = 0.;
-	double dAnaWidth = 0.2, dAnaHeight = 0.2, dAnaDepth = 0.005;
+	double dAnaWidth = 0.05, dAnaHeight = 0.05;
 
 	// MIEZE
 	bool bMiezeIdeal = 1;
-	double dDistMonoMieze = 0.5;
 	double dMiezeWidth = 0.35, dMiezeHeight = 0.35;
-	double dMiezeL1 = 0.9;
-	double dMiezeF1 = 46000., dMiezeF2 = 61920.;
 	double dMiezeCoilThick = 0.;
 	double dMiezeCoilTilt = 0.;
 	
 	int iMiezeNumCoils = 1;
 	double dMiezeNumOsc = 2.;
-	double dMiezeFm = 2.*double(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
+	double dMiezeFm = -1.;
 
 	// detector
-	double dDistAnaDet = 1.;
 	double dDetWidth = 0.4, dDetHeight = 0.4;
+	double dDetTofBase = 0.;
 %}
 
 
@@ -79,6 +90,10 @@ INITIALIZE
 	printf("Analyser: theta_a=%f, 2thetaa_=%f\n", dAnaTheta, dAnaTwoTheta);
 
 
+	double v = 2.*M_PI*HBAR / (dLam*1e-10) / MNEUTRON;
+	dDetTofBase = (dDistSrcMono + dDistMonoSample + dDistSampleAna + dDistAnaDet) / v;
+
+	dMiezeFm = 2.*double(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
 
 	double dMiezeLs = dDistSampleAna + dDistAnaDet;
 	double dMiezeL2 = dMiezeLs + dDistMonoSample - dMiezeL1 - dDistMonoMieze;
@@ -111,7 +126,11 @@ COMPONENT Source = Source_simple(
 	yheight = 0.01, xwidth = 0.01, focus_xw = dMonoWidth*0.5, focus_yh = dMonoHeight*0.5,
 	lambda0 = dLam, dlambda = dDeltaLam, gauss = 1, dist = dDistSrcMono)
 		AT (0, 0, 0) RELATIVE Origin
-
+		EXTEND
+		%{
+			//t = 0.;
+			t = rand01() * dMiezeNumOsc/dMiezeFm;
+		%}
 //----------------------------------------------------------------------------------------------------
 
 
@@ -289,19 +308,18 @@ COMPONENT psd = PSD_monitor(
 	xwidth = dDetWidth, yheight = dDetHeight)
 		AT (0, 0, 0) RELATIVE DetAxis
 
-/*
-COMPONENT osc = Osc_monitor(
-	nchan=64, filename="osc",
-	xwidth = dDetWidth, yheight = dDetHeight, geo = 0,
-	period = dMiezeNumOsc/dMiezeFm,
+COMPONENT tof = TOF_monitor(nt=128, 
+		tmin=(dDetTofBase-dMiezeNumOsc/dMiezeFm)*1e6, 
+		tmax=(dDetTofBase+dMiezeNumOsc/dMiezeFm)*1e6, 
+	xwidth = dDetWidth, yheight = dDetHeight, 
+	filename = "tof",
 	restore_neutron = 1)
 		AT (0, 0, 0) RELATIVE DetAxis
-*/
 
 COMPONENT oscpsd = Osc_PSD_monitor(
-	nchan=16, nx=64, ny=64, filename="oscpsd",
+	nchan=32, nx=64, ny=64, filename="oscpsd",
 	xwidth = dDetWidth, yheight = dDetHeight, geo = 0,
-	period = dMiezeNumOsc/dMiezeFm, num_osc = dMiezeNumOsc,
+	period = dMiezeNumOsc/dMiezeFm,
 	restore_neutron = 1)
 		AT (0, 0, 0) RELATIVE DetAxis
 

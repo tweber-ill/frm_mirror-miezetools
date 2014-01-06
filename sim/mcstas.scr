@@ -1,0 +1,81 @@
+#!./hermelin
+
+__init__()
+{
+	import("colors.scr");
+}
+
+mcclean(instr)
+{
+	exec("rm -f " + (instr + ".c") + " " + (instr + ".cpp") + " " + (instr + ".out"));
+}
+
+mccompile(instr)
+{
+	instr_cpp = instr + ".cpp";
+	instr_mc = instr + ".instr";
+	instr_out = instr + ".out";
+
+	print("="*80);
+	print(BLUE + "Compiling McStas -> C++..." + NOCOLOR);
+	#flags = "--verbose -t";
+	flags = "-t";
+	status = exec("mcstas-2.0 " + flags + " -o " + instr_cpp + " " + instr_mc);
+
+	print("\n");
+	if(status)
+		print(GREEN + "Compiling '" + instr_mc 
+				+ "' to '" + instr_cpp + "' SUCCEEDED." + NOCOLOR);
+	else
+	{
+		print(RED + "Compiling '" + instr_mc 
+				+ "' to '" + instr_cpp + "' FAILED." + NOCOLOR);
+		return 0;
+	}
+	print("="*80);
+	print("\n");
+
+
+
+	print("="*80);
+	print(BLUE + "Compiling C++ -> native..." + NOCOLOR);
+	
+	cc = "gcc";
+	flags = "-g -O2 -march=native -xc++ -lm -lstdc++ -fpermissive -w -std=c++11";
+	status = exec(cc + " " + flags + " " + "-o " + instr_out + " " + instr_cpp);
+
+	print("\n");
+	if(status)
+		print(GREEN + "Compiling '" + instr_cpp 
+			+ "' to '" + instr_out + "' SUCCEEDED." + NOCOLOR);
+	else
+	{
+		print(RED + "Compiling '" + instr_cpp 
+			+ "' to '" + instr_out + "' FAILED." + NOCOLOR);
+		return 0;
+	}
+
+	exec("strip " + instr_out);
+
+	print("="*80);
+	print("\n");
+
+	return 1;
+}
+
+mcrun(instr, num_neutr, dir, simparams)
+{
+	instr_out = instr + ".out";
+	opts = "-n " + num_neutr + " -d " + dir;
+
+	#print("="*80);
+	print(BLUE + "Running simulation with " + num_neutr + " neutrons..." + NOCOLOR);
+
+	exec("rm -rf " + dir);
+	status = exec("./" + instr_out + " " + opts + " " + simparams);
+	if(not status)
+		print(RED + "Running '" + instr_out + "' FAILED." + NOCOLOR);
+	else
+		print(GREEN + "Running '" + instr_out + "' SUCCEEDED." + NOCOLOR);
+	return status; 
+}

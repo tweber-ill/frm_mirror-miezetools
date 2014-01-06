@@ -1,0 +1,98 @@
+#!./hermelin
+
+__init__()
+{
+	global NUM_THREADS = thread_hwcount();
+
+	print(ver());
+	print("CPU supports " + NUM_THREADS + " threads.\n");
+
+	import("mcstas.scr");
+	import("mieze.scr");
+	import("colors.scr");
+}
+
+
+evaluate(dir)
+{
+	dat = loadtxt(dir + "/oscpsd_1d.sim");
+#	dat = loadtxt(dir + "/tof.sim");
+	dat = [dat[0], dat[1], dat[2], dat[4]];
+	result = contrast(2, dat);
+
+	return result;
+}
+
+main()
+{
+	do_compile = 1;
+	num_neutrons = 1e6;
+	INSTR = "tasmieze";
+
+	L_sample_ana = 0.5;
+	L_ana_det = 0.5;
+	L_mono_sample = 2.;
+	L_mono_mieze = 0.5;
+
+	L1 = 0.9;
+	Ls = L_sample_ana + L_ana_det;
+	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
+	lam = 4.;		# A
+	dlam = lam/25.;
+	tau = 25.;		# ps
+
+	f1f2 = mieze_f1f2(L1, L2, Ls, lam*1e-10, tau*1e-12);	
+
+	
+	if(do_compile)
+	{
+		mcclean(INSTR);
+		if(not mccompile(INSTR))
+			return;
+	}
+
+
+	#anadepths = logspace(log10(0.0001), log10(0.01), 15);
+	anadepths = linspace(0.0001, 0.01, 15);
+	print("Analyser depths: " + str(anadepths));
+
+	simBaseParams = "dLam=" + lam 
+			+ " dDeltaLam=" + dlam 
+			+ " dMiezeF1=" + f1f2[0] 
+			+ " dMiezeF2=" + f1f2[1]
+			+ " dMiezeL1=" + L1
+			+ " dDistMonoMieze=" + L_mono_mieze
+			+ " dDistMonoSample=" +  L_mono_sample
+			+ " dDistSampleAna=" + L_sample_ana
+			+ " dDistAnaDet=" + L_ana_det;
+	
+	contrasts = vec(vec_size(anadepths));
+	for(anadepth : anadepths)
+	{
+		print("\n\n");
+		print("-"*80);
+		print(YELLOW + "Analyser depth = " + anadepth + " m." + NOCOLOR);
+		simParams = simBaseParams + " dAnaDepth=" + anadepth;
+
+		if(mcrun(INSTR, num_neutrons, "output/tst0", simParams))
+		{
+			iter = cur_iter(anadepth);
+
+			result = evaluate("output/tst0");
+			print(YELLOW + "Result " + (iter+1) + " of " + vec_size(anadepths) + ": " 
+				+ str(result) + NOCOLOR);
+
+			contrasts[iter] = result[0];
+		}
+	}
+
+	params = map();
+	params["xlabel"] = "Analyser Thickness (mm)";
+	params["ylabel"] = "Contrast";
+	params["title"] = "Result";
+	params["xlimits"] = 1000.*min(anadepths) + " " + 1000.*max(anadepths);
+	params["ylimits"] = "0 1";
+
+	print(params);
+	plot(anadepths*1000., contrasts, params);
+}

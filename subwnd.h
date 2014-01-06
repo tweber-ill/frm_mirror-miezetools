@@ -79,6 +79,8 @@ public:
 	virtual Plot3d* ConvertTo3d(int iParam=-1) { return 0; }
 
 
+	virtual void SaveImageAs() const { };
+
 	virtual void SetROI(const Roi* pROI, bool bAntiRoi=0) {}
 	virtual Roi* GetROI(bool bAntiRoi=0) { return 0; }
 
