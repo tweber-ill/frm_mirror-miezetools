@@ -29,7 +29,7 @@ Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pP
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	this->setWindowTitle(QString(pcTitle));
 
-#ifdef USE_GP
+#ifdef USE_GPL
 	GPL_Init();
 #else
 	this->setMouseTracking(true);
