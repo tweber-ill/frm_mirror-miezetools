@@ -10,19 +10,26 @@ FLAGS = ${INC} -std=c++11 -ggdb ${DEFINES}
 
 STD_LIBS = -lsupc++ -lstdc++ -lm
 MATH_LIBS = -lMinuit2 -lfftw3
-MISC_LIBS = ./gnuplot-qt.so
+#MISC_LIBS = ./gnuplot-qt.so
+MISC_LIBS = 
 LAPACK_LIBS = -L/usr/local/lib64 -llapacke -llapack -lblas -lgfortran
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib -lQtCore -lQtGui -lQtXml -lQtXmlPatterns -lQtOpenGL -lGL -lGLU -lX11
-LIBS_RESO = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS} ${LAPACK_LIBS}
+LIBS_RESO = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams-mt ${QT_LIBS} ${LAPACK_LIBS}
+LIBS_FORMULA = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams-mt ${QT_LIBS}
 LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams-mt ${MATH_LIBS} ${QT_LIBS} ${LAPACK_LIBS} ${MISC_LIBS} ${STD_LIBS}
+
 
 cattus: main.o mainwnd.o mainwnd_files.o mainwnd_session.o mainwnd_mdi.o subwnd.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o ExportDlg.o PlotPropDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o file.o comp.o rand.o InfoDock.o NormDlg.o LatticeDlg.o RebinDlg.o
 	${CC} ${FLAGS} -o cattus main.o mainwnd.o mainwnd_files.o mainwnd_session.o mainwnd_mdi.o subwnd.o settings.o data.o data1.o data2.o data3.o data4.o FormulaDlg.o CombineDlg.o ComboDlg.o FitDlg.o ListDlg.o ResoDlg.o RoiDlg.o SettingsDlg.o PsdPhaseDlg.o RadialIntDlg.o ExportDlg.o PlotPropDlg.o fourier.o string.o xml.o loadcasc.o loadnicos.o loadtxt.o plotgl.o plot.o plot2d.o plot3d.o plot4d.o roi.o cn.o pop.o chi2.o fitter.o functions.o parser.o freefit.o freefit-nd.o gauss.o gauss-nd.o msin.o interpolation.o ellipse.o linalg.o blob.o export.o fit_data.o formulas.o file.o comp.o rand.o InfoDock.o NormDlg.o LatticeDlg.o RebinDlg.o ${LIBS}
 	strip cattus
 
-reso: settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o
-	${CC} ${FLAGS} -o reso settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o ${LIBS_RESO}
+reso: settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o comp.o
+	${CC} ${FLAGS} -o reso settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o comp.o ${LIBS_RESO}
 	strip reso
+
+formula: FormulaDlg_prog.o formulas.o string.o settings.o plot_nopars.o data.o data1.o blob.o roi.o xml.o comp.o export.o data2.o
+	${CC} ${FLAGS} -o formula FormulaDlg_prog.o formulas.o string.o settings.o plot_nopars.o data.o data1.o blob.o roi.o xml.o comp.o export.o data2.o ${LIBS_FORMULA}
+	strip formula
 
 
 main.o: main.cpp
@@ -86,6 +93,9 @@ ResoDlg.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
 
 ResoDlg_prog.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
 	${CC} ${FLAGS} -c -DSTANDALONE_RESO -o ResoDlg_prog.o dialogs/ResoDlg.cpp
+
+FormulaDlg_prog.o: dialogs/FormulaDlg.cpp dialogs/FormulaDlg.h
+	${CC} ${FLAGS} -c -DSTANDALONE_FORMULA -o FormulaDlg_prog.o dialogs/FormulaDlg.cpp
 
 PsdPhaseDlg.o: dialogs/PsdPhaseDlg.cpp dialogs/PsdPhaseDlg.h
 	${CC} ${FLAGS} -c -o PsdPhaseDlg.o dialogs/PsdPhaseDlg.cpp
@@ -237,6 +247,7 @@ clean:
 	rm -f *.o
 	rm -f cattus
 	rm -f reso
+	rm -f formula
 	
 	rm -f ui/*.h
 	rm -f *.moc

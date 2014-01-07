@@ -31,7 +31,7 @@ Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pP
 
 #ifdef USE_GP
 	GPL_Init();
-#e�lse
+#else
 	this->setMouseTracking(true);
 #endif
 }

@@ -16,6 +16,7 @@ gmon.out
 sim/*.sim
 sim/**/*.sim
 sim/tasmieze.c
+sim/tasmieze.cpp
 sim/tasmieze
 sim/tasmieze.out
 script/tokens.h
