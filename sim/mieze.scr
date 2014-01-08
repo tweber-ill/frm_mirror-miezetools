@@ -69,6 +69,6 @@ contrast(num_osc, datxy)
 	C = amp / offs;
 #	print("Contrast: " + C + ", Phase: " + phase + ", Amplitude: " + amp + ", Offset: " + offs);
 
-	plot_msin(num_osc, C, phase, amp, offs, datxy);	
+#	plot_msin(num_osc, C, phase, amp, offs, datxy);	
 	return [C, phase, amp, offs];
 }

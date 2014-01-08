@@ -3,6 +3,9 @@
 __init__()
 {
 	global NUM_THREADS = thread_hwcount();
+#	global NUM_THREADS = 1;
+	global INSTR = "tasmieze";
+	global num_neutrons = 1e6;
 
 	print(ver());
 	print("CPU supports " + NUM_THREADS + " threads.\n");
@@ -23,11 +26,32 @@ evaluate(dir)
 	return result;
 }
 
+run_thread(params, param_name, baseparams)
+{
+	for(param : params)
+	{
+		idx = int(param[0]);
+		the_param = param[1];
+
+		simParams = baseparams + " " + param_name + "=" + the_param;
+		dir = "output/iter_" + idx;
+
+		if(mcrun(INSTR, num_neutrons, dir, simParams))
+		{
+			result = evaluate(dir);
+
+			begin_critical();
+			print(YELLOW + "Result for " + param_name + " = " + the_param + ": "
+					+ str(result) + NOCOLOR);
+			global contrasts[idx] = result[0];
+			end_critical();
+		}
+	}
+}
+
 main()
 {
 	do_compile = 1;
-	num_neutrons = 1e6;
-	INSTR = "tasmieze";
 
 	L_sample_ana = 0.5;
 	L_ana_det = 0.5;
@@ -43,6 +67,7 @@ main()
 
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam*1e-10, tau*1e-12);	
 
+
 	
 	if(do_compile)
 	{
@@ -53,7 +78,10 @@ main()
 
 
 	#anadepths = logspace(log10(0.0001), log10(0.01), 15);
-	anadepths = linspace(0.0001, 0.01, 15);
+	anadepths = linspace(0.0001, 0.01, 16);
+	indices = linspace(0, vec_size(anadepths)-1, vec_size(anadepths));
+	global contrasts = vec(vec_size(anadepths));
+
 	print("Analyser depths: " + str(anadepths));
 
 	simBaseParams = "dLam=" + lam 
@@ -65,26 +93,38 @@ main()
 			+ " dDistMonoSample=" +  L_mono_sample
 			+ " dDistSampleAna=" + L_sample_ana
 			+ " dDistAnaDet=" + L_ana_det;
+
+	print("\n\n");
+	print("="*80);
+	print(BLUE + "Starting simulation in " + NUM_THREADS + " threads." + NOCOLOR);
+	print("\n");
+
+
+	threads = nthread(NUM_THREADS, "run_thread", zip(indices, anadepths), "dAnaDepth", simBaseParams);
+	join(threads);
+
+	print("\n");
+	print(GREEN + "All thread runs have finished." + NOCOLOR);
+	print("="*80);
 	
-	contrasts = vec(vec_size(anadepths));
-	for(anadepth : anadepths)
-	{
-		print("\n\n");
-		print("-"*80);
-		print(YELLOW + "Analyser depth = " + anadepth + " m." + NOCOLOR);
-		simParams = simBaseParams + " dAnaDepth=" + anadepth;
-
-		if(mcrun(INSTR, num_neutrons, "output/tst0", simParams))
-		{
-			iter = cur_iter(anadepth);
-
-			result = evaluate("output/tst0");
-			print(YELLOW + "Result " + (iter+1) + " of " + vec_size(anadepths) + ": " 
-				+ str(result) + NOCOLOR);
-
-			contrasts[iter] = result[0];
-		}
-	}
+#	for(anadepth : anadepths)
+#	{
+#		print("\n\n");
+#		print("-"*80);
+#		print(YELLOW + "Analyser depth = " + anadepth + " m." + NOCOLOR);
+#		simParams = simBaseParams + " dAnaDepth=" + anadepth;
+#
+#		if(mcrun(INSTR, num_neutrons, "output/tst0", simParams))
+#		{
+#			iter = cur_iter(anadepth);
+#
+#			result = evaluate("output/tst0");
+#			print(YELLOW + "Result " + (iter+1) + " of " + vec_size(anadepths) + ": " 
+#				+ str(result) + NOCOLOR);
+#
+#			contrasts[iter] = result[0];
+#		}
+#	}
 
 	params = map();
 	params["xlabel"] = "Analyser Thickness (mm)";
@@ -93,6 +133,6 @@ main()
 	params["xlimits"] = 1000.*min(anadepths) + " " + 1000.*max(anadepths);
 	params["ylimits"] = "0 1";
 
-	print(params);
+	#print(params);
 	plot(anadepths*1000., contrasts, params);
 }
