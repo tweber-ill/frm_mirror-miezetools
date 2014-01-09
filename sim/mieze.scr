@@ -32,7 +32,7 @@ mieze_fm(tau, Ls, lam)
 {
 	p = h/lam;
 	v = p / m_n;
-	fm = tau / (Ls * h) * (m_n * vÂ^3);
+	fm = tau / (Ls * h) * (m_n * v^3);
 	return fm;
 }
 
@@ -50,7 +50,7 @@ mieze_f1f2(L1, L2, Ls, lam, tau)
 # test
 # main() { print(mieze_f1f2(1., 2., 0.8, 10e-10, 25e-12)); }
 
-contrast(num_osc, datxy)
+contrast(num_osc, datxy, want_plot)
 {
 	data = datxy[1];
 	len = vec_size(data);
@@ -69,6 +69,7 @@ contrast(num_osc, datxy)
 	C = amp / offs;
 #	print("Contrast: " + C + ", Phase: " + phase + ", Amplitude: " + amp + ", Offset: " + offs);
 
-#	plot_msin(num_osc, C, phase, amp, offs, datxy);	
+	if(want_plot)
+		plot_msin(num_osc, C, phase, amp, offs, datxy);	
 	return [C, phase, amp, offs];
 }

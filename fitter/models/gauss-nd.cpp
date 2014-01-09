@@ -126,7 +126,7 @@ std::string GaussModel_nd::print(bool bFillInSyms) const
 bool GaussModel_nd::SetParams(const std::vector<double>& vecParams)
 {
 	m_amp = vecParams[0];
-	
+
 	for(unsigned int i=0; i<m_uiDim; ++i)
 	{
 		m_pspread[i] = vecParams[0*m_uiDim + i + 1];
@@ -160,31 +160,31 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 
 
 	double *pdXMin = new double[uiDim];
-	double *pdXMax = new double[uiDim];	
+	double *pdXMax = new double[uiDim];
 	for(unsigned int i=0; i<uiDim; ++i)
 	{
 		get_minmax<double>(iLen, ppx[i], pdXMin[i], pdXMax[i]);
 		//std::cout << "min=" << pdXMin[i] << ", max=" << pdXMax[i] <<std::endl;
 	}
-	
+
 
 	double dMin, dMax;
 	get_minmax<double>(iLen, py, dMin, dMax);
 	//std::cout << "min=" << dMin << ", max=" << dMax <<std::endl;	
-	
+
 	//dAmp = dMax;
 	//dAmp_err = 0.1*dMax;
 
 
 	ROOT::Minuit2::MnUserParameters params;
 	params.Add("amp", dAmp, dAmp_err);
-	
+
 	for(unsigned int i=0; i<uiDim; ++i)
 	{
 		std::ostringstream ostr;
 		ostr << "spread_" << i;
 		params.Add(ostr.str(), pSpread[i], pSpread_err[i]);
-		
+
 		//std::cout << "spread " << i << ": " << pSpread[i] << "+-" << pSpread_err[i] << std::endl;
 	}
 
@@ -210,7 +210,7 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 
 		params.SetLowerLimit(ostrSpread.str(), 0.);
 		params.SetLimits(ostrx0.str(), pdXMin[i], pdXMax[i]);
-		params.Fix(ostrx0.str());		
+		params.Fix(ostrx0.str());
 	}
 
 
@@ -218,9 +218,9 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 	ROOT::Minuit2::MnMigrad *migrad = new ROOT::Minuit2::MnMigrad(fkt, params, 0);
 	ROOT::Minuit2::FunctionMinimum *mini = new ROOT::Minuit2::FunctionMinimum((*migrad)());
 	//std::cout << (*mini) << std::endl;
-	
+
 	bool bValidFit = mini->IsValid() && mini->HasValidParameters();
-	
+
 	for(unsigned int i=0; i<uiDim; ++i)
 	{
 		std::ostringstream ostrSpread;
@@ -238,14 +238,14 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 	delete migrad;
 
 	params.Release("amp");
-	
+
 	for(unsigned int i=0; i<uiDim; ++i)
 	{
 		std::ostringstream ostrx0;
 		ostrx0 << "x0_" << i;
 
 		params.Release(ostrx0.str());
-	}	
+	}
 
 	migrad = new ROOT::Minuit2::MnMigrad(fkt, params, 1);
 	mini = new ROOT::Minuit2::FunctionMinimum((*migrad)());
@@ -254,7 +254,7 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 
 	params.SetValue("amp", mini->UserState().Value("amp"));
 	params.SetError("amp", mini->UserState().Error("amp"));
-	
+
 	for(unsigned int i=0; i<uiDim; ++i)
 	{
 		std::ostringstream ostrSpread, ostrx0;
@@ -304,7 +304,7 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 		for(unsigned int iParam=0; iParam<params.Params().size(); ++iParam)
 		{
 			std::pair<double, double> err = minos(iParam);
-			
+
 			std::cerr << "minos error for " << params.GetName(iParam) << ": "
 						<< err.first << ", " << err.second << std::endl;
 		}
@@ -325,9 +325,11 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 		pSpread_err[i] = mini->UserState().Error(ostrSpread.str());
 		pX0[i] = mini->UserState().Value(ostrx0.str());
 		pX0_err[i] = mini->UserState().Error(ostrx0.str());
-	}	
-	
-		
+	}
+
+
+	delete[] pdXMin;
+	delete[] pdXMax;
 	delete mini;
 	delete migrad;
 
