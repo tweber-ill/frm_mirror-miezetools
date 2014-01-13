@@ -3,7 +3,7 @@ __init__()
 	global h = 2.*pi*hbar;
 }
 
-plot_msin(num_osc, C, phase, amp, offs, dat)
+plot_msin(num_osc, C, phase, amp, offs, dat, dattof)
 {
 	x = linspace(min(dat[0]), max(dat[0]), 64);
 	xosc = linspace(0, num_osc*2*pi, 64);
@@ -12,7 +12,10 @@ plot_msin(num_osc, C, phase, amp, offs, dat)
 	param = map();
 	param["style"] = "line";
 	param["title"] = "Contrast: " + C + ", Phase: " + phase;
-	plot(dat, [x,y,param]);
+	plot(dat, [x,y,param], ["window" : "0"]);
+
+
+	plot(dattof, ["window" : "1"]);
 }
 
 
@@ -50,7 +53,7 @@ mieze_f1f2(L1, L2, Ls, lam, tau)
 # test
 # main() { print(mieze_f1f2(1., 2., 0.8, 10e-10, 25e-12)); }
 
-contrast(num_osc, datxy, want_plot)
+contrast(num_osc, datxy, dattof, want_plot)
 {
 	data = datxy[1];
 	len = vec_size(data);
@@ -70,6 +73,6 @@ contrast(num_osc, datxy, want_plot)
 #	print("Contrast: " + C + ", Phase: " + phase + ", Amplitude: " + amp + ", Offset: " + offs);
 
 	if(want_plot)
-		plot_msin(num_osc, C, phase, amp, offs, datxy);	
+		plot_msin(num_osc, C, phase, amp, offs, datxy, dattof);	
 	return [C, phase, amp, offs];
 }
