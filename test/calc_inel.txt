@@ -2,6 +2,8 @@ tau * Delta E / hbar = Delta phi
 
 
 
+MIEZE
+-----
 
 totales Diff beider Seiten:
 
@@ -27,3 +29,29 @@ L_s/v_2^3 = -(L_1/v_1^3 + L_b/v_1^3) - omega_2/(omega_2-omega_1)*L_1/v_1^3
 L_s = -((L_1 + L_b) - omega_2/(omega_2-omega_1)*L_1) * v_2^3 / v_1^3
 L_s = -(L_1 + L_b - omega_2/(omega_2-omega_1)*L_1) * v_2^3 / v_1^3
 L_s = (omega_1/(omega_2-omega_1)*L_1 - L_b) * v_2^3/v_1^3
+
+
+
+
+NSE/NRSE
+--------
+
+totales Diff beider Seiten
+
+E = 1/2 m v_2^2 - 1/2 m v_1^2
+Delta E = dE/dv_1*dv_1 + dE/dv_2*dv_2 = m v_2 dv_2 - m v_1 dv_1
+
+phi = gamma B1 L1 / v1 - gamma B2 L2 / v2
+Delta phi = -gamma B1 L1 / v1^2 * dv1 + gamma B2 L2 / v2^2 * dv2
+
+
+tau/hbar Delta E = Delta phi
+tau / hbar * (m v_2 dv_2 - m v_1 dv_1) = -gamma B1 L1 / v1^2 * dv1 + gamma B2 L2 / v2^2 * dv2
+
+Gruppieren:
+
+tau / hbar * m v2 dv2 = gamma B2 L2 / v2^2 * dv2
+tau / hbar * m v1 dv1 = gamma B1 L1 / v1^2 * dv1
+
+tau / hbar * m = gamma B1 L1 / v1^3
+tau / hbar * m = gamma B2 L2 / v2^3
