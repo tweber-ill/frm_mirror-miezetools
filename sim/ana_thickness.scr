@@ -114,6 +114,7 @@ main()
 	params["title"] = "Result";
 	params["xlimits"] = 1000.*min(anadepths) + " " + 1000.*max(anadepths);
 	params["ylimits"] = "0 1";
+	params["term"] = "x11";
 
 	#print(params);
 	plot(anadepths*1000., contrasts, params);

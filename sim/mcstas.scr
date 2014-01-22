@@ -41,7 +41,7 @@ mccompile(instr)
 	print(BLUE + "Compiling C++ -> native..." + NOCOLOR);
 	
 	cc = "gcc";
-	flags = "-g -O2 -march=native -xc++ -lm -lstdc++ -fpermissive -w -std=c++11";
+	flags = "-g -O2 -march=native -xc++ -lm -lstdc++ -fpermissive -w -std=gnu++11 -undef__STRICT_ANSI__";
 	status = exec(cc + " " + flags + " " + "-o " + instr_out + " " + instr_cpp);
 
 	print("\n");
@@ -69,13 +69,13 @@ mcrun(instr, num_neutr, dir, simparams)
 	opts = "-n " + num_neutr + " -d " + dir;
 
 	#print("="*80);
-	print(BLUE + "Running simulation with " + num_neutr + " neutrons..." + NOCOLOR);
+	print(BLUE + "Running simulation with " + num_neutr + " neutrons in dir '" + dir + "'" + NOCOLOR);
 
 	exec("rm -rf " + dir);
 	status = exec("./" + instr_out + " " + opts + " " + simparams);
 	if(not status)
-		print(RED + "Running '" + instr_out + "' FAILED." + NOCOLOR);
+		print(RED + "Running '" + instr_out + "' in dir '" + dir + "' FAILED." + NOCOLOR);
 	else
-		print(GREEN + "Running '" + instr_out + "' SUCCEEDED." + NOCOLOR);
+		print(GREEN + "Running '" + instr_out + "' in dir '" + dir + "'  SUCCEEDED." + NOCOLOR);
 	return status; 
 }
