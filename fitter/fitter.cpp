@@ -10,10 +10,10 @@
 #include <algorithm>
 #include <sstream>
 
-#include <Minuit2/FCNBase.h>
+/*#include <Minuit2/FCNBase.h>
 #include <Minuit2/FunctionMinimum.h>
 #include <Minuit2/MnMigrad.h>
-#include <Minuit2/MnPrint.h>
+#include <Minuit2/MnPrint.h>*/
 
 #include "../helper/misc.h"
 #include "fitter.h"
