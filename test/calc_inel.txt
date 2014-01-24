@@ -3,7 +3,9 @@ inel.:   S(omega) = Lorentz um omega0	-> FT(omega -> tau) = exp. Abfall mit Schl
 
 
 
-Spin-Echo-Kondition: E-Änderung führt zu phi-Änderung:
+Spin-Echo-Kondition: E-Änderung führt zu phi-Änderung,
+Proportionalitätskonstanten tau zu diesem Zeitpunkt noch unbekannt, 
+stellen sich als Spin-Echo-Zeiten heraus:
 tau * Delta E / hbar = Delta phi
 
 
@@ -65,3 +67,4 @@ Gleichsetzen tau1 = tau2:
 
 gamma B1 L1 / v1^3 = gamma B2 L2 / v2^3
 omega1 L1 / v1^3 = omega2 L2 / v2^3
+
