@@ -1,5 +1,10 @@
-tau * Delta E / hbar = Delta phi
+qusiel.: S(omega) = Lorentz um 0	-> FT(omega -> tau) = exp. Abfall
+inel.:   S(omega) = Lorentz um omega0	-> FT(omega -> tau) = exp. Abfall mit Schlenker	-> Kompensation mit inel. Tuning
 
+
+
+Spin-Echo-Kondition: E-Änderung führt zu phi-Änderung:
+tau * Delta E / hbar = Delta phi
 
 
 MIEZE
@@ -48,16 +53,15 @@ Delta phi = -gamma B1 L1 / v1^2 * dv1 + gamma B2 L2 / v2^2 * dv2
 tau/hbar Delta E = Delta phi
 tau / hbar * (m v_2 dv_2 - m v_1 dv_1) = -gamma B1 L1 / v1^2 * dv1 + gamma B2 L2 / v2^2 * dv2
 
-Gruppieren:
+Gruppieren nach gleichen v1, v2:
 
-tau / hbar * m v2 dv2 = gamma B2 L2 / v2^2 * dv2
-tau / hbar * m v1 dv1 = gamma B1 L1 / v1^2 * dv1
+tau2 / hbar * m v2 dv2 = gamma B2 L2 / v2^2 * dv2
+tau1 / hbar * m v1 dv1 = gamma B1 L1 / v1^2 * dv1
 
-tau / hbar * m = gamma B1 L1 / v1^3
-tau / hbar * m = gamma B2 L2 / v2^3
+tau1 / hbar * m = gamma B1 L1 / v1^3
+tau2 / hbar * m = gamma B2 L2 / v2^3
 
-Gleichsetzen:
+Gleichsetzen tau1 = tau2:
 
 gamma B1 L1 / v1^3 = gamma B2 L2 / v2^3
 omega1 L1 / v1^3 = omega2 L2 / v2^3
-
