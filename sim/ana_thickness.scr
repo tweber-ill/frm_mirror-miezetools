@@ -2,8 +2,8 @@
 
 __init__()
 {
-	global NUM_THREADS = thread_hwcount();
-#	global NUM_THREADS = 1;
+#	global NUM_THREADS = thread_hwcount();
+	global NUM_THREADS = 1;
 	global INSTR = "tasmieze";
 	global num_neutrons = 1e6;
 

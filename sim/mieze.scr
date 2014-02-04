@@ -3,17 +3,16 @@ __init__()
 	global h = 2.*pi*hbar;
 }
 
-plot_msin(num_osc, C, phase, amp, offs, dat, dattof)
+plot_msin(num_osc, C, phase, amp, freq, offs, dat, dattof)
 {
 	x = linspace(min(dat[0]), max(dat[0]), 64);
-	xosc = linspace(0, num_osc*2*pi, 64);
-	y = amp*sin(xosc + phase) + offs;
+#	xosc = linspace(0, num_osc*2.*pi, 64);
+	y = sin_model(x, amp, phase, offs, freq);
 
 	param = map();
 	param["style"] = "line";
 	param["title"] = "Contrast: " + C + ", Phase: " + phase;
 	plot(dat, [x,y,param], ["window" : "0"]);
-
 
 	plot(dattof, ["window" : "1"]);
 }
@@ -50,11 +49,16 @@ mieze_f1f2(L1, L2, Ls, lam, tau)
 	return [f1, f2];
 }
 
-# test
-# main() { print(mieze_f1f2(1., 2., 0.8, 10e-10, 25e-12)); }
+sin_model(x, amp, phase, offs, freq)
+{
+	return amp*sin(freq*x + phase) + offs;
+}
 
 contrast(num_osc, datxy, dattof, want_plot)
 {
+	#print(datxy);
+	f_M = 2.*2.*pi*(real(datxy[3]["param_dMiezeF2"]) - real(datxy[3]["param_dMiezeF1"])) * 1e-6;
+
 	data = datxy[1];
 	len = vec_size(data);
 
@@ -66,13 +70,33 @@ contrast(num_osc, datxy, dattof, want_plot)
 	offs = data_fft[0][0] / len;
 
 	phase = atan2(imag, real) + pi/2. - 2.*pi/2.*num_osc/len;
+	phase = fmod(phase, 2.*pi);
 	if(phase less 0.)
-		phase = phase - 2.*pi;
+		phase = phase + 2.*pi;
 
+	miny = min(datxy[1]);
+	maxy = max(datxy[1]);
+	#print("min y: " + miny + ", max y: " + maxy);
+
+	hints = [amp, phase, offs, f_M];
+	hints_errs = [amp/10., pi/10., offs/10., f_M/100.];
+	lowerlims = ["amp":0., "offs":miny, "phase":0.];
+	upperlims = ["amp":maxy, "offs":maxy, "phase":2.*pi];
+	fitparam = fit("sin_model", datxy[0], datxy[1], datxy[2], 
+				["hints":hints, "hints_errors":hints_errs,
+				"lower_limits":lowerlims, "upper_limits":upperlims,
+				"fixed":["freq"]]);
+
+        params_vals = map_vec_to_val(fitparam, 0);
+        params_errs = map_vec_to_val(fitparam, 1);
+
+	amp = params_vals["amp"];
+	phase = params_vals["phase"];
+	offs = params_vals["offs"];
 	C = amp / offs;
 #	print("Contrast: " + C + ", Phase: " + phase + ", Amplitude: " + amp + ", Offset: " + offs);
 
 	if(want_plot)
-		plot_msin(num_osc, C, phase, amp, offs, datxy, dattof);	
+		plot_msin(num_osc, C, phase, amp, f_M, offs, datxy, dattof);	
 	return [C, phase, amp, offs];
 }
