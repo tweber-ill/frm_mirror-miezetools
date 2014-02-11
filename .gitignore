@@ -8,7 +8,10 @@
 Debug/*
 Release/*
 ui/*.h
-cattus
+./cattus
+./reso
+./taz
+./formula
 script/hermelin
 perf.data
 perf.data.old
@@ -21,4 +24,3 @@ sim/tasmieze
 sim/tasmieze.out
 script/tokens.h
 script/script.tab.cc
-

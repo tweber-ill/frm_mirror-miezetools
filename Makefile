@@ -17,6 +17,7 @@ QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns -lQtOpenGL \
 	-lGL -lGLU -lX11
 LIBS_RESO = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams-mt ${QT_LIBS} ${LAPACK_LIBS}
+LIBS_TAZ = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS}
 LIBS_FORMULA = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams-mt ${QT_LIBS}
 LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams-mt ${MATH_LIBS} ${QT_LIBS} ${LAPACK_LIBS} ${MISC_LIBS} ${STD_LIBS}
 
@@ -49,6 +50,10 @@ reso: settings.o data.o data1.o ResoDlg_prog.o string.o xml.o plot_nopars.o cn.o
 			plot_nopars.o cn.o pop.o ellipse.o roi.o plotgl.o linalg.o blob.o comp.o \
 			${LIBS_RESO}
 	strip reso
+
+taz: taz_prog.o scattering_triangle.o
+	${CC} ${FLAGS} -o taz taz_prog.o scattering_triangle.o \
+			${LIBS_TAZ}
 
 formula: FormulaDlg_prog.o formulas.o string.o settings.o plot_nopars.o data.o data1.o \
 	blob.o roi.o xml.o comp.o export.o data2.o
@@ -123,6 +128,15 @@ ResoDlg_prog.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
 
 FormulaDlg_prog.o: dialogs/FormulaDlg.cpp dialogs/FormulaDlg.h
 	${CC} ${FLAGS} -c -DSTANDALONE_FORMULA -o FormulaDlg_prog.o dialogs/FormulaDlg.cpp
+
+taz_prog.o: tools/taz/taz.cpp tools/taz/taz.h
+	${CC} ${FLAGS} -c -DSTANDALONE_TAZ -o taz_prog.o tools/taz/taz.cpp
+
+taz.o: tools/taz/taz.cpp tools/taz/taz.h
+	${CC} ${FLAGS} -c -o taz.o tools/taz/taz.cpp
+
+scattering_triangle.o: tools/taz/scattering_triangle.cpp tools/taz/scattering_triangle.h
+	${CC} ${FLAGS} -c -o scattering_triangle.o tools/taz/scattering_triangle.cpp
 
 PsdPhaseDlg.o: dialogs/PsdPhaseDlg.cpp dialogs/PsdPhaseDlg.h
 	${CC} ${FLAGS} -c -o PsdPhaseDlg.o dialogs/PsdPhaseDlg.cpp
@@ -275,8 +289,11 @@ clean:
 	rm -f cattus
 	rm -f reso
 	rm -f formula
+	rm -f taz
 	
 	rm -f ui/*.h
 	rm -f *.moc
 	rm -f dialogs/*.moc
+	rm -f tools/res/*.moc
+	rm -f tools/taz/*.moc
 	rm -f plot/*.moc

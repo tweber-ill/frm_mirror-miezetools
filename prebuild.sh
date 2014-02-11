@@ -36,15 +36,17 @@ moc dialogs/FitDlg.h -o dialogs/FitDlg.moc
 moc dialogs/AboutDlg.h -o dialogs/AboutDlg.moc
 moc dialogs/RoiDlg.h -o dialogs/RoiDlg.moc
 moc dialogs/ComboDlg.h -o dialogs/ComboDlg.moc
-moc dialogs/ResoDlg.h -o dialogs/ResoDlg.moc
 moc dialogs/PsdPhaseDlg.h -o dialogs/PsdPhaseDlg.moc
 moc dialogs/RadialIntDlg.h -o dialogs/RadialIntDlg.moc
-moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
 moc dialogs/LatticeDlg.h -o dialogs/LatticeDlg.moc
 moc dialogs/PlotPropDlg.h -o dialogs/PlotPropDlg.moc
 moc dialogs/RebinDlg.h -o dialogs/RebinDlg.moc
 moc dialogs/ExportDlg.h -o dialogs/ExportDlg.moc
 moc dialogs/InfoDock.h -o dialogs/InfoDock.moc
 moc dialogs/NormDlg.h -o dialogs/NormDlg.moc
+
+moc dialogs/ResoDlg.h -o dialogs/ResoDlg.moc
+moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
+moc tools/taz/taz.h -o tools/taz/taz.moc
 
 echo -e "\n"
