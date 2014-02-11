@@ -8,11 +8,11 @@
 #include <iostream>
 #include <map>
 
-#include "../settings.h"
-#include "../helper/string.h"
-#include "../helper/misc.h"
-#include "../helper/xml.h"
-#include "../helper/math.h"
+#include "../../settings.h"
+#include "helper/string.h"
+#include "helper/misc.h"
+#include "helper/xml.h"
+#include "helper/math.h"
 //#include "../data/export.h"
 
 #include <QtGui/QPainter>
@@ -1060,7 +1060,7 @@ void ResoDlg::showEvent(QShowEvent *event)
 		return 0;
 	}
 
-	#include "../subwnd.moc"
+	#include "../../subwnd.moc"
 #endif
 
 #include "ResoDlg.moc"

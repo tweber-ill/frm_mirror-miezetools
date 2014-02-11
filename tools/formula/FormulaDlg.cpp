@@ -6,12 +6,12 @@
 
 #include "FormulaDlg.h"
 #include <boost/units/io.hpp>
-#include "../helper/mieze.hpp"
-#include "../helper/string.h"
-#include "../helper/math.h"
-#include "../helper/misc.h"
-#include "../settings.h"
-#include "../data/export.h"
+#include "helper/mieze.hpp"
+#include "helper/string.h"
+#include "helper/math.h"
+#include "helper/misc.h"
+#include "../../settings.h"
+#include "../../data/export.h"
 
 #include <sstream>
 #include <iostream>
@@ -893,7 +893,7 @@ void FormulaDlg::accept()
 		return 0;
 	}
 
-	#include "../subwnd.moc"
+	#include "../../subwnd.moc"
 #endif
 
 

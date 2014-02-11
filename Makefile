@@ -120,14 +120,17 @@ FitDlg.o: dialogs/FitDlg.cpp dialogs/FitDlg.h
 ListDlg.o: dialogs/ListDlg.cpp dialogs/ListDlg.h
 	${CC} ${FLAGS} -c -o ListDlg.o dialogs/ListDlg.cpp
 
-ResoDlg.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
-	${CC} ${FLAGS} -c -o ResoDlg.o dialogs/ResoDlg.cpp
+ResoDlg.o: tools/res/ResoDlg.cpp tools/res/ResoDlg.h
+	${CC} ${FLAGS} -c -o ResoDlg.o tools/res/ResoDlg.cpp
 
-ResoDlg_prog.o: dialogs/ResoDlg.cpp dialogs/ResoDlg.h
-	${CC} ${FLAGS} -c -DSTANDALONE_RESO -o ResoDlg_prog.o dialogs/ResoDlg.cpp
+ResoDlg_prog.o: tools/res/ResoDlg.cpp tools/res/ResoDlg.h
+	${CC} ${FLAGS} -c -DSTANDALONE_RESO -o ResoDlg_prog.o tools/res/ResoDlg.cpp
 
-FormulaDlg_prog.o: dialogs/FormulaDlg.cpp dialogs/FormulaDlg.h
-	${CC} ${FLAGS} -c -DSTANDALONE_FORMULA -o FormulaDlg_prog.o dialogs/FormulaDlg.cpp
+FormulaDlg.o: tools/formula/FormulaDlg.cpp tools/formula/FormulaDlg.h
+	${CC} ${FLAGS} -c -o FormulaDlg.o tools/formula/FormulaDlg.cpp
+
+FormulaDlg_prog.o: tools/formula/FormulaDlg.cpp tools/formula/FormulaDlg.h
+	${CC} ${FLAGS} -c -DSTANDALONE_FORMULA -o FormulaDlg_prog.o tools/formula/FormulaDlg.cpp
 
 taz_prog.o: tools/taz/taz.cpp tools/taz/taz.h
 	${CC} ${FLAGS} -c -DSTANDALONE_TAZ -o taz_prog.o tools/taz/taz.cpp
@@ -149,9 +152,6 @@ SettingsDlg.o: dialogs/SettingsDlg.cpp dialogs/SettingsDlg.h
 
 RadialIntDlg.o: dialogs/RadialIntDlg.cpp dialogs/RadialIntDlg.h
 	${CC} ${FLAGS} -c -o RadialIntDlg.o dialogs/RadialIntDlg.cpp
-
-FormulaDlg.o: dialogs/FormulaDlg.cpp dialogs/FormulaDlg.h
-	${CC} ${FLAGS} -c -o FormulaDlg.o dialogs/FormulaDlg.cpp
 
 LatticeDlg.o: dialogs/LatticeDlg.cpp dialogs/LatticeDlg.h
 	${CC} ${FLAGS} -c -o LatticeDlg.o dialogs/LatticeDlg.cpp

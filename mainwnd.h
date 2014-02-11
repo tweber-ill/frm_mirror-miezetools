@@ -26,16 +26,19 @@
 #include "dialogs/CombineDlg.h"
 #include "dialogs/RoiDlg.h"
 #include "dialogs/FitDlg.h"
-#include "dialogs/ResoDlg.h"
 #include "dialogs/PsdPhaseDlg.h"
 #include "dialogs/RadialIntDlg.h"
-#include "dialogs/FormulaDlg.h"
-#include "dialogs/LatticeDlg.h"
+//#include "dialogs/LatticeDlg.h"
 #include "dialogs/PlotPropDlg.h"
 #include "dialogs/RebinDlg.h"
 #include "dialogs/ExportDlg.h"
 #include "dialogs/InfoDock.h"
 #include "dialogs/NormDlg.h"
+
+#include "tools/formula/FormulaDlg.h"
+#include "tools/res/ResoDlg.h"
+#include "tools/taz/taz.h"
+
 
 #define MAX_RECENT_FILES 32
 #define WND_TITLE "Cattus, a MIEZE toolset"
@@ -67,7 +70,8 @@ protected:
 	RebinDlg *m_prebindlg;
 	ExportDlg *m_pexportdlg;
 	NormDlg *m_pnormdlg;
-	LatticeDlg *m_platticedlg;
+	//LatticeDlg *m_platticedlg;
+	TazDlg *m_pTazDlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);
@@ -157,7 +161,8 @@ protected slots:
 	void ShowPSDPhaseCorr();
 	void CalcPSDPhases();
 	void ShowFormulas();
-	void ShowLatticeCalc();
+	//void ShowLatticeCalc();
+	void ShowTaz();
 
 	void ShowAbout();
 	void ShowBrowser();

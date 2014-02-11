@@ -10,8 +10,8 @@
 #include <QtGui/QDialog>
 #include <vector>
 #include <string>
-#include "../ui/ui_formulas.h"
-#include "../plot/plot.h"
+#include "ui/ui_formulas.h"
+#include "../../plot/plot.h"
 
 
 class FormulaDlg : public QDialog, Ui::FormulaDlg

@@ -45,8 +45,8 @@ moc dialogs/ExportDlg.h -o dialogs/ExportDlg.moc
 moc dialogs/InfoDock.h -o dialogs/InfoDock.moc
 moc dialogs/NormDlg.h -o dialogs/NormDlg.moc
 
-moc dialogs/ResoDlg.h -o dialogs/ResoDlg.moc
-moc dialogs/FormulaDlg.h -o dialogs/FormulaDlg.moc
+moc tools/res/ResoDlg.h -o tools/res/ResoDlg.moc
+moc tools/formula/FormulaDlg.h -o tools/formula/FormulaDlg.moc
 moc tools/taz/taz.h -o tools/taz/taz.moc
 
 echo -e "\n"

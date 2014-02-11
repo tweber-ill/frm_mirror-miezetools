@@ -12,13 +12,13 @@
 #include <vector>
 #include <string>
 
-#include "../ui/ui_reso.h"
-#include "../tools/res/cn.h"
-#include "../tools/res/pop.h"
-#include "../helper/linalg.h"
-#include "../plot/plot.h"
-#include "../plot/plotgl.h"
-#include "../tools/res/ellipse.h"
+#include "ui/ui_reso.h"
+#include "cn.h"
+#include "pop.h"
+#include "helper/linalg.h"
+#include "../../plot/plot.h"
+#include "../../plot/plotgl.h"
+#include "ellipse.h"
 
 
 class EllipseDlg : public QDialog
