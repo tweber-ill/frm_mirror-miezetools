@@ -8,10 +8,10 @@
 Debug/*
 Release/*
 ui/*.h
-./cattus
-./reso
-./taz
-./formula
+bin/cattus
+bin/reso
+bin/taz
+bin/formula
 script/hermelin
 perf.data
 perf.data.old
