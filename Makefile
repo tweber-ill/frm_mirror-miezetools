@@ -32,7 +32,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o obj/ellipse.o \
 	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o obj/taz.o \
-	obj/scattering_triangle.o
+	obj/scattering_triangle.o obj/lattice.o
 	${CC} ${FLAGS} -o bin/cattus obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o \
 			obj/mainwnd_mdi.o obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o \
 			obj/data3.o obj/data4.o obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o \
@@ -45,7 +45,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 			obj/interpolation.o obj/ellipse.o obj/linalg.o obj/blob.o obj/export.o \
 			obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o obj/rand.o obj/InfoDock.o \
 			obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o \
-			obj/taz.o obj/scattering_triangle.o \
+			obj/taz.o obj/scattering_triangle.o obj/lattice.o \
 			${LIBS}
 	strip bin/cattus
 
@@ -59,8 +59,8 @@ reso: obj/settings.o obj/data.o obj/data1.o obj/ResoDlg_prog.o obj/string.o obj/
 			${LIBS_RESO}
 	strip bin/reso
 
-taz: obj/taz_prog.o obj/scattering_triangle.o
-	${CC} ${FLAGS} -o bin/taz obj/taz_prog.o obj/scattering_triangle.o \
+taz: obj/taz_prog.o obj/scattering_triangle.o obj/lattice.o
+	${CC} ${FLAGS} -o bin/taz obj/taz_prog.o obj/scattering_triangle.o obj/lattice.o \
 			${LIBS_TAZ}
 	strip bin/taz
 
@@ -192,6 +192,9 @@ obj/xml.o: helper/xml.cpp helper/xml.h
 
 obj/linalg.o: helper/linalg.cpp helper/linalg.h
 	${CC} ${FLAGS} -c -o obj/linalg.o helper/linalg.cpp
+
+obj/lattice.o: helper/lattice.cpp helper/lattice.h
+	${CC} ${FLAGS} -c -o obj/lattice.o helper/lattice.cpp
 
 obj/blob.o: helper/blob.cpp helper/blob.h
 	${CC} ${FLAGS} -c -o obj/blob.o helper/blob.cpp
