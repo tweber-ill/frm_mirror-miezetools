@@ -49,26 +49,26 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 			${LIBS}
 	strip bin/cattus
 
-reso: obj/settings.o obj/data.o obj/data1.o obj/ResoDlg_prog.o obj/string.o obj/xml.o \
+reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml.o \
 	obj/plot_nopars.o obj/cn.o obj/pop.o obj/ellipse.o obj/roi.o obj/plotgl.o \
-	obj/linalg.o obj/blob.o obj/comp.o
-	${CC} ${FLAGS} -o bin/reso obj/settings.o obj/data.o obj/data1.o obj/ResoDlg_prog.o \
+	obj/linalg.o obj/blob.o obj/comp.o obj/ResoDlg.o
+	${CC} ${FLAGS} -o bin/reso obj/settings.o obj/data.o obj/data1.o obj/reso_main.o \
 			obj/string.o obj/xml.o obj/plot_nopars.o obj/cn.o obj/pop.o \
 			obj/ellipse.o obj/roi.o obj/plotgl.o obj/linalg.o obj/blob.o \
-			obj/comp.o \
+			obj/comp.o obj/ResoDlg.o \
 			${LIBS_RESO}
 	strip bin/reso
 
-taz: obj/taz_prog.o obj/scattering_triangle.o obj/lattice.o
-	${CC} ${FLAGS} -o bin/taz obj/taz_prog.o obj/scattering_triangle.o obj/lattice.o \
+taz: obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/lattice.o
+	${CC} ${FLAGS} -o bin/taz obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/lattice.o \
 			${LIBS_TAZ}
 	strip bin/taz
 
-formula: obj/FormulaDlg_prog.o obj/formulas.o obj/string.o obj/settings.o obj/plot_nopars.o \
+formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/string.o obj/settings.o obj/plot_nopars.o \
 	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/comp.o obj/export.o obj/data2.o
-	${CC} ${FLAGS} -o bin/formula obj/FormulaDlg_prog.o obj/formulas.o obj/string.o obj/settings.o \
+	${CC} ${FLAGS} -o bin/formula obj/FormulaDlg.o obj/formulas.o obj/string.o obj/settings.o \
 			obj/plot_nopars.o obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o \
-			obj/comp.o obj/export.o obj/data2.o \
+			obj/comp.o obj/export.o obj/data2.o obj/formula_main.o \
 			${LIBS_FORMULA}
 	strip bin/formula
 
@@ -132,17 +132,17 @@ obj/ListDlg.o: dialogs/ListDlg.cpp dialogs/ListDlg.h
 obj/ResoDlg.o: tools/res/ResoDlg.cpp tools/res/ResoDlg.h
 	${CC} ${FLAGS} -c -o obj/ResoDlg.o tools/res/ResoDlg.cpp
 
-obj/ResoDlg_prog.o: tools/res/ResoDlg.cpp tools/res/ResoDlg.h
-	${CC} ${FLAGS} -c -DSTANDALONE_RESO -o obj/ResoDlg_prog.o tools/res/ResoDlg.cpp
+obj/reso_main.o: tools/res/reso_main.cpp tools/res/ResoDlg.h
+	${CC} ${FLAGS} -c -o obj/reso_main.o tools/res/reso_main.cpp
 
 obj/FormulaDlg.o: tools/formula/FormulaDlg.cpp tools/formula/FormulaDlg.h
 	${CC} ${FLAGS} -c -o obj/FormulaDlg.o tools/formula/FormulaDlg.cpp
 
-obj/FormulaDlg_prog.o: tools/formula/FormulaDlg.cpp tools/formula/FormulaDlg.h
-	${CC} ${FLAGS} -c -DSTANDALONE_FORMULA -o obj/FormulaDlg_prog.o tools/formula/FormulaDlg.cpp
+obj/formula_main.o: tools/formula/formula_main.cpp tools/formula/FormulaDlg.h
+	${CC} ${FLAGS} -c -o obj/formula_main.o tools/formula/formula_main.cpp
 
-obj/taz_prog.o: tools/taz/taz.cpp tools/taz/taz.h
-	${CC} ${FLAGS} -c -DSTANDALONE_TAZ -o obj/taz_prog.o tools/taz/taz.cpp
+obj/taz_main.o: tools/taz/taz_main.cpp tools/taz/taz.h
+	${CC} ${FLAGS} -c -o obj/taz_main.o tools/taz/taz_main.cpp
 
 obj/taz.o: tools/taz/taz.cpp tools/taz/taz.h
 	${CC} ${FLAGS} -c -o obj/taz.o tools/taz/taz.cpp
