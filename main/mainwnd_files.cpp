@@ -6,15 +6,15 @@
  */
 
 #include "mainwnd.h"
-#include "dialogs/ComboDlg.h"
-#include "helper/string.h"
-#include "helper/misc.h"
-#include "helper/comp.h"
-#include "helper/file.h"
+#include "../dialogs/ComboDlg.h"
+#include "../helper/string.h"
+#include "../helper/misc.h"
+#include "../helper/comp.h"
+#include "../helper/file.h"
 #include "settings.h"
-#include "loader/loadtxt.h"
-#include "loader/loadnicos.h"
-#include "loader/loadcasc.h"
+#include "../loader/loadtxt.h"
+#include "../loader/loadnicos.h"
+#include "../loader/loadcasc.h"
 
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMessageBox>
@@ -22,7 +22,7 @@
 #include <QtCore/QSignalMapper>
 #include <QtCore/QTemporaryFile>
 
-#include "data/export.h"
+#include "../data/export.h"
 
 #include <fstream>
 

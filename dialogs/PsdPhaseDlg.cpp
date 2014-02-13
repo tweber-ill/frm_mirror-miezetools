@@ -11,7 +11,7 @@
 
 #include "PsdPhaseDlg.h"
 #include "ListDlg.h"
-#include "../settings.h"
+#include "../main/settings.h"
 
 #include "../helper/mieze.hpp"
 #include "../helper/fourier.h"

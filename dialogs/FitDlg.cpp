@@ -22,7 +22,7 @@
 #include "../plot/plot3d.h"
 #include "../plot/plot4d.h"
 
-#include "../settings.h"
+#include "../main/settings.h"
 
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMessageBox>

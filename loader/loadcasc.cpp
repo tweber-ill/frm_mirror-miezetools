@@ -6,7 +6,7 @@
  */
 
 #include "loadcasc.h"
-#include "../settings.h"
+#include "../main/settings.h"
 
 #include <QtCore/QVector>
 #include <QtCore/QList>

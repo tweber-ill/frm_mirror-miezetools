@@ -6,7 +6,7 @@
  */
 
 #include "mainwnd.h"
-#include "helper/string.h"
+#include "../helper/string.h"
 #include "settings.h"
 
 #include <QtGui/QMdiSubWindow>

@@ -10,7 +10,7 @@
 #include "helper/string.h"
 #include "helper/math.h"
 #include "helper/misc.h"
-#include "../../settings.h"
+#include "../../main/settings.h"
 #include "../../data/export.h"
 
 #include <sstream>

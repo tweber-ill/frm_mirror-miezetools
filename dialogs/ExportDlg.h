@@ -12,7 +12,7 @@
 #include <QtGui/QMdiArea>
 
 #include "../ui/ui_export.h"
-#include "../subwnd.h"
+#include "../main/subwnd.h"
 
 
 class ExportDlg : public QDialog, Ui::ExportDlg

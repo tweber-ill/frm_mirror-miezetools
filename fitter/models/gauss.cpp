@@ -22,7 +22,7 @@
 #include "../../helper/math.h"
 #include "interpolation.h"
 
-#include "../../settings.h"
+#include "../../main/settings.h"
 
 
 //----------------------------------------------------------------------

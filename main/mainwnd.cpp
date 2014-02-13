@@ -22,22 +22,22 @@
 
 #include "settings.h"
 
-#include "helper/string.h"
-#include "helper/file.h"
-#include "helper/misc.h"
-#include "helper/mieze.hpp"
-#include "helper/xml.h"
+#include "../helper/string.h"
+#include "../helper/file.h"
+#include "../helper/misc.h"
+#include "../helper/mieze.hpp"
+#include "../helper/xml.h"
 
-#include "dialogs/ListDlg.h"
-#include "dialogs/SettingsDlg.h"
-#include "dialogs/AboutDlg.h"
-#include "dialogs/ComboDlg.h"
+#include "../dialogs/ListDlg.h"
+#include "../dialogs/SettingsDlg.h"
+#include "../dialogs/AboutDlg.h"
+#include "../dialogs/ComboDlg.h"
 
-#include "fitter/models/msin.h"
-#include "fitter/models/gauss.h"
-#include "fitter/models/interpolation.h"
+#include "../fitter/models/msin.h"
+#include "../fitter/models/gauss.h"
+#include "../fitter/models/interpolation.h"
 
-#include "data/export.h"
+#include "../data/export.h"
 
 
 
@@ -1089,4 +1089,4 @@ void MiezeMainWnd::RebinTriggered()
 
 #include "mainwnd.moc"
 #include "subwnd.moc"
-#include "dialogs/AboutDlg.moc"
+#include "../dialogs/AboutDlg.moc"

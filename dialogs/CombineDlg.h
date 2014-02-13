@@ -10,7 +10,7 @@
 #include <QtGui/QDialog>
 #include <list>
 #include "../ui/ui_combine_graphs.h"
-#include "../subwnd.h"
+#include "../main/subwnd.h"
 #include "../plot/plot.h"
 
 class CombineGraphsDlg : public QDialog, Ui::CombineDlg

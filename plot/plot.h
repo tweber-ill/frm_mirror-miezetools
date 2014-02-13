@@ -19,7 +19,7 @@
 	#include <QtGnuplotWidget.h>
 #endif
 
-#include "../subwnd.h"
+#include "../main/subwnd.h"
 #include "../data/data.h"
 #include "../fitter/fitter.h"
 #include "../helper/string.h"

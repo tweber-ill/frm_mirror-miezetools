@@ -20,7 +20,7 @@
 #endif
 
 
-#include "../subwnd.h"
+#include "../main/subwnd.h"
 #include "../data/data.h"
 #include "../roi/roi.h"
 

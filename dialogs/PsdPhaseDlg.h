@@ -14,7 +14,7 @@
 #include <vector>
 #include <string>
 
-#include "../subwnd.h"
+#include "../main/subwnd.h"
 #include "../ui/ui_psd_phase.h"
 #include "../ui/ui_psd_phase_corr.h"
 #include "../plot/plot2d.h"

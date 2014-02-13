@@ -5,7 +5,7 @@
  */
 
 #include "RoiDlg.h"
-#include "../settings.h"
+#include "../main/settings.h"
 #include "../helper/string.h"
 
 #include <QtGui/QMenu>

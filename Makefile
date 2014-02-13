@@ -73,26 +73,26 @@ formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/string.o obj/set
 	strip bin/formula
 
 
-obj/main.o: main.cpp
-	${CC} ${FLAGS} -c -o obj/main.o main.cpp
+obj/main.o: main/main.cpp
+	${CC} ${FLAGS} -c -o obj/main.o main/main.cpp
 
-obj/mainwnd.o: mainwnd.cpp mainwnd.h
-	${CC} ${FLAGS} -c -o obj/mainwnd.o mainwnd.cpp
+obj/mainwnd.o: main/mainwnd.cpp main/mainwnd.h
+	${CC} ${FLAGS} -c -o obj/mainwnd.o main/mainwnd.cpp
 
-obj/mainwnd_files.o: mainwnd_files.cpp mainwnd.h
-	${CC} ${FLAGS} -c -o obj/mainwnd_files.o mainwnd_files.cpp
+obj/mainwnd_files.o: main/mainwnd_files.cpp main/mainwnd.h
+	${CC} ${FLAGS} -c -o obj/mainwnd_files.o main/mainwnd_files.cpp
 
-obj/mainwnd_session.o: mainwnd_session.cpp mainwnd.h
-	${CC} ${FLAGS} -c -o obj/mainwnd_session.o mainwnd_session.cpp
+obj/mainwnd_session.o: main/mainwnd_session.cpp main/mainwnd.h
+	${CC} ${FLAGS} -c -o obj/mainwnd_session.o main/mainwnd_session.cpp
 
-obj/mainwnd_mdi.o: mainwnd_mdi.cpp mainwnd.h
-	${CC} ${FLAGS} -c -o obj/mainwnd_mdi.o mainwnd_mdi.cpp
+obj/mainwnd_mdi.o: main/mainwnd_mdi.cpp main/mainwnd.h
+	${CC} ${FLAGS} -c -o obj/mainwnd_mdi.o main/mainwnd_mdi.cpp
 
-obj/subwnd.o: subwnd.cpp subwnd.h
-	${CC} ${FLAGS} -c -o obj/subwnd.o subwnd.cpp
+obj/subwnd.o: main/subwnd.cpp main/subwnd.h
+	${CC} ${FLAGS} -c -o obj/subwnd.o main/subwnd.cpp
 
-obj/settings.o: settings.cpp settings.h
-	${CC} ${FLAGS} -c -o obj/settings.o settings.cpp
+obj/settings.o: main/settings.cpp main/settings.h
+	${CC} ${FLAGS} -c -o obj/settings.o main/settings.cpp
 
 
 obj/data.o: data/data.cpp data/data.h

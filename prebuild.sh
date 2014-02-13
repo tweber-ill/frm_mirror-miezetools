@@ -21,8 +21,8 @@ echo -e "\n"
 
 echo -e "building mocs..."
 
-moc mainwnd.h -o mainwnd.moc
-moc subwnd.h -o subwnd.moc
+moc main/mainwnd.h -o main/mainwnd.moc
+moc main/subwnd.h -o main/subwnd.moc
 
 moc plot/plot.h -o plot/plot.moc
 moc plot/plot2d.h -o plot/plot2d.moc

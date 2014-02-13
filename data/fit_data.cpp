@@ -13,7 +13,7 @@
 #include "../helper/math.h"
 #include "../helper/mieze.hpp"
 #include "../helper/fourier.h"
-#include "../settings.h"
+#include "../main/settings.h"
 
 bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt)
 {

@@ -11,10 +11,10 @@
 #include <QtGui/QWidget>
 #include <string>
 #include <iostream>
-#include "roi/roi.h"
-#include "helper/xml.h"
-#include "helper/blob.h"
-#include "helper/string.h"
+#include "../roi/roi.h"
+#include "../helper/xml.h"
+#include "../helper/blob.h"
+#include "../helper/string.h"
 
 class DataInterface;
 class Plot;

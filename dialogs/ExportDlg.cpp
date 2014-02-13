@@ -7,7 +7,7 @@
 #include "ExportDlg.h"
 #include "ListDlg.h"
 #include "../helper/string.h"
-#include "../settings.h"
+#include "../main/settings.h"
 #include "../data/export.h"
 
 #include <set>

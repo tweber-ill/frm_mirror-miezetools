@@ -17,7 +17,7 @@
 #include "../helper/mieze.hpp"
 #include "../data/fit_data.h"
 #include "../fitter/models/msin.h"
-#include "../settings.h"
+#include "../main/settings.h"
 
 
 Plot4d::Plot4d(QWidget* pParent, const char* pcTitle,  bool bCountData)

@@ -11,8 +11,8 @@
 #include <fstream>
 #include <string>
 
-#include "helper/string.h"
-#include "helper/rand.h"
+#include "../helper/string.h"
+#include "../helper/rand.h"
 
 #ifdef Q_WS_X11
 //#include <X11/Xlib.h>
@@ -22,7 +22,7 @@ extern "C" int XInitThreads();
 #include "mainwnd.h"
 #include "settings.h"
 
-#include "dialogs/SettingsDlg.h"
+#include "../dialogs/SettingsDlg.h"
 
 extern void init_formulas();
 
