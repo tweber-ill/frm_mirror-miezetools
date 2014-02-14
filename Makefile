@@ -32,7 +32,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o obj/ellipse.o \
 	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o obj/taz.o \
-	obj/scattering_triangle.o obj/lattice.o
+	obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o
 	${CC} ${FLAGS} -o bin/cattus obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o \
 			obj/mainwnd_mdi.o obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o \
 			obj/data3.o obj/data4.o obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o \
@@ -45,7 +45,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 			obj/interpolation.o obj/ellipse.o obj/linalg.o obj/blob.o obj/export.o \
 			obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o obj/rand.o obj/InfoDock.o \
 			obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o \
-			obj/taz.o obj/scattering_triangle.o obj/lattice.o \
+			obj/taz.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o \
 			${LIBS}
 	strip bin/cattus
 
@@ -59,8 +59,9 @@ reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml
 			${LIBS_RESO}
 	strip bin/reso
 
-taz: obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/lattice.o
-	${CC} ${FLAGS} -o bin/taz obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/lattice.o \
+taz: obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o
+	${CC} ${FLAGS} -o bin/taz obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o \
+			obj/lattice.o \
 			${LIBS_TAZ}
 	strip bin/taz
 
@@ -149,6 +150,9 @@ obj/taz.o: tools/taz/taz.cpp tools/taz/taz.h
 
 obj/scattering_triangle.o: tools/taz/scattering_triangle.cpp tools/taz/scattering_triangle.h
 	${CC} ${FLAGS} -c -o obj/scattering_triangle.o tools/taz/scattering_triangle.cpp
+
+obj/tas_layout.o: tools/taz/tas_layout.cpp tools/taz/tas_layout.h
+	${CC} ${FLAGS} -c -o obj/tas_layout.o tools/taz/tas_layout.cpp
 
 obj/PsdPhaseDlg.o: dialogs/PsdPhaseDlg.cpp dialogs/PsdPhaseDlg.h
 	${CC} ${FLAGS} -c -o obj/PsdPhaseDlg.o dialogs/PsdPhaseDlg.cpp
