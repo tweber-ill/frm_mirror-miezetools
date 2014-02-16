@@ -48,5 +48,7 @@ moc dialogs/NormDlg.h -o dialogs/NormDlg.moc
 moc tools/res/ResoDlg.h -o tools/res/ResoDlg.moc
 moc tools/formula/FormulaDlg.h -o tools/formula/FormulaDlg.moc
 moc tools/taz/taz.h -o tools/taz/taz.moc
+moc tools/taz/scattering_triangle.h -o tools/taz/scattering_triangle.moc
+moc tools/taz/tas_layout.h -o tools/taz/tas_layout.moc
 
 echo -e "\n"
