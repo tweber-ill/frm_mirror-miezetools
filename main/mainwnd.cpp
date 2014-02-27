@@ -357,6 +357,10 @@ MiezeMainWnd::MiezeMainWnd()
 	pReso->setText("Resolution...");
 	pMenuCalc->addAction(pReso);
 
+	QAction *pTaz = new QAction(this);
+	pTaz->setText("TAS Layout...");
+	pMenuCalc->addAction(pTaz);
+
 
 	pMenuCalc->addSeparator();
 
@@ -369,9 +373,6 @@ MiezeMainWnd::MiezeMainWnd()
 	pLattice->setText("Lattice...");
 	pMenuCalc->addAction(pLattice);*/
 
-	QAction *pTaz = new QAction(this);
-	pTaz->setText("TAS Layout...");
-	pMenuCalc->addAction(pTaz);
 
 	QAction *pPSDPhase = new QAction(this);
 	pPSDPhase->setText("Flat PSD Phases...");
