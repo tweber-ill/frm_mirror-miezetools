@@ -302,6 +302,7 @@ obj/interpolation.o: fitter/models/interpolation.cpp fitter/models/interpolation
 
 clean:
 	find bin -regex 'bin/[_a-zA-Z0-9]*' | xargs rm -f
+	rm -f bin/*.exe
 	rm -f obj/*.o
 	rm -f ui/*.h
 	rm -f *.moc

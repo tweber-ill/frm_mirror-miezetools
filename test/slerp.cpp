@@ -20,7 +20,7 @@ T quat_angle(const quaternion<T>& q1, const quaternion<T>& q2)
 
 // see: http://run.usc.edu/cs520-s12/assign2/p245-shoemake.pdf
 template<typename T>
-quaternion<T> slerp(const quaternion<T>& q1, const quaternion<T>& q2, double t)
+quaternion<T> slerp(const quaternion<T>& q1, const quaternion<T>& q2, T t)
 {
 	T angle = quat_angle(q1, q2);
 
