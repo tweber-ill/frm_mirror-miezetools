@@ -159,7 +159,7 @@ bool RoiRect::IsInside(double dX, double dY) const
 	if(!float_equal(m_dAngle, 0.))
 	{
 		ublas::vector<double> vecCenter = m_bottomleft + (m_topright-m_bottomleft)*.5;
-		ublas::matrix<double> matRot_inv = ::rotation_matrix_2d<double>(-m_dAngle/180.*M_PI);
+		ublas::matrix<double> matRot_inv = ::rotation_matrix_2d(-m_dAngle/180.*M_PI);
 		vecPoint = ublas::prod(matRot_inv, (vecPoint-vecCenter)) + vecCenter;
 	}
 
@@ -250,7 +250,7 @@ ublas::vector<double> RoiRect::GetVertex(unsigned int i) const
 	}
 
 	ublas::vector<double> vecCenter = bottomleft + (topright-bottomleft)*.5;
-	ublas::matrix<double> matRot = ::rotation_matrix_2d<double>(m_dAngle / 180. * M_PI);
+	ublas::matrix<double> matRot = ::rotation_matrix_2d(m_dAngle / 180. * M_PI);
 
 	vecRet = ublas::prod(matRot, (vecRet-vecCenter)) + vecCenter;
 	return vecRet;
