@@ -2,12 +2,85 @@
 
 __init__()
 {
+	global mono_d = 3.355;
+	global ana_d = 3.355;
 }
 
+get_mono_tt(k, d)
+{
+	tt = 2.*asin(pi/(d*k));
+	return tt;
+}
 
+get_tt(ki, kf, Q)
+{
+	ttcos = (ki*ki + kf*kf - Q*Q) / (2.*ki*kf);
+	if(abs(ttcos) greater 1.)
+	{
+		print("Error: Scattering triangle not closed.");
+		exit(-1);
+	}
 
+	tt = acos(ttcos);
+	return tt;
+}
+
+lam2k(lam)
+{
+	return 2.*pi / lam;
+}
+
+k2E(k)
+{
+	k = k*1e10;
+
+	p = hbar*k;
+	E = p^2. / (2. * m_n);
+
+	E_meV = E/q_e * 1000.;
+	return E_meV;
+}
+
+E2k(E_meV)
+{
+	imag = 0;
+	if(E_meV less 0.)
+		imag = 1;
+
+	E = E_meV / 1000. * q_e;
+	E = abs(E);
+
+	p = sqrt(2.*m_n*E);
+	k = p / hbar;
+	return k / 1e10;
+}
 
 main()
 {
+	lam_i = real(input("lam_i [A] = "));
+	k_i = lam2k(lam_i);
+	E_i = k2E(k_i);
+	mono_tt = get_mono_tt(k_i, mono_d);
 
+	Q = real(input("Q [1/A] = "));
+	dE = real(input("dE [meV] = "));
+
+	E_f = E_i - dE;
+	k_f = E2k(E_f);	
+
+	tt = get_tt(k_i, k_f, Q);
+	ana_tt = get_mono_tt(k_f, ana_d);
+
+
+	print("\n" + "-"*80);
+	print("k_i = " + k_i + " 1/A");
+	print("E_i = " + E_i + " meV");
+
+	print("k_f = " + k_f + " 1/A");
+	print("E_f = " + E_f + " meV");
+
+	print("2theta_mono = " + mono_tt/pi*180. + " deg");
+	print("2theta_ana = " + ana_tt/pi*180. + " deg");
+	print("2theta_sample = " + tt/pi*180. + " deg");
+	print("-"*80);
 }
