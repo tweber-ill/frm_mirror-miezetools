@@ -118,7 +118,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "eV";
 		constant.strName = "1 electron volt";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -130,7 +130,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "h";
 		constant.strName = "Planck constant";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -142,7 +142,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "h";
 		constant.strName = "Planck constant";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -154,7 +154,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "hbar";
 		constant.strName = "Planck constant";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -166,7 +166,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "hbar";
 		constant.strName = "Planck constant";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -178,7 +178,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "m_n";
 		constant.strName = "Neutron mass";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -190,7 +190,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "g_n";
 		constant.strName = "Neutron g";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -202,7 +202,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "gamma_n";
 		constant.strName = "Neutron gyromagnetic ratio";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -226,7 +226,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "mu_n";
 		constant.strName = "Neutron magnetic moment";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -238,7 +238,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "mu_N";
 		constant.strName = "Nuclear magneton";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -250,7 +250,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "c";
 		constant.strName = "Vacuum speed of light";
-		constant.strVal = insert_before(ostrVal.str(), "(", "\n");
+		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}

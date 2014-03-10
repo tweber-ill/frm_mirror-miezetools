@@ -109,7 +109,7 @@ void SettingsDlg::SaveSettings()
 
 	std::string strStartIdx = editStartIndices->text().toStdString();
 	std::vector<unsigned int> vecIndices;
-	::get_tokens<unsigned int>(strStartIdx, ",; ", vecIndices);
+	::get_tokens<unsigned int>(strStartIdx, std::string(",; "), vecIndices);
 
 	QList<QVariant> lst;
 	for(unsigned int iIdx : vecIndices)

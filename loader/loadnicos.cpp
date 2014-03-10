@@ -17,7 +17,7 @@ void NicosData::FilterComments(LoadTxt::t_mapComm& mapComm)
 	{
 		const std::string& strKey = (*iter).first;
 
-		if(begins_with(strKey, "##"))
+		if(begins_with(strKey, std::string("##")))
 		{
 			mapComm.erase(iter);
 			iter = mapComm.begin();
@@ -33,9 +33,9 @@ NicosData::NicosData(const LoadTxt& data) : m_data(data), m_bOk(0)
 	const std::vector<std::string>& strAux = m_data.GetAuxStrings();
 
 	if(strAux.size() >= 1)
-		::get_tokens<std::string>(strAux[0], " \t", m_vecColNames);
+		::get_tokens<std::string>(strAux[0], std::string(" \t"), m_vecColNames);
 	if(strAux.size() >= 2)
-		::get_tokens<std::string>(strAux[1], " \t", m_vecColUnits);
+		::get_tokens<std::string>(strAux[1], std::string(" \t"), m_vecColUnits);
 
 	//for(auto str : m_vecColNames) std::cout << str << std::endl;
 	//for(auto str : m_vecColUnits) std::cout << str << std::endl;

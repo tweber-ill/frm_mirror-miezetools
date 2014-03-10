@@ -43,7 +43,7 @@ static void CalcRealRecip(const std::vector<QLineEdit*>& vecEditIn,
 						QLabel* pLabIn=0, QLabel* pLabOut=0, QLabel* pLabelStatus=0)
 {
 	std::vector<double> vecVals0;
-	get_tokens<double>(vecEditIn[0]->text().toStdString(), " ,;\t", vecVals0);
+	get_tokens<double, std::string>(vecEditIn[0]->text().toStdString(), " ,;\t", vecVals0);
 	unsigned int iDim = vecVals0.size();
 	const unsigned int iMaxDim = vecEditIn.size();
 	if(iDim > iMaxDim) iDim = iMaxDim;
@@ -72,7 +72,7 @@ static void CalcRealRecip(const std::vector<QLineEdit*>& vecEditIn,
 	{
 		std::string strVec = vecEditIn[iVec]->text().toStdString();
 		std::vector<double> vecVals;
-		get_tokens<double>(strVec, " ,;\t", vecVals);
+		get_tokens<double, std::string>(strVec, " ,;\t", vecVals);
 		while(vecVals.size() < iDim) vecVals.push_back(0.);
 
 		for(unsigned int iComp=0; iComp<iDim; ++iComp)

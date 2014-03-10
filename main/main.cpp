@@ -12,6 +12,7 @@
 #include <string>
 
 #include "../helper/string.h"
+#include "../helper/spec_char.h"
 #include "../helper/rand.h"
 
 #ifdef Q_WS_X11
@@ -55,12 +56,13 @@ int main(int argc, char **argv)
 #endif
 	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 
-	init_rand();
-	init_formulas();
-
 	int iRet = -1;
 	try
 	{
+		init_rand();
+		init_spec_chars();
+		init_formulas();
+
 		QSettings *pGlobals = Settings::GetGlobals();
 		QApplication a(argc, argv);
 		//std::cout << a.type() << std::endl;

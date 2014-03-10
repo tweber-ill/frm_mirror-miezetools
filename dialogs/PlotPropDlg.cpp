@@ -187,7 +187,7 @@ void PlotPropDlg::SaveSettings()
 
 			std::string strPhases = editPhases->text().toStdString();
 			std::vector<double> vecPhases;
-			::get_tokens<double>(strPhases, ",; ", vecPhases);
+			::get_tokens<double>(strPhases, std::string(",; "), vecPhases);
 
 			bool bHasPhases = (vecPhases.size() != 0);
 			dat4.SetHasPhases(bHasPhases);

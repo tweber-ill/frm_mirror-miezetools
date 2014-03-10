@@ -50,5 +50,6 @@ moc tools/formula/FormulaDlg.h -o tools/formula/FormulaDlg.moc
 moc tools/taz/taz.h -o tools/taz/taz.moc
 moc tools/taz/scattering_triangle.h -o tools/taz/scattering_triangle.moc
 moc tools/taz/tas_layout.h -o tools/taz/tas_layout.moc
+moc tools/taz/recip3d.h -o tools/taz/recip3d.moc
 
 echo -e "\n"

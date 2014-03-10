@@ -32,7 +32,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o obj/ellipse.o \
 	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o obj/taz.o \
-	obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o
+	obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o obj/recip3d.o obj/spec_char.o
 	${CC} ${FLAGS} -o bin/cattus obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o \
 			obj/mainwnd_mdi.o obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o \
 			obj/data3.o obj/data4.o obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o \
@@ -46,6 +46,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 			obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o obj/rand.o obj/InfoDock.o \
 			obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o \
 			obj/taz.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o \
+			obj/recip3d.o obj/spec_char.o \
 			${LIBS}
 	strip bin/cattus
 
@@ -59,9 +60,10 @@ reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml
 			${LIBS_RESO}
 	strip bin/reso
 
-taz: obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o
+taz: obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o obj/plotgl.o \
+	obj/recip3d.o obj/spec_char.o
 	${CC} ${FLAGS} -o bin/taz obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o \
-			obj/lattice.o \
+			obj/lattice.o obj/plotgl.o obj/recip3d.o obj/spec_char.o \
 			${LIBS_TAZ}
 	strip bin/taz
 
@@ -148,6 +150,9 @@ obj/taz_main.o: tools/taz/taz_main.cpp tools/taz/taz.h
 obj/taz.o: tools/taz/taz.cpp tools/taz/taz.h
 	${CC} ${FLAGS} -c -o obj/taz.o tools/taz/taz.cpp
 
+obj/recip3d.o: tools/taz/recip3d.cpp tools/taz/recip3d.h
+	${CC} ${FLAGS} -c -o obj/recip3d.o tools/taz/recip3d.cpp
+
 obj/scattering_triangle.o: tools/taz/scattering_triangle.cpp tools/taz/scattering_triangle.h
 	${CC} ${FLAGS} -c -o obj/scattering_triangle.o tools/taz/scattering_triangle.cpp
 
@@ -190,6 +195,9 @@ obj/fourier.o: helper/fourier.cpp helper/fourier.h
 
 obj/string.o: helper/string.cpp helper/string.h
 	${CC} ${FLAGS} -c -o obj/string.o helper/string.cpp
+
+obj/spec_char.o: helper/spec_char.cpp helper/spec_char.h
+	${CC} ${FLAGS} -c -o obj/spec_char.o helper/spec_char.cpp
 
 obj/xml.o: helper/xml.cpp helper/xml.h
 	${CC} ${FLAGS} -c -o obj/xml.o helper/xml.cpp

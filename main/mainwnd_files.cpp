@@ -57,7 +57,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 
 	std::string strFileNoDir = ::get_file(_strFile);
 
-	if(is_equal(strExt, "tof"))
+	if(is_equal(strExt, std::string("tof")))
 	{
 		TofFile tof(strFile.c_str());
 		if(!tof.IsOpen())
@@ -112,7 +112,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		AddSubWindow(pSWB);
 		pSWB->GetActualWidget()->RefreshPlot();*/
 	}
-	else if(is_equal(strExt, "pad"))
+	else if(is_equal(strExt, std::string("pad")))
 	{
 		PadFile pad(strFile.c_str());
 		if(!pad.IsOpen())
@@ -146,7 +146,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		AddSubWindow(pPlot);
 		pPlot->GetActualWidget()->RefreshPlot();
 	}
-	else if(is_equal(strExt, "dat") || is_equal(strExt, "sim"))
+	else if(is_equal(strExt, std::string("dat")) || is_equal(strExt, std::string("sim")))
 	{
 		LoadTxt * pdat = new LoadTxt();
 		if(!pdat->Load(strFile.c_str()))

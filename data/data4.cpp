@@ -390,7 +390,7 @@ bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_dTotal = xml.Query<double>((strBase+"total").c_str(), 0.);
 
 	std::string strPhases = xml.QueryString((strBase+"phases").c_str(), "");
-	::get_tokens<double>(strPhases, ",; ", m_vecPhases);
+	::get_tokens<double>(strPhases, std::string(",; "), m_vecPhases);
 
 	return DataInterface::LoadXML(xml, blob, strBase);;
 }
