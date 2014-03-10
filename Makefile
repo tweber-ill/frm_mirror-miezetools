@@ -52,11 +52,11 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 
 reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml.o \
 	obj/plot_nopars.o obj/cn.o obj/pop.o obj/ellipse.o obj/roi.o obj/plotgl.o \
-	obj/linalg.o obj/blob.o obj/comp.o obj/ResoDlg.o
+	obj/linalg.o obj/blob.o obj/comp.o obj/ResoDlg.o obj/spec_char.o
 	${CC} ${FLAGS} -o bin/reso obj/settings.o obj/data.o obj/data1.o obj/reso_main.o \
 			obj/string.o obj/xml.o obj/plot_nopars.o obj/cn.o obj/pop.o \
 			obj/ellipse.o obj/roi.o obj/plotgl.o obj/linalg.o obj/blob.o \
-			obj/comp.o obj/ResoDlg.o \
+			obj/comp.o obj/ResoDlg.o obj/spec_char.o \
 			${LIBS_RESO}
 	strip bin/reso
 
