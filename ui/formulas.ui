@@ -72,7 +72,7 @@
           <item row="1" column="0">
            <widget class="QRadioButton" name="radioBraggDirLam">
             <property name="text">
-             <string>lambda:</string>
+             <string>λ:</string>
             </property>
            </widget>
           </item>
@@ -86,7 +86,7 @@
           <item row="3" column="0">
            <widget class="QRadioButton" name="radioBraggDirTT">
             <property name="text">
-             <string>2 theta:</string>
+             <string>2θ:</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -136,7 +136,7 @@
           <item row="1" column="0">
            <widget class="QRadioButton" name="radioBraggReciLam">
             <property name="text">
-             <string>lambda:</string>
+             <string>λ:</string>
             </property>
            </widget>
           </item>
@@ -150,7 +150,7 @@
           <item row="3" column="0">
            <widget class="QRadioButton" name="radioBraggReciTT">
             <property name="text">
-             <string>2 theta:</string>
+             <string>2θ:</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -179,7 +179,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>lambda:</string>
+             <string>λ:</string>
             </property>
            </widget>
           </item>
@@ -402,7 +402,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>lambda (A):</string>
+          <string>λ (Å):</string>
          </property>
         </widget>
        </item>
@@ -416,7 +416,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_12">
          <property name="text">
-          <string>Scattering angle (deg):</string>
+          <string>Scattering Angle (deg):</string>
          </property>
         </widget>
        </item>
@@ -478,7 +478,7 @@
        <item row="3" column="0">
         <widget class="QLabel" name="label_13">
          <property name="text">
-          <string>Q Range (1/A):</string>
+          <string>Q Range (Å⁻¹):</string>
          </property>
         </widget>
        </item>
@@ -573,7 +573,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_15">
          <property name="text">
-          <string>Lattice Constant (A):</string>
+          <string>Lattice Constant (Å):</string>
          </property>
         </widget>
        </item>
@@ -618,7 +618,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_16">
          <property name="text">
-          <string>Neutron Wavelength (A):</string>
+          <string>Neutron Wavelength (Å):</string>
          </property>
         </widget>
        </item>
@@ -718,7 +718,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_23">
          <property name="text">
-          <string>Q Range (1/A):</string>
+          <string>Q Range (Å⁻¹):</string>
          </property>
         </widget>
        </item>
