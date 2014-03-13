@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include "../helper/string.h"
+#include "../helper/string_map.h"
 
 
 class PadFile

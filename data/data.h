@@ -21,6 +21,7 @@ namespace ublas = boost::numeric::ublas;
 #include "../helper/xml.h"
 #include "../helper/blob.h"
 #include "../helper/string.h"
+#include "../helper/string_map.h"
 
 enum DataType
 {

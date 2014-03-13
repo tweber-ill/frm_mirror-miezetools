@@ -15,6 +15,7 @@
 
 #include "../ui/ui_infos.h"
 #include "../helper/string.h"
+#include "../helper/string_map.h"
 
 
 class InfoWidget : public QWidget, public Ui::InfoWidget

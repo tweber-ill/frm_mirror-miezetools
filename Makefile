@@ -32,7 +32,8 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o obj/ellipse.o \
 	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o obj/taz.o \
-	obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o obj/recip3d.o obj/spec_char.o
+	obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o obj/recip3d.o obj/spec_char.o \
+	obj/string_map.o
 	${CC} ${FLAGS} -o bin/cattus obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o \
 			obj/mainwnd_mdi.o obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o \
 			obj/data3.o obj/data4.o obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o \
@@ -46,32 +47,33 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 			obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o obj/rand.o obj/InfoDock.o \
 			obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o \
 			obj/taz.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o \
-			obj/recip3d.o obj/spec_char.o \
+			obj/recip3d.o obj/spec_char.o obj/string_map.o \
 			${LIBS}
 	strip bin/cattus
 
 reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml.o \
 	obj/plot_nopars.o obj/cn.o obj/pop.o obj/ellipse.o obj/roi.o obj/plotgl.o \
-	obj/linalg.o obj/blob.o obj/comp.o obj/ResoDlg.o obj/spec_char.o
+	obj/linalg.o obj/blob.o obj/comp.o obj/ResoDlg.o obj/spec_char.o obj/string_map.o
 	${CC} ${FLAGS} -o bin/reso obj/settings.o obj/data.o obj/data1.o obj/reso_main.o \
 			obj/string.o obj/xml.o obj/plot_nopars.o obj/cn.o obj/pop.o \
 			obj/ellipse.o obj/roi.o obj/plotgl.o obj/linalg.o obj/blob.o \
-			obj/comp.o obj/ResoDlg.o obj/spec_char.o \
+			obj/comp.o obj/ResoDlg.o obj/spec_char.o obj/string_map.o \
 			${LIBS_RESO}
 	strip bin/reso
 
 taz: obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o obj/plotgl.o \
-	obj/recip3d.o obj/spec_char.o
+	obj/recip3d.o obj/spec_char.o obj/string.o
 	${CC} ${FLAGS} -o bin/taz obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o \
-			obj/lattice.o obj/plotgl.o obj/recip3d.o obj/spec_char.o \
+			obj/lattice.o obj/plotgl.o obj/recip3d.o obj/spec_char.o obj/string.o \
 			${LIBS_TAZ}
 	strip bin/taz
 
 formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/string.o obj/settings.o obj/plot_nopars.o \
-	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/comp.o obj/export.o obj/data2.o
+	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/comp.o obj/export.o obj/data2.o \
+	obj/string_map.o
 	${CC} ${FLAGS} -o bin/formula obj/FormulaDlg.o obj/formulas.o obj/string.o obj/settings.o \
 			obj/plot_nopars.o obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o \
-			obj/comp.o obj/export.o obj/data2.o obj/formula_main.o \
+			obj/comp.o obj/export.o obj/data2.o obj/formula_main.o obj/string_map.o \
 			${LIBS_FORMULA}
 	strip bin/formula
 
@@ -195,6 +197,9 @@ obj/fourier.o: helper/fourier.cpp helper/fourier.h
 
 obj/string.o: helper/string.cpp helper/string.h
 	${CC} ${FLAGS} -c -o obj/string.o helper/string.cpp
+
+obj/string_map.o: helper/string_map.cpp helper/string_map.h
+	${CC} ${FLAGS} -c -o obj/string_map.o helper/string_map.cpp
 
 obj/spec_char.o: helper/spec_char.cpp helper/spec_char.h
 	${CC} ${FLAGS} -c -o obj/spec_char.o helper/spec_char.cpp

@@ -15,6 +15,7 @@
 #include "../helper/xml.h"
 #include "../helper/blob.h"
 #include "../helper/string.h"
+#include "../helper/string_map.h"
 
 class DataInterface;
 class Plot;
