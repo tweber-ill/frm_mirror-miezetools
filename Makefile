@@ -62,9 +62,10 @@ reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml
 	strip bin/reso
 
 taz: obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o obj/plotgl.o \
-	obj/recip3d.o obj/spec_char.o obj/string.o
+	obj/recip3d.o obj/spec_char.o obj/string.o obj/xml.o
 	${CC} ${FLAGS} -o bin/taz obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o \
 			obj/lattice.o obj/plotgl.o obj/recip3d.o obj/spec_char.o obj/string.o \
+			obj/xml.o \
 			${LIBS_TAZ}
 	strip bin/taz
 
