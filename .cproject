@@ -5,12 +5,12 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.debug.321083479" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -86,18 +86,18 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.321083479.971258902" name="/" resourcePath="tools/taz/plot">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.217431196" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1562038791" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1734708344"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1828314290" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.744857616" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1840526087" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.145692831"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.701128003" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.841266968" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514"/>
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.321083479.305289461" name="/" resourcePath="tools/taz">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1194882511" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1369469127" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1734708344"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1037188643" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.495737549" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.416797601" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.145692831"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1236982447" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1383814079" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="tools/taz/plot|tools/formula/formula_main.cpp|tools/res/reso_main.cpp|tools/taz/taz_main.cpp|tools/formula/ui|tools/res/ui|tools/res/helper|tools/formula/helper|tools/taz/ui|tools/taz/helper|tools/plot_gpl|tools/red|sim|tools/misc|script|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tools/taz|tools/taz.bck|tools/taz/plot|tools/formula/formula_main.cpp|tools/res/reso_main.cpp|tools/taz/taz_main.cpp|tools/formula/ui|tools/res/ui|tools/res/helper|tools/formula/helper|tools/taz/ui|tools/taz/helper|tools/plot_gpl|tools/red|sim|tools/misc|script|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -107,12 +107,12 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.release.1616845256" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -185,18 +185,18 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.1616845256.159210193" name="/" resourcePath="tools/taz/plot">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.399515524" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.23068721" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1060114624"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1492257391" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1863495447" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.338405548" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release.2100629918"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.213409537" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.346119555"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1566992579" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162"/>
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.1616845256.618693434" name="/" resourcePath="tools/taz">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.459667956" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.747883466" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1060114624"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.300101496" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.165214295" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.672239221" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release.2100629918"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.873900755" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.346119555"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1734393390" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="tools/taz/plot|tools/formula/formula_main.cpp|tools/res/reso_main.cpp|tools/taz/taz_main.cpp|tools/formula/ui|tools/res/ui|tools/res/helper|tools/formula/helper|tools/taz/ui|tools/taz/helper|tools/plot_gpl|tools/red|tools/misc|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tools/taz|tools/taz.bck|tools/taz/plot|tools/formula/formula_main.cpp|tools/res/reso_main.cpp|tools/taz/taz_main.cpp|tools/formula/ui|tools/res/ui|tools/res/helper|tools/formula/helper|tools/taz/ui|tools/taz/helper|tools/plot_gpl|tools/red|tools/misc|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

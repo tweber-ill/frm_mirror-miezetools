@@ -37,7 +37,6 @@
 
 #include "../tools/formula/FormulaDlg.h"
 #include "../tools/res/ResoDlg.h"
-#include "../tools/taz/taz.h"
 
 
 #define MAX_RECENT_FILES 32
@@ -71,7 +70,6 @@ protected:
 	ExportDlg *m_pexportdlg;
 	NormDlg *m_pnormdlg;
 	//LatticeDlg *m_platticedlg;
-	TazDlg *m_pTazDlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);

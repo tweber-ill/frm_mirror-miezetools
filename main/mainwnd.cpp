@@ -54,9 +54,7 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_pplotpropdlg(0),
 					  m_prebindlg(0),
 					  m_pexportdlg(0),
-					  m_pnormdlg(0),
-					  m_pTazDlg(0)/*,
-					  m_platticedlg(0)*/
+					  m_pnormdlg(0)
 {
 	this->setWindowIcon(QIcon("res/mainicon.png"));
 	this->setWindowTitle(WND_TITLE);
@@ -509,7 +507,6 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pradialintdlg) delete m_pradialintdlg;
 	if(m_pformuladlg) delete m_pformuladlg;
 	//if(m_platticedlg) delete m_platticedlg;
-	if(m_pTazDlg) delete m_pTazDlg;
 	if(m_pplotpropdlg) delete m_pplotpropdlg;
 	if(m_prebindlg) delete m_prebindlg;
 	if(m_pexportdlg) delete m_pexportdlg;
@@ -954,11 +951,7 @@ void MiezeMainWnd::ShowFormulas()
 
 void MiezeMainWnd::ShowTaz()
 {
-	if(!m_pTazDlg)
-		m_pTazDlg = new TazDlg(this);
-
-	m_pTazDlg->show();
-	m_pTazDlg->activateWindow();
+	std::cerr << "TODO: start external TAZ tool" << std::endl;
 }
 
 void MiezeMainWnd::ShowPSDPhaseCorr()

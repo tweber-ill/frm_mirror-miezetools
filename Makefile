@@ -17,7 +17,6 @@ QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns -lQtOpenGL \
 	-lGL -lGLU -lX11
 LIBS_RESO = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams-mt ${QT_LIBS} ${LAPACK_LIBS}
-LIBS_TAZ = -L/usr/lib64 -lstdc++ -lm ${QT_LIBS}
 LIBS_FORMULA = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams-mt ${QT_LIBS}
 LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams-mt ${MATH_LIBS} ${QT_LIBS} ${LAPACK_LIBS} ${MISC_LIBS} ${STD_LIBS}
 
@@ -31,9 +30,8 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/cn.o obj/pop.o obj/chi2.o obj/fitter.o obj/functions.o obj/parser.o obj/freefit.o \
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o obj/ellipse.o \
 	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
-	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o obj/taz.o \
-	obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o obj/recip3d.o obj/spec_char.o \
-	obj/string_map.o
+	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o \
+	obj/lattice.o obj/spec_char.o obj/string_map.o
 	${CC} ${FLAGS} -o bin/cattus obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o \
 			obj/mainwnd_mdi.o obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o \
 			obj/data3.o obj/data4.o obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o \
@@ -46,8 +44,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 			obj/interpolation.o obj/ellipse.o obj/linalg.o obj/blob.o obj/export.o \
 			obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o obj/rand.o obj/InfoDock.o \
 			obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o \
-			obj/taz.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o \
-			obj/recip3d.o obj/spec_char.o obj/string_map.o \
+			obj/lattice.o obj/spec_char.o obj/string_map.o \
 			${LIBS}
 	strip bin/cattus
 
@@ -61,13 +58,6 @@ reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml
 			${LIBS_RESO}
 	strip bin/reso
 
-taz: obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o obj/lattice.o obj/plotgl.o \
-	obj/recip3d.o obj/spec_char.o obj/string.o obj/xml.o
-	${CC} ${FLAGS} -o bin/taz obj/taz.o obj/taz_main.o obj/scattering_triangle.o obj/tas_layout.o \
-			obj/lattice.o obj/plotgl.o obj/recip3d.o obj/spec_char.o obj/string.o \
-			obj/xml.o \
-			${LIBS_TAZ}
-	strip bin/taz
 
 formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/string.o obj/settings.o obj/plot_nopars.o \
 	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/comp.o obj/export.o obj/data2.o \
@@ -146,21 +136,6 @@ obj/FormulaDlg.o: tools/formula/FormulaDlg.cpp tools/formula/FormulaDlg.h
 
 obj/formula_main.o: tools/formula/formula_main.cpp tools/formula/FormulaDlg.h
 	${CC} ${FLAGS} -c -o obj/formula_main.o tools/formula/formula_main.cpp
-
-obj/taz_main.o: tools/taz/taz_main.cpp tools/taz/taz.h
-	${CC} ${FLAGS} -c -o obj/taz_main.o tools/taz/taz_main.cpp
-
-obj/taz.o: tools/taz/taz.cpp tools/taz/taz.h
-	${CC} ${FLAGS} -c -o obj/taz.o tools/taz/taz.cpp
-
-obj/recip3d.o: tools/taz/recip3d.cpp tools/taz/recip3d.h
-	${CC} ${FLAGS} -c -o obj/recip3d.o tools/taz/recip3d.cpp
-
-obj/scattering_triangle.o: tools/taz/scattering_triangle.cpp tools/taz/scattering_triangle.h
-	${CC} ${FLAGS} -c -o obj/scattering_triangle.o tools/taz/scattering_triangle.cpp
-
-obj/tas_layout.o: tools/taz/tas_layout.cpp tools/taz/tas_layout.h
-	${CC} ${FLAGS} -c -o obj/tas_layout.o tools/taz/tas_layout.cpp
 
 obj/PsdPhaseDlg.o: dialogs/PsdPhaseDlg.cpp dialogs/PsdPhaseDlg.h
 	${CC} ${FLAGS} -c -o obj/PsdPhaseDlg.o dialogs/PsdPhaseDlg.cpp
@@ -322,5 +297,4 @@ clean:
 	rm -f *.moc
 	rm -f dialogs/*.moc
 	rm -f tools/res/*.moc
-	rm -f tools/taz/*.moc
 	rm -f plot/*.moc
