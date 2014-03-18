@@ -23,28 +23,27 @@ LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams-mt ${MATH_LIBS} ${QT_LIBS} ${LAPAC
 
 cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/mainwnd_mdi.o \
 	obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o obj/data3.o obj/data4.o \
-	obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o obj/FitDlg.o obj/ListDlg.o obj/ResoDlg.o \
+	obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o obj/FitDlg.o obj/ListDlg.o \
 	obj/RoiDlg.o obj/SettingsDlg.o obj/PsdPhaseDlg.o obj/RadialIntDlg.o obj/ExportDlg.o \
 	obj/PlotPropDlg.o obj/fourier.o obj/string.o obj/xml.o obj/loadcasc.o obj/loadnicos.o \
 	obj/loadtxt.o obj/plotgl.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o obj/roi.o \
-	obj/cn.o obj/pop.o obj/chi2.o obj/fitter.o obj/functions.o obj/parser.o obj/freefit.o \
-	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o obj/ellipse.o \
+	obj/chi2.o obj/fitter.o obj/functions.o obj/parser.o obj/freefit.o \
+	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o \
 	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
-	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o \
-	obj/lattice.o obj/spec_char.o obj/string_map.o
+	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
+	obj/spec_char.o obj/string_map.o
 	${CC} ${FLAGS} -o bin/cattus obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o \
 			obj/mainwnd_mdi.o obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o \
 			obj/data3.o obj/data4.o obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o \
-			obj/FitDlg.o obj/ListDlg.o obj/ResoDlg.o obj/RoiDlg.o obj/SettingsDlg.o \
+			obj/FitDlg.o obj/ListDlg.o obj/RoiDlg.o obj/SettingsDlg.o \
 			obj/PsdPhaseDlg.o obj/RadialIntDlg.o obj/ExportDlg.o obj/PlotPropDlg.o \
 			obj/fourier.o obj/string.o obj/xml.o obj/loadcasc.o obj/loadnicos.o \
 			obj/loadtxt.o obj/plotgl.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o \
-			obj/roi.o obj/cn.o obj/pop.o obj/chi2.o obj/fitter.o obj/functions.o \
+			obj/roi.o obj/chi2.o obj/fitter.o obj/functions.o \
 			obj/parser.o obj/freefit.o obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o \
-			obj/interpolation.o obj/ellipse.o obj/linalg.o obj/blob.o obj/export.o \
+			obj/interpolation.o obj/linalg.o obj/blob.o obj/export.o \
 			obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o obj/rand.o obj/InfoDock.o \
-			obj/NormDlg.o obj/LatticeDlg.o obj/RebinDlg.o \
-			obj/lattice.o obj/spec_char.o obj/string_map.o \
+			obj/NormDlg.o obj/RebinDlg.o obj/spec_char.o obj/string_map.o \
 			${LIBS}
 	strip bin/cattus
 

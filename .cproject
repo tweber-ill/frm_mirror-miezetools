@@ -86,18 +86,18 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.321083479.305289461" name="/" resourcePath="tools/taz">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1194882511" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1369469127" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1734708344"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1037188643" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.495737549" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.416797601" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.145692831"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1236982447" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1383814079" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514"/>
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.321083479.1915802374" name="/" resourcePath="tools/res">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.1420350981" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1237040442" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1734708344"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1380925761" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1815047685"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.666185327" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1337232108"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.635351809" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug.145692831"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.467303616" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1930011373"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.1460435850" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug.1657053514"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="tools/taz|tools/taz.bck|tools/taz/plot|tools/formula/formula_main.cpp|tools/res/reso_main.cpp|tools/taz/taz_main.cpp|tools/formula/ui|tools/res/ui|tools/res/helper|tools/formula/helper|tools/taz/ui|tools/taz/helper|tools/plot_gpl|tools/red|sim|tools/misc|script|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tools/res|tools/taz|tools/taz.bck|tools/taz/plot|tools/formula/formula_main.cpp|tools/res/reso_main.cpp|tools/taz/taz_main.cpp|tools/formula/ui|tools/res/ui|tools/res/helper|tools/formula/helper|tools/taz/ui|tools/taz/helper|tools/plot_gpl|tools/red|sim|tools/misc|script|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -185,18 +185,18 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.1616845256.618693434" name="/" resourcePath="tools/taz">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.459667956" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.747883466" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1060114624"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.300101496" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.165214295" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261"/>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.672239221" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release.2100629918"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.873900755" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.346119555"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1734393390" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162"/>
+					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.1616845256.1770300966" name="/" resourcePath="tools/res">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.947166302" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release" unusedChildren="">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1264768960" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1060114624"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.536617872" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1166504783"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1540887263" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1525659261"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.1786309302" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release.2100629918"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1535284239" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.346119555"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.2142610857" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release.426369162"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="tools/taz|tools/taz.bck|tools/taz/plot|tools/formula/formula_main.cpp|tools/res/reso_main.cpp|tools/taz/taz_main.cpp|tools/formula/ui|tools/res/ui|tools/res/helper|tools/formula/helper|tools/taz/ui|tools/taz/helper|tools/plot_gpl|tools/red|tools/misc|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tools/res|tools/taz|tools/taz.bck|tools/taz/plot|tools/formula/formula_main.cpp|tools/res/reso_main.cpp|tools/taz/taz_main.cpp|tools/formula/ui|tools/res/ui|tools/res/helper|tools/formula/helper|tools/taz/ui|tools/taz/helper|tools/plot_gpl|tools/red|tools/misc|test|script/test" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

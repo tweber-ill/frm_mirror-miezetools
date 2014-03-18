@@ -48,7 +48,7 @@ MiezeMainWnd::MiezeMainWnd()
 					  m_pcombinedlg(0), m_pfitdlg(0),
 					  m_proidlg(new RoiDlg(this)),
 					  m_pantiroidlg(new RoiDlg(this)),
-					  m_presdlg(0), m_pphasecorrdlg(0),
+					  m_pphasecorrdlg(0),
 					  m_pradialintdlg(0),
 					  m_pformuladlg(0),
 					  m_pplotpropdlg(0),
@@ -353,24 +353,17 @@ MiezeMainWnd::MiezeMainWnd()
 
 	QAction *pReso = new QAction(this);
 	pReso->setText("Resolution...");
-	pMenuCalc->addAction(pReso);
+	//pMenuCalc->addAction(pReso);
 
 	QAction *pTaz = new QAction(this);
 	pTaz->setText("TAS Layout...");
-	pMenuCalc->addAction(pTaz);
+	//pMenuCalc->addAction(pTaz);
 
-
-	pMenuCalc->addSeparator();
-
+	//pMenuCalc->addSeparator();
 
 	QAction *pFormulas = new QAction(this);
 	pFormulas->setText("Formulas...");
 	pMenuCalc->addAction(pFormulas);
-
-	/*QAction *pLattice = new QAction(this);
-	pLattice->setText("Lattice...");
-	pMenuCalc->addAction(pLattice);*/
-
 
 	QAction *pPSDPhase = new QAction(this);
 	pPSDPhase->setText("Flat PSD Phases...");
@@ -482,7 +475,6 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pPhaseCorr, SIGNAL(triggered()), this, SLOT(ShowPSDPhaseCorr()));
 	QObject::connect(pPSDPhase, SIGNAL(triggered()), this, SLOT(CalcPSDPhases()));
 	QObject::connect(pFormulas, SIGNAL(triggered()), this, SLOT(ShowFormulas()));
-	//QObject::connect(pLattice, SIGNAL(triggered()), this, SLOT(ShowLatticeCalc()));
 	QObject::connect(pTaz, SIGNAL(triggered()), this, SLOT(ShowTaz()));
 
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
@@ -502,11 +494,9 @@ MiezeMainWnd::~MiezeMainWnd()
 	if(m_pfitdlg) delete m_pfitdlg;
 	if(m_proidlg) delete m_proidlg;
 	if(m_pantiroidlg) delete m_pantiroidlg;
-	if(m_presdlg) delete m_presdlg;
 	if(m_pphasecorrdlg) delete m_pphasecorrdlg;
 	if(m_pradialintdlg) delete m_pradialintdlg;
 	if(m_pformuladlg) delete m_pformuladlg;
-	//if(m_platticedlg) delete m_platticedlg;
 	if(m_pplotpropdlg) delete m_pplotpropdlg;
 	if(m_prebindlg) delete m_prebindlg;
 	if(m_pexportdlg) delete m_pexportdlg;
@@ -910,11 +900,7 @@ void MiezeMainWnd::ShowBrowser()
 
 void MiezeMainWnd::ShowReso()
 {
-	if(!m_presdlg)
-		m_presdlg = new ResoDlg(this);
-
-	m_presdlg->show();
-	m_presdlg->activateWindow();
+	std::cerr << "TODO: start external reso tool" << std::endl;
 }
 
 void MiezeMainWnd::CalcPSDPhases()
@@ -939,15 +925,6 @@ void MiezeMainWnd::ShowFormulas()
 	m_pformuladlg->show();
 	m_pformuladlg->activateWindow();
 }
-
-/*void MiezeMainWnd::ShowLatticeCalc()
-{
-	if(!m_platticedlg)
-		m_platticedlg = new LatticeDlg(this);
-
-	m_platticedlg->show();
-	m_platticedlg->activateWindow();
-}*/
 
 void MiezeMainWnd::ShowTaz()
 {

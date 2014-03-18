@@ -28,15 +28,12 @@
 #include "../dialogs/FitDlg.h"
 #include "../dialogs/PsdPhaseDlg.h"
 #include "../dialogs/RadialIntDlg.h"
-//#include "../dialogs/LatticeDlg.h"
 #include "../dialogs/PlotPropDlg.h"
 #include "../dialogs/RebinDlg.h"
 #include "../dialogs/ExportDlg.h"
 #include "../dialogs/InfoDock.h"
 #include "../dialogs/NormDlg.h"
-
 #include "../tools/formula/FormulaDlg.h"
-#include "../tools/res/ResoDlg.h"
 
 
 #define MAX_RECENT_FILES 32
@@ -61,7 +58,6 @@ protected:
 	CombineGraphsDlg *m_pcombinedlg;
 	FitDlg *m_pfitdlg;
 	RoiDlg *m_proidlg, *m_pantiroidlg;
-	ResoDlg *m_presdlg;
 	RadialIntDlg *m_pradialintdlg;
 	PsdPhaseCorrDlg *m_pphasecorrdlg;
 	FormulaDlg *m_pformuladlg;
@@ -69,7 +65,6 @@ protected:
 	RebinDlg *m_prebindlg;
 	ExportDlg *m_pexportdlg;
 	NormDlg *m_pnormdlg;
-	//LatticeDlg *m_platticedlg;
 
 	unsigned int m_iPlotCnt;
 	std::string GetPlotTitle(const std::string& strFile);

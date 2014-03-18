@@ -7,6 +7,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QApplication>
 //#include <QtGui/QCleanlooksStyle>
+#include <QtOpenGL/QGLWidget>
 #include <iostream>
 #include <fstream>
 #include <string>
