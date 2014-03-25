@@ -368,13 +368,17 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 					iX = dlg.GetSelectedValue();
 					iY = dlg.GetSelectedValueY();
 					m_strLastXColumn = pnicosdat->GetColName(iX);
-					strCtrName = pnicosdat->GetColName(iY);
+					m_strLastYColumn = pnicosdat->GetColName(iY);
+					//strCtrName = m_strLastYColumn;
 				}
 				else
 					return;
 			}
 
-			iY = pnicosdat->GetColIdx(strCtrName);
+			if(m_strLastYColumn.length())
+				iY = pnicosdat->GetColIdx(m_strLastYColumn);
+			if(iY < 0)
+				iY = pnicosdat->GetColIdx(strCtrName);
 			const double *pdx = pnicosdat->GetColumn(iX);
 			const double *pdy = pnicosdat->GetColumn(iY);
 			double *pdyerr = new double[pnicosdat->GetDim()];
@@ -438,6 +442,7 @@ void MiezeMainWnd::FileLoadTriggered()
 		return;
 
 	m_strLastXColumn = "";
+	m_strLastYColumn = "";
 	bool bDirSet=false;
 
 	unsigned int iFile = 0;
@@ -532,6 +537,7 @@ void MiezeMainWnd::LoadRecentFileList()
 void MiezeMainWnd::LoadFile(const QString& strFile)
 {
 	m_strLastXColumn = "";
+	m_strLastYColumn = "";
 	LoadFile(strFile.toStdString());
 }
 

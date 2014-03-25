@@ -77,6 +77,11 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 	m_iPlotCnt = xml.Query<unsigned int>((strBase + "plot_counter").c_str(), 0);
 	unsigned int iWndCnt = xml.Query<unsigned int>((strBase + "window_counter").c_str(), 0);
 
+	/*std::string strGeo = xml.QueryString((strBase+"viewport_geo").c_str(), "");
+	::trim(strGeo);
+	if(strGeo != "")
+		m_pmdi->viewport()->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));*/
+
 
 	std::vector<std::string> vecSWBase, vecSWType;
 	SubWindowBase** pSWBs = new SubWindowBase*[iWndCnt];
@@ -161,6 +166,7 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 
 		const std::string& strSWBase = vecSWBase[iWnd];
 		std::string strGeo = xml.QueryString((strSWBase+"geo").c_str(), "");
+		::trim(strGeo);
 		if(pSubWnd && strGeo != "")
 			pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
 
@@ -205,11 +211,12 @@ void MiezeMainWnd::SessionSaveTriggered()
 	ofstr << "<cattus_session>\n\n";
 	ofstr << "<plot_counter> " << m_iPlotCnt << " </plot_counter>\n";
 	ofstr << "<window_counter> " << vecWnd.size() << " </window_counter>\n";
+	//ofstr << "<viewport_geo> " << m_pmdi->viewport()->saveGeometry().toHex().data()
+	//		<< " </viewport_geo>\n";
 
 	std::ofstream ofstrBlob(m_strCurSess + ".blob", std::ofstream::binary);
 
 	unsigned int iWnd=0;
-
 	for(SubWindowBase *pWnd : vecWnd)
 	{
 		std::ostringstream ostrSaving;

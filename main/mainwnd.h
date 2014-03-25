@@ -83,6 +83,7 @@ protected:
 	Plot* Convert4d1d(Plot4d* pPlot4d, int iFoil=-1);
 
 	std::string m_strLastXColumn;
+	std::string m_strLastYColumn;
 
 	// recent files
 	QStringList m_lstRecentFiles;
