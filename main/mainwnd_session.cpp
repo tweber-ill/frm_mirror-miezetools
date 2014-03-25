@@ -164,11 +164,22 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 		AddSubWindow(pSWB, 0);
 		QMdiSubWindow *pSubWnd = FindSubWindow(pSWB);
 
-		const std::string& strSWBase = vecSWBase[iWnd];
-		std::string strGeo = xml.QueryString((strSWBase+"geo").c_str(), "");
-		::trim(strGeo);
-		if(pSubWnd && strGeo != "")
-			pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
+		if(pSubWnd)
+		{
+			const std::string& strSWBase = vecSWBase[iWnd];
+			std::string strGeo = xml.QueryString((strSWBase+"geo").c_str(), "");
+			::trim(strGeo);
+			if(strGeo != "")
+				pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
+
+			// hack to position subwindows correctly in scroll area
+			bool bOkX = 0, bOkY = 0;
+			int iGeoX = xml.Query<int>((strSWBase+"geo_x").c_str(), 0, &bOkX);
+			int iGeoY = xml.Query<int>((strSWBase+"geo_y").c_str(), 0, &bOkY);
+
+			if(bOkX && bOkY)
+				pSubWnd->move(iGeoX, iGeoY);
+		}
 
 		pSWB->GetActualWidget()->RefreshPlot();
 		pSWB->show();
@@ -232,6 +243,10 @@ void MiezeMainWnd::SessionSaveTriggered()
 		{
 			std::string strGeo = pSubWnd->saveGeometry().toHex().data();
 			ofstr << "<geo> " << strGeo << " </geo>\n";
+
+			// hack
+			ofstr << "<geo_x> " << pSubWnd->pos().x() << "</geo_x>\n";
+			ofstr << "<geo_y> " << pSubWnd->pos().y() << "</geo_y>\n";
 		}
 		pWnd->SaveXML(ofstr, ofstrBlob);
 		ofstr << "</window_" << iWnd << ">\n";
