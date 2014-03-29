@@ -340,7 +340,7 @@ static std::string get_expression(const Node& node, const std::vector<Symbol>& s
 	}
 	else if(node.iType == NODE_MULT)
 	{
-		//ostr << "(";
+		ostr << "(";
 
 		for(unsigned int i=0; i<node.vecChildren.size(); ++i)
 		{
@@ -349,12 +349,12 @@ static std::string get_expression(const Node& node, const std::vector<Symbol>& s
 				ostr << "*";
 		}
 
-		//ostr << ")";
+		ostr << ")";
 		return ostr.str();
 	}
 	else if(node.iType == NODE_DIV)
 	{
-		//ostr << "(";
+		ostr << "(";
 
 		for(unsigned int i=0; i<node.vecChildren.size(); ++i)
 		{
@@ -363,7 +363,7 @@ static std::string get_expression(const Node& node, const std::vector<Symbol>& s
 				ostr << "/";
 		}
 
-		//ostr << ")";
+		ostr << ")";
 		return ostr.str();
 	}
 	else if(node.iType == NODE_POW)
