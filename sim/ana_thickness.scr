@@ -2,8 +2,8 @@
 
 __init__()
 {
-#	global NUM_THREADS = thread_hwcount();
-	global NUM_THREADS = 1;
+	global NUM_THREADS = thread_hwcount();
+#	global NUM_THREADS = 1;
 	global INSTR = "tasmieze";
 	global num_neutrons = 1e6;
 
@@ -45,7 +45,8 @@ run_thread(params, param_name, baseparams)
 			begin_critical();
 			print(YELLOW + "Result for " + param_name + " = " + the_param + ": "
 					+ str(result) + NOCOLOR);
-			global contrasts[idx] = result[0];
+			global contrasts[idx] = result[0][0];
+			global contrasts_err[idx] = result[1][0];
 			end_critical();
 		}
 	}
@@ -82,6 +83,7 @@ main()
 	anadepths = linspace(0.0001, 0.01, 16);
 	indices = linspace(0, vec_size(anadepths)-1, vec_size(anadepths));
 	global contrasts = vec(vec_size(anadepths));
+	global contrasts_err = vec(vec_size(anadepths));
 
 	print("Analyser depths: " + str(anadepths));
 
@@ -117,5 +119,5 @@ main()
 	params["term"] = "x11";
 
 	#print(params);
-	plot(anadepths*1000., contrasts, params);
+	plot(anadepths*1000., contrasts, contrasts_err, params);
 }
