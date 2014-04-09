@@ -20,6 +20,9 @@ DEFINE INSTRUMENT TasMieze
 	double dMonoTheta = 0.0,
 
 	// sample
+	// 001: C Single_crystal
+	// 100: Phonon_simple
+	int iSample = 1,
 	double dDistMonoSample = 2.0,
 	double dSampleTheta = 0.0, 
 	double dSampleTwoTheta = 0.0,
@@ -31,6 +34,7 @@ DEFINE INSTRUMENT TasMieze
 
 	// detector
 	double dDistAnaDet = 1.0,
+	double dDetOffs = 0.0,
 
 	// 1: calculate TAS angles internally
 	// 0: calculate TAS angles externally
@@ -47,15 +51,19 @@ DECLARE
 	double dMonoD = 6.79;
 	double dDistSrcMono = 1.;
 	double dMonoWidth = 0.005, dMonoHeight = 0.005, dMonoDepth = 0.001;
+	double dMonoMosaic = 10.0;
 
 	// sample
 	double dSampleD = 6.79;
 	double dSampleWidth = 0.05, dSampleHeight = 0.05, dSampleDepth = 0.001;
+	
+	double dTargetSampleAna[3];
 
 	// analyser
 	bool bAnaIdeal = 0;
 	double dAnaD = 6.79;
 	double dAnaWidth = 0.05, dAnaHeight = 0.05;
+	double dAnaMosaic = 10.0;
 
 	// MIEZE
 	bool bMiezeIdeal = 1;
@@ -97,14 +105,19 @@ INITIALIZE
 		dAnaTheta = dAnaScatterSense*asin(dAnaOrder*dLam / (2.*dAnaD)) / M_PI * 180.;
 	}
 
+	dTargetSampleAna[0] = sin((dSampleTwoTheta-dSampleTheta)/180.*M_PI) * dDistSampleAna;
+	dTargetSampleAna[1] = 0.;
+	dTargetSampleAna[2] = cos((dSampleTwoTheta-dSampleTheta)/180.*M_PI) * dDistSampleAna;
+
+
 	printf("--------------------------------------------------------------------------------\n");
 	printf("Monochromator: theta_m=%f, 2theta_m=%f\n", dMonoTheta, 2.*dMonoTheta);
 	printf("Sample: theta_s=%f, 2theta_s=%f\n", dSampleTheta, dSampleTwoTheta);
 	printf("Analyser: theta_a=%f, 2thetaa_=%f\n", dAnaTheta, 2.*dAnaTheta);
 
 
-	double v = 2.*M_PI*HBAR / (dLam*1e-10) / MNEUTRON;
-	dDetTofBase = (dDistSrcMono + dDistMonoSample + dDistSampleAna + dDistAnaDet) / v;
+	double dv = 2.*M_PI*HBAR / (dLam*1e-10) / MNEUTRON;
+	dDetTofBase = (dDistSrcMono + dDistMonoSample + dDistSampleAna + dDistAnaDet + dDetOffs) / dv;
 
 	dMiezeFm = 2.*double(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
 
@@ -156,7 +169,7 @@ COMPONENT MonoAxisBegin = Arm()
 	AT (0, 0, dDistSrcMono) RELATIVE Source
 
 COMPONENT Mono_flat = Monochromator_flat(
-	zwidth = dMonoWidth, yheight = dMonoHeight, mosaich = 10, mosaicv = 10,
+	zwidth = dMonoWidth, yheight = dMonoHeight, mosaich = dMonoMosaic, mosaicv = dMonoMosaic,
 	r0 = 1, DM = dMonoD)
 		WHEN(bMonoIdeal == 1)
   		AT (0, 0, 0) RELATIVE MonoAxisBegin
@@ -170,7 +183,7 @@ COMPONENT Mono_flat = Monochromator_flat(
 COMPONENT Mono_crystal = Single_crystal(
 	reflections = "C_graphite.lau", 
 	xwidth = dMonoWidth, yheight = dMonoHeight, zdepth = dMonoDepth, 
-	delta_d_d = 1e-4, mosaic = 10, recip_cell = 0, barns = 0, 
+	delta_d_d = 1e-4, mosaic = dMonoMosaic, recip_cell = 0, barns = 0, 
 	ax = 2.464, ay = 0, az = 0, 
 	bx = 0, by = 2.464, bz = 0, 
 	cx = 0, cy = 0, cz = dMonoD,
@@ -237,6 +250,7 @@ COMPONENT Sample_crystal_C = Single_crystal(
 	aa = 0, bb = 0, cc = 120,
 	sigma_abs = 0.0035, sigma_inc = 0.001, 
 	order = 0, RX = 0, RY = 0, RZ = 0)
+		WHEN(iSample == 1)
 		AT (0, 0, 0) RELATIVE SampleAxisBegin
 		ROTATED (0, 90+dSampleTheta, 0) RELATIVE SampleAxisBegin
 		EXTEND
@@ -244,6 +258,23 @@ COMPONENT Sample_crystal_C = Single_crystal(
 			if(bAbsorbNonScattered && !SCATTERED)
 				ABSORB;
 		%}
+
+COMPONENT Sample_phonon = Phonon_simple(
+	radius = dSampleWidth, yheight = dSampleHeight,
+	//target_index = +4, focus_r=dAnaWidth/2.0,
+	target_x = dTargetSampleAna[0], target_y = dTargetSampleAna[1], target_z = dTargetSampleAna[2],
+	focus_xw = dAnaWidth, focus_yh = dAnaHeight,
+	a=5, b=0.9, M=100, c=5, DW=1, T=300, sigma_abs=0.01, sigma_inc=0.001)
+		WHEN(iSample == 100)
+		AT (0, 0, 0) RELATIVE SampleAxisBegin
+		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin
+//		EXTEND
+//		%{
+// no SCATTER in component!
+//			if(bAbsorbNonScattered && !SCATTERED)
+//				ABSORB;
+//		%}
+
 
 COMPONENT SampleAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE SampleAxisBegin
@@ -264,12 +295,12 @@ COMPONENT AnaAxisBegin = Arm()
 COMPONENT E_mon = E_monitor(
 	xwidth = dAnaWidth, yheight = dAnaHeight,
 	nE = 256, filename = "E_mon_pre_ana",
-	Emin = E_i - E_i/2.0, Emax = E_i + E_i/2.0,
+	Emin = 0.0, Emax = E_i*2.0,
 	restore_neutron = 1)
 		AT (0,0,0) RELATIVE AnaAxisBegin
 
 COMPONENT Ana_flat = Monochromator_flat(
-	zwidth = dAnaWidth, yheight = dAnaHeight, mosaich = 10, mosaicv = 10,
+	zwidth = dAnaWidth, yheight = dAnaHeight, mosaich = dAnaMosaic, mosaicv = dAnaMosaic,
 	r0 = 1, DM = dAnaD)
 		WHEN(bAnaIdeal == 1)
   		AT (0, 0, 0) RELATIVE AnaAxisBegin
@@ -283,7 +314,7 @@ COMPONENT Ana_flat = Monochromator_flat(
 COMPONENT Ana_crystal = Single_crystal(
 	reflections = "C_graphite.lau", 
 	xwidth = dAnaWidth, yheight = dAnaHeight, zdepth = dAnaDepth, 
-	delta_d_d = 1e-4, mosaic = 10, recip_cell = 0, barns = 0, 
+	delta_d_d = 1e-4, mosaic = dAnaMosaic, recip_cell = 0, barns = 0, 
 	ax = 2.464, ay = 0, az = 0, 
 	bx = 0, by = 2.464, bz = 0, 
 	cx = 0, cy = 0, cz = dAnaD,
@@ -313,7 +344,7 @@ COMPONENT AnaAxisEnd = Arm()
 // detector
 
 COMPONENT DetAxis = Arm()
-	AT (0, 0, dDistAnaDet) RELATIVE AnaAxisEnd
+	AT (0, 0, dDistAnaDet + dDetOffs) RELATIVE AnaAxisEnd
 
 
 /*

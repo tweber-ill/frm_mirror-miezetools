@@ -8,7 +8,14 @@ __init__()
 
 get_mono_tt(k, d)
 {
-	tt = 2.*asin(pi/(d*k));
+	ttsin = pi / (d*k);
+	if(abs(ttsin) greater 1.)
+	{
+		print("Error: Invalid monochromator/analyser angle.");
+		exit(-1);
+	}
+
+	tt = 2.*asin(ttsin);
 	return tt;
 }
 

@@ -43,6 +43,7 @@ run(simParams)
 main()
 {
 	do_compile = 1;
+	sample_idx = 100;
 
 
 	# -------------------------------------------------------------------------------- 
@@ -61,6 +62,8 @@ main()
 	tau = 25.;		# ps
 
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam*1e-10, tau*1e-12);	
+
+	det_offs = 0.47;
 	# -------------------------------------------------------------------------------- 
 
 
@@ -72,11 +75,11 @@ main()
 	E_i = k2E(k_i);
 	mono_tt = get_mono_tt(k_i, mono_d);
 
-	Q = 0.;
-	dE = 0.;
+	Q = 0.5;
+	dE = 2.5;
 
-	sample_d = mono_d;
-	Q = get_mono_Q(sample_d);
+	# sample_d = mono_d;
+	# Q = get_mono_Q(sample_d);
 
 	E_f = E_i - dE;
 	k_f = E2k(E_f);
@@ -112,7 +115,9 @@ main()
 			+ " dAnaTheta=" + ana_tt/2 /pi*180.
 			+ " dSampleTheta=" + sample_tt/2 /pi*180.
 			+ " dSampleTwoTheta=" + sample_tt /pi*180.
-			+ " bAutoSetAngles=0";
+			+ " bAutoSetAngles=0" 
+			+ " iSample=" + sample_idx
+			+ " dDetOffs=" + det_offs;
 
 	print("\n\n");
 	print("="*80);
