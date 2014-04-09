@@ -91,12 +91,22 @@ contrast(num_osc, datxy, dattof, want_plot)
         params_errs = map_vec_to_val(fitparam, 1);
 
 	amp = params_vals["amp"];
+	amp_err = params_errs["amp"];
+
 	phase = params_vals["phase"];
+	phase_err = params_errs["phase"];
+
 	offs = params_vals["offs"];
+	offs_err = params_errs["offs"];
+
 	C = amp / offs;
+	C_err = sqrt((amp_err/offs)^2. + (-amp/offs^2. * offs_err)^2.);
+
 #	print("Contrast: " + C + ", Phase: " + phase + ", Amplitude: " + amp + ", Offset: " + offs);
 
 	if(want_plot)
 		plot_msin(num_osc, C, phase, amp, f_M, offs, datxy, dattof);	
-	return [C, phase, amp, offs];
+
+	return [[C, phase, amp, offs],
+		[C_err, phase_err, amp_err, offs_err]];
 }

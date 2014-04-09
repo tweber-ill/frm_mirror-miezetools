@@ -1,0 +1,124 @@
+#!./hermelin
+
+__init__()
+{
+	global INSTR = "tasmieze";
+	global num_neutrons = 1e6;
+
+	print(ver());
+
+	import("mcstas.scr");
+	import("tas.scr");
+	import("mieze.scr");
+	import("colors.scr");
+}
+
+
+evaluate(dir)
+{
+	dat = loadtxt(dir + "/oscpsd_1d.sim");
+	dat = [dat[0], dat[1], dat[2], dat[4]];
+
+	dattof = loadtxt(dir + "/tof.sim");
+	dattof = [dattof[0], dattof[1], dattof[2], dattof[4]];
+
+	result = contrast(2, dat, dattof, 1);
+	return result;
+}
+
+run(simParams)
+{
+	dir = "output/single";
+
+	if(mcrun(INSTR, num_neutrons, dir, simParams))
+	{
+		result = evaluate(dir);
+		print(YELLOW + "Result: " + str(result) + NOCOLOR);
+		return result;
+	}
+
+	return 0.;
+}
+
+main()
+{
+	do_compile = 1;
+
+
+	# -------------------------------------------------------------------------------- 
+	# MIEZE stuff
+
+	L_sample_ana = 0.5;
+	L_ana_det = 0.5;
+	L_mono_sample = 2.;
+	L_mono_mieze = 0.5;
+
+	L1 = 0.9;
+	Ls = L_sample_ana + L_ana_det;
+	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
+	lam = 4.;		# A
+	dlam = lam/25.;
+	tau = 25.;		# ps
+
+	f1f2 = mieze_f1f2(L1, L2, Ls, lam*1e-10, tau*1e-12);	
+	# -------------------------------------------------------------------------------- 
+
+
+
+	# -------------------------------------------------------------------------------- 
+	# TAS stuff
+
+	k_i = lam2k(lam);
+	E_i = k2E(k_i);
+	mono_tt = get_mono_tt(k_i, mono_d);
+
+	Q = 0.;
+	dE = 0.;
+
+	sample_d = mono_d;
+	Q = get_mono_Q(sample_d);
+
+	E_f = E_i - dE;
+	k_f = E2k(E_f);
+
+	sample_tt = get_tt(k_i, k_f, Q);
+	#sample_tt = mono_tt;
+
+	ana_tt = get_mono_tt(k_f, ana_d);
+	# --------------------------------------------------------------------------------
+
+
+
+
+	
+	if(do_compile)
+	{
+		mcclean(INSTR);
+		if(not mccompile(INSTR))
+			return;
+	}
+
+
+	simBaseParams = "dLam=" + lam 
+			+ " dDeltaLam=" + dlam 
+			+ " dMiezeF1=" + f1f2[0] 
+			+ " dMiezeF2=" + f1f2[1]
+			+ " dMiezeL1=" + L1
+			+ " dDistMonoMieze=" + L_mono_mieze
+			+ " dDistMonoSample=" +  L_mono_sample
+			+ " dDistSampleAna=" + L_sample_ana
+			+ " dDistAnaDet=" + L_ana_det
+			+ " dMonoTheta=" + mono_tt/2 /pi*180.
+			+ " dAnaTheta=" + ana_tt/2 /pi*180.
+			+ " dSampleTheta=" + sample_tt/2 /pi*180.
+			+ " dSampleTwoTheta=" + sample_tt /pi*180.
+			+ " bAutoSetAngles=0";
+
+	print("\n\n");
+	print("="*80);
+	print(BLUE + "Starting simulation..." + NOCOLOR);
+	print("\n");
+
+
+	result = run(simBaseParams);
+}

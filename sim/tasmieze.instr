@@ -16,15 +16,25 @@ DEFINE INSTRUMENT TasMieze
 	double dMiezeF2 = 61920.0,
 	double dDistMonoMieze = 0.5,
 
+	// mono
+	double dMonoTheta = 0.0,
+
 	// sample
 	double dDistMonoSample = 2.0,
+	double dSampleTheta = 0.0, 
+	double dSampleTwoTheta = 0.0,
 
 	// analyser
-	double dAnaDepth = 0.005,
+	double dAnaTheta=0.0,
+	double dAnaDepth = 0.001,
 	double dDistSampleAna = 1.0,
 
 	// detector
-	double dDistAnaDet = 1.0
+	double dDistAnaDet = 1.0,
+
+	// 1: calculate TAS angles internally
+	// 0: calculate TAS angles externally
+	int bAutoSetAngles = 1
 )
 
 
@@ -36,18 +46,15 @@ DECLARE
 	bool bMonoIdeal = 0;
 	double dMonoD = 6.79;
 	double dDistSrcMono = 1.;
-	double dMonoTheta = 63.4, dMonoTwoTheta = 126.8;
 	double dMonoWidth = 0.005, dMonoHeight = 0.005, dMonoDepth = 0.001;
 
 	// sample
 	double dSampleD = 6.79;
-	double dSampleTheta=0., dSampleTwoTheta = 0.;
 	double dSampleWidth = 0.05, dSampleHeight = 0.05, dSampleDepth = 0.001;
 
 	// analyser
 	bool bAnaIdeal = 0;
 	double dAnaD = 6.79;
-	double dAnaTheta=0., dAnaTwoTheta = 0.;
 	double dAnaWidth = 0.05, dAnaHeight = 0.05;
 
 	// MIEZE
@@ -63,31 +70,37 @@ DECLARE
 	// detector
 	double dDetWidth = 0.4, dDetHeight = 0.4;
 	double dDetTofBase = 0.;
+	
+	double E_i;
 %}
 
 
 
 INITIALIZE
 %{
-	double dMonoScatterSense = 1.;
-	double dMonoOrder = 2.;
-	dMonoTheta = dMonoScatterSense*asin(dMonoOrder*dLam / (2.*dMonoD)) / M_PI * 180.;
-	dMonoTwoTheta = dMonoTheta * 2.;
+	double v_i = HBAR*2.*M_PI / (dLam*1e-10 * MNEUTRON);
+	E_i = VS2E*v_i*v_i;
 
-	double dSampleScatterSense = -1.;
-	double dSampleOrder = 2.;
-	dSampleTheta = dSampleScatterSense*asin(dSampleOrder*dLam / (2.*dSampleD)) / M_PI * 180.;
-	dSampleTwoTheta = dSampleTheta * 2.;
+	if(bAutoSetAngles)
+	{
+		double dMonoScatterSense = 1.;
+		double dMonoOrder = 2.;
+		dMonoTheta = dMonoScatterSense*asin(dMonoOrder*dLam / (2.*dMonoD)) / M_PI * 180.;
 
-	double dAnaScatterSense = 1.;
-	double dAnaOrder = 2.;
-	dAnaTheta = dAnaScatterSense*asin(dAnaOrder*dLam / (2.*dAnaD)) / M_PI * 180.;
-	dAnaTwoTheta = dAnaTheta * 2.;
+		double dSampleScatterSense = -1.;
+		double dSampleOrder = 2.;
+		dSampleTheta = dSampleScatterSense*asin(dSampleOrder*dLam / (2.*dSampleD)) / M_PI * 180.;
+		dSampleTwoTheta = dSampleTheta * 2.;
+
+		double dAnaScatterSense = 1.;
+		double dAnaOrder = 2.;
+		dAnaTheta = dAnaScatterSense*asin(dAnaOrder*dLam / (2.*dAnaD)) / M_PI * 180.;
+	}
 
 	printf("--------------------------------------------------------------------------------\n");
-	printf("Monochromator: theta_m=%f, 2theta_m=%f\n", dMonoTheta, dMonoTwoTheta);
+	printf("Monochromator: theta_m=%f, 2theta_m=%f\n", dMonoTheta, 2.*dMonoTheta);
 	printf("Sample: theta_s=%f, 2theta_s=%f\n", dSampleTheta, dSampleTwoTheta);
-	printf("Analyser: theta_a=%f, 2thetaa_=%f\n", dAnaTheta, dAnaTwoTheta);
+	printf("Analyser: theta_a=%f, 2thetaa_=%f\n", dAnaTheta, 2.*dAnaTheta);
 
 
 	double v = 2.*M_PI*HBAR / (dLam*1e-10) / MNEUTRON;
@@ -176,7 +189,7 @@ COMPONENT Mono_crystal = Single_crystal(
 
 COMPONENT MonoAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE MonoAxisBegin
-	ROTATED (0, dMonoTwoTheta, 0) RELATIVE MonoAxisBegin
+	ROTATED (0, 2.0*dMonoTheta, 0) RELATIVE MonoAxisBegin
 
 
 
@@ -248,6 +261,13 @@ COMPONENT SampleAxisEnd = Arm()
 COMPONENT AnaAxisBegin = Arm()
 	AT (0, 0, dDistSampleAna) RELATIVE SampleAxisEnd
 
+COMPONENT E_mon = E_monitor(
+	xwidth = dAnaWidth, yheight = dAnaHeight,
+	nE = 256, filename = "E_mon_pre_ana",
+	Emin = E_i - E_i/2.0, Emax = E_i + E_i/2.0,
+	restore_neutron = 1)
+		AT (0,0,0) RELATIVE AnaAxisBegin
+
 COMPONENT Ana_flat = Monochromator_flat(
 	zwidth = dAnaWidth, yheight = dAnaHeight, mosaich = 10, mosaicv = 10,
 	r0 = 1, DM = dAnaD)
@@ -282,7 +302,7 @@ COMPONENT Ana_crystal = Single_crystal(
 
 COMPONENT AnaAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE AnaAxisBegin
-	ROTATED (0, dAnaTwoTheta, 0) RELATIVE AnaAxisBegin
+	ROTATED (0, 2.0*dAnaTheta, 0) RELATIVE AnaAxisBegin
 
 //----------------------------------------------------------------------------------------------------
 

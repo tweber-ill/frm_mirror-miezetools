@@ -2,14 +2,21 @@
 
 __init__()
 {
-	global mono_d = 3.355;
-	global ana_d = 3.355;
+	global mono_d = 6.79/2.;
+	global ana_d = 6.79/2.;
 }
 
 get_mono_tt(k, d)
 {
 	tt = 2.*asin(pi/(d*k));
 	return tt;
+}
+
+get_mono_Q(d)
+{
+	n = 1.;
+	Q = n * 2.*pi / d;
+	return Q;
 }
 
 get_tt(ki, kf, Q)
