@@ -725,7 +725,7 @@ public:
 		ublas::matrix<T> inv;
 		if(!::inverse(mat, inv))
         {
-            std::cerr << "Could not invert matrix " << mat << std::endl;
+            //std::cerr << "Could not invert matrix " << mat << std::endl;
 			return false;
         }
 
