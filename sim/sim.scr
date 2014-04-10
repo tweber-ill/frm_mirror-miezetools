@@ -1,0 +1,19 @@
+sim_evaluate(dir, show_plots)
+{
+        dat = loadtxt(dir + "/oscpsd_1d.sim");
+        dat = [dat[0], dat[1], dat[2], dat[4]];
+
+        dattof = loadtxt(dir + "/tof.sim");
+        dattof = [dattof[0], dattof[1], dattof[2], dattof[4]];
+
+        result = contrast(2, dat, dattof, show_plots);
+        return result;
+}
+
+show_Emon(dir)
+{
+	dat = loadtxt(dir + "/E_mon_pre_ana.sim");
+        dat = [dat[0], dat[1], dat[2], dat[4]];
+
+	plot(dat, ["window":2]);
+}

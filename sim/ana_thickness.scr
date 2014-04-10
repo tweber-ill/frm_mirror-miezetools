@@ -11,25 +11,16 @@ __init__()
 	print("CPU supports " + NUM_THREADS + " threads.\n");
 
 	import("mcstas.scr");
+	import("sim.scr");
 	import("mieze.scr");
 	import("colors.scr");
 }
 
 
-evaluate(dir)
-{
-	dat = loadtxt(dir + "/oscpsd_1d.sim");
-	dat = [dat[0], dat[1], dat[2], dat[4]];
-
-	dattof = loadtxt(dir + "/tof.sim");
-	dattof = [dattof[0], dattof[1], dattof[2], dattof[4]];
-
-	result = contrast(2, dat, dattof, (NUM_THREADS eq 1));
-	return result;
-}
-
 run_thread(params, param_name, baseparams)
 {
+	show_plots = NUM_THREADS eq 1;
+
 	for(param : params)
 	{
 		idx = int(param[0]);
@@ -40,7 +31,7 @@ run_thread(params, param_name, baseparams)
 
 		if(mcrun(INSTR, num_neutrons, dir, simParams))
 		{
-			result = evaluate(dir);
+			result = sim_evaluate(dir, show_plots);
 
 			begin_critical();
 			print(YELLOW + "Result for " + param_name + " = " + the_param + ": "
@@ -109,6 +100,8 @@ main()
 	print("\n");
 	print(GREEN + "All thread runs have finished." + NOCOLOR);
 	print("="*80);
+
+	print("Contrasts: " + str(contrasts));
 	
 	params = map();
 	params["xlabel"] = "Analyser Thickness (mm)";

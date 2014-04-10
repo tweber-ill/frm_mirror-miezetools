@@ -1,6 +1,6 @@
 __init__()
 {
-	global h = 2.*pi*hbar;
+	import("tas.scr");
 }
 
 plot_msin(num_osc, C, phase, amp, freq, offs, dat, dattof)
@@ -30,20 +30,21 @@ mieze_f2(L1, L2, f1)
 	return (L1/L2 + 1.)*f1;
 }
 
-mieze_fm(tau, Ls, lam)
+mieze_fm(tau, Ls, lam_A)
 {
-	p = h/lam;
-	v = p / m_n;
+	v = lam2v(lam_A);
+
 	fm = tau / (Ls * h) * (m_n * v^3);
 	return fm;
 }
 
-mieze_f1f2(L1, L2, Ls, lam, tau)
+mieze_f1f2(L1, L2, Ls, lam_A, tau_ps)
 {
-	p = h/lam;
-	v = p / m_n;
+	tau = tau_ps * 1e-12;
 
-	f1 = L2/L1 / (2 * Ls * h) * (m_n *v^3 * tau);
+	v = lam2v(lam_A);
+
+	f1 = L2/L1 / (2 * Ls * 2.*pi*hbar) * (m_n *v^3 * tau);
 	f2 = (L1/L2 + 1.)*f1;
 
 	return [f1, f2];
@@ -110,3 +111,17 @@ contrast(num_osc, datxy, dattof, want_plot)
 	return [[C, phase, amp, offs],
 		[C_err, phase_err, amp_err, offs_err]];
 }
+
+mieze_det_offs(L_1, L_b, f_A, f_B, lam_A, dE_meV)
+{
+#	print("L1 = " + L_1 + "\nLb = " + L_b + "\nfA = " + f_A + "\nfB = " + f_B + "\nlam = " + lam_A + "\ndE = " + dE_meV + "\n");
+
+	v_n = lam2v(lam_A);
+	dE_J = dE_meV * 1e-3 * q_e;
+
+	Ls_elast = f_A*L_1 / (f_B-f_A) - L_b;
+	Ls_inelast = Ls_elast * (sqrt(v_n^2. + 2.*dE_J/m_n)/v_n)^3.;
+
+	return Ls_inelast - Ls_elast;
+}
+

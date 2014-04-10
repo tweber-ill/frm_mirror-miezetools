@@ -111,9 +111,10 @@ INITIALIZE
 
 
 	printf("--------------------------------------------------------------------------------\n");
-	printf("Monochromator: theta_m=%f, 2theta_m=%f\n", dMonoTheta, 2.*dMonoTheta);
-	printf("Sample: theta_s=%f, 2theta_s=%f\n", dSampleTheta, dSampleTwoTheta);
-	printf("Analyser: theta_a=%f, 2thetaa_=%f\n", dAnaTheta, 2.*dAnaTheta);
+	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
+	printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
+	printf("Sample: theta_s=%f deg, 2theta_s=%f deg\n", dSampleTheta, dSampleTwoTheta);
+	printf("Analyser: theta_a=%f deg, 2thetaa_=%f deg\n", dAnaTheta, 2.*dAnaTheta);
 
 
 	double dv = 2.*M_PI*HBAR / (dLam*1e-10) / MNEUTRON;
@@ -128,8 +129,8 @@ INITIALIZE
 	// for Mieze Box component: Origin is at center
 	dDistMonoMieze += dMiezeL1/2.;
 
-	printf("MIEZE: L1=%f, L2=%f, Ls=%f, Lb=%f, f1=%f, f2=%f\n", 
-		dMiezeL1, dMiezeL2, dMiezeLs, dMiezeLb, dMiezeF1, dMiezeF2);
+	printf("MIEZE: L1=%f m, L2=%f m, Ls=%f m, Lb=%f m, f1=%f Hz, f2=%f Hz, offs=%f m\n", 
+		dMiezeL1, dMiezeL2, dMiezeLs, dMiezeLb, dMiezeF1, dMiezeF2, dDetOffs);
 	printf("--------------------------------------------------------------------------------\n");
 %}
 

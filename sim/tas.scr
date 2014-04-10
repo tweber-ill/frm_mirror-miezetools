@@ -44,6 +44,15 @@ lam2k(lam)
 	return 2.*pi / lam;
 }
 
+lam2v(lam_A)
+{
+	lam = lam_A * 1e-10;
+	p = hbar*2.*pi/lam;
+	v = p/m_n;
+
+	return v;
+}
+
 k2E(k)
 {
 	k = k*1e10;
