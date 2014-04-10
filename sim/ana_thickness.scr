@@ -59,7 +59,7 @@ main()
 	dlam = lam/25.;
 	tau = 25.;		# ps
 
-	f1f2 = mieze_f1f2(L1, L2, Ls, lam*1e-10, tau*1e-12);	
+	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 
 	
 	if(do_compile)
@@ -101,6 +101,8 @@ main()
 	print(GREEN + "All thread runs have finished." + NOCOLOR);
 	print("="*80);
 
+
+	print("Analyser thicknesses: " + str(anadepths));
 	print("Contrasts: " + str(contrasts));
 	
 	params = map();
