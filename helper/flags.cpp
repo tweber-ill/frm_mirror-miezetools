@@ -19,3 +19,9 @@ void *my_popen(const char* pcCmd, const char* pcType)
 
 	return p;
 }
+
+
+int my_pclose(void *pPipe)
+{
+	return ::pclose((FILE*)pPipe);
+}
