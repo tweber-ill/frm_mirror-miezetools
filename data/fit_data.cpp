@@ -29,13 +29,15 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 	const unsigned int iLen = pvecDatX->size();
 
 
+	// Minuit doesn't handle errors that are exactly 0
 	if(params.bAssumeErrorIfZero)
 	{
+		double dMinY = *std::min_element(py, py+iLen);
 		double dMaxY = *std::max_element(py, py+iLen);
 		for(unsigned int iErr=0; iErr<iLen; ++iErr)
 		{
 			if(pyerr[iErr] < std::numeric_limits<double>::min())
-				pyerr[iErr] = dMaxY * 0.1;
+				pyerr[iErr] = dMaxY * 0.001;
 		}
 	}
 

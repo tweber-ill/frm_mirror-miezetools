@@ -1,6 +1,6 @@
 __init__()
 {
-	global hwhm2sigma = 1./(sqrt(2.*log(2.)));
+	import("fit.scr");
 }
 
 sim_evaluate(dir, show_plots)
@@ -15,66 +15,24 @@ sim_evaluate(dir, show_plots)
         return result;
 }
 
-
-doublegauss_model(x, x0_0, sigma_0, amp_0, x0_1, sigma_1, amp_1, offs)
-{
-	return amp_0 * exp(-0.5 * ((x-x0_0) / sigma_0)^2.) 
-		+ amp_1 * exp(-0.5 * ((x-x0_1) / sigma_1)^2.) 
-		+ offs;
-}
-
-fit_doublegauss(x, y, yerr)
-{
-	peaks = find_peaks(x, y);
-	#print("Peaks: " + str(peaks));
-
-	peaks_x = peaks[0];
-	peaks_size = peaks[1];
-	peaks_width = peaks[2] * hwhm2sigma;
-
-	if(length(peaks_x) less 2 or length(peaks_size) less 2 or length(peaks_width) less 2)
-	{
-		print("Error: Prefitter didn't find enough peaks.");
-		return 0;
-	}
-
-
-	yrange = max(y)-min(y);
-
-	hints = [peaks_x[0], peaks_width[0], peaks_size[0], 
-		peaks_x[1], peaks_width[1], peaks_size[1],
-		min(y)];
-
-	hints_err = [peaks_x[0]/10., peaks_width[0]/10., peaks_size[0]/10., 
-		peaks_x[1]/10., peaks_width[1]/10., peaks_size[1]/10.,
-		yrange/10.];
-
-	#x_ = linspace(0., 10., 64);
-	#y_ = doublegauss_model(x_, peaks_x[0], peaks_width[0], peaks_size[0], peaks_x[1], peaks_width[1], peaks_size[1], 0.);
-	#plot(x_, y_, ["style":"line"]);
-
-	#print("Hints: " + str(hints));
-
-	lowerlims = ["x0_0":peaks_x[0]*0.9., "x0_1":peaks_x[1]*0.9., "amp_0":peaks_size[0]*0.9., "amp_1":peaks_size[1]*0.9., "sigma_0":peaks_width[0]*0.9, "sigma_1":peaks_width[1]*0.9, "offs":min(y)];
-	upperlims = ["x0_0":peaks_x[0]*1.1, "x0_1":peaks_x[1]*1.1., "amp_0":peaks_size[0]*1.1., "amp_1":peaks_size[1]*1.1., "sigma_0":peaks_width[0]*1.1, "sigma_1":peaks_width[1]*1.1, "offs":max(y)];
-
-	fitparams = fit("doublegauss_model", x, y, yerr, 
-			["hints":hints, "hints_errors":hints_err,
-			"lower_limits":lowerlims, "upper_limits":upperlims,
-			"fixed":["offs"], "debug":1]);
-
-	return fitparams;
-}
-
 show_Emon(dir)
 {
 	dat = loadtxt(dir + "/E_mon_pre_ana.sim");
 	dat = [dat[0], dat[1], dat[2], dat[4]];
 
-	#dgauss = fit_doublegauss(dat[0], dat[1], dat[2]);
-	#print("Double Gaussian fit: " + str(dgauss));
+	dgauss = fit_doublegauss(dat[0], dat[1], dat[2]);
 
-	plot(dat, ["window":2]);
+        params_vals = map_vec_to_val(dgauss);
+        params_errs = map_vec_to_val(dgauss, 1);
+
+	print("Double Gaussian fit values: " + str(params_vals));
+	print("Double Gaussian fit errors: " + str(params_errs));
+
+        fitx = linspace(min(dat[0]), max(dat[0]), 128);
+        fity = doublegauss_model(fitx, *params_vals);
+
+
+	plot([dat, [fitx, fity, ["style":"line"]]], ["window":2]);
 }
 
 
