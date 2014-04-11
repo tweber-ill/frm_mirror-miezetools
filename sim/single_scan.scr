@@ -21,7 +21,7 @@ run(simParams)
 	if(mcrun(INSTR, num_neutrons, dir, simParams))
 	{
 		result = sim_evaluate(dir, 1);
-		show_Emon(dir);
+		eval_Emon(dir, 0);
 		print(YELLOW + "Result: " + str(result) + NOCOLOR);
 		return result;
 	}
@@ -34,8 +34,8 @@ main()
 	do_compile = 1;
 	sample_idx = 100;
 
-	Q = 0.1;		# 1/A
-	dE = 0.5;		# meV
+	Q = 0.2;		# 1/A
+	dE = -0.417;		# meV
 
 	# -------------------------------------------------------------------------------- 
 	# MIEZE stuff
@@ -65,9 +65,9 @@ main()
 
 	k_i = lam2k(lam);
 	E_i = k2E(k_i);
-	mono_tt = get_mono_tt(k_i, mono_d);
+	mono_tt = get_mono_tt(k_i, mono_d/mono_order);
 
-	# sample_d = mono_d;
+	# sample_d = mono_d/mono_order;
 	# Q = get_mono_Q(sample_d);
 
 	E_f = E_i - dE;
@@ -76,7 +76,7 @@ main()
 	sample_tt = get_tt(k_i, k_f, Q);
 	#sample_tt = mono_tt;
 
-	ana_tt = get_mono_tt(k_f, ana_d);
+	ana_tt = get_mono_tt(k_f, ana_d/ana_order);
 	# --------------------------------------------------------------------------------
 
 
@@ -106,7 +106,11 @@ main()
 			+ " dSampleTwoTheta=" + sample_tt /pi*180.
 			+ " bAutoSetAngles=0" 
 			+ " iSample=" + sample_idx
-			+ " dDetOffs=" + det_offs;
+			+ " dDetOffs=" + det_offs
+			+ " dMonoD=" + mono_d
+			+ " dAnaD=" + ana_d
+			+ " dMonoOrder=" + mono_order
+			+ " dAnaOrder=" + ana_order;
 
 	print("\n\n");
 	print("="*80);

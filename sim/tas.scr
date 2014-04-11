@@ -2,8 +2,11 @@
 
 __init__()
 {
-	global mono_d = 6.79/2.;
-	global ana_d = 6.79/2.;
+	global mono_order = 2.0;
+	global ana_order = 2.0;
+
+	global mono_d = 6.79;
+	global ana_d = 6.79;
 }
 
 get_mono_tt(k, d)
@@ -83,7 +86,7 @@ main()
 	lam_i = real(input("lam_i [A] = "));
 	k_i = lam2k(lam_i);
 	E_i = k2E(k_i);
-	mono_tt = get_mono_tt(k_i, mono_d);
+	mono_tt = get_mono_tt(k_i, mono_d/mono_order);
 
 	Q = real(input("Q [1/A] = "));
 	dE = real(input("dE [meV] = "));
@@ -92,7 +95,7 @@ main()
 	k_f = E2k(E_f);	
 
 	tt = get_tt(k_i, k_f, Q);
-	ana_tt = get_mono_tt(k_f, ana_d);
+	ana_tt = get_mono_tt(k_f, ana_d/ana_order);
 
 
 	print("\n" + "-"*80);

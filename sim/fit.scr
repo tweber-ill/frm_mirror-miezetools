@@ -10,7 +10,8 @@ doublegauss_model(x, x0_0, sigma_0, amp_0, x0_1, sigma_1, amp_1, offs)
 		+ offs;
 }
 
-fit_doublegauss(x, y, yerr)
+# two peaks left and right of E0
+fit_doublegauss(x, y, yerr, E0)
 {
 	peaks = find_peaks(x, y);
 	#print("Peaks: " + str(peaks));
@@ -25,6 +26,25 @@ fit_doublegauss(x, y, yerr)
 		return 0;
 	}
 
+	has_left = 0;
+	has_right = 0;
+	idx_lt = 0;
+	idx_rt = 1;
+	for(px : peaks_x)
+	{
+		if(has_left eq 0 and px less E0)
+		{
+			idx_lt = cur_iter(px);
+			has_left = 1;
+		}
+
+		if(has_right eq 0 and px greater E0)
+		{
+			idx_rt = cur_iter(px);
+			has_right = 1;
+		}
+	}
+
 
 	# Minuit doesn't handle errors == 0
 	yrange = max(y)-min(y);
@@ -34,22 +54,22 @@ fit_doublegauss(x, y, yerr)
 			thisyerr = yrange*0.001;
 	}
 
-	hints = [peaks_x[0], peaks_width[0], peaks_size[0], 
-		peaks_x[1], peaks_width[1], peaks_size[1],
+	hints = [peaks_x[idx_lt], peaks_width[idx_lt], peaks_size[idx_lt], 
+		peaks_x[idx_rt], peaks_width[idx_rt], peaks_size[idx_rt],
 		min(y)];
 
-	hints_err = [peaks_x[0]/10., peaks_width[0]/10., peaks_size[0]/10., 
-		peaks_x[1]/10., peaks_width[1]/10., peaks_size[1]/10.,
+	hints_err = [peaks_x[idx_lt]/10., peaks_width[idx_lt]/10., peaks_size[idx_lt]/10., 
+		peaks_x[idx_rt]/10., peaks_width[idx_rt]/10., peaks_size[idx_rt]/10.,
 		yrange/10.];
 
 	#x_ = linspace(0., 10., 64);
-	#y_ = doublegauss_model(x_, peaks_x[0], peaks_width[0], peaks_size[0], peaks_x[1], peaks_width[1], peaks_size[1], 0.);
+	#y_ = doublegauss_model(x_, peaks_x[idx_lt], peaks_width[idx_lt], peaks_size[idx_lt], peaks_x[idx_rt], peaks_width[idx_rt], peaks_size[idx_rt], 0.);
 	#plot(x_, y_, ["style":"line"]);
 
 	#print("Hints: " + str(hints));
 
-#	lowerlims = ["x0_0":peaks_x[0]*0.8., "x0_1":peaks_x[1]*0.8., "amp_0":peaks_size[0]*0.8., "amp_1":peaks_size[1]*0.8., "sigma_0":peaks_width[0]*0.8, "sigma_1":peaks_width[1]*0.8, "offs":min(y)];
-#	upperlims = ["x0_0":peaks_x[0]*1.2, "x0_1":peaks_x[1]*1.2., "amp_0":peaks_size[0]*1.2., "amp_1":peaks_size[1]*1.2., "sigma_0":peaks_width[0]*1.2, "sigma_1":peaks_width[1]*1.2, "offs":max(y)];
+#	lowerlims = ["x0_0":peaks_x[idx_lt]*0.8., "x0_1":peaks_x[idx_rt]*0.8., "amp_0":peaks_size[idx_lt]*0.8, "amp_1":peaks_size[idx_rt]*0.8., "sigma_0":peaks_width[idx_lt]*0.8, "sigma_1":peaks_width[idx_rt]*0.8, "offs":min(y)];
+#	upperlims = ["x0_0":peaks_x[idx_lt]*1.2, "x0_1":peaks_x[idx_rt]*1.2., "amp_0":peaks_size[idx_lt]*1.2., "amp_1":peaks_size[idx_rt]*1.2., "sigma_0":peaks_width[idx_lt]*1.2, "sigma_1":peaks_width[idx_rt]*1.2, "offs":max(y)];
 
 	lowerlims = ["amp_0":min(y), "amp_1":min(y), "sigma_0":0., "sigma_1":0., "offs":min(y)];
 	upperlims = ["amp_0":max(y), "amp_1":max(y), "offs":max(y)];

@@ -17,6 +17,8 @@ DEFINE INSTRUMENT TasMieze
 	double dDistMonoMieze = 0.5,
 
 	// mono
+	double dMonoD = 6.79,
+	double dMonoOrder = 2.0,
 	double dMonoTheta = 0.0,
 
 	// sample
@@ -28,6 +30,8 @@ DEFINE INSTRUMENT TasMieze
 	double dSampleTwoTheta = 0.0,
 
 	// analyser
+	double dAnaD = 6.79,
+	double dAnaOrder = 2.0,
 	double dAnaTheta=0.0,
 	double dAnaDepth = 0.001,
 	double dDistSampleAna = 1.0,
@@ -48,7 +52,6 @@ DECLARE
 
 	// monochromator
 	bool bMonoIdeal = 0;
-	double dMonoD = 6.79;
 	double dDistSrcMono = 1.;
 	double dMonoWidth = 0.005, dMonoHeight = 0.005, dMonoDepth = 0.001;
 	double dMonoMosaic = 10.0;
@@ -61,7 +64,6 @@ DECLARE
 
 	// analyser
 	bool bAnaIdeal = 0;
-	double dAnaD = 6.79;
 	double dAnaWidth = 0.05, dAnaHeight = 0.05;
 	double dAnaMosaic = 10.0;
 
@@ -92,7 +94,6 @@ INITIALIZE
 	if(bAutoSetAngles)
 	{
 		double dMonoScatterSense = 1.;
-		double dMonoOrder = 2.;
 		dMonoTheta = dMonoScatterSense*asin(dMonoOrder*dLam / (2.*dMonoD)) / M_PI * 180.;
 
 		double dSampleScatterSense = -1.;
@@ -101,7 +102,6 @@ INITIALIZE
 		dSampleTwoTheta = dSampleTheta * 2.;
 
 		double dAnaScatterSense = 1.;
-		double dAnaOrder = 2.;
 		dAnaTheta = dAnaScatterSense*asin(dAnaOrder*dLam / (2.*dAnaD)) / M_PI * 180.;
 	}
 
@@ -265,16 +265,10 @@ COMPONENT Sample_phonon = Phonon_simple(
 	//target_index = +4, focus_r=dAnaWidth/2.0,
 	target_x = dTargetSampleAna[0], target_y = dTargetSampleAna[1], target_z = dTargetSampleAna[2],
 	focus_xw = dAnaWidth, focus_yh = dAnaHeight,
-	a=5, b=0.9, M=100, c=5, DW=1, T=300, sigma_abs=0.01, sigma_inc=0.001)
+	a=5, b=0.9, M=1000, c=2, DW=1, T=20, sigma_abs=0.01, sigma_inc=0.001)
 		WHEN(iSample == 100)
 		AT (0, 0, 0) RELATIVE SampleAxisBegin
 		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin
-//		EXTEND
-//		%{
-// no SCATTER in component!
-//			if(bAbsorbNonScattered && !SCATTERED)
-//				ABSORB;
-//		%}
 
 
 COMPONENT SampleAxisEnd = Arm()
@@ -296,7 +290,7 @@ COMPONENT AnaAxisBegin = Arm()
 COMPONENT E_mon = E_monitor(
 	xwidth = dAnaWidth, yheight = dAnaHeight,
 	nE = 256, filename = "E_mon_pre_ana",
-	Emin = 0.0, Emax = E_i*2.0,
+	Emin = 0.5*E_i, Emax = 1.5*E_i,
 	restore_neutron = 1)
 		AT (0,0,0) RELATIVE AnaAxisBegin
 

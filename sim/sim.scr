@@ -1,6 +1,9 @@
+#!./hermelin
+
 __init__()
 {
 	import("fit.scr");
+	import("tas.scr");
 }
 
 sim_evaluate(dir, show_plots)
@@ -15,28 +18,51 @@ sim_evaluate(dir, show_plots)
         return result;
 }
 
-show_Emon(dir)
+eval_Emon(dir, do_fit)
 {
 	dat = loadtxt(dir + "/E_mon_pre_ana.sim");
 	dat = [dat[0], dat[1], dat[2], dat[4]];
 
-	dgauss = fit_doublegauss(dat[0], dat[1], dat[2]);
+	plot_obj = vec(1);
+	plot_obj[0] = dat;
 
-        params_vals = map_vec_to_val(dgauss);
-        params_errs = map_vec_to_val(dgauss, 1);
+	if(do_fit)
+	{
+		lam = real(dat[3]["param_dLam"]);
+		E = k2E(lam2k(lam));
+	
+		print("lam_i = " + lam + "A\nE_i = " + E + " meV");
+		print();
 
-	print("Double Gaussian fit values: " + str(params_vals));
-	print("Double Gaussian fit errors: " + str(params_errs));
 
-        fitx = linspace(min(dat[0]), max(dat[0]), 128);
-        fity = doublegauss_model(fitx, *params_vals);
+		dgauss = fit_doublegauss(dat[0], dat[1], dat[2], E);
+
+	        params_vals = map_vec_to_val(dgauss);
+	        params_errs = map_vec_to_val(dgauss, 1);
+
+		print("Double Gaussian fit values: " + str(params_vals));
+		print("Double Gaussian fit errors: " + str(params_errs));
+
+	        fitx = linspace(min(dat[0]), max(dat[0]), 128);
+	        fity = doublegauss_model(fitx, *params_vals);
 
 
-	plot([dat, [fitx, fity, ["style":"line"]]], ["window":2]);
+		peak1 = params_vals["x0_0"];
+		peak2 = params_vals["x0_1"];
+
+		print();
+		print("Peak E_1 = " + peak1 + ", dE_1 = " + (peak1 - E));
+		print("Peak E_2 = " + peak2 + ", dE_2 = " + (peak2 - E));
+
+
+		plot_obj[1] = [fitx, fity, ["style":"line"]];
+	}
+
+	plot(plot_obj, ["window":2]);
 }
 
 
 main()
 {
-	show_Emon("output/single");
+	eval_Emon("output/single", 1);
 }
