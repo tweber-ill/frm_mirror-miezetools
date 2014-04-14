@@ -76,6 +76,6 @@ mcrun(instr, num_neutr, dir, simparams)
 	if(not status)
 		print(RED + "Running '" + instr_out + "' in dir '" + dir + "' FAILED." + NOCOLOR);
 	else
-		print(GREEN + "Running '" + instr_out + "' in dir '" + dir + "'  SUCCEEDED." + NOCOLOR);
+		print(GREEN + "Running '" + instr_out + "' in dir '" + dir + "' SUCCEEDED." + NOCOLOR);
 	return status; 
 }

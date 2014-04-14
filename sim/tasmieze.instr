@@ -10,16 +10,19 @@ DEFINE INSTRUMENT TasMieze
 	double dLam = 5.0, 
 	double dDeltaLam = 0.1,
 
+
 	// MIEZE
 	double dMiezeL1 = 0.9,
 	double dMiezeF1 = 46000.0, 
 	double dMiezeF2 = 61920.0,
 	double dDistMonoMieze = 0.5,
 
+
 	// mono
 	double dMonoD = 6.79,
 	double dMonoOrder = 2.0,
 	double dMonoTheta = 0.0,
+
 
 	// sample
 	// 001: C Single_crystal
@@ -29,12 +32,22 @@ DEFINE INSTRUMENT TasMieze
 	double dSampleTheta = 0.0, 
 	double dSampleTwoTheta = 0.0,
 
+	double dTemp = 20.0,
+	double dSampleD = 6.79,
+	double dSampleOrder = 2.0,
+	double dSampleB = 1.0,
+	double dSampleM = 1.0,
+
+	double dSamplePhononVel = 1.0,
+
+
 	// analyser
 	double dAnaD = 6.79,
 	double dAnaOrder = 2.0,
 	double dAnaTheta=0.0,
 	double dAnaDepth = 0.001,
 	double dDistSampleAna = 1.0,
+
 
 	// detector
 	double dDistAnaDet = 1.0,
@@ -57,7 +70,6 @@ DECLARE
 	double dMonoMosaic = 10.0;
 
 	// sample
-	double dSampleD = 6.79;
 	double dSampleWidth = 0.05, dSampleHeight = 0.05, dSampleDepth = 0.001;
 	
 	double dTargetSampleAna[3];
@@ -97,7 +109,6 @@ INITIALIZE
 		dMonoTheta = dMonoScatterSense*asin(dMonoOrder*dLam / (2.*dMonoD)) / M_PI * 180.;
 
 		double dSampleScatterSense = -1.;
-		double dSampleOrder = 2.;
 		dSampleTheta = dSampleScatterSense*asin(dSampleOrder*dLam / (2.*dSampleD)) / M_PI * 180.;
 		dSampleTwoTheta = dSampleTheta * 2.;
 
@@ -265,7 +276,7 @@ COMPONENT Sample_phonon = Phonon_simple(
 	//target_index = +4, focus_r=dAnaWidth/2.0,
 	target_x = dTargetSampleAna[0], target_y = dTargetSampleAna[1], target_z = dTargetSampleAna[2],
 	focus_xw = dAnaWidth, focus_yh = dAnaHeight,
-	a=5, b=0.9, M=1000, c=2, DW=1, T=20, sigma_abs=0.01, sigma_inc=0.001)
+	a=dSampleD, b=dSampleB, M=dSampleM, c=dSamplePhononVel, DW=1, T=dTemp, sigma_abs=0.0, sigma_inc=0.0)
 		WHEN(iSample == 100)
 		AT (0, 0, 0) RELATIVE SampleAxisBegin
 		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin

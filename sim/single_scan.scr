@@ -12,6 +12,7 @@ __init__()
 	import("tas.scr");
 	import("mieze.scr");
 	import("colors.scr");
+	import("phonon.scr");
 }
 
 run(simParams)
@@ -34,8 +35,16 @@ main()
 	do_compile = 1;
 	sample_idx = 100;
 
-	Q = 0.2;		# 1/A
-	dE = -0.417;		# meV
+	sample_d = 5.0;
+	sample_b = 1.0;
+	sample_m = 1.0;
+	sample_vel = 1.0;
+
+	Q = 0.2;							# 1/A
+	dE = phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
+
+	print("Q = " + Q + " 1/A");
+	print("E = " + dE + " meV");
 
 	# -------------------------------------------------------------------------------- 
 	# MIEZE stuff
@@ -50,12 +59,12 @@ main()
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
 	lam = 4.;		# A
 	dlam = lam/25.;
-	tau = 25.;		# ps
+	tau = 10.;		# ps
 
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, dE);
 
-	#print("Detector offset: " + det_offs);
+	print("Detector offset: " + det_offs);
 	# -------------------------------------------------------------------------------- 
 
 
@@ -110,7 +119,12 @@ main()
 			+ " dMonoD=" + mono_d
 			+ " dAnaD=" + ana_d
 			+ " dMonoOrder=" + mono_order
-			+ " dAnaOrder=" + ana_order;
+			+ " dAnaOrder=" + ana_order
+			+ " dSampleD=" + sample_d
+			+ " dSampleOrder=1.0"
+			+ " dSampleB=" + sample_b
+			+ " dSampleM=" + sample_m
+			+ " dSamplePhononVel=" + sample_vel;
 
 	print("\n\n");
 	print("="*80);
