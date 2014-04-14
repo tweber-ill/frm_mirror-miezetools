@@ -7,6 +7,8 @@
 DEFINE INSTRUMENT TasMieze
 (
 	// source
+	double dSourceWidth = 0.001,
+	double dSourceHeight = 0.001,
 	double dLam = 5.0, 
 	double dDeltaLam = 0.1,
 
@@ -19,9 +21,19 @@ DEFINE INSTRUMENT TasMieze
 
 
 	// mono
+	int bMonoIdeal = 0,
+
+	double dMonoWidth = 0.0025, 
+	double dMonoHeight = 0.0025,
+	double dMonoDepth = 0.001,
+
+	double dMonoMosaic = 10.0,
+
 	double dMonoD = 6.79,
 	double dMonoOrder = 2.0,
 	double dMonoTheta = 0.0,
+
+	double dDistSrcMono = 1.0,
 
 
 	// sample
@@ -31,6 +43,10 @@ DEFINE INSTRUMENT TasMieze
 	double dDistMonoSample = 2.0,
 	double dSampleTheta = 0.0, 
 	double dSampleTwoTheta = 0.0,
+
+	double dSampleWidth = 0.05, 
+	double dSampleHeight = 0.05, 
+	double dSampleDepth = 0.001,
 
 	double dTemp = 20.0,
 	double dSampleD = 6.79,
@@ -42,16 +58,27 @@ DEFINE INSTRUMENT TasMieze
 
 
 	// analyser
+	int bAnaIdeal = 0,
+
+	double dAnaWidth = 0.0025, 
+	double dAnaHeight = 0.0025,
+	double dAnaDepth = 0.001,
+
+	double dAnaMosaic = 10.0,
+
 	double dAnaD = 6.79,
 	double dAnaOrder = 2.0,
 	double dAnaTheta=0.0,
-	double dAnaDepth = 0.001,
 	double dDistSampleAna = 1.0,
 
 
 	// detector
+	double dDetWidth = 0.4, 
+	double dDetHeight = 0.4,
+
 	double dDistAnaDet = 1.0,
 	double dDetOffs = 0.0,
+	double dDeltaEMon = -1.0,
 
 	// 1: calculate TAS angles internally
 	// 0: calculate TAS angles externally
@@ -63,21 +90,9 @@ DECLARE
 %{
 	int bAbsorbNonScattered = 1;
 
-	// monochromator
-	bool bMonoIdeal = 0;
-	double dDistSrcMono = 1.;
-	double dMonoWidth = 0.005, dMonoHeight = 0.005, dMonoDepth = 0.001;
-	double dMonoMosaic = 10.0;
-
 	// sample
-	double dSampleWidth = 0.05, dSampleHeight = 0.05, dSampleDepth = 0.001;
-	
 	double dTargetSampleAna[3];
 
-	// analyser
-	bool bAnaIdeal = 0;
-	double dAnaWidth = 0.05, dAnaHeight = 0.05;
-	double dAnaMosaic = 10.0;
 
 	// MIEZE
 	bool bMiezeIdeal = 1;
@@ -90,7 +105,6 @@ DECLARE
 	double dMiezeFm = -1.;
 
 	// detector
-	double dDetWidth = 0.4, dDetHeight = 0.4;
 	double dDetTofBase = 0.;
 	
 	double E_i;
@@ -120,6 +134,9 @@ INITIALIZE
 	dTargetSampleAna[1] = 0.;
 	dTargetSampleAna[2] = cos((dSampleTwoTheta-dSampleTheta)/180.*M_PI) * dDistSampleAna;
 
+
+	if(dDeltaEMon < 0.)
+		dDeltaEMon = E_i*0.5;
 
 	printf("--------------------------------------------------------------------------------\n");
 	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
@@ -161,7 +178,8 @@ COMPONENT Origin = Progress_bar()
 // source
 
 COMPONENT Source = Source_simple(
-	yheight = 0.01, xwidth = 0.01, focus_xw = dMonoWidth*0.5, focus_yh = dMonoHeight*0.5,
+	yheight = dSourceHeight, xwidth = dSourceWidth, 
+	focus_xw = dMonoWidth*0.5, focus_yh = dMonoHeight*0.5,
 	lambda0 = dLam, dlambda = dDeltaLam, gauss = 1, dist = dDistSrcMono)
 		AT (0, 0, 0) RELATIVE Origin
 		EXTEND
@@ -301,7 +319,7 @@ COMPONENT AnaAxisBegin = Arm()
 COMPONENT E_mon = E_monitor(
 	xwidth = dAnaWidth, yheight = dAnaHeight,
 	nE = 256, filename = "E_mon_pre_ana",
-	Emin = 0.5*E_i, Emax = 1.5*E_i,
+	Emin = E_i - dDeltaEMon, Emax = E_i + dDeltaEMon,
 	restore_neutron = 1)
 		AT (0,0,0) RELATIVE AnaAxisBegin
 

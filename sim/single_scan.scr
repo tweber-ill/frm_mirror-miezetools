@@ -33,15 +33,20 @@ run(simParams)
 main()
 {
 	do_compile = 1;
-	sample_idx = 100;
 
+	source_width = 0.001;
+	mono_ana_width = 0.005;
+	mono_ana_mosaic = 10.0;
+	sample_idx = 100;
+	sample_width = 0.005;
+	sample_depth = 0.005;
 	sample_d = 5.0;
 	sample_b = 1.0;
 	sample_m = 1.0;
-	sample_vel = 1.0;
+	sample_vel = 1.5;
 
 	Q = 0.2;							# 1/A
-	dE = phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
+	dE = -phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
 
 	print("Q = " + Q + " 1/A");
 	print("E = " + dE + " meV");
@@ -58,8 +63,8 @@ main()
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
 	lam = 4.;		# A
-	dlam = lam/25.;
-	tau = 10.;		# ps
+	dlam = 0.01 * lam;
+	tau = 100.;		# ps
 
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, dE);
@@ -86,6 +91,8 @@ main()
 	#sample_tt = mono_tt;
 
 	ana_tt = get_mono_tt(k_f, ana_d/ana_order);
+
+	emon_range = abs(dE*2.);
 	# --------------------------------------------------------------------------------
 
 
@@ -120,11 +127,24 @@ main()
 			+ " dAnaD=" + ana_d
 			+ " dMonoOrder=" + mono_order
 			+ " dAnaOrder=" + ana_order
+			+ " dSampleWidth=" + sample_width
+			+ " dSampleHeight=" + sample_width
+			+ " dSampleDepth=" + sample_depth
 			+ " dSampleD=" + sample_d
 			+ " dSampleOrder=1.0"
 			+ " dSampleB=" + sample_b
 			+ " dSampleM=" + sample_m
-			+ " dSamplePhononVel=" + sample_vel;
+			+ " dSamplePhononVel=" + sample_vel
+			+ " dTemp=20"
+			+ " dDeltaEMon=" + emon_range
+			+ " dMonoWidth=" + mono_ana_width
+			+ " dMonoHeight=" + mono_ana_width
+			+ " dAnaWidth=" + mono_ana_width
+			+ " dAnaHeight=" + mono_ana_width;
+			+ " dMonoMosaic=" + mono_ana_mosaic
+			+ " dAnaMosaic=" + mono_ana_mosaic
+			+ " dSourceWidth=" + source_width
+			+ " dSourceHeight=" + source_width;
 
 	print("\n\n");
 	print("="*80);
