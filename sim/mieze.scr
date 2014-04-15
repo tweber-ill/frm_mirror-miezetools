@@ -103,6 +103,12 @@ contrast(num_osc, datxy, dattof, want_plot)
 	C = amp / offs;
 	C_err = sqrt((amp_err/offs)^2. + (-amp/offs^2. * offs_err)^2.);
 
+	if(not isfinite(C))
+	{
+		C = 0.;
+		C_err = 1.;
+	}
+
 #	print("Contrast: " + C + ", Phase: " + phase + ", Amplitude: " + amp + ", Offset: " + offs);
 
 	if(want_plot)

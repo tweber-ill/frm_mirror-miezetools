@@ -48,7 +48,7 @@ main()
 	sample_d = 5.0;
 	sample_b = 1.0;
 	sample_m = 1.0;
-	sample_vel = 1.5;
+	sample_vel = 0.5;
 
 	Q = 0.2;							# 1/A
 	dE = phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
@@ -139,7 +139,7 @@ main()
 			+ " dSampleB=" + sample_b
 			+ " dSampleM=" + sample_m
 			+ " dSamplePhononVel=" + sample_vel
-			+ " dTemp=20"
+			+ " dTemp=5"
 			+ " dDeltaEMon=" + emon_range
 			+ " dMonoWidth=" + mono_ana_width
 			+ " dMonoHeight=" + mono_ana_width

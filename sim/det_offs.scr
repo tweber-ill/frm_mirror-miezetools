@@ -21,16 +21,17 @@ __init__()
 
 main()
 {
+#	global NUM_THREADS = 1;
 	do_compile = 1;
 
 	lam = 4.;		# A
-	dlam = 0.02 * lam;
+	dlam = 0.04 * lam;
 
 	source_width = 0.001;
 	det_width = 0.04;
-	mono_ana_ideal = 1;
+	mono_ana_ideal = 0;
 	mono_ana_width = 0.005;
-	mono_ana_mosaic = 10.0;
+	mono_ana_mosaic = 20.0;
 	sample_idx = 100;
 	sample_width = 0.004;
 	sample_depth = 0.002;
