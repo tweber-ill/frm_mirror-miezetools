@@ -2,11 +2,12 @@
 
 __init__()
 {
-	global INSTR = "tasmieze";
+	#global INSTR = "tasmieze";
+	global INSTR = "tasmieze_nomono";
 	global NUM_THREADS = thread_hwcount();
 	print("CPU supports " + NUM_THREADS + " threads.\n");
 
-	global num_neutrons = 1e6;
+	global num_neutrons = 1e5;
 
 	print("Running on " + ver() + "\n");
 
@@ -22,12 +23,12 @@ main()
 {
 	do_compile = 1;
 
-	lam = 5.;		# A
-	dlam = 0.01 * lam;
+	lam = 4.;		# A
+	dlam = 0.02 * lam;
 
 	source_width = 0.001;
 	det_width = 0.04;
-	mono_ana_ideal = 0;
+	mono_ana_ideal = 1;
 	mono_ana_width = 0.005;
 	mono_ana_mosaic = 10.0;
 	sample_idx = 100;
@@ -39,7 +40,7 @@ main()
 	sample_vel = 1.5;
 
 	Q = 0.2;							# 1/A
-	dE = phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
+	dE = -phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
 
 	print("Q = " + Q + " 1/A");
 	print("E = " + dE + " meV");
@@ -148,7 +149,7 @@ main()
 	print(BLUE + "Starting simulation..." + NOCOLOR);
 	print("\n");
 
-	det_offs = linspace(-0.5, 0.5, 16);
+	det_offs = linspace(-0.8, 0.8, 16);
 	indices = linspace(0, vec_size(det_offs)-1, vec_size(det_offs));
 	global contrasts = vec(vec_size(det_offs));
 	global contrasts_err = vec(vec_size(det_offs));
@@ -161,16 +162,21 @@ main()
 	print(GREEN + "All thread runs have finished." + NOCOLOR);
 	print("="*80);
 
-	print("Detector Offsets: " + str(det_offs));
-	print("Contrasts: " + str(contrasts));
-	
 	params = map();
-	params["xlabel"] = "Detector Offset (mm)";
+	params["xlabel"] = "Detector offset (mm)";
 	params["ylabel"] = "Contrast";
-	params["title"] = "Result";
 	params["xlimits"] = 1000.*min(det_offs) + " " + 1000.*max(det_offs);
 	params["ylimits"] = "0 1";
 	params["term"] = "x11";
 
-	plot(det_offs*1000., contrasts, contrasts_err, params);
+	det_offs_mm = det_offs*1000.;
+	thefit = fit_gauss(det_offs_mm, contrasts, contrasts_err);
+	print("Fit: " + str(thefit));
+
+	fitx = linspace(min(det_offs_mm), max(det_offs_mm), 64);
+	fity = gauss_model(fitx, *map_vec_to_val(thefit));
+
+	params["title"] = "x0 = " + thefit["x0"][0] + " mm +- " + thefit["x0"][1] + " mm";
+
+	plot([[det_offs_mm, contrasts, contrasts_err, params], [fitx, fity, ["style":"line"]]]);
 }
