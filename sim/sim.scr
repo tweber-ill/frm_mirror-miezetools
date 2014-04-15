@@ -2,7 +2,11 @@
 
 __init__()
 {
+	global NUM_THREADS = thread_hwcount();
+	print("CPU supports " + NUM_THREADS + " threads.\n");
+
 	import("fit.scr");
+	import("mieze.scr");
 	import("tas.scr");
 }
 
@@ -17,6 +21,36 @@ sim_evaluate(dir, show_plots)
         result = contrast(2, dat, dattof, show_plots);
         return result;
 }
+
+
+run_thread(params, param_name, baseparams)
+{
+	show_plots = NUM_THREADS eq 1;
+
+	for(param : params)
+	{
+		idx = int(param[0]);
+		the_param = param[1];
+
+		simParams = baseparams + " " + param_name + "=" + the_param;
+		dir = "output/" + param_name + "_iter_" + idx;
+
+		if(mcrun(INSTR, num_neutrons, dir, simParams))
+		{
+			result = sim_evaluate(dir, show_plots);
+			if(show_plots)
+				eval_Emon(dir, 0);
+
+			begin_critical();
+			print(YELLOW + "Result for " + param_name + " = " + the_param + ": "
+					+ str(result) + NOCOLOR);
+			global contrasts[idx] = result[0][0];
+			global contrasts_err[idx] = result[1][0];
+			end_critical();
+		}
+	}
+}
+
 
 eval_Emon(dir, do_fit)
 {

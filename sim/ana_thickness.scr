@@ -2,13 +2,8 @@
 
 __init__()
 {
-	global NUM_THREADS = thread_hwcount();
-#	global NUM_THREADS = 1;
 	global INSTR = "tasmieze";
 	global num_neutrons = 1e6;
-
-	print(ver());
-	print("CPU supports " + NUM_THREADS + " threads.\n");
 
 	import("mcstas.scr");
 	import("sim.scr");
@@ -16,35 +11,9 @@ __init__()
 	import("colors.scr");
 }
 
-
-run_thread(params, param_name, baseparams)
-{
-	show_plots = NUM_THREADS eq 1;
-
-	for(param : params)
-	{
-		idx = int(param[0]);
-		the_param = param[1];
-
-		simParams = baseparams + " " + param_name + "=" + the_param;
-		dir = "output/iter_" + idx;
-
-		if(mcrun(INSTR, num_neutrons, dir, simParams))
-		{
-			result = sim_evaluate(dir, show_plots);
-
-			begin_critical();
-			print(YELLOW + "Result for " + param_name + " = " + the_param + ": "
-					+ str(result) + NOCOLOR);
-			global contrasts[idx] = result[0][0];
-			global contrasts_err[idx] = result[1][0];
-			end_critical();
-		}
-	}
-}
-
 main()
 {
+#	global NUM_THREADS = 1;
 	do_compile = 0;
 
 	L_sample_ana = 0.5;

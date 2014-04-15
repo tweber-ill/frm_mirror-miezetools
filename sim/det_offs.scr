@@ -3,6 +3,9 @@
 __init__()
 {
 	global INSTR = "tasmieze";
+	global NUM_THREADS = thread_hwcount();
+	print("CPU supports " + NUM_THREADS + " threads.\n");
+
 	global num_neutrons = 1e6;
 
 	print("Running on " + ver() + "\n");
@@ -15,27 +18,12 @@ __init__()
 	import("phonon.scr");
 }
 
-run(simParams)
-{
-	dir = "output/single";
-
-	if(mcrun(INSTR, num_neutrons, dir, simParams))
-	{
-		result = sim_evaluate(dir, 1);
-		eval_Emon(dir, 0);
-		print(YELLOW + "Result: " + str(result) + NOCOLOR);
-		return result;
-	}
-
-	return 0.;
-}
-
 main()
 {
 	do_compile = 1;
 
 	lam = 5.;		# A
-	dlam = 0.05 * lam;
+	dlam = 0.01 * lam;
 
 	source_width = 0.001;
 	det_width = 0.04;
@@ -59,20 +47,20 @@ main()
 	# -------------------------------------------------------------------------------- 
 	# MIEZE stuff
 
-	L_sample_ana = 0.5;
-	L_ana_det = 0.5;
+	L_sample_ana = 1.0;
+	L_ana_det = 1.0;
 	L_mono_sample = 2.;
 	L_mono_mieze = 0.5;
 
 	L1 = 0.9;
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
-	tau = 50.;		# ps
+	tau = 100.;		# ps
 
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
-	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
+	ideal_det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
 
-	print("Detector offset: " + det_offs + " m");
+	print("Ideal detector offset: " + ideal_det_offs + " m");
 	# -------------------------------------------------------------------------------- 
 
 
@@ -126,7 +114,7 @@ main()
 			+ " dSampleTwoTheta=" + sample_tt /pi*180.
 			+ " bAutoSetAngles=0" 
 			+ " iSample=" + sample_idx
-			+ " dDetOffs=" + det_offs
+#			+ " dDetOffs=" + det_offs
 			+ " dMonoD=" + mono_d
 			+ " dAnaD=" + ana_d
 			+ " dMonoOrder=" + mono_order
@@ -160,6 +148,29 @@ main()
 	print(BLUE + "Starting simulation..." + NOCOLOR);
 	print("\n");
 
+	det_offs = linspace(-0.5, 0.5, 16);
+	indices = linspace(0, vec_size(det_offs)-1, vec_size(det_offs));
+	global contrasts = vec(vec_size(det_offs));
+	global contrasts_err = vec(vec_size(det_offs));
 
-	result = run(simBaseParams);
+
+	threads = nthread(NUM_THREADS, "run_thread", zip(indices, det_offs), "dDetOffs", simBaseParams);
+	join(threads);
+
+	print("\n");
+	print(GREEN + "All thread runs have finished." + NOCOLOR);
+	print("="*80);
+
+	print("Detector Offsets: " + str(det_offs));
+	print("Contrasts: " + str(contrasts));
+	
+	params = map();
+	params["xlabel"] = "Detector Offset (mm)";
+	params["ylabel"] = "Contrast";
+	params["title"] = "Result";
+	params["xlimits"] = 1000.*min(det_offs) + " " + 1000.*max(det_offs);
+	params["ylimits"] = "0 1";
+	params["term"] = "x11";
+
+	plot(det_offs*1000., contrasts, contrasts_err, params);
 }

@@ -1,0 +1,99 @@
+#!./hermelin
+
+__init__()
+{
+#	global INSTR = "tasmieze";
+	global INSTR = "tasmieze_nomono";
+	global num_neutrons = 5e6;
+
+	import("mcstas.scr");
+	import("sim.scr");
+	import("mieze.scr");
+	import("fit.scr");
+	import("colors.scr");
+}
+
+main()
+{
+#	global NUM_THREADS = 1;
+	do_compile = 1;
+
+	mono_ana_mosaic = 10.0;
+
+	L_sample_ana = 0.2;
+	L_ana_det = 2.0;
+	L_mono_sample = 2.;
+	L_mono_mieze = 0.5;
+
+	L1 = 0.9;
+	Ls = L_sample_ana + L_ana_det;
+	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
+	lam = 4.5;		# A
+	dlam = lam*0.01;
+	tau = 150.;		# ps
+
+	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
+
+	
+	if(do_compile)
+	{
+		mcclean(INSTR);
+		if(not mccompile(INSTR))
+			return;
+	}
+
+
+	det_offs = linspace(-1.5, 1.5, 16);
+	indices = linspace(0, vec_size(det_offs)-1, vec_size(det_offs));
+	global contrasts = vec(vec_size(det_offs));
+	global contrasts_err = vec(vec_size(det_offs));
+
+	print("Detector offsets: " + str(det_offs));
+
+	simBaseParams = "dLam=" + lam 
+			+ " dDeltaLam=" + dlam 
+			+ " dMiezeF1=" + f1f2[0] 
+			+ " dMiezeF2=" + f1f2[1]
+			+ " dMiezeL1=" + L1
+			+ " dDistMonoMieze=" + L_mono_mieze
+			+ " dDistMonoSample=" +  L_mono_sample
+			+ " dDistSampleAna=" + L_sample_ana
+			+ " dDistAnaDet=" + L_ana_det
+			+ " dMonoMosaic=" + mono_ana_mosaic
+			+ " dAnaMosaic=" + mono_ana_mosaic;
+
+	print("\n\n");
+	print("="*80);
+	print(BLUE + "Starting simulation in " + NUM_THREADS + " threads." + NOCOLOR);
+	print("\n");
+
+
+	threads = nthread(NUM_THREADS, "run_thread", zip(indices, det_offs), "dDetOffs", simBaseParams);
+	join(threads);
+
+	print("\n");
+	print(GREEN + "All thread runs have finished." + NOCOLOR);
+	print("="*80);
+
+
+
+	print("Contrasts: " + str(contrasts));
+	
+	params = map();
+	params["xlabel"] = "Detector offset (mm)";
+	params["ylabel"] = "Contrast";
+	params["xlimits"] = 1000.*min(det_offs) + " " + 1000.*max(det_offs);
+	params["ylimits"] = "0 1";
+	params["term"] = "x11";
+
+	det_offs_mm = det_offs*1000.;
+	thefit = fit_gauss(det_offs_mm, contrasts, contrasts_err);
+	print("Fit: " + str(thefit));
+
+	fitx = linspace(min(det_offs_mm), max(det_offs_mm), 64);
+	fity = gauss_model(fitx, *map_vec_to_val(thefit));
+
+	params["title"] = "x0 = " + thefit["x0"][0] + " mm +- " + thefit["x0"][1] + " mm";
+
+	plot([[det_offs_mm, contrasts, contrasts_err, params], [fitx, fity, ["style":"line"]]]);
+}

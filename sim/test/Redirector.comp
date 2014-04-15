@@ -1,0 +1,79 @@
+/*
+ * Transform neutron paths
+ * Author: Tobias Weber
+ * Date: April 2014
+ */
+
+DEFINE COMPONENT Redirector
+DEFINITION PARAMETERS ()
+SETTING PARAMETERS (double xmin=0, double xmax=0, double ymin=0, double ymax=0, 
+		    double xwidth=0.1, double yheight=0.1,
+		    double rot_y)
+DECLARE
+%{
+	#undef rotate
+	#include <iostream>
+	#include "helper/linalg.h"
+
+	//#redefine rotate !!
+
+	typedef ublas::matrix<double> t_mat;
+	typedef ublas::vector<double> t_vec;
+%}
+
+INITIALIZE
+%{
+    if (ymin > ymax) {
+        // swap
+        double ytmp = ymin;
+        ymin = ymax;
+        ymax = ytmp;
+    }
+    if (xmin > xmax) {
+        // swap
+        double xtmp = xmin;
+        xmin = xmax;
+        xmax = xtmp;
+    }
+
+    if (yheight > 0) {
+        ymax = yheight/2.;
+        ymin = -yheight/2.;
+    } else
+        yheight = ymax-ymin;
+
+    if (xwidth > 0) {
+        xmax = xwidth/2.;
+        xmin = -xwidth/2.;
+    } else
+        xwidth = xmax-xmin;
+
+%}
+
+TRACE
+%{
+//	if(x<xmin || x>xmax || y<ymin || y>ymax)
+//		ABSORB;
+
+	t_vec vel(3);
+	vel[0] = vx;
+	vel[1] = vy;
+	vel[2] = vz;
+
+	t_mat rot = rotation_matrix_3d_y(rot_y/180.*M_PI);
+	t_vec vel_rot = ublas::prod(rot, vel);
+
+	vx = vel_rot[0];
+	vy = vel_rot[1];
+	vz = vel_rot[2];
+
+	SCATTER;
+%}
+
+MCDISPLAY
+%{
+    magnify("xy");
+    box(xmin+xwidth/2., ymin+yheight/2., 0, xwidth, yheight, 0.001);
+%}
+
+END

@@ -85,3 +85,55 @@ fit_doublegauss(x, y, yerr, E0)
 
 	return fitparams;
 }
+
+
+
+
+
+gauss_model(x, x0, sigma, amp, offs)
+{
+	return amp * exp(-0.5 * ((x-x0) / sigma)^2.) + offs;
+}
+
+fit_gauss(x, y, yerr)
+{
+	peaks = find_peaks(x, y);
+	#print("Peaks: " + str(peaks));
+
+	peaks_x = peaks[0];
+	peaks_size = peaks[1];
+	peaks_width = peaks[2] * hwhm2sigma;
+
+	if(length(peaks_x) less 1 or length(peaks_size) less 1 or length(peaks_width) less 1)
+	{
+		print("Error: Prefitter didn't find enough peaks.");
+		return 0;
+	}
+
+	idx_lt = 0;
+
+	# Minuit doesn't handle errors == 0
+	yrange = max(y)-min(y);
+	for(thisyerr : yerr)
+	{
+		if(thisyerr eq 0.)
+			thisyerr = yrange*0.001;
+	}
+
+	hints = [peaks_x[idx_lt], peaks_width[idx_lt], peaks_size[idx_lt], min(y)];
+	hints_err = [peaks_x[idx_lt]/10., peaks_width[idx_lt]/10., peaks_size[idx_lt]/10., yrange/10.];
+
+	lowerlims = ["amp":min(y), "sigma":0., "offs":min(y)];
+	upperlims = ["amp":max(y), "offs":max(y)];
+
+	fitparams = fit("gauss_model", x, y, yerr, 
+			[
+				"hints":hints, "hints_errors":hints_err,
+				"lower_limits":lowerlims, "upper_limits":upperlims,
+				"fixed":["offs"], "debug":0,
+				"steps":["frrf", "rffr", "xxxx"]
+			]
+			);
+
+	return fitparams;
+}

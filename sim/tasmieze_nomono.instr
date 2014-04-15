@@ -1,5 +1,5 @@
 /*
- * new TAS-MIEZE instrument
+ * new TAS-MIEZE instrument without monochromator
  * @author tweber
  * @date 25-nov-13
  */
@@ -20,7 +20,7 @@ DEFINE INSTRUMENT TasMieze
 	double dDistMonoMieze = 0.5,
 
 
-	// mono
+	// mono, unused
 	int bMonoIdeal = 0,
 
 	double dMonoWidth = 0.0025, 
@@ -127,8 +127,8 @@ INITIALIZE
 
 	if(bAutoSetAngles)
 	{
-		double dMonoScatterSense = 1.;
-		dMonoTheta = dMonoScatterSense*asin(dMonoOrder*dLam / (2.*dMonoD)) / M_PI * 180.;
+		//double dMonoScatterSense = 1.;
+		//dMonoTheta = dMonoScatterSense*asin(dMonoOrder*dLam / (2.*dMonoD)) / M_PI * 180.;
 
 		double dSampleScatterSense = -1.;
 		dSampleTheta = dSampleScatterSense*asin(dSampleOrder*dLam / (2.*dSampleD)) / M_PI * 180.;
@@ -148,7 +148,7 @@ INITIALIZE
 
 	printf("--------------------------------------------------------------------------------\n");
 	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
-	printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
+	//printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
 	printf("Sample: theta_s=%f deg, 2theta_s=%f deg, lam_f=%f A, v_f=%f m/s\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f);
 	printf("Analyser: theta_a=%f deg, 2thetaa_=%f deg\n", dAnaTheta, 2.*dAnaTheta);
 
@@ -168,7 +168,7 @@ INITIALIZE
 
 
 
-	dDetTofBase = (dDistSrcMono + dDistMonoSample) / v_i + (dDistSampleAna + dDistAnaDet + dDetOffs) / v_f;
+	dDetTofBase = (/*dDistSrcMono +*/ dDistMonoSample) / v_i + (dDistSampleAna + dDistAnaDet + dDetOffs) / v_f;
 	dDetTofBase += 0.5*dMiezeNumOsc/dMiezeFm;
 %}
 
@@ -184,73 +184,29 @@ COMPONENT Origin = Progress_bar()
 
 
 
+
 //----------------------------------------------------------------------------------------------------
 // source
 
+COMPONENT MonoAxisBegin = Arm()
+	AT (0, 0, 0.0) RELATIVE Origin
+
+
+	
 COMPONENT Source = Source_simple(
 	yheight = dSourceHeight, xwidth = dSourceWidth, 
-	focus_xw = dMonoWidth, focus_yh = dMonoHeight,
-	lambda0 = dLam, dlambda = dDeltaLam, gauss = 0, dist = dDistSrcMono)
-		AT (0, 0, 0) RELATIVE Origin
+	focus_xw = dSampleWidth, focus_yh = dSampleHeight,
+	lambda0 = dLam, dlambda = dDeltaLam, gauss = 1, dist = dDistMonoSample)
+		AT (0, 0, 0) RELATIVE MonoAxisBegin
 		EXTEND
 		%{
 			//t = 0.;
 			t = rand01() * dMiezeNumOsc/dMiezeFm;
 		%}
-//----------------------------------------------------------------------------------------------------
-
-
-
-
-//----------------------------------------------------------------------------------------------------
-// monochromator
-
-COMPONENT MonoAxisBegin = Arm()
-	AT (0, 0, dDistSrcMono) RELATIVE Source
-
-/*
-COMPONENT Mono_pseudo = Redirector(xwidth=dMonoWidth, yheight=dMonoHeight,
-			rot_y = 2.0*dMonoTheta)
-		WHEN(bMonoIdeal == 2)
-		AT (0,0,0) RELATIVE MonoAxisBegin
-		ROTATED (0,0,0) RELATIVE MonoAxisBegin
-*/
-
-COMPONENT Mono_flat = Monochromator_flat(
-	zwidth = dMonoWidth, yheight = dMonoHeight, mosaich = dMonoMosaic, mosaicv = dMonoMosaic,
-	r0 = 1, DM = dMonoD)
-		WHEN(bMonoIdeal == 1)
-  		AT (0, 0, 0) RELATIVE MonoAxisBegin
-	  	ROTATED (0, dMonoTheta, 0) RELATIVE MonoAxisBegin
-		EXTEND
-		%{
-			if(bAbsorbNonScattered && !SCATTERED)
-				ABSORB;
-		%}
-
-COMPONENT Mono_crystal = Single_crystal(
-	reflections = "C_graphite.lau", 
-	xwidth = dMonoWidth, yheight = dMonoHeight, zdepth = dMonoDepth, 
-	delta_d_d = 1e-4, mosaic = dMonoMosaic, recip_cell = 0, barns = 0, 
-	ax = 2.464, ay = 0, az = 0, 
-	bx = 0, by = 2.464, bz = 0, 
-	cx = 0, cy = 0, cz = dMonoD,
-	aa = 0, bb = 0, cc = 120,
-	sigma_abs = 0.0035, sigma_inc = 0.001, 
-	order = 0, RX = 0, RY = 0, RZ = 0)
-		WHEN(bMonoIdeal == 0)
-		AT (0, 0, 0) RELATIVE MonoAxisBegin
-		ROTATED (0, 90+dMonoTheta, 0) RELATIVE MonoAxisBegin
-		EXTEND
-		%{
-			if(bAbsorbNonScattered && !SCATTERED)
-				ABSORB;
-		%}
-
 
 COMPONENT MonoAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE MonoAxisBegin
-	ROTATED (0, 2.0*dMonoTheta, 0) RELATIVE MonoAxisBegin
+	ROTATED (0, 0, 0) RELATIVE MonoAxisBegin
 
 
 

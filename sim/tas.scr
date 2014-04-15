@@ -31,6 +31,8 @@ get_mono_Q(d)
 
 get_tt(ki, kf, Q)
 {
+	sample_sense = -1.0;
+
 	ttcos = (ki*ki + kf*kf - Q*Q) / (2.*ki*kf);
 	if(abs(ttcos) greater 1.)
 	{
@@ -38,13 +40,18 @@ get_tt(ki, kf, Q)
 		exit(-1);
 	}
 
-	tt = acos(ttcos);
+	tt = sample_sense*acos(ttcos);
 	return tt;
 }
 
 lam2k(lam)
 {
 	return 2.*pi / lam;
+}
+
+k2lam(k)
+{
+	return 2.*pi / k;
 }
 
 lam2v(lam_A)
@@ -79,6 +86,12 @@ E2k(E_meV)
 	p = sqrt(2.*m_n*E);
 	k = p / hbar;
 	return k / 1e10;
+}
+
+E2lam(E_meV)
+{
+	return k2lam(E2k(E_meV));
+	
 }
 
 main()
