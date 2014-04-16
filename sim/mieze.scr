@@ -1,3 +1,8 @@
+#
+# Mieze Calculations
+# Author: TW
+#
+
 __init__()
 {
 	import("tas.scr");

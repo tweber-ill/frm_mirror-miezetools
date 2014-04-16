@@ -1,4 +1,8 @@
 #!./hermelin
+#
+# Detector offset simulation for phonon
+# Author: TW
+#
 
 __init__()
 {
@@ -17,7 +21,7 @@ __init__()
 main()
 {
 #	global NUM_THREADS = 1;
-	do_compile = 0;
+	do_compile = 1;
 
 	if(do_compile)
 	{
@@ -94,7 +98,7 @@ main()
 		L1 = 0.9;
 		Ls = L_sample_ana + L_ana_det;
 		L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
-		tau = 100.;		# ps
+		tau = 75.;		# ps
 
 		f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 		ideal_det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
@@ -250,6 +254,13 @@ main()
 
 	savetxt("output/det_offs.dat", [dat_x, dat_y_sim, dat_yerr_sim, plop]);
 
+
+
+	Qs = linspace(minx, maxx, 128);
+	dEs = -phonon_disp(sample_vel, sample_m, Qs, sample_d);
+	dat_y_theo_fine = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dEs)*1000.;
+	dat_x_theo_fine = Qs;
+
 	plot([ [dat_x, dat_y_sim, dat_yerr_sim, ["legend":"simulation"]], 
-		[dat_x, dat_y_theo, ["legend":"theory"]], plop ]);
+		[dat_x_theo_fine, dat_y_theo_fine, ["style":"line", "legend":"theory"]], plop ]);
 }

@@ -83,6 +83,15 @@ DEFINE INSTRUMENT TasMieze
 	// 1: calculate TAS angles internally
 	// 0: calculate TAS angles externally
 	int bAutoSetAngles = 1,
+ 
+ 
+ 
+	// collimators / slits
+	double dCollBeforeMonoDivH = 40.0,
+	double dCollBeforeSampleDivH = 40.0,
+	double dCollAfterSampleDivH = 40.0,
+	double dCollAfterAnaDivH = 40.0,
+
 
 
 	// expected lambda after inelastic scattering
@@ -191,7 +200,6 @@ COMPONENT Origin = Progress_bar()
 COMPONENT MonoAxisBegin = Arm()
 	AT (0, 0, 0.0) RELATIVE Origin
 
-
 	
 COMPONENT Source = Source_simple(
 	yheight = dSourceHeight, xwidth = dSourceWidth, 
@@ -203,6 +211,11 @@ COMPONENT Source = Source_simple(
 			//t = 0.;
 			t = rand01() * dMiezeNumOsc/dMiezeFm;
 		%}
+		
+COMPONENT CollBeforeMono = Collimator_linear(
+			xwidth=dMonoWidth*2.0, yheight=dMonoHeight*2.0, length=0.1,
+			divergence=dCollBeforeMonoDivH, divergenceV=0.0)
+	AT (0, 0, 0) RELATIVE MonoAxisBegin	
 
 COMPONENT MonoAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE MonoAxisBegin
@@ -243,6 +256,12 @@ COMPONENT MiezeBox = MIEZE_box(N=1,
 COMPONENT SampleAxisBegin = Arm()
 	AT (0, 0, dDistMonoSample) RELATIVE MonoAxisEnd
 
+COMPONENT CollBeforeSample = Collimator_linear(
+			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
+			divergence=dCollBeforeSampleDivH, divergenceV=0.0)
+	AT (0, 0, -dDistMonoSample*0.1 - 0.1) RELATIVE SampleAxisBegin
+
+
 
 COMPONENT Sample_crystal_C = Single_crystal(
 	reflections = "C_graphite.lau", 
@@ -277,6 +296,12 @@ COMPONENT Sample_phonon = Phonon_simple(
 COMPONENT SampleAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE SampleAxisBegin
 	ROTATED (0, dSampleTwoTheta, 0) RELATIVE SampleAxisBegin
+
+COMPONENT CollAfterSample = Collimator_linear(
+			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
+			divergence=dCollAfterSampleDivH, divergenceV=0.0)
+	AT (0, 0, dDistMonoSample*0.1 + 0.1) RELATIVE SampleAxisEnd
+
 
 //----------------------------------------------------------------------------------------------------
 
@@ -332,6 +357,11 @@ COMPONENT Ana_crystal = Single_crystal(
 COMPONENT AnaAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE AnaAxisBegin
 	ROTATED (0, 2.0*dAnaTheta, 0) RELATIVE AnaAxisBegin
+	
+COMPONENT CollAfterAna = Collimator_linear(
+			xwidth=dAnaWidth*2.0, yheight=dAnaHeight*2.0, length=0.1,
+			divergence=dCollAfterAnaDivH, divergenceV=0.0)
+	AT (0, 0, dDistSampleAna*0.1 + 0.1) RELATIVE AnaAxisEnd	
 
 //----------------------------------------------------------------------------------------------------
 

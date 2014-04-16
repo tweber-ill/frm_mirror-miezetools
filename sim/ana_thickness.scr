@@ -1,5 +1,8 @@
 #!./hermelin
-
+#
+# Analyser thickness simulation
+# Author: TW
+#
 __init__()
 {
 	global INSTR = "tasmieze";

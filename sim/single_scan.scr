@@ -1,5 +1,10 @@
 #!./hermelin
 
+#
+# Single invokation of tasmieze sim
+# Author: TW
+#
+
 __init__()
 {
 	global INSTR = "tasmieze";

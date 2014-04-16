@@ -1,4 +1,8 @@
 #!./hermelin
+#
+# Detector offset for bragg peak
+# Author: TW
+#
 
 __init__()
 {

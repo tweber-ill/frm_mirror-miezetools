@@ -1,3 +1,8 @@
+#
+# Fitting routines
+# Author: TW
+#
+
 __init__()
 {
 	global hwhm2sigma = 1./(sqrt(2.*log(2.)));

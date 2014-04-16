@@ -1,5 +1,10 @@
 #!./hermelin
 
+#
+# Common routines for MIEZE sims
+# Author: TW
+#
+
 __init__()
 {
 	global NUM_THREADS = thread_hwcount();

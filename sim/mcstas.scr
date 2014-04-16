@@ -1,4 +1,8 @@
 #!./hermelin
+#
+# Routines for invoking McStas
+# Author: TW
+#
 
 __init__()
 {

@@ -83,8 +83,15 @@ DEFINE INSTRUMENT TasMieze
 	// 1: calculate TAS angles internally
 	// 0: calculate TAS angles externally
 	int bAutoSetAngles = 1,
+ 
+ 
+	// collimators / slits
+	double dCollBeforeMonoDivH = 30.0,
+	double dCollBeforeSampleDivH = 30.0,
+	double dCollAfterSampleDivH = 30.0,
+	double dCollAfterAnaDivH = 30.0,
 
-
+ 
 	// expected lambda after inelastic scattering
 	double dLam_f = -1.0
 )
@@ -207,6 +214,11 @@ COMPONENT Source = Source_simple(
 
 COMPONENT MonoAxisBegin = Arm()
 	AT (0, 0, dDistSrcMono) RELATIVE Source
+	
+COMPONENT CollBeforeMono = Collimator_linear(
+			xwidth=dMonoWidth*2.0, yheight=dMonoHeight*2.0, length=0.1,
+			divergence=dCollBeforeMonoDivH, divergenceV=0.0)
+	AT (0, 0, -dDistSrcMono*0.1 - 0.1) RELATIVE MonoAxisBegin
 
 /*
 COMPONENT Mono_pseudo = Redirector(xwidth=dMonoWidth, yheight=dMonoHeight,
@@ -287,6 +299,12 @@ COMPONENT MiezeBox = MIEZE_box(N=1,
 COMPONENT SampleAxisBegin = Arm()
 	AT (0, 0, dDistMonoSample) RELATIVE MonoAxisEnd
 
+COMPONENT CollBeforeSample = Collimator_linear(
+			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
+			divergence=dCollBeforeSampleDivH, divergenceV=0.0)
+	AT (0, 0, -dDistMonoSample*0.1 - 0.1) RELATIVE SampleAxisBegin
+
+
 
 COMPONENT Sample_crystal_C = Single_crystal(
 	reflections = "C_graphite.lau", 
@@ -318,9 +336,16 @@ COMPONENT Sample_phonon = Phonon_simple(
 		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin
 
 
+		
+		
 COMPONENT SampleAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE SampleAxisBegin
 	ROTATED (0, dSampleTwoTheta, 0) RELATIVE SampleAxisBegin
+
+COMPONENT CollAfterSample = Collimator_linear(
+			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
+			divergence=dCollAfterSampleDivH, divergenceV=0.0)
+	AT (0, 0, dDistMonoSample*0.1 + 0.1) RELATIVE SampleAxisEnd
 
 //----------------------------------------------------------------------------------------------------
 
@@ -371,11 +396,16 @@ COMPONENT Ana_crystal = Single_crystal(
 			if(bAbsorbNonScattered && !SCATTERED)
 				ABSORB;
 		%}
-
+		
 
 COMPONENT AnaAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE AnaAxisBegin
 	ROTATED (0, 2.0*dAnaTheta, 0) RELATIVE AnaAxisBegin
+
+COMPONENT CollAfterAna = Collimator_linear(
+			xwidth=dAnaWidth*2.0, yheight=dAnaHeight*2.0, length=0.1,
+			divergence=dCollAfterAnaDivH, divergenceV=0.0)
+	AT (0, 0, dDistSampleAna*0.1 + 0.1) RELATIVE AnaAxisEnd
 
 //----------------------------------------------------------------------------------------------------
 

@@ -1,5 +1,9 @@
 #!./hermelin
 
+#
+# Calculate phonon dispersion
+# Author: TW
+#
 
 phonon_disp_beta(beta, m, q, a)
 {
