@@ -17,77 +17,8 @@ __init__()
 main()
 {
 #	global NUM_THREADS = 1;
-	do_compile = 1;
+	do_compile = 0;
 
-	lam = 4.;		# A
-	dlam = 0.01 * lam;
-
-	source_width = 0.001;
-	det_width = 0.04;
-	mono_ana_ideal = 0;
-	mono_ana_width = 0.005;
-	mono_ana_mosaic = 30.0;
-	sample_idx = 100;
-	sample_width = 0.004;
-	sample_depth = 0.002;
-	sample_d = 5.0;
-	sample_b = 1.0;
-	sample_m = 1.0;
-	sample_vel = 1.5;
-
-	Q = 0.2;							# 1/A
-	dE = -phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
-
-	print("Q = " + Q + " 1/A");
-	print("E = " + dE + " meV");
-
-	# -------------------------------------------------------------------------------- 
-	# MIEZE stuff
-
-	L_sample_ana = 1.0;
-	L_ana_det = 1.0;
-	L_mono_sample = 2.;
-	L_mono_mieze = 0.5;
-
-	L1 = 0.9;
-	Ls = L_sample_ana + L_ana_det;
-	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
-	tau = 100.;		# ps
-
-	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
-	ideal_det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
-
-	print("Ideal detector offset: " + ideal_det_offs + " m");
-	# -------------------------------------------------------------------------------- 
-
-
-
-	# -------------------------------------------------------------------------------- 
-	# TAS stuff
-
-	k_i = lam2k(lam);
-	E_i = k2E(k_i);
-	mono_tt = get_mono_tt(k_i, mono_d/mono_order);
-
-	# sample_d = mono_d/mono_order;
-	# Q = get_mono_Q(sample_d);
-
-	E_f = E_i - dE;
-	k_f = E2k(E_f);
-	lam_f = E2lam(E_f);
-
-	sample_tt = get_tt(k_i, k_f, Q);
-	#sample_tt = mono_tt;
-
-	ana_tt = get_mono_tt(k_f, ana_d/ana_order);
-
-	emon_range = abs(dE*2.);
-	# --------------------------------------------------------------------------------
-
-
-
-
-	
 	if(do_compile)
 	{
 		mcclean(INSTR);
@@ -96,7 +27,110 @@ main()
 	}
 
 
-	simBaseParams = "dLam=" + lam 
+	varmaps = [
+			[	
+				"lam" : 4., 			# A
+				"Q" : 0.1			# 1/A
+			],
+			[ "Q" : 0.15 ],
+			[ "Q" : 0.2 ],
+			[ "Q" : 0.25 ],
+			[ "Q" : 0.3 ],
+			[ "Q" : 0.35 ],
+			[ "Q" : 0.4 ],
+		];
+
+	numsteps = length(varmaps);
+
+	dat_x = vec(numsteps);
+	dat_y_sim = vec(numsteps);
+	dat_yerr_sim = vec(numsteps);
+	dat_y_theo = vec(numsteps);
+
+	for(varmap : varmaps)
+	{
+		step = cur_iter(varmap);
+		step_name = "step_" + step;
+
+		print();
+		print("="*80);
+		print(GREEN + "Running step " + (step+1) + " of " + numsteps + "..." + NOCOLOR);
+		print(GREEN + "Parameters: " + str(varmap) + NOCOLOR);
+		print("="*80);
+		print();
+
+
+
+		register_var(varmap);
+
+		source_width = 0.001;
+		det_width = 0.04;
+		mono_ana_ideal = 0;
+		mono_ana_width = 0.005;
+		mono_ana_mosaic = 30.0;
+		sample_idx = 100;
+		sample_width = 0.004;
+		sample_depth = 0.002;
+		sample_d = 5.;
+		sample_b = 1.;
+		sample_m = 1.;
+		sample_vel = 1.5;
+
+		dlam = 0.01*lam;
+		dE = -phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
+
+		print("Q = " + Q + " 1/A");
+		print("E = " + dE + " meV");
+
+
+		# -------------------------------------------------------------------------------- 
+		# MIEZE stuff
+
+		L_sample_ana = 1.0;
+		L_ana_det = 1.0;
+		L_mono_sample = 2.;
+		L_mono_mieze = 0.5;
+
+		L1 = 0.9;
+		Ls = L_sample_ana + L_ana_det;
+		L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
+		tau = 100.;		# ps
+
+		f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
+		ideal_det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
+
+		print("Ideal detector offset: " + ideal_det_offs + " m");
+		# -------------------------------------------------------------------------------- 
+
+
+
+		# -------------------------------------------------------------------------------- 
+		# TAS stuff
+
+		k_i = lam2k(lam);
+		E_i = k2E(k_i);
+		mono_tt = get_mono_tt(k_i, mono_d/mono_order);
+
+		# sample_d = mono_d/mono_order;
+		# Q = get_mono_Q(sample_d);
+
+		E_f = E_i - dE;
+		k_f = E2k(E_f);
+		lam_f = E2lam(E_f);
+
+		sample_tt = get_tt(k_i, k_f, Q);
+		#sample_tt = mono_tt;
+
+		ana_tt = get_mono_tt(k_f, ana_d/ana_order);
+
+		emon_range = abs(dE*2.);
+		# --------------------------------------------------------------------------------
+
+
+
+
+	
+		simBaseParams = "dLam=" + lam 
 			+ " dDeltaLam=" + dlam 
 			+ " dMiezeF1=" + f1f2[0] 
 			+ " dMiezeF2=" + f1f2[1]
@@ -111,7 +145,6 @@ main()
 			+ " dSampleTwoTheta=" + sample_tt /pi*180.
 			+ " bAutoSetAngles=0" 
 			+ " iSample=" + sample_idx
-#			+ " dDetOffs=" + det_offs
 			+ " dMonoD=" + mono_d
 			+ " dAnaD=" + ana_d
 			+ " dMonoOrder=" + mono_order
@@ -140,43 +173,83 @@ main()
 			+ " dDetHeight=" + det_width
 			+ " dLam_f=" + lam_f;
 
-	print("\n\n");
+		print("\n\n");
+		print("="*80);
+		print(BLUE + "Starting simulation..." + NOCOLOR);
+		print("\n");
+
+		det_offs = linspace(-0.5, 0.5, 20);
+		indices = linspace(0, vec_size(det_offs)-1, vec_size(det_offs));
+		global contrasts = vec(vec_size(det_offs));
+		global contrasts_err = vec(vec_size(det_offs));
+
+
+		threads = nthread(NUM_THREADS, "run_thread", zip(indices, det_offs), "dDetOffs", simBaseParams, step_name);
+		join(threads);
+
+		print("\n");
+		print(GREEN + "All thread runs have finished." + NOCOLOR);
+		print("="*80);
+
+		params = map();
+		params["xlabel"] = "Detector offset (mm)";
+		params["ylabel"] = "Contrast";
+		params["xlimits"] = 1000.*min(det_offs) + " " + 1000.*max(det_offs);
+		params["ylimits"] = "0 1";
+		params["term"] = "x11";
+
+		det_offs_mm = det_offs*1000.;
+
+		thefit = fit_gauss(det_offs_mm, contrasts, contrasts_err);
+		print("Fit: " + str(thefit));
+
+		fitx = linspace(min(det_offs_mm), max(det_offs_mm), 64);
+		fity = gauss_model(fitx, *map_vec_to_val(thefit));
+
+		params["title"] = "Step " + (step+1) + " of " + numsteps + ": "
+					+ "ideal x0 = " + (ideal_det_offs*1000.) + " mm; "
+					+ "sim x0 = " + thefit["x0"][0] + " mm +- " + thefit["x0"][1] + " mm";
+		simdat = [det_offs_mm, contrasts, contrasts_err, params];
+		fitdat = [fitx, fity, ["style":"line"]];
+
+		#savetxt("output/det_offs.dat", simdat);
+		plot([simdat, fitdat]);
+
+
+		
+		dat_x[step] = Q;
+		dat_y_sim[step] = thefit["x0"][0];
+		dat_yerr_sim[step] = thefit["x0"][1];
+		dat_y_theo[step] = ideal_det_offs*1000.;
+	}
+
+	print();
 	print("="*80);
-	print(BLUE + "Starting simulation..." + NOCOLOR);
-	print("\n");
-
-	det_offs = linspace(-0.5, 0.5, 20);
-	indices = linspace(0, vec_size(det_offs)-1, vec_size(det_offs));
-	global contrasts = vec(vec_size(det_offs));
-	global contrasts_err = vec(vec_size(det_offs));
-
-
-	threads = nthread(NUM_THREADS, "run_thread", zip(indices, det_offs), "dDetOffs", simBaseParams);
-	join(threads);
-
-	print("\n");
-	print(GREEN + "All thread runs have finished." + NOCOLOR);
+	print(GREEN + "Step " + (step+1) + " of " + numsteps + " finished." + NOCOLOR);
 	print("="*80);
+	print();
 
-	params = map();
-	params["xlabel"] = "Detector offset (mm)";
-	params["ylabel"] = "Contrast";
-	params["xlimits"] = 1000.*min(det_offs) + " " + 1000.*max(det_offs);
-	params["ylimits"] = "0 1";
-	params["term"] = "x11";
+	minx = min(dat_x);
+	maxx = max(dat_x);
+	miny = min(dat_y_sim, dat_y_theo);
+	maxy = max(dat_y_sim, dat_y_theo);
 
-	det_offs_mm = det_offs*1000.;
+	minx = minx - (maxx-minx)*0.1;
+	maxx = maxx + (maxx-minx)*0.1;
+	miny = miny - (maxy-miny)*0.1;
+	maxy = maxy + (maxy-miny)*0.1;
 
-	thefit = fit_gauss(det_offs_mm, contrasts, contrasts_err);
-	print("Fit: " + str(thefit));
 
-	fitx = linspace(min(det_offs_mm), max(det_offs_mm), 64);
-	fity = gauss_model(fitx, *map_vec_to_val(thefit));
+	plop = [
+			"xlabel" : "Q (1/A)",
+			"ylabel" : "Optimal detector offset (mm)",
+			"xlimits" : minx + " " + maxx,
+			"ylimits" : miny + " " + maxy,
+			"title" : "Result"
+		];
 
-	params["title"] = "x0 = " + thefit["x0"][0] + " mm +- " + thefit["x0"][1] + " mm";
-	simdat = [det_offs_mm, contrasts, contrasts_err, params];
-	fitdat = [fitx, fity, ["style":"line"]];
+	savetxt("output/det_offs.dat", [dat_x, dat_y_sim, dat_yerr_sim, plop]);
 
-	savetxt("output/det_offs.dat", simdat);
-	plot([simdat, fitdat]);
+	plot([ [dat_x, dat_y_sim, dat_yerr_sim, ["legend":"simulation"]], 
+		[dat_x, dat_y_theo, ["legend":"theory"]], plop ]);
 }

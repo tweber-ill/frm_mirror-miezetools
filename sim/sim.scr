@@ -23,9 +23,11 @@ sim_evaluate(dir, show_plots)
 }
 
 
-run_thread(params, param_name, baseparams)
+run_thread(params, param_name, baseparams, step_name)
 {
 	show_plots = NUM_THREADS eq 1;
+	if(length(step_name) neq 0)
+		step_name = step_name + "_";
 
 	for(param : params)
 	{
@@ -33,7 +35,7 @@ run_thread(params, param_name, baseparams)
 		the_param = param[1];
 
 		simParams = baseparams + " " + param_name + "=" + the_param;
-		dir = "output/" + param_name + "_iter_" + idx;
+		dir = "output/" + step_name + param_name + "_iter_" + idx;
 
 		if(mcrun(INSTR, num_neutrons, dir, simParams))
 		{

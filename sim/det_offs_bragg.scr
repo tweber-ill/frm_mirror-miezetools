@@ -68,7 +68,7 @@ main()
 	print("\n");
 
 
-	threads = nthread(NUM_THREADS, "run_thread", zip(indices, det_offs), "dDetOffs", simBaseParams);
+	threads = nthread(NUM_THREADS, "run_thread", zip(indices, det_offs), "dDetOffs", simBaseParams, "");
 	join(threads);
 
 	print("\n");
