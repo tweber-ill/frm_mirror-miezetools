@@ -228,7 +228,7 @@ T str_to_var(const t_str& str)
 }
 
 template<typename T, class t_str=std::string>
-t_str var_to_str(const T& t, std::streamsize iPrec=16)
+t_str var_to_str(const T& t, std::streamsize iPrec=10)
 {
 	typedef typename t_str::value_type t_char;
 
