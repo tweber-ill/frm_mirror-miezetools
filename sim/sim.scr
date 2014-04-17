@@ -17,14 +17,15 @@ __init__()
 
 sim_evaluate(dir, show_plots)
 {
-        dat = loadtxt(dir + "/oscpsd_1d.sim");
-        dat = [dat[0], dat[1], dat[2], dat[4]];
+	#dat = loadtxt(dir + "/oscpsd_1d.sim");
+	dat = loadtxt(dir + "/oscpsd_sph_1d.sim");
+	dat = [dat[0], dat[1], dat[2], dat[4]];
 
-        dattof = loadtxt(dir + "/tof.sim");
-        dattof = [dattof[0], dattof[1], dattof[2], dattof[4]];
+	dattof = loadtxt(dir + "/tof.sim");
+	dattof = [dattof[0], dattof[1], dattof[2], dattof[4]];
 
-        result = contrast(2, dat, dattof, show_plots);
-        return result;
+	result = contrast(2, dat, dattof, show_plots);
+	return result;
 }
 
 
@@ -62,10 +63,17 @@ run_thread(params, param_name, baseparams, step_name)
 eval_Emon(dir, do_fit)
 {
 	dat = loadtxt(dir + "/E_mon_pre_ana.sim");
+	dat[4]["legend"] = "before analyser";
 	dat = [dat[0], dat[1], dat[2], dat[4]];
 
-	plot_obj = vec(1);
+	dat_post = loadtxt(dir + "/E_mon_post_ana.sim");
+	dat_post[4]["legend"] = "after analyser";
+	dat_post = [dat_post[0], dat_post[1], dat_post[2], dat_post[4]];
+
+
+	plot_obj = vec(2);
 	plot_obj[0] = dat;
+	plot_obj[1] = dat_post;
 
 	if(do_fit)
 	{
@@ -96,7 +104,7 @@ eval_Emon(dir, do_fit)
 		print("Peak E_2 = " + peak2 + ", dE_2 = " + (peak2 - E));
 
 
-		plot_obj[1] = [fitx, fity, ["style":"line"]];
+		plot_obj[2] = [fitx, fity, ["style":"line"]];
 	}
 
 	plot(plot_obj, ["window":2]);

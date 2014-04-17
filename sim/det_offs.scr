@@ -8,7 +8,7 @@ __init__()
 {
 	#global INSTR = "tasmieze";
 	global INSTR = "tasmieze_nomono";
-	global num_neutrons = 1e5;
+	global num_neutrons = 1e6;
 
 	import("mcstas.scr");
 	import("sim.scr");
@@ -33,15 +33,15 @@ main()
 
 	varmaps = [
 			[	
-				"lam" : 4., 			# A
-				"Q" : 0.1			# 1/A
+				"lam" : 3., 			# A
+				"Q" : 0.4			# 1/A
 			],
-			[ "Q" : 0.15 ],
-			[ "Q" : 0.2 ],
-			[ "Q" : 0.25 ],
-			[ "Q" : 0.3 ],
-			[ "Q" : 0.35 ],
-			[ "Q" : 0.4 ],
+			[ "Q" : 0.45 ],
+			[ "Q" : 0.5 ],
+			[ "Q" : 0.55 ],
+			[ "Q" : 0.6 ],
+			[ "Q" : 0.65 ],
+			[ "Q" : 0.7 ],
 		];
 
 	numsteps = length(varmaps);
@@ -70,12 +70,12 @@ main()
 		source_width = 0.001;
 		det_width = 0.04;
 		mono_ana_ideal = 0;
-		mono_ana_width = 0.005;
-		mono_ana_mosaic = 30.0;
+		mono_ana_width = 0.0075;
+		mono_ana_mosaic = 15.0;
 		sample_idx = 100;
-		sample_width = 0.004;
-		sample_depth = 0.002;
-		sample_d = 5.;
+		sample_width = 0.002;
+		sample_depth = 0.001;
+		sample_d = 1.;
 		sample_b = 1.;
 		sample_m = 1.;
 		sample_vel = 1.5;
@@ -90,15 +90,15 @@ main()
 		# -------------------------------------------------------------------------------- 
 		# MIEZE stuff
 
-		L_sample_ana = 1.0;
+		L_sample_ana = 0.5;
 		L_ana_det = 1.0;
-		L_mono_sample = 2.;
+		L_mono_sample = 2.5;
 		L_mono_mieze = 0.5;
 
-		L1 = 0.9;
+		L1 = 1.;
 		Ls = L_sample_ana + L_ana_det;
 		L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
-		tau = 75.;		# ps
+		tau = 50.;		# ps
 
 		f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 		ideal_det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
@@ -161,7 +161,7 @@ main()
 			+ " dSampleB=" + sample_b
 			+ " dSampleM=" + sample_m
 			+ " dSamplePhononVel=" + sample_vel
-			+ " dTemp=20"
+			+ " dTemp=5"
 			+ " dDeltaEMon=" + emon_range
 			+ " dMonoWidth=" + mono_ana_width
 			+ " dMonoHeight=" + mono_ana_width
@@ -182,7 +182,7 @@ main()
 		print(BLUE + "Starting simulation..." + NOCOLOR);
 		print("\n");
 
-		det_offs = linspace(-0.5, 0.5, 20);
+		det_offs = linspace(-0.5, 1.0, 20);
 		indices = linspace(0, vec_size(det_offs)-1, vec_size(det_offs));
 		global contrasts = vec(vec_size(det_offs));
 		global contrasts_err = vec(vec_size(det_offs));
@@ -252,7 +252,6 @@ main()
 			"title" : "Result"
 		];
 
-	savetxt("output/det_offs.dat", [dat_x, dat_y_sim, dat_yerr_sim, plop]);
 
 
 
@@ -260,6 +259,11 @@ main()
 	dEs = -phonon_disp(sample_vel, sample_m, Qs, sample_d);
 	dat_y_theo_fine = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dEs)*1000.;
 	dat_x_theo_fine = Qs;
+
+
+	savetxt("output/det_offs.dat", [dat_x, dat_y_sim, dat_yerr_sim, plop]);
+	savetxt("output/det_offs_theo.dat", [dat_x_theo_fine, dat_y_theo_fine, plop]);
+
 
 	plot([ [dat_x, dat_y_sim, dat_yerr_sim, ["legend":"simulation"]], 
 		[dat_x_theo_fine, dat_y_theo_fine, ["style":"line", "legend":"theory"]], plop ]);

@@ -7,8 +7,9 @@
 
 __init__()
 {
-	global INSTR = "tasmieze";
-	global num_neutrons = 1e6;
+#	global INSTR = "tasmieze";
+	global INSTR = "tasmieze_nomono";
+	global num_neutrons = 1e5;
 
 	print("Running on " + ver() + "\n");
 
@@ -39,24 +40,24 @@ main()
 {
 	do_compile = 1;
 
-	lam = 5.;		# A
-	dlam = 0.05 * lam;
+	lam = 3.;		# A
+	dlam = 0.01 * lam;
 
 	source_width = 0.001;
-	det_width = 0.04;
+	det_width = 0.02;
 	mono_ana_ideal = 0;
 	mono_ana_width = 0.005;
-	mono_ana_mosaic = 10.0;
+	mono_ana_mosaic = 30.0;
 	sample_idx = 100;
 	sample_width = 0.004;
 	sample_depth = 0.002;
-	sample_d = 5.0;
+	sample_d = 1.0;
 	sample_b = 1.0;
 	sample_m = 1.0;
-	sample_vel = 0.5;
+	sample_vel = 1.5;
 
 	Q = 0.2;							# 1/A
-	dE = phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
+	dE = -phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
 
 	print("Q = " + Q + " 1/A");
 	print("E = " + dE + " meV");
@@ -144,7 +145,7 @@ main()
 			+ " dSampleB=" + sample_b
 			+ " dSampleM=" + sample_m
 			+ " dSamplePhononVel=" + sample_vel
-			+ " dTemp=5"
+			+ " dTemp=100"
 			+ " dDeltaEMon=" + emon_range
 			+ " dMonoWidth=" + mono_ana_width
 			+ " dMonoHeight=" + mono_ana_width

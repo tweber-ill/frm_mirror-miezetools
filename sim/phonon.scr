@@ -58,6 +58,7 @@ main(args)
 
 
 	q = linspace(-pi/a, pi/a, 256);
+#	q = linspace(-pi/a/10., pi/a/10., 256);
 	beta = v2beta(v, a, m);
 	om = phonon_disp(v, m, q, a);
 
@@ -65,8 +66,8 @@ main(args)
 
 	plopt = ["style":"line", "legend":"phonon dispersion"];
 
-	title = "m=" + m + ", a=" + a + ", beta=" + beta + ", v=" + v;
-	plopt2 = ["xlabel":"q", "ylabel":"omega", "title":title, "xlimits":xlim];
+	title = "m=" + m + " amu, a=" + a + " A, beta=" + beta + ", v=" + v + " meV/A^{-1}";
+	plopt2 = ["xlabel":"q (1/A)", "ylabel":"E (meV)", "title":title, "xlimits":xlim];
 
 	plot([q, om, plopt], plopt2);
 }

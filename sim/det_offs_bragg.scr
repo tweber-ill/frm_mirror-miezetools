@@ -22,17 +22,18 @@ main()
 #	global NUM_THREADS = 1;
 	do_compile = 1;
 
-	mono_ana_mosaic = 10.0;
+	mono_ana_mosaic = 30.0;
+	mono_ana_ideal = 0;
 
-	L_sample_ana = 0.2;
-	L_ana_det = 2.0;
+	L_sample_ana = 0.5;
+	L_ana_det = 1.0;
 	L_mono_sample = 2.;
 	L_mono_mieze = 0.5;
 
-	L1 = 0.9;
+	L1 = 1.0;
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
-	lam = 4.5;		# A
+	lam = 3.;		# A
 	dlam = lam*0.01;
 	tau = 150.;		# ps
 
@@ -47,7 +48,7 @@ main()
 	}
 
 
-	det_offs = linspace(-1.5, 1.5, 16);
+	det_offs = linspace(-0.5, 0.5, 20);
 	indices = linspace(0, vec_size(det_offs)-1, vec_size(det_offs));
 	global contrasts = vec(vec_size(det_offs));
 	global contrasts_err = vec(vec_size(det_offs));
@@ -64,7 +65,9 @@ main()
 			+ " dDistSampleAna=" + L_sample_ana
 			+ " dDistAnaDet=" + L_ana_det
 			+ " dMonoMosaic=" + mono_ana_mosaic
-			+ " dAnaMosaic=" + mono_ana_mosaic;
+			+ " dAnaMosaic=" + mono_ana_mosaic
+			+ " bMonoIdeal=" + mono_ana_ideal
+			+ " bAnaIdeal=" + mono_ana_ideal;
 
 	print("\n\n");
 	print("="*80);

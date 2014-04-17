@@ -87,10 +87,15 @@ DEFINE INSTRUMENT TasMieze
  
  
 	// collimators / slits
-	double dCollBeforeMonoDivH = 40.0,
-	double dCollBeforeSampleDivH = 40.0,
-	double dCollAfterSampleDivH = 40.0,
-	double dCollAfterAnaDivH = 40.0,
+	double dCollBeforeMonoDivH = 60.0,
+	double dCollBeforeSampleDivH = 60.0,
+	double dCollAfterSampleDivH = 30.0,
+	double dCollAfterAnaDivH = 30.0,
+ 
+	double dCollBeforeMonoDivV = 60.0,
+	double dCollBeforeSampleDivV = 60.0,
+	double dCollAfterSampleDivV = 30.0,
+	double dCollAfterAnaDivV = 30.0,
 
 
 
@@ -119,8 +124,11 @@ DECLARE
 
 	// detector
 	double dDetTofBase = 0.;
+	double dDetSphPhi = 0.;
+	double dDetSphTheta = 0.;
 	
 	double E_i;
+	double dMiezeLs = -1.0;
 %}
 
 
@@ -133,6 +141,7 @@ INITIALIZE
 	double v_i = HBAR*2.*M_PI / (dLam*1e-10 * MNEUTRON);
 	double v_f = HBAR*2.*M_PI / (dLam_f*1e-10 * MNEUTRON);
 	E_i = VS2E*v_i*v_i;
+	double E_f = VS2E*v_f*v_f;
 
 	if(bAutoSetAngles)
 	{
@@ -158,18 +167,16 @@ INITIALIZE
 	printf("--------------------------------------------------------------------------------\n");
 	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
 	//printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
-	printf("Sample: theta_s=%f deg, 2theta_s=%f deg, lam_f=%f A, v_f=%f m/s\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f);
+	printf("Sample: theta_s=%f deg, 2theta_s=%f deg,\n"
+		"\texpected lam_f=%f A, v_f=%f m/s, E_f=%f meV\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f, E_f);
 	printf("Analyser: theta_a=%f deg, 2thetaa_=%f deg\n", dAnaTheta, 2.*dAnaTheta);
 
 
 	dMiezeFm = 2.*double(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
 
-	double dMiezeLs = dDistSampleAna + dDistAnaDet;
+	dMiezeLs = dDistSampleAna + dDistAnaDet;
 	double dMiezeL2 = dMiezeLs + dDistMonoSample - dMiezeL1 - dDistMonoMieze;
 	double dMiezeLb = dMiezeL2 - dMiezeLs;
-
-	// for Mieze Box component: Origin is at center
-	//dDistMonoMieze += dMiezeL1/2.;
 
 	printf("MIEZE: L1=%f m, L2=%f m, Ls=%f m, Lb=%f m, f1=%f Hz, f2=%f Hz, offs=%f m\n", 
 		dMiezeL1, dMiezeL2, dMiezeLs, dMiezeLb, dMiezeF1, dMiezeF2, dDetOffs);
@@ -179,6 +186,10 @@ INITIALIZE
 
 	dDetTofBase = (/*dDistSrcMono +*/ dDistMonoSample) / v_i + (dDistSampleAna + dDistAnaDet + dDetOffs) / v_f;
 	dDetTofBase += 0.5*dMiezeNumOsc/dMiezeFm;
+
+
+	dDetSphTheta = atan2(0.5*dDetHeight, dMiezeLs+dDetOffs) / M_PI*180.;
+	dDetSphPhi = atan2(0.5*dDetWidth, dMiezeLs+dDetOffs) / M_PI*180.;
 %}
 
 
@@ -198,13 +209,13 @@ COMPONENT Origin = Progress_bar()
 // source
 
 COMPONENT MonoAxisBegin = Arm()
-	AT (0, 0, 0.0) RELATIVE Origin
+	AT (0, 0, 0) RELATIVE Origin
 
 	
 COMPONENT Source = Source_simple(
 	yheight = dSourceHeight, xwidth = dSourceWidth, 
 	focus_xw = dSampleWidth, focus_yh = dSampleHeight,
-	lambda0 = dLam, dlambda = dDeltaLam, gauss = 1, dist = dDistMonoSample)
+	lambda0 = dLam, dlambda = dDeltaLam, gauss = 0, dist = dDistMonoSample)
 		AT (0, 0, 0) RELATIVE MonoAxisBegin
 		EXTEND
 		%{
@@ -214,7 +225,7 @@ COMPONENT Source = Source_simple(
 		
 COMPONENT CollBeforeMono = Collimator_linear(
 			xwidth=dMonoWidth*2.0, yheight=dMonoHeight*2.0, length=0.1,
-			divergence=dCollBeforeMonoDivH, divergenceV=0.0)
+			divergence=dCollBeforeMonoDivH, divergenceV=dCollBeforeMonoDivV)
 	AT (0, 0, 0) RELATIVE MonoAxisBegin	
 
 COMPONENT MonoAxisEnd = Arm()
@@ -258,7 +269,7 @@ COMPONENT SampleAxisBegin = Arm()
 
 COMPONENT CollBeforeSample = Collimator_linear(
 			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
-			divergence=dCollBeforeSampleDivH, divergenceV=0.0)
+			divergence=dCollBeforeSampleDivH, divergenceV=dCollBeforeSampleDivV)
 	AT (0, 0, -dDistMonoSample*0.1 - 0.1) RELATIVE SampleAxisBegin
 
 
@@ -299,7 +310,7 @@ COMPONENT SampleAxisEnd = Arm()
 
 COMPONENT CollAfterSample = Collimator_linear(
 			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
-			divergence=dCollAfterSampleDivH, divergenceV=0.0)
+			divergence=dCollAfterSampleDivH, divergenceV=dCollAfterSampleDivV)
 	AT (0, 0, dDistMonoSample*0.1 + 0.1) RELATIVE SampleAxisEnd
 
 
@@ -360,7 +371,7 @@ COMPONENT AnaAxisEnd = Arm()
 	
 COMPONENT CollAfterAna = Collimator_linear(
 			xwidth=dAnaWidth*2.0, yheight=dAnaHeight*2.0, length=0.1,
-			divergence=dCollAfterAnaDivH, divergenceV=0.0)
+			divergence=dCollAfterAnaDivH, divergenceV=dCollAfterAnaDivV)
 	AT (0, 0, dDistSampleAna*0.1 + 0.1) RELATIVE AnaAxisEnd	
 
 //----------------------------------------------------------------------------------------------------
@@ -369,7 +380,7 @@ COMPONENT CollAfterAna = Collimator_linear(
 
 
 //----------------------------------------------------------------------------------------------------
-// detector
+// detectors
 
 COMPONENT DetAxis = Arm()
 	AT (0, 0, dDistAnaDet + dDetOffs) RELATIVE AnaAxisEnd
@@ -381,6 +392,23 @@ COMPONENT lam = L_monitor(
 	Lmin = 0, Lmax = 10, restore_neutron = 1)
 		AT (0, 0, 0) RELATIVE DetAxis
 */
+
+COMPONENT oscpsd_sph = Osc_PSD_monitor(
+	nchan=32, nx=128, ny=128, filename="oscpsd_sph",
+	xwidth = dDetWidth, yheight = dDetHeight, geo = 1,
+	radius = dMiezeLs+dDetOffs,
+	thetamin = -dDetSphTheta, thetamax = dDetSphTheta,
+	phimin = -dDetSphPhi, phimax = dDetSphPhi,
+	period = dMiezeNumOsc/dMiezeFm,
+	restore_neutron = 1)
+		AT (0, 0, -dMiezeLs-dDetOffs) RELATIVE DetAxis
+
+COMPONENT E_mon_post_ana = E_monitor(
+	xwidth = dDetWidth, yheight = dDetHeight,
+	nE = 512, filename = "E_mon_post_ana",
+	Emin = E_i - dDeltaEMon, Emax = E_i + dDeltaEMon,
+	restore_neutron = 1)
+		AT (0,0,0) RELATIVE DetAxis
 
 COMPONENT psd = PSD_monitor(
 	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
