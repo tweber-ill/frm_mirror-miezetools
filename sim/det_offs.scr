@@ -8,7 +8,7 @@ __init__()
 {
 	#global INSTR = "tasmieze";
 	global INSTR = "tasmieze_nomono";
-	global num_neutrons = 1e6;
+	global num_neutrons = 1e5;
 
 	import("mcstas.scr");
 	import("sim.scr");
@@ -45,6 +45,8 @@ main()
 		];
 
 	numsteps = length(varmaps);
+	det_offs_count = 16;
+	totalsimcount = det_offs_count * numsteps;
 
 	dat_x = vec(numsteps);
 	dat_y_sim = vec(numsteps);
@@ -182,7 +184,7 @@ main()
 		print(BLUE + "Starting simulation..." + NOCOLOR);
 		print("\n");
 
-		det_offs = linspace(-0.5, 1.0, 20);
+		det_offs = linspace(-0.5, 1.0, det_offs_count);
 		indices = linspace(0, vec_size(det_offs)-1, vec_size(det_offs));
 		global contrasts = vec(vec_size(det_offs));
 		global contrasts_err = vec(vec_size(det_offs));

@@ -7,6 +7,10 @@
 __init__()
 {
 	import("colors.scr");
+
+	global mcmutex = mutex();
+	global totalsimcount = 1;
+	global finishedsims = 0;
 }
 
 mcclean(instr)
@@ -16,6 +20,8 @@ mcclean(instr)
 
 mccompile(instr)
 {
+	set_termtitle("Compiling \"" + instr + "\"");
+
 	instr_cpp = instr + ".cpp";
 	instr_mc = instr + ".instr";
 	instr_out = instr + ".out";
@@ -41,10 +47,10 @@ mccompile(instr)
 
 
 
-	print("="*80);
-	print(BLUE + "Compiling C++ -> native..." + NOCOLOR);
-	
 	cc = "gcc";
+	print("="*80);
+	print(BLUE + "Compiling C++ -> native using " + cc + "..." + NOCOLOR);
+	
 	flags = "-g -O2 -march=native -xc++ -lm -lstdc++ -fpermissive -w -std=gnu++11 -undef__STRICT_ANSI__";
 	status = exec(cc + " " + flags + " " + "-o " + instr_out + " " + instr_cpp);
 
@@ -67,8 +73,23 @@ mccompile(instr)
 	return 1;
 }
 
+update_simcount(do_inc)
+{
+	begin_critical(mcmutex);
+		if(do_inc)
+			finishedsims = finishedsims + 1;
+
+		percentage = int(real(finishedsims) / real(totalsimcount) * 100.);
+		set_termtitle(finishedsims + " of " + totalsimcount + 
+			" (" + percentage + "%) simulations finished");
+	end_critical(mcmutex);
+}
+
 mcrun(instr, num_neutr, dir, simparams)
 {
+	# set_termtitle("Running \"" + instr + "\ in " + dir);
+	update_simcount(0);
+
 	instr_out = instr + ".out";
 	opts = "-n " + num_neutr + " -d " + dir;
 
@@ -81,5 +102,9 @@ mcrun(instr, num_neutr, dir, simparams)
 		print(RED + "Running '" + instr_out + "' in dir '" + dir + "' FAILED." + NOCOLOR);
 	else
 		print(GREEN + "Running '" + instr_out + "' in dir '" + dir + "' SUCCEEDED." + NOCOLOR);
+
+	set_termtitle("Simulation \"" + instr + "\" finished");
+
+	update_simcount(1);
 	return status; 
 }

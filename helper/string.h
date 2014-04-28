@@ -135,12 +135,14 @@ template<class t_str=std::string>
 void find_all_and_replace(t_str& str1, const t_str& str_old,
 						const t_str& str_new)
 {
-	while(1)
+	std::size_t pos=0;
+	while(pos < str1.length())
 	{
-		std::size_t pos = str1.find(str_old);
+		pos = str1.find(str_old, pos);
 		if(pos==t_str::npos)
 			break;
 		str1.replace(pos, str_old.length(), str_new);
+		pos += str_new.length();
 	}
 }
 
