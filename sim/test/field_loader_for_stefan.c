@@ -60,10 +60,10 @@ void lerp(const double *pVec1, const double *pVec2, double t, double *pVecRet)
 void slerp(const double *pVec1, const double *pVec2, double t, double *pVecRet)
 {
 	double angle = vec_angle(pVec1, pVec2);
-	
+
 	double dSkalar1 = sin((1.-t)*angle)/sin(angle);
 	double dSkalar2 = sin(t*angle)/sin(angle);
-	
+
 	unsigned int i=0;
 	for(i=0; i<3; ++i)
 	{
@@ -97,10 +97,10 @@ void interpolate(double x, double y, double z,
 {
 	double dX_1 = xmid-dXStep;
 	double dX_2 = xmid+dXStep;
-	
+
 	double dY_1 = ymid-dYStep;
-	double dY_2 = ymid+dYStep;	
-	
+	double dY_2 = ymid+dYStep;
+
 	double dZ_1 = zmid-dZStep;
 	double dZ_2 = zmid+dZStep;
 
@@ -109,11 +109,11 @@ void interpolate(double x, double y, double z,
 	void (*interp)(const double*, const double*, double, double*) 
 			= slerp;
 			/*= lerp;*/
-	
+
 	double tx = (x - dX_1) / (dX_2 - dX_1);
 	double ty = (y - dY_1) / (dY_2 - dY_1);
 	double tz = (z - dZ_1) / (dZ_2 - dZ_1);
-	
+
 	/*printf("t: %lg %lg %lg\n", tx, ty, tz);*/
 
 
@@ -122,21 +122,21 @@ void interpolate(double x, double y, double z,
 	interp(dB_1, dB_2, tx, dB_12);
 	double dB_34[3];
 	interp(dB_3, dB_4, tx, dB_34);
-	
+
 	double dB_12_34[3];
 	interp(dB_12, dB_34, ty, dB_12_34);
-	
-	
+
+
 	/* Würfel-Rüchseite, Punkte 5,6,7,8 */
 	double dB_56[3];
 	interp(dB_5, dB_6, tx, dB_56);
 	double dB_78[3];
 	interp(dB_7, dB_8, tx, dB_78);
-	
+
 	double dB_56_78[3];
-	interp(dB_56, dB_78, ty, dB_56_78);	
-	
-	
+	interp(dB_56, dB_78, ty, dB_56_78);
+
+
 	/* Finale Interpolation */
 	interp(dB_12_34, dB_56_78, tz, pB);
 }
@@ -146,35 +146,35 @@ void get_field(double x, double y, double z, double *pB)
 	int iXLen = (int)((dXMax-dXMin)/dXStep)+1;
 	int iYLen = (int)((dYMax-dYMin)/dYStep)+1;
 	int iZLen = (int)((dZMax-dZMin)/dZStep)+1;
-	
+
 	int iXMid = (int)((x - dXMin)/dXStep);
 	int iYMid = (int)((y - dYMin)/dYStep);
 	int iZMid = (int)((z - dZMin)/dZStep);
-	
+
 	int iIdxMid = (iZMid*iYLen*iXLen + iYMid*iXLen + iXMid)*3;
-	
+
 	/**pBx = field[iIdxMid+0];
 	*pBy = field[iIdxMid+1];
 	*pBz = field[iIdxMid+2];*/
-	
+
 	/*printf("Middle pos: %lg %lg %lg\n", pos[iIdxMid], pos[iIdxMid+1], pos[iIdxMid+2]);
 	printf("Middle field: %lg %lg %lg\n", field[iIdxMid], field[iIdxMid+1], field[iIdxMid+2]);*/
-	
-	
+
+
 	int iIdx_1 = ((iZMid-1)*iYLen*iXLen + (iYMid-1)*iXLen + (iXMid-1))*3;
 	int iIdx_2 = ((iZMid-1)*iYLen*iXLen + (iYMid-1)*iXLen + (iXMid+1))*3;
 	int iIdx_3 = ((iZMid-1)*iYLen*iXLen + (iYMid+1)*iXLen + (iXMid-1))*3;
 	int iIdx_4 = ((iZMid-1)*iYLen*iXLen + (iYMid+1)*iXLen + (iXMid+1))*3;
-	
+
 	int iIdx_5 = ((iZMid+1)*iYLen*iXLen + (iYMid-1)*iXLen + (iXMid-1))*3;
 	int iIdx_6 = ((iZMid+1)*iYLen*iXLen + (iYMid-1)*iXLen + (iXMid+1))*3;
 	int iIdx_7 = ((iZMid+1)*iYLen*iXLen + (iYMid+1)*iXLen + (iXMid-1))*3;
-	int iIdx_8 = ((iZMid+1)*iYLen*iXLen + (iYMid+1)*iXLen + (iXMid+1))*3;	
-	
-	
+	int iIdx_8 = ((iZMid+1)*iYLen*iXLen + (iYMid+1)*iXLen + (iXMid+1))*3;
+
+
 	/*printf("Indices: %d, %d, %d, %d, %d, %d, %d, %d\n",
 		iIdx_1, iIdx_2, iIdx_3, iIdx_4, iIdx_5, iIdx_6, iIdx_7, iIdx_8);*/
-	
+
 	if(iIdx_1 >= iNumNodes*3 || iIdx_1 < 0 || 
 		iIdx_2 >= iNumNodes*3 || iIdx_2 < 0 || 
 		iIdx_3 >= iNumNodes*3 || iIdx_3 < 0 || 
@@ -187,7 +187,7 @@ void get_field(double x, double y, double z, double *pB)
 		printf("Index out of bounds.\n");
 		return;
 	}
-	
+
 	double dB_1[3], dB_2[3], dB_3[3], dB_4[3], dB_5[3], dB_6[3], dB_7[3], dB_8[3];
 
 	dB_1[0] = field[iIdx_1 + 0]; dB_1[1] = field[iIdx_1 + 1]; dB_1[2] = field[iIdx_1 + 2];
@@ -198,7 +198,7 @@ void get_field(double x, double y, double z, double *pB)
 	dB_6[0] = field[iIdx_6 + 0]; dB_6[1] = field[iIdx_6 + 1]; dB_6[2] = field[iIdx_6 + 2];
 	dB_7[0] = field[iIdx_7 + 0]; dB_7[1] = field[iIdx_7 + 1]; dB_7[2] = field[iIdx_7 + 2];
 	dB_8[0] = field[iIdx_8 + 0]; dB_8[1] = field[iIdx_8 + 1]; dB_8[2] = field[iIdx_8 + 2];
-	
+
 	/*printf("pos: %lg %lg %lg,\t mid: %lg %lg %lg\n", x,y,z, pos[iIdxMid+0],pos[iIdxMid+1],pos[iIdxMid+2]);*/
 	interpolate(x,y,z, pos[iIdxMid+0],pos[iIdxMid+1],pos[iIdxMid+2], dB_1,dB_2,dB_3,dB_4,dB_5,dB_6,dB_7,dB_8, pB);
 }
@@ -267,7 +267,7 @@ int load_field_file(const char* pcFile)
 		sscanf(pLine, "%lg %lg %lg %lg %lg %lg",
 				&curpos[0], &curpos[1], &curpos[2],
 				&curfield[0], &curfield[1], &curfield[2]);
-		
+
 		/* x,y,z - Minima und -Maxima */
 		dXMin = fmin(curpos[0], dXMin);
 		dXMax = fmax(curpos[0], dXMax);
@@ -285,31 +285,43 @@ int load_field_file(const char* pcFile)
 
 	printf("Ranges: x=%lg..%lg, y=%lg..%lg, z=%lg..%lg\n", 
 			dXMin, dXMax, dYMin, dYMax, dZMin, dZMax);
-	
+
 	printf("Sizes: %lg, %lg, %lg\n", 
 			(dXMax-dXMin)/dXStep + 1., 
 			(dYMax-dYMin)/dYStep + 1., 
 			(dZMax-dZMin)/dZStep + 1.);
-	
+
 	fclose(pf);
 	return 1;
 }
 
 
+// McStas-kompatible Feldfunktion
+void fieldfkt(double x, double y, double z, double t, 
+		double *pBx, double *pBy, double *pBz)
+{
+	double dB[3];
+	get_field(x,y,z, dB);
+
+	*pBx = dB[0];
+	*pBy = dB[1];
+	*pBz = dB[2];
+}
+
 
 int main()
 {
 	load_field_file("data.txt");
-	
+
 	double dB[3];
-	
+
 	double dX = 0.;
 	for(dX=69.; dX<71.; dX+=0.1)
 	{
 		get_field(dX, 0., 0., dB);
 		printf("Interpolated field: %lg %lg %lg\n", dB[0], dB[1], dB[2]);
 	}
-	
+
 	unload_field();
 	return 0;
 }
