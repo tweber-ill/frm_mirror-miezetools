@@ -1,6 +1,9 @@
 CC = gcc
-INC = -I/usr/include/qt4 -I/usr/local/include -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtGui -I./tools/plot_gpl/src/qtterminal
-LIB_DIRS = -L/usr/lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/local/lib
+INC = -I/usr/include/qt4 -I/usr/local/include -I/usr/include/qt4/QtCore \
+	-I/usr/include/qt4/QtGui -I./tools/plot_gpl/src/qtterminal \
+	-I/usr/include/root -I/usr/include/lapacke
+LIB_DIRS = -L/usr/lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/local/lib \
+	-L/usr/lib64/root
 
 #DEFINES = -DUSE_GPL -DUSE_FFTW
 DEFINES = -DUSE_FFTW
@@ -8,7 +11,7 @@ DEFINES = -DUSE_FFTW
 FLAGS = ${INC} -O2 -march=native -std=c++11 -DNDEBUG ${DEFINES}
 #FLAGS = ${INC} -std=c++11 -ggdb ${DEFINES}
 
-STD_LIBS = -lsupc++ -lstdc++ -lm
+STD_LIBS = -lstdc++ -lm
 MATH_LIBS = -lMinuit2 -lfftw3
 #MISC_LIBS = ./gnuplot-qt.so
 MISC_LIBS = 
@@ -16,9 +19,9 @@ LAPACK_LIBS = -L/usr/local/lib64 -llapacke -llapack -lblas -lgfortran
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns -lQtOpenGL \
 	-lGL -lGLU -lX11
-LIBS_RESO = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams-mt ${QT_LIBS} ${LAPACK_LIBS}
-LIBS_FORMULA = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams-mt ${QT_LIBS}
-LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams-mt ${MATH_LIBS} ${QT_LIBS} ${LAPACK_LIBS} ${MISC_LIBS} ${STD_LIBS}
+LIBS_RESO = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams ${QT_LIBS} ${LAPACK_LIBS}
+LIBS_FORMULA = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams ${QT_LIBS}
+LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams ${MATH_LIBS} ${QT_LIBS} ${LAPACK_LIBS} ${MISC_LIBS} ${STD_LIBS}
 
 
 cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/mainwnd_mdi.o \
