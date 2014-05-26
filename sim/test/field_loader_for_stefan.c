@@ -61,6 +61,13 @@ void slerp(const double *pVec1, const double *pVec2, double t, double *pVecRet)
 {
 	double angle = vec_angle(pVec1, pVec2);
 
+	/* Falls Vektoren kollinear -> Komponenten linear interpolieren */
+	if(fabs(angle) < 1e-6)
+	{
+		lerp(pVec1, pVec2, t, pVecRet);
+		return;
+	}
+
 	double dSkalar1 = sin((1.-t)*angle)/sin(angle);
 	double dSkalar2 = sin(t*angle)/sin(angle);
 
@@ -143,6 +150,13 @@ void interpolate(double x, double y, double z,
 
 void get_field(double x, double y, double z, double *pB)
 {
+	if(x<dXMin || x>dXMax || y<dYMin || y>dYMax || z<dZMin || z>dZMax)
+	{
+		//printf("No field for position %lg %lg %lg.\n", x,y,z);
+		pB[0] = pB[1] = pB[2] = 0.;
+		return;
+	}
+
 	int iXLen = (int)((dXMax-dXMin)/dXStep)+1;
 	int iYLen = (int)((dYMax-dYMin)/dYStep)+1;
 	int iZLen = (int)((dZMax-dZMin)/dZStep)+1;
@@ -150,6 +164,13 @@ void get_field(double x, double y, double z, double *pB)
 	int iXMid = (int)((x - dXMin)/dXStep);
 	int iYMid = (int)((y - dYMin)/dYStep);
 	int iZMid = (int)((z - dZMin)/dZStep);
+
+	if(iXMid<0 || iYMid<0 || iZMid<0)
+	{
+		//printf("Negative index for position %lg %lg %lg.\n", x,y,z);
+		pB[0] = pB[1] = pB[2] = 0.;
+		return;
+	}
 
 	int iIdxMid = (iZMid*iYLen*iXLen + iYMid*iXLen + iXMid)*3;
 
@@ -184,7 +205,8 @@ void get_field(double x, double y, double z, double *pB)
 		iIdx_7 >= iNumNodes*3 || iIdx_7 < 0 ||
 		iIdx_8 >= iNumNodes*3 || iIdx_8 < 0)
 	{
-		printf("Index out of bounds.\n");
+		//printf("Index out of bounds for position %lg %lg %lg.\n", x,y,z);
+		pB[0] = pB[1] = pB[2] = 0.;
 		return;
 	}
 
