@@ -11,7 +11,7 @@ __init__()
 	global INSTR = "tasmieze_nomono";
 	global num_neutrons = 1e5;
 
-	print("Running on " + ver() + "\n");
+	print("Running on " + interp_ver() + "\n");
 
 	import("mcstas.scr");
 	import("sim.scr");
