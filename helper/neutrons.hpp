@@ -93,6 +93,20 @@ p2k(const units::quantity<units::unit<units::momentum_dimension, Sys>, Y>& p)
 {
 	return p/co::hbar;
 }
+
+template<class Sys, class Y>
+units::quantity<units::unit<units::velocity_dimension, Sys>, Y>
+k2v(const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& k)
+{
+	return k2p(k) / co::m_n;
+}
+
+template<class Sys, class Y>
+units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>
+v2k(const units::quantity<units::unit<units::velocity_dimension, Sys>, Y>& v)
+{
+	return co::m_n*v/co::hbar;
+}
 // --------------------------------------------------------------------------------
 
 
@@ -297,9 +311,9 @@ Y debye_waller_low_T(const units::quantity<units::unit<units::temperature_dimens
 // scattering triangle / TAS stuff
 
 // Q_vec = ki_vec - kf_vec
-// Q^2 = ki^2 + kf^2 - 2ki kf cos 2th
-// cos 2th = (-Q^2 + ki^2 + kf^2) / (2ki kf)
-
+// kf_vec = ki_vec - Q_vec
+// kf^2 = ki^2 + Q^2 - 2ki Q cos th
+// cos th = (-kf^2 + ki^2 + Q^2) / (2kiQ)
 template<class Sys, class Y>
 units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y>
 get_angle_ki_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& ki,
@@ -312,6 +326,10 @@ get_angle_ki_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sy
 	return units::acos((ki*ki - kf*kf + Q*Q)/(2.*ki*Q));
 }
 
+// Q_vec = ki_vec - kf_vec
+// ki_vec = Q_vec + kf_vec
+// ki^2 = Q^2 + kf^2 + 2Q kf cos th
+// cos th = (ki^2 - Q^2 - kf^2) / (2Q kf)
 template<class Sys, class Y>
 units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y>
 get_angle_kf_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& ki,
@@ -321,8 +339,7 @@ get_angle_kf_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sy
 	if(Q*(1e-10 * units::si::meter) == 0.)
 		return M_PI/2. * units::si::radians;
 
-	return M_PI*units::si::radians
-			- units::acos((kf*kf - ki*ki + Q*Q)/(2.*kf*Q));
+	return units::acos((-kf*kf + ki*ki - Q*Q)/(2.*kf*Q));
 }
 
 template<class Sys, class Y>
@@ -338,6 +355,9 @@ get_mono_twotheta(const units::quantity<units::unit<units::wavenumber_dimension,
 	return tt;
 }
 
+// Q_vec = ki_vec - kf_vec
+// Q^2 = ki^2 + kf^2 - 2ki kf cos 2th
+// cos 2th = (-Q^2 + ki^2 + kf^2) / (2ki kf)
 template<class Sys, class Y>
 units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y>
 get_sample_twotheta(const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& ki,
@@ -366,6 +386,179 @@ get_energy_transfer(const units::quantity<units::unit<units::wavenumber_dimensio
 	return co::hbar*co::hbar*ki*ki/(2.*co::m_n)
 			- co::hbar*co::hbar*kf*kf/(2.*co::m_n);
 }
+
+// --------------------------------------------------------------------------------
+
+
+// --------------------------------------------------------------------------------
+// spurions
+
+// inelastic spurions -> Shirane pp. 146-148
+template<class Sys, class Y>
+units::quantity<units::unit<units::energy_dimension, Sys>, Y>
+get_inelastic_spurion(bool bConstEi,
+		units::quantity<units::unit<units::energy_dimension, Sys>, Y> E,
+		unsigned int iOrderMono, unsigned int iOrderAna)
+{
+	const double dOrderMonoSq = double(iOrderMono)*double(iOrderMono);
+	const double dOrderAnaSq = double(iOrderAna)*double(iOrderAna);
+
+	units::quantity<units::unit<units::energy_dimension, Sys>, Y> E_sp;
+
+	// formulas from Shirane, p. 147
+	if(bConstEi)
+		E_sp = (1. - dOrderMonoSq/dOrderAnaSq) * E;
+	else
+		E_sp = (dOrderAnaSq/dOrderMonoSq - 1.) * E;
+
+	return E_sp;
+}
+
+struct InelasticSpurion
+{
+	double dE_meV = 0.;
+	unsigned int iOrderMono = 1;
+	unsigned int iOrderAna = 1;
+};
+
+template<class Sys, class Y>
+std::vector<InelasticSpurion> check_inelastic_spurions(bool bConstEi,
+			units::quantity<units::unit<units::energy_dimension, Sys>, Y> Ei,
+			units::quantity<units::unit<units::energy_dimension, Sys>, Y> Ef,
+			units::quantity<units::unit<units::energy_dimension, Sys>, Y> E,
+			unsigned int iMaxOrder=5)
+{
+	const double dESensitivity = 0.25;	// meV
+
+	std::vector<InelasticSpurion> vecSpuris;
+
+	for(unsigned int iOrder=1; iOrder<=iMaxOrder; ++iOrder)
+	{
+		InelasticSpurion spuri;
+		units::quantity<units::unit<units::energy_dimension, Sys>, Y> EiEf;
+
+		if(bConstEi)
+		{
+			spuri.iOrderAna = iOrder;
+			EiEf = Ei;
+		}
+		else
+		{
+			spuri.iOrderMono = iOrder;
+			EiEf = Ef;
+		}
+
+		spuri.dE_meV = get_inelastic_spurion(bConstEi, EiEf,
+							spuri.iOrderMono, spuri.iOrderAna) / one_meV;
+
+		//std::cout << spuri.dE_meV << " *** " << Y(E/one_meV) << std::endl;
+		if(spuri.dE_meV!=0. && float_equal(spuri.dE_meV, Y(E/one_meV), dESensitivity))
+			vecSpuris.push_back(spuri);
+	}
+
+	return vecSpuris;
+}
+
+struct ElasticSpurion
+{
+	bool bAType = 0;
+	bool bMType = 0;
+
+	bool bAKfSmallerKi = 0;
+	bool bMKfSmallerKi = 0;
+};
+
+// accidental elastic spurions -> Shirane pp. 150-155 (esp. fig. 6.2)
+template<typename T=double>
+ElasticSpurion check_elastic_spurion(const ublas::vector<T>& ki,
+							const ublas::vector<T>& kf,
+							const ublas::vector<T>& q)
+{
+	const double dKi = ublas::norm_2(ki);
+	const double dKf = ublas::norm_2(kf);
+	const double dq = ublas::norm_2(q);
+
+	const double dAngleSensitivity = 2.;
+	const double dQSensitivity = std::max(dKi, dKf) / 50.;
+
+
+	ElasticSpurion result;
+
+	ublas::vector<T> ki_norm = ki;	ki_norm /= dKi;
+	ublas::vector<T> kf_norm = kf;	kf_norm /= dKf;
+
+	// Q, q and G point in the opposite direction in Shirane!
+	// Shirane: Q = kf - ki, E = Ei - Ef
+	// here: Q = ki - kf, E = Ei - Ef
+	ublas::vector<T> q_norm = -q;	q_norm /= dq;
+
+	double dAngleKfq = std::acos(ublas::inner_prod(kf_norm, q_norm));
+	double dAngleKiq = std::acos(ublas::inner_prod(ki_norm, q_norm));
+
+	//std::cout << "angle ki q: " << dAngleKiq/M_PI*180. << std::endl;
+	//std::cout << "angle kf q: " << dAngleKfq/M_PI*180. << std::endl;
+
+	bool bKiqParallel = 0, bkiqAntiParallel = 0;
+	bool bKfqParallel = 0, bKfqAntiParallel = 0;
+
+	if(float_equal(dAngleKiq, 0., dAngleSensitivity/180.*M_PI))
+		bKiqParallel = 1;
+	else if(float_equal(dAngleKiq, M_PI, dAngleSensitivity/180.*M_PI))
+		bkiqAntiParallel = 1;
+	if(float_equal(dAngleKfq, 0., dAngleSensitivity/180.*M_PI))
+		bKfqParallel = 1;
+	else if(float_equal(dAngleKfq, M_PI, dAngleSensitivity/180.*M_PI))
+		bKfqAntiParallel = 1;
+
+	// type A: q || kf, kf > ki
+	if(bKfqParallel)
+	{
+		double dApparentKf = dKf - dq;
+
+		if(::float_equal(dApparentKf, dKi, dQSensitivity))
+		{
+			result.bAType = 1;
+			result.bAKfSmallerKi = 0;
+		}
+	}
+	// type A: q || kf, kf < ki
+	else if(bKfqAntiParallel)
+	{
+		double dApparentKf = dKf + dq;
+
+		if(::float_equal(dApparentKf, dKi, dQSensitivity))
+		{
+			result.bAType = 1;
+			result.bAKfSmallerKi = 1;
+		}
+	}
+
+	// type M: q || ki, kf > ki
+	if(bKiqParallel)
+	{
+		double dApparentKi = dKi + dq;
+
+		if(::float_equal(dApparentKi, dKf, dQSensitivity))
+		{
+			result.bMType = 1;
+			result.bMKfSmallerKi = 0;
+		}
+	}
+	// type M: q || ki, kf < ki
+	else if(bkiqAntiParallel)
+	{
+		double dApparentKi = dKi - dq;
+
+		if(::float_equal(dApparentKi, dKf, dQSensitivity))
+		{
+			result.bMType = 1;
+			result.bMKfSmallerKi = 1;
+		}
+	}
+
+	return result;
+}
+
 
 // --------------------------------------------------------------------------------
 

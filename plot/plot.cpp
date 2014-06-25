@@ -382,11 +382,11 @@ void Plot::paint()
 
 				// error bars
 				if(err.y()!=0.)
-					painter.drawRect(QRectF(coord.x()-0.5/dScaleX, coord.y()-0.5*err.y(),
-											1.5/dScaleX, err.y()));
+					painter.drawRect(QRectF(coord.x()-0.5/dScaleX, coord.y()-1.*err.y(),
+											1.5/dScaleX, 2.*err.y()));
 				if(err.x()!=0.)
-					painter.drawRect(QRectF(coord.x()-0.5*err.x(), coord.y()-0.5/dScaleY,
-											err.x(), 1.5/dScaleY));
+					painter.drawRect(QRectF(coord.x()-1.*err.x(), coord.y()-0.5/dScaleY,
+											2.*err.x(), 1.5/dScaleY));
 			}
 		}
 		else if(pltobj.plttype == PLOT_FKT)
