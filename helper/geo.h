@@ -73,7 +73,7 @@ public:
 	}
 
 	// "Lotfusspunkt"
-	ublas::vector<T> GetDroppedPerp(const ublas::vector<T>& vecP, double *pdDist=0) const
+	ublas::vector<T> GetDroppedPerp(const ublas::vector<T>& vecP, T *pdDist=0) const
 	{
 		T dist = GetDist(vecP);
 		ublas::vector<T> vecdropped = vecP - dist*m_vecNorm;
@@ -138,6 +138,67 @@ public:
 	const ublas::vector<T>& GetX0() const { return m_vecX0; }
 	const ublas::vector<T>& GetDir() const { return m_vecDir; }
 
+	T GetDist(const Line<T>& l1) const
+	{
+		const Line<T>& l0 = *this;
+
+		ublas::vector<T> vecNorm = cross_3(l0.GetDir(), l1.GetDir());
+
+		T tnum = std::fabs(ublas::inner_prod(l1.GetX0()-l0.GetX0(), vecNorm));
+		T tdenom = ublas::norm_2(vecNorm);
+
+		return tnum/tdenom;
+	}
+
+	T GetDist(const ublas::vector<T>& vecPt) const
+	{
+		T tnum = ublas::norm_2(cross_3(m_vecDir, vecPt-m_vecX0));
+		T tdenom = ublas::norm_2(m_vecDir);
+
+		return tnum / tdenom;
+	}
+
+
+	// "Lotfusspunkt"
+	ublas::vector<T> GetDroppedPerp(const ublas::vector<T>& vecP, T *pdDist=0) const
+	{
+		T t = ublas::inner_prod(vecP-GetX0(), GetDir()) / ublas::inner_prod(GetDir(), GetDir());
+		ublas::vector<T> vecdropped = operator()(t);
+
+		if(pdDist)
+		{
+			ublas::vector<T> vecD = vecP - vecdropped;
+			*pdDist = std::sqrt(ublas::inner_prod(vecD, vecD));
+		}
+
+		return vecdropped;
+	}
+
+
+	bool GetSide(const ublas::vector<T>& vecP, T *pdDist=0) const
+	{
+		const unsigned int N = m_vecDir.size();
+		if(N != 2)
+		{
+			std::cerr << "Error: \"Side of line\" only defined for 2d vectors."
+					<< std::endl;
+			return false;
+		}
+
+		ublas::vector<T> vecDropped = GetDroppedPerp(vecP, pdDist);
+
+
+		ublas::vector<T> vecNorm(2);
+		vecNorm[0] = m_vecDir[1];
+		vecNorm[1] = -m_vecDir[0];
+
+		T tDot = ublas::inner_prod(vecP-vecDropped, vecNorm);
+
+		//std::cout << "dropped: " << vecDropped << ", dot: " << tDot << std::endl;
+		return tDot < T(0);
+	}
+
+
 	// http://mathworld.wolfram.com/Line-PlaneIntersection.html
 	bool intersect(const Plane<T>& plane, T& t)
 	{
@@ -178,7 +239,7 @@ public:
 		return true;
 	}
 
-	bool intersect(const Line<T>& line, T& t)
+	bool intersect(const Line<T>& line, T& t) const
 	{
 		const ublas::vector<T>& pos0 =  this->GetX0();
 		const ublas::vector<T>& pos1 =  line.GetX0();
@@ -210,7 +271,7 @@ public:
 		ublas::vector<T> params = ublas::prod(inv, pos);
 		t = params[0];
 
-        //std::cout << "t=" << t << ", ";
+		//std::cout << "t=" << t << ", ";
 		return true;
 	}
 

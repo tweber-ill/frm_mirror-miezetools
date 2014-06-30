@@ -31,6 +31,24 @@ template<typename INT> bool is_odd(INT i);
 template<class matrix_type, typename T>
 T determinant(const matrix_type& mat);
 
+
+template<class vec_type>
+bool vec_equal(const vec_type& vec0, const vec_type& vec1,
+		typename vec_type::value_type eps = std::numeric_limits<typename vec_type::value_type>::epsilon())
+{
+	typedef typename vec_type::value_type T;
+
+	if(vec0.size() != vec1.size())
+		return false;
+
+	for(unsigned int i=0; i<vec0.size(); ++i)
+		if(!float_equal<T>(vec0[i], vec1[i], eps))
+			return false;
+
+	return true;
+}
+
+
 template<class vec_type>
 typename vec_type::value_type vec_len(const vec_type& vec)
 {
@@ -348,7 +366,7 @@ bool inverse(const ublas::matrix<T>& mat, ublas::matrix<T>& inv)
 		inv = ublas::identity_matrix<T>(N);
 		ublas::lu_substitute(lu, perm, inv);
 	}
-	catch(ublas::internal_logic& ex)
+	catch(const std::exception& ex)
 	{
 		std::cerr << "Error: Matrix inversion failed with exception: " << ex.what() << "." << "\n";
 		std::cerr << "Matrix to be inverted was: " << mat << "." << std::endl;
@@ -444,7 +462,7 @@ bool solve_linear(const ublas::matrix<T>& M, const ublas::vector<T>& v,
 			//std::cout << "Rsub" << Rsub << std::endl;
 			//std::cout << "det: " << determinant(Rsub) << std::endl;
 
-			T det = determinant(Rsub);
+			T det = determinant<ublas::matrix<T>, T>(Rsub);
 			if(!float_equal(det, 0.))
 			{
 				bFoundNonSingular = 1;
