@@ -34,11 +34,13 @@ template<class matrix_type, typename T>
 T determinant(const matrix_type& mat);
 
 
-// create a ublas vector
-template<typename T=double>
-ublas::vector<T> ublas_vec(const std::initializer_list<T>& lst)
+
+// create a vector
+template<typename T=double, class V=ublas::vector<double> >
+V make_vec(const std::initializer_list<T>& lst)
 {
-	ublas::vector<T> vec(lst.size());
+	V vec(lst.size());
+
 	typename std::initializer_list<T>::const_iterator iter = lst.begin();
 	for(std::size_t i=0; i<lst.size(); ++i, ++iter)
 		vec[i] = *iter;
@@ -46,14 +48,15 @@ ublas::vector<T> ublas_vec(const std::initializer_list<T>& lst)
 	return vec;
 }
 
+
 // create a ublas matrix
-template<typename T=double>
-ublas::matrix<T> ublas_mat(const std::initializer_list<std::initializer_list<T> >& lst)
+template<typename T=double, class M=ublas::matrix<double> >
+M make_mat(const std::initializer_list<std::initializer_list<T> >& lst)
 {
 	std::size_t I = lst.size();
 	std::size_t J = lst.begin()->size();
 
-	ublas::matrix<T> mat(I, J);
+	M mat(I, J);
 	typename std::initializer_list<std::initializer_list<T> >::const_iterator iter = lst.begin();
 
 	for(std::size_t i=0; i<I; ++i, ++iter)
@@ -198,19 +201,13 @@ matrix_type rotation_matrix_2d(T angle)
 		c = std::cos(angle);
 	}
 
-	matrix_type mat(2,2);
-
-	mat(0,0) = c; mat(0,1) = -s;
-	mat(1,0) = s; mat(1,1) = c;
-
-	return mat;
+	return make_mat<T, matrix_type>({	{c, -s},
+						{s,  c}});
 }
 
 template<class matrix_type=ublas::matrix<double>, typename T=double>
 matrix_type rotation_matrix_3d_x(T angle)
 {
-	matrix_type mat(3,3);
-
 	T s, c;
 	if(angle==0.)
 	{
@@ -223,18 +220,14 @@ matrix_type rotation_matrix_3d_x(T angle)
 		c = std::cos(angle);
 	}
 
-	mat(0,0)=1; mat(0,1)=0; mat(0,2)=0;
-	mat(1,0)=0; mat(1,1)=c; mat(1,2)=-s;
-	mat(2,0)=0; mat(2,1)=s; mat(2,2)=c;
-
-	return mat;
+	return make_mat<T, matrix_type>({	{1, 0,  0},
+						{0, c, -s},
+						{0, s,  c}});
 }
 
 template<class matrix_type=ublas::matrix<double>, typename T=double>
 matrix_type rotation_matrix_3d_y(T angle)
 {
-	matrix_type mat(3,3);
-
 	T s, c;
 	if(angle==0.)
 	{
@@ -247,18 +240,14 @@ matrix_type rotation_matrix_3d_y(T angle)
 		c = std::cos(angle);
 	}
 
-	mat(0,0)=c; mat(0,1)=0; mat(0,2)=s;
-	mat(1,0)=0; mat(1,1)=1; mat(1,2)=0;
-	mat(2,0)=-s; mat(2,1)=0; mat(2,2)=c;
-
-	return mat;
+	return make_mat<T, matrix_type>({	{c,  0, s},
+						{0,  1, 0},
+						{-s, 0, c}});
 }
 
 template<class matrix_type=ublas::matrix<double>, typename T=double>
 matrix_type rotation_matrix_3d_z(T angle)
 {
-	matrix_type mat(3,3);
-
 	T s, c;
 	if(angle==0.)
 	{
@@ -271,32 +260,25 @@ matrix_type rotation_matrix_3d_z(T angle)
 		c = std::cos(angle);
 	}
 
-	mat(0,0)=c; mat(0,1)=-s; mat(0,2)=0;
-	mat(1,0)=s; mat(1,1)=c; mat(1,2)=0;
-	mat(2,0)=0; mat(2,1)=0; mat(2,2)=1;
 
-	return mat;
+	return make_mat<T, matrix_type>({	{c, -s, 0},
+						{s,  c, 0},
+						{0,  0, 1}});
 }
 
-template<typename T=double>
-ublas::matrix<T> skew(const ublas::vector<T>& vec)
+template<class matrix_type = ublas::matrix<double>, 
+	class vector_type = ublas::vector<double>>
+matrix_type skew(const vector_type& vec)
 {
-	ublas::matrix<T> mat = ublas::zero_matrix<T>(vec.size(), vec.size());
-
 	if(vec.size() == 3)
 	{
-		mat(0,1) = -vec[2];
-		mat(0,2) = vec[1];
-		mat(1,2) = -vec[0];
-
-		mat(1,0) = -mat(0,1);
-		mat(2,0) = -mat(0,2);
-		mat(2,1) = -mat(1,2);
+		return make_mat<typename vector_type::value_type>
+				({	{       0, -vec[2],  vec[1]},
+					{  vec[2],       0, -vec[0]},
+					{ -vec[1],  vec[0],       0}});
 	}
 	else
 		throw Err("Skew only defined for three dimensions.");
-
-	return mat;
 }
 
 template<typename T=double>
@@ -761,14 +743,12 @@ std::vector<T> rotation_angle(const ublas::matrix<T>& rot)
 template<typename vector_type = ublas::vector<double> >
 vector_type cross_3(const vector_type& vec0, const vector_type& vec1)
 {
-	vector_type vec;
-	vec.resize(3);
-
-	vec[0] = vec0[1]*vec1[2] - vec1[1]*vec0[2];
-	vec[1] = vec0[2]*vec1[0] - vec1[2]*vec0[0];
-	vec[2] = vec0[0]*vec1[1] - vec1[0]*vec0[1];
-
-	return vec;
+	return make_vec<typename vector_type::value_type, vector_type>
+		({
+			vec0[1]*vec1[2] - vec1[1]*vec0[2],
+			vec0[2]*vec1[0] - vec1[2]*vec0[0],
+			vec0[0]*vec1[1] - vec1[0]*vec0[1]
+		});
 }
 
 
