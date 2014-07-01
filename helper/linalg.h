@@ -21,6 +21,8 @@
 namespace ublas = boost::numeric::ublas;
 namespace math = boost::math;
 
+#include <initializer_list>
+
 
 //#include "math.h"
 template<typename T> bool float_equal(T t1, T t2, T eps = std::numeric_limits<T>::epsilon());
@@ -30,6 +32,41 @@ template<typename INT> bool is_odd(INT i);
 
 template<class matrix_type, typename T>
 T determinant(const matrix_type& mat);
+
+
+// create a ublas vector
+template<typename T=double>
+ublas::vector<T> ublas_vec(const std::initializer_list<T>& lst)
+{
+	ublas::vector<T> vec(lst.size());
+	typename std::initializer_list<T>::const_iterator iter = lst.begin();
+	for(std::size_t i=0; i<lst.size(); ++i, ++iter)
+		vec[i] = *iter;
+
+	return vec;
+}
+
+// create a ublas matrix
+template<typename T=double>
+ublas::matrix<T> ublas_mat(const std::initializer_list<std::initializer_list<T> >& lst)
+{
+	std::size_t I = lst.size();
+	std::size_t J = lst.begin()->size();
+
+	ublas::matrix<T> mat(I, J);
+	typename std::initializer_list<std::initializer_list<T> >::const_iterator iter = lst.begin();
+
+	for(std::size_t i=0; i<I; ++i, ++iter)
+	{
+		typename std::initializer_list<T>::const_iterator iterinner = iter->begin();
+		for(std::size_t j=0; j<J; ++j, ++iterinner)
+		{
+			mat(i,j) = *iterinner;
+		}
+	}
+
+	return mat;
+}
 
 
 template<class vec_type>
