@@ -49,7 +49,7 @@ V make_vec(const std::initializer_list<T>& lst)
 }
 
 
-// create a ublas matrix
+// create a matrix
 template<typename T=double, class M=ublas::matrix<double> >
 M make_mat(const std::initializer_list<std::initializer_list<T> >& lst)
 {
