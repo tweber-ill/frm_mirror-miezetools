@@ -720,7 +720,7 @@ vector_type cross_3(const vector_type& vec0, const vector_type& vec1)
 }
 
 
-template<class matrix_type=ublas::matrix<double> >
+template<class matrix_type/*=ublas::matrix<double>*/>
 typename matrix_type::value_type determinant(const matrix_type& mat)
 {
 	typedef typename matrix_type::value_type T;
