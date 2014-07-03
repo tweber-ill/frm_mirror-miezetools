@@ -14,6 +14,7 @@
 #include "roi.h"
 #include "pnpoly.h"
 #include "../helper/math.h"
+#include "../helper/linalg.h"
 #include "../data/data.h"
 
 //------------------------------------------------------------------------------

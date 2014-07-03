@@ -15,6 +15,7 @@
 #include <algorithm>
 
 #include "../../helper/math.h"
+#include "../../helper/geo.h"
 #include "../../helper/misc.h"
 
 extern int iFitterVerbosity;

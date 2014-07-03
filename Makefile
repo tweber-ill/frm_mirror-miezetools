@@ -19,9 +19,9 @@ LAPACK_LIBS = -L/usr/local/lib64 -llapacke -llapack -lblas -lgfortran
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns -lQtOpenGL \
 	-lGL -lGLU -lX11
-LIBS_RESO = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams ${QT_LIBS} ${LAPACK_LIBS}
-LIBS_FORMULA = -L/usr/lib64 -lstdc++ -lm -lboost_iostreams ${QT_LIBS}
-LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams ${MATH_LIBS} ${QT_LIBS} ${LAPACK_LIBS} ${MISC_LIBS} ${STD_LIBS}
+LIBS_RESO = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${LAPACK_LIBS} ${STD_LIBS}
+LIBS_FORMULA = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${STD_LIBS}
+LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}
 
 
 cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/mainwnd_mdi.o \
@@ -52,11 +52,13 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 
 reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml.o \
 	obj/plot_nopars.o obj/cn.o obj/pop.o obj/ellipse.o obj/roi.o obj/plotgl.o \
-	obj/linalg.o obj/blob.o obj/comp.o obj/ResoDlg.o obj/spec_char.o obj/string_map.o
+	obj/linalg.o obj/linalg2.o obj/blob.o obj/comp.o obj/ResoDlg.o obj/spec_char.o \
+	obj/string_map.o
 	${CC} ${FLAGS} -o bin/reso obj/settings.o obj/data.o obj/data1.o obj/reso_main.o \
 			obj/string.o obj/xml.o obj/plot_nopars.o obj/cn.o obj/pop.o \
 			obj/ellipse.o obj/roi.o obj/plotgl.o obj/linalg.o obj/blob.o \
 			obj/comp.o obj/ResoDlg.o obj/spec_char.o obj/string_map.o \
+			obj/linalg2.o \
 			${LIBS_RESO}
 	strip bin/reso
 
@@ -187,6 +189,9 @@ obj/xml.o: helper/xml.cpp helper/xml.h
 
 obj/linalg.o: helper/linalg.cpp helper/linalg.h
 	${CC} ${FLAGS} -c -o obj/linalg.o helper/linalg.cpp
+
+obj/linalg2.o: helper/linalg2.cpp helper/linalg2.h
+	${CC} ${FLAGS} -c -o obj/linalg2.o helper/linalg2.cpp
 
 obj/lattice.o: helper/lattice.cpp helper/lattice.h
 	${CC} ${FLAGS} -c -o obj/lattice.o helper/lattice.cpp

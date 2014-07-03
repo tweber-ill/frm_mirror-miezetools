@@ -8,6 +8,7 @@
 #define __NEUTRON_FORMULAS__
 
 #include "math.h"
+#include "linalg.h"
 #include "exception.h"
 
 #include <boost/units/unit.hpp>

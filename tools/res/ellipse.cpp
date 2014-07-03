@@ -10,6 +10,7 @@
 
 #include "ellipse.h"
 #include "helper/linalg.h"
+#include "helper/linalg2.h"
 #include "helper/math.h"
 #include "cn.h"
 
