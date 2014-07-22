@@ -17,11 +17,24 @@ __init__()
 
 sim_evaluate(dir, show_plots)
 {
-	#dat = loadtxt(dir + "/oscpsd_1d.sim");
-	dat = loadtxt(dir + "/oscpsd_sph_1d.sim");
+	#dat = loadtxt(dir + "/oscpsd_1d.dat");
+	if(file_exists(dir + "/oscpsd_sph_1d.sim"))
+		dat = loadtxt(dir + "/oscpsd_sph_1d.sim");
+	else if(file_exists(dir + "/oscpsd_sph_1d.dat"))
+		dat = loadtxt(dir + "/oscpsd_sph_1d.dat");
+	else
+		return 0;
+
 	dat = [dat[0], dat[1], dat[2], dat[4]];
 
-	dattof = loadtxt(dir + "/tof.sim");
+
+	if(file_exists(dir + "/tof.sim"))
+		dattof = loadtxt(dir + "/tof.sim");
+	else if(file_exists(dir + "/tof.dat"))
+		dattof = loadtxt(dir + "/tof.dat");
+	else
+		return 0;
+
 	dattof = [dattof[0], dattof[1], dattof[2], dattof[4]];
 
 	result = contrast(2, dat, dattof, show_plots);
@@ -62,11 +75,23 @@ run_thread(params, param_name, baseparams, step_name)
 
 eval_Emon(dir, do_fit)
 {
-	dat = loadtxt(dir + "/E_mon_pre_ana.sim");
+	if(file_exists(dir + "/E_mon_pre_ana.sim"))
+		dat = loadtxt(dir + "/E_mon_pre_ana.sim");
+	else if(file_exists(dir + "/E_mon_pre_ana.dat"))
+		dat = loadtxt(dir + "/E_mon_pre_ana.dat");
+	else
+		return 0;
+
 	dat[4]["legend"] = "before analyser";
 	dat = [dat[0], dat[1], dat[2], dat[4]];
 
-	dat_post = loadtxt(dir + "/E_mon_post_ana.sim");
+	if(file_exists(dir + "/E_mon_post_ana.sim"))
+		dat_post = loadtxt(dir + "/E_mon_post_ana.sim");
+	else if(file_exists(dir + "/E_mon_post_ana.dat"))
+		dat_post = loadtxt(dir + "/E_mon_post_ana.dat");
+	else
+		return 0;
+
 	dat_post[4]["legend"] = "after analyser";
 	dat_post = [dat_post[0], dat_post[1], dat_post[2], dat_post[4]];
 
@@ -82,7 +107,6 @@ eval_Emon(dir, do_fit)
 	
 		print("lam_i = " + lam + "A\nE_i = " + E + " meV");
 		print();
-
 
 		dgauss = fit_doublegauss(dat[0], dat[1], dat[2], E);
 

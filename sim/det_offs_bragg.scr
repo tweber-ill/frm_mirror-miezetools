@@ -53,6 +53,8 @@ main()
 	global contrasts = vec(vec_size(det_offs));
 	global contrasts_err = vec(vec_size(det_offs));
 
+	totalsimcount = length(det_offs);
+
 	print("Detector offsets: " + str(det_offs));
 
 	simBaseParams = "dLam=" + lam 

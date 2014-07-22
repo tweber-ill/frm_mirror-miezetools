@@ -30,7 +30,7 @@ mccompile(instr)
 	print(BLUE + "Compiling McStas -> C++..." + NOCOLOR);
 	#flags = "--verbose -t";
 	flags = "-t";
-	status = exec("mcstas-2.0 " + flags + " -o " + instr_cpp + " " + instr_mc);
+	status = exec("mcstas " + flags + " -o " + instr_cpp + " " + instr_mc);
 
 	print("\n");
 	if(status)

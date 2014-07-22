@@ -17,7 +17,7 @@ __init__()
 main()
 {
 #	global NUM_THREADS = 1;
-	do_compile = 0;
+	do_compile = 1;
 
 	L_sample_ana = 0.5;
 	L_ana_det = 0.5;

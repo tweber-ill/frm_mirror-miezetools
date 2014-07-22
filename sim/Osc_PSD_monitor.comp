@@ -249,7 +249,7 @@ SAVE
 			pcYLabel = "\\gh [deg]";	// theta
 		}
 
-		DETECTOR_OUT_3D(
+		/*DETECTOR_OUT_3D(
 			"Osc PSD monitor",        // t
 			pcXLabel,                 // xl
 			pcYLabel,                 // yl
@@ -263,7 +263,7 @@ SAVE
 			nx, ny, nchan,            // m, n, p
 			&TOF_N[0][0][0], &TOF_p[0][0][0], &TOF_p2[0][0][0],	// p0, p1, p2
 			filename                  // f
-		);
+		);*/
 
 
 		

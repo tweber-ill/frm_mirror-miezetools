@@ -115,6 +115,8 @@ DECLARE
 	double dMiezeWidth = 0.35, dMiezeHeight = 0.35;
 	double dMiezeCoilThick = 0.;
 	double dMiezeCoilTilt = 0.;
+
+	double dMiezeLs = -1.;
 	
 	int iMiezeNumCoils = 1;
 	double dMiezeNumOsc = 2.;
@@ -169,7 +171,7 @@ INITIALIZE
 
 	dMiezeFm = 2.*double(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
 
-	double dMiezeLs = dDistSampleAna + dDistAnaDet;
+	dMiezeLs = dDistSampleAna + dDistAnaDet;
 	double dMiezeL2 = dMiezeLs + dDistMonoSample - dMiezeL1 - dDistMonoMieze;
 	double dMiezeLb = dMiezeL2 - dMiezeLs;
 
