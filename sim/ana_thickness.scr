@@ -48,6 +48,8 @@ main()
 	global contrasts = vec(vec_size(anadepths));
 	global contrasts_err = vec(vec_size(anadepths));
 
+	totalsimcount = length(anadepths);
+
 	print("Analyser depths: " + str(anadepths));
 
 	simBaseParams = "dLam=" + lam 
