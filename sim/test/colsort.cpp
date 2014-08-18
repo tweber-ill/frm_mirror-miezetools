@@ -56,6 +56,16 @@ void sortdata(std::vector<std::vector<double> >& vecData, const std::vector<unsi
 
 int main(int argc, char **argv)
 {
+	if(argc <= 1)
+	{
+		std::cerr << "\nUsage: "
+			<< "\n\t" << argv[0] << " -i <infile> -o <outfile> -s <sortorder>\n"
+			<< "Example: "
+			<< "\n\t" << argv[0] << " -i \"tst-in.dat\" -o \"tst-out.dat\" -s \"2 1 0\"\n"
+			<< std::endl;
+		return -1;
+	}
+
 	std::string strInFile;
 	std::string strOutFile;
 
