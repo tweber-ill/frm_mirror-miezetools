@@ -57,7 +57,7 @@ class Chi2Function_nd : public ROOT::Minuit2::FCNBase
 
 		unsigned int m_uiLen;
 		std::vector<const double*> m_vecpx;
-		
+
 		const double* m_py;
 		const double* m_pdy;
 
@@ -69,7 +69,7 @@ class Chi2Function_nd : public ROOT::Minuit2::FCNBase
 					  m_py(py), m_pdy(pdy)
 		{
 			m_vecpx.resize(m_uiDim);
-			
+
 			for(unsigned int i=0; i<m_uiDim; ++i)
 				m_vecpx[i] = ppx[i];
 		}

@@ -48,17 +48,17 @@ double Chi2Function_nd::chi2(const std::vector<double>& vecParams) const
 	autodeleter<FunctionModel_nd> _a0(pfkt);
 
 	bool bParamsOk = pfkt->SetParams(vecParams);
-	
+
 	double *px = new double[m_uiDim];
 	autodeleter<double> _a1(px, 1);
-	
+
 	double dChi2 = 0.;
 
 	for(unsigned int i=0; i<m_uiLen; ++i)
 	{
 		for(unsigned int iX=0; iX<m_uiDim; ++iX)
 			px[iX] = m_vecpx[iX][i];
-		
+
 		double d = (*pfkt)(px) - m_py[i];
 		double dy = m_pdy ? m_pdy[i] : 0.1*d;	// assume 10% error if none given
 		if(fabs(dy) < std::numeric_limits<double>::min())
