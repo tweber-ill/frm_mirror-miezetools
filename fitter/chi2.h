@@ -24,6 +24,8 @@ class Chi2Function : public ROOT::Minuit2::FCNBase
 		const double* m_py;
 		const double* m_pdy;
 
+		double m_dSigma = 1.;
+
 	public:
 		Chi2Function(const FunctionModel* fkt=0,
 					   unsigned int uiLen=0, const double* px=0,
@@ -38,14 +40,16 @@ class Chi2Function : public ROOT::Minuit2::FCNBase
 
 		virtual double Up() const
 		{
-			// 1. for chi^2
-			return 1.;
+			return m_dSigma*m_dSigma;
 		}
 
 		virtual double operator()(const std::vector<double>& vecParams) const
 		{
 			return chi2(vecParams);
 		}
+
+		void SetSigma(double dSig) { m_dSigma = dSig; }
+		double GetSigma() const { return m_dSigma; }
 };
 
 // in n dimensions
