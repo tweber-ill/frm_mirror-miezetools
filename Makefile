@@ -199,7 +199,7 @@ obj/lattice.o: helper/lattice.cpp helper/lattice.h
 obj/blob.o: helper/blob.cpp helper/blob.h
 	${CC} ${FLAGS} -c -o obj/blob.o helper/blob.cpp
 
-obj/formulas.o: helper/formulas.cpp helper/neutrons.hpp
+obj/formulas.o: helper/formulas.cpp helper/formulas.h
 	${CC} ${FLAGS} -c -o obj/formulas.o helper/formulas.cpp
 
 obj/comp.o: helper/comp.cpp helper/comp.h
