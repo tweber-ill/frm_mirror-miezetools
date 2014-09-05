@@ -9,6 +9,7 @@
 #include "helper/mieze.hpp"
 #include "helper/string.h"
 #include "helper/math.h"
+#include "helper/formulas.h"
 #include "helper/misc.h"
 #include "../../main/settings.h"
 #include "../../data/export.h"
