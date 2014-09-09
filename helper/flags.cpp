@@ -13,9 +13,8 @@ void *my_popen(const char* pcCmd, const char* pcType)
 {
 	static std::mutex s_mutex;
 
-	s_mutex.lock();
+	std::lock_guard<std::mutex> _lck(s_mutex);
 	FILE* p = ::popen(pcCmd, pcType);
-	s_mutex.unlock();
 
 	return p;
 }

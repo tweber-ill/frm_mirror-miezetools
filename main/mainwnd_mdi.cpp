@@ -167,18 +167,19 @@ void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd, bool bShow)
 {
 	if(!pWnd) return;
 
-	m_mutex.lock();
+	QMdiSubWindow *pSubWnd = 0;
+	{
+		std::lock_guard<std::mutex> _lck(m_mutex);
 
-	pWnd->setParent(m_pmdi);
-	SubWindowBase *pActualWidget = pWnd->GetActualWidget();
-	QObject::connect(pWnd, SIGNAL(WndDestroyed(SubWindowBase*)), this, SLOT(SubWindowDestroyed(SubWindowBase*)));
-	QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
-	QObject::connect(pActualWidget, SIGNAL(ParamsChanged(const StringMap&)), this, SLOT(PlotParamsDynChanged(const StringMap&)));
+		pWnd->setParent(m_pmdi);
+		SubWindowBase *pActualWidget = pWnd->GetActualWidget();
+		QObject::connect(pWnd, SIGNAL(WndDestroyed(SubWindowBase*)), this, SLOT(SubWindowDestroyed(SubWindowBase*)));
+		QObject::connect(pActualWidget, SIGNAL(SetStatusMsg(const char*, int)), this, SLOT(SetStatusMsg(const char*, int)));
+		QObject::connect(pActualWidget, SIGNAL(ParamsChanged(const StringMap&)), this, SLOT(PlotParamsDynChanged(const StringMap&)));
 
-	QMdiSubWindow* pSubWnd = m_pmdi->addSubWindow(pWnd);
-	emit SubWindowAdded(pWnd);
-
-	m_mutex.unlock();
+		pSubWnd = m_pmdi->addSubWindow(pWnd);
+		emit SubWindowAdded(pWnd);
+	}
 
 	if(bShow)
 	{
