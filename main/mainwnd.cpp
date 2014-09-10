@@ -351,12 +351,12 @@ MiezeMainWnd::MiezeMainWnd()
 	QMenu *pMenuCalc = new QMenu(this);
 	pMenuCalc->setTitle("Calculations");
 
-	QAction *pReso = new QAction(this);
-	pReso->setText("Resolution...");
+	//QAction *pReso = new QAction(this);
+	//pReso->setText("Resolution...");
 	//pMenuCalc->addAction(pReso);
 
-	QAction *pTaz = new QAction(this);
-	pTaz->setText("TAS Layout...");
+	//QAction *pTaz = new QAction(this);
+	//pTaz->setText("TAS Layout...");
 	//pMenuCalc->addAction(pTaz);
 
 	//pMenuCalc->addSeparator();
@@ -471,11 +471,11 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pWndCsc, SIGNAL(triggered()), m_pmdi, SLOT(cascadeSubWindows()));
 	QObject::connect(pCloseAll, SIGNAL(triggered()), this, SLOT(CloseAllTriggered()));
 
-	QObject::connect(pReso, SIGNAL(triggered()), this, SLOT(ShowReso()));
+	//QObject::connect(pReso, SIGNAL(triggered()), this, SLOT(ShowReso()));
 	QObject::connect(pPhaseCorr, SIGNAL(triggered()), this, SLOT(ShowPSDPhaseCorr()));
 	QObject::connect(pPSDPhase, SIGNAL(triggered()), this, SLOT(CalcPSDPhases()));
 	QObject::connect(pFormulas, SIGNAL(triggered()), this, SLOT(ShowFormulas()));
-	QObject::connect(pTaz, SIGNAL(triggered()), this, SLOT(ShowTaz()));
+	//QObject::connect(pTaz, SIGNAL(triggered()), this, SLOT(ShowTaz()));
 
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
 	QObject::connect(pBrowser, SIGNAL(triggered()), this, SLOT(ShowBrowser()));
@@ -898,11 +898,6 @@ void MiezeMainWnd::ShowBrowser()
 
 
 
-void MiezeMainWnd::ShowReso()
-{
-	std::cerr << "TODO: start external reso tool" << std::endl;
-}
-
 void MiezeMainWnd::CalcPSDPhases()
 {
 	PsdPhaseDlg dlg(this);
@@ -924,11 +919,6 @@ void MiezeMainWnd::ShowFormulas()
 
 	m_pformuladlg->show();
 	m_pformuladlg->activateWindow();
-}
-
-void MiezeMainWnd::ShowTaz()
-{
-	std::cerr << "TODO: start external TAZ tool" << std::endl;
 }
 
 void MiezeMainWnd::ShowPSDPhaseCorr()

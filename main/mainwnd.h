@@ -151,12 +151,12 @@ protected slots:
 	void BezierInterpolation();
 	void BSplineInterpolation();
 
-	void ShowReso();
+	//void ShowReso();
 	void ShowPSDPhaseCorr();
 	void CalcPSDPhases();
 	void ShowFormulas();
 	//void ShowLatticeCalc();
-	void ShowTaz();
+	//void ShowTaz();
 
 	void ShowAbout();
 	void ShowBrowser();
