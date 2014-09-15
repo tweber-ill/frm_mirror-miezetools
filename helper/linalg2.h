@@ -16,7 +16,7 @@
 template<typename T=double>
 bool qr(const ublas::matrix<T>& M, ublas::matrix<T>& Q, ublas::matrix<T>& R)
 {
-	std::cerr << "Error: No specialisation of \"eigenvec\" available for this type." << std::endl;
+	log_err("No specialisation of \"qr\" available for this type.");
 	return false;
 }
 
@@ -31,14 +31,14 @@ bool eigenvec(const ublas::matrix<T>& mat,
 		std::vector<ublas::vector<T> >& evecs_real, std::vector<ublas::vector<T> >& evecs_imag, 
 		std::vector<T>& evals_real, std::vector<T>& evals_imag)
 {
-	std::cerr << "Error: No specialisation of \"eigenvec\" available for this type." << std::endl;
+	log_err("No specialisation of \"eigenvec\" available for this type.");
 	return false;
 }
 
 template<typename T=double>
 bool eigenvec_sym(const ublas::matrix<T>& mat, std::vector<ublas::vector<T> >& evecs, std::vector<T>& evals)
 {
-	std::cerr << "Error: No specialisation of \"eigenvec_sym\" available for this type." << std::endl;
+	log_err("No specialisation of \"eigenvec_sym\" available for this type.");
 	return false;
 }
 

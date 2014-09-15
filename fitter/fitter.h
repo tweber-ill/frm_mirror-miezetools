@@ -40,10 +40,10 @@ class FunctionModel
 class FunctionModel_nd
 {
 	protected:
-	
+
 	public:
 		virtual unsigned int GetDim() const = 0;
-	
+
 		virtual bool SetParams(const std::vector<double>& vecParams) = 0;
 		virtual double operator()(const double* px) const = 0;
 
@@ -68,9 +68,6 @@ class FunctionModel_param
 		virtual const char* GetModelName() const = 0;
 };
 
-
-extern int iFitterVerbosity;
-extern void fitter_set_default_verbosity(int iVerbosity);
 
 //----------------------------------------------------------------------
 #endif	// __FITTER__H__

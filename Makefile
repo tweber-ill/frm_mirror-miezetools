@@ -34,7 +34,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o \
 	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
-	obj/spec_char.o obj/string_map.o
+	obj/spec_char.o obj/string_map.o obj/log.o
 	${CC} ${FLAGS} -o bin/cattus obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o \
 			obj/mainwnd_mdi.o obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o \
 			obj/data3.o obj/data4.o obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o \
@@ -47,28 +47,30 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 			obj/interpolation.o obj/linalg.o obj/blob.o obj/export.o \
 			obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o obj/rand.o obj/InfoDock.o \
 			obj/NormDlg.o obj/RebinDlg.o obj/spec_char.o obj/string_map.o \
+			obj/log.o \
 			${LIBS}
 	strip bin/cattus
 
 reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml.o \
 	obj/plot_nopars.o obj/cn.o obj/pop.o obj/ellipse.o obj/roi.o obj/plotgl.o \
 	obj/linalg.o obj/linalg2.o obj/blob.o obj/comp.o obj/ResoDlg.o obj/spec_char.o \
-	obj/string_map.o
+	obj/string_map.o obj/log.o
 	${CC} ${FLAGS} -o bin/reso obj/settings.o obj/data.o obj/data1.o obj/reso_main.o \
 			obj/string.o obj/xml.o obj/plot_nopars.o obj/cn.o obj/pop.o \
 			obj/ellipse.o obj/roi.o obj/plotgl.o obj/linalg.o obj/blob.o \
 			obj/comp.o obj/ResoDlg.o obj/spec_char.o obj/string_map.o \
-			obj/linalg2.o \
+			obj/linalg2.o obj/log.o \
 			${LIBS_RESO}
 	strip bin/reso
 
 
 formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/string.o obj/settings.o obj/plot_nopars.o \
 	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/comp.o obj/export.o obj/data2.o \
-	obj/string_map.o
+	obj/string_map.o obj/log.o
 	${CC} ${FLAGS} -o bin/formula obj/FormulaDlg.o obj/formulas.o obj/string.o obj/settings.o \
 			obj/plot_nopars.o obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o \
 			obj/comp.o obj/export.o obj/data2.o obj/formula_main.o obj/string_map.o \
+			obj/log.o \
 			${LIBS_FORMULA}
 	strip bin/formula
 
@@ -153,8 +155,8 @@ obj/SettingsDlg.o: dialogs/SettingsDlg.cpp dialogs/SettingsDlg.h
 obj/RadialIntDlg.o: dialogs/RadialIntDlg.cpp dialogs/RadialIntDlg.h
 	${CC} ${FLAGS} -c -o obj/RadialIntDlg.o dialogs/RadialIntDlg.cpp
 
-obj/LatticeDlg.o: dialogs/LatticeDlg.cpp dialogs/LatticeDlg.h
-	${CC} ${FLAGS} -c -o obj/LatticeDlg.o dialogs/LatticeDlg.cpp
+#obj/LatticeDlg.o: dialogs/LatticeDlg.cpp dialogs/LatticeDlg.h
+#	${CC} ${FLAGS} -c -o obj/LatticeDlg.o dialogs/LatticeDlg.cpp
 
 obj/ExportDlg.o: dialogs/ExportDlg.cpp dialogs/ExportDlg.h
 	${CC} ${FLAGS} -c -o obj/ExportDlg.o dialogs/ExportDlg.cpp
@@ -193,8 +195,8 @@ obj/linalg.o: helper/linalg.cpp helper/linalg.h
 obj/linalg2.o: helper/linalg2.cpp helper/linalg2.h
 	${CC} ${FLAGS} -c -o obj/linalg2.o helper/linalg2.cpp
 
-obj/lattice.o: helper/lattice.cpp helper/lattice.h
-	${CC} ${FLAGS} -c -o obj/lattice.o helper/lattice.cpp
+#obj/lattice.o: helper/lattice.cpp helper/lattice.h
+#	${CC} ${FLAGS} -c -o obj/lattice.o helper/lattice.cpp
 
 obj/blob.o: helper/blob.cpp helper/blob.h
 	${CC} ${FLAGS} -c -o obj/blob.o helper/blob.cpp
@@ -210,6 +212,9 @@ obj/file.o: helper/file.cpp helper/file.h
 
 obj/rand.o: helper/rand.cpp helper/rand.h
 	${CC} ${FLAGS} -c -o obj/rand.o helper/rand.cpp
+
+obj/log.o: helper/log.cpp helper/log.h
+	${CC} ${FLAGS} -c -o obj/log.o helper/log.cpp
 
 
 obj/loadcasc.o: loader/loadcasc.cpp loader/loadcasc.h

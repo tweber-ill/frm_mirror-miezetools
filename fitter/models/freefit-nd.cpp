@@ -18,6 +18,7 @@
 #include "freefit-nd.h"
 #include "freefit.h"
 #include "../chi2.h"
+#include "../../helper/log.h"
 
 
 static std::string get_param_name(unsigned int iNum)
@@ -88,13 +89,11 @@ std::vector<Symbol> FreeFktModel_nd::GetFreeParams(const double *px) const
 bool FreeFktModel_nd::SetParams(const std::vector<double>& vecParams)
 {
 	std::vector<Symbol>& syms = m_parser.GetSymbols();
-	
+
 	if(syms.size() != vecParams.size())
 	{
-		if(iFitterVerbosity >= 1)
-			std::cerr << syms.size() << " symbols in table, but "
-						<< vecParams.size() << " symbols supplied."
-						<< std::endl;
+		log_err(syms.size(), " symbols in table, but ",
+			vecParams.size(), " symbols supplied.");
 
 		return false;
 	}
@@ -161,8 +160,7 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 	FreeFktModel_nd freemod(uiDim, pcExp);
 	if(!freemod.IsOk())
 	{
-		if(iFitterVerbosity >= 1)
-			std::cerr << "Error: N-dim free function model could not be created." << std::endl;
+		log_err("N-dim free function model could not be created.");
 		return 0;
 	}
 	
@@ -191,7 +189,7 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 		}
 	}
 
-	
+
 	// step 1: free fit (limited)
 	ROOT::Minuit2::MnMigrad migrad(fkt, params, /*MINUIT_STRATEGY*/1);
 	ROOT::Minuit2::FunctionMinimum mini = migrad();
@@ -233,16 +231,14 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 
 	*pFinalModel = new FreeFktModel_nd(freemod);
 
-	if(iFitterVerbosity >= 3)
+	//if(iFitterVerbosity >= 3)
 	{
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
-		std::cerr << "result of user-defined fit step 1" << std::endl;
-		std::cerr << "=================================" << std::endl;
-		std::cerr << mini << std::endl;
-		std::cerr << "result of user-defined fit step 2" << std::endl;
-		std::cerr << "=================================" << std::endl;
-		std::cerr << mini2 << std::endl;
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
+		log_info("result of user-defined fit step 1");
+		std::ostringstream ostrMini; ostrMini << mini;
+		log_info(ostrMini.str());
+		log_info("result of user-defined fit step 2");
+		std::ostringstream ostrMini2; ostrMini2 << mini2;
+		log_info(ostrMini2.str());
 	}
 
 	return bValidFit;

@@ -17,8 +17,7 @@
 #include "../../helper/math.h"
 #include "../../helper/geo.h"
 #include "../../helper/misc.h"
-
-extern int iFitterVerbosity;
+#include "../../helper/log.h"
 
 
 // see:
@@ -213,13 +212,12 @@ void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder
 	std::reverse(vecMaximaX.begin(), vecMaximaX.end());
 
 
-    if(iFitterVerbosity >= 3)
-    {
-        std::cout << "Prefitter found peaks at: ";
-        for(double dValX : vecMaximaX)
-                std::cout << dValX << ", ";
-        std::cout << std::endl;
-    }
+
+	std::ostringstream ostrDbg;
+	ostrDbg << "Prefitter found peaks at: ";
+	for(double dValX : vecMaximaX)
+		ostrDbg << dValX << ", ";
+	log_debug(ostrDbg.str());
 
 
 	delete[] pSplineX;

@@ -11,6 +11,7 @@
 #include "helper/math.h"
 #include "helper/formulas.h"
 #include "helper/misc.h"
+#include "helper/log.h"
 #include "../../main/settings.h"
 #include "../../data/export.h"
 
@@ -342,7 +343,7 @@ void FormulaDlg::CalcNeutronv()
 	if(!check_input(strInput))
 		return;
 
-	std::cerr << "Error: Velocity parsing not yet implemented." << std::endl;
+	log_err("Velocity parsing not yet implemented.");
 }
 
 void FormulaDlg::CalcNeutronE()

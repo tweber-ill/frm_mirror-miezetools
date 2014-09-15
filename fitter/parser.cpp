@@ -26,13 +26,10 @@ namespace fus = boost::fusion;
 #include "functions.h"
 
 #include "../helper/math.h"
+#include "../helper/log.h"
 
 //----------------------------------------------------------------------
 // old procedural interface
-
-static int iVerbosity = 1;	// 0..3
-
-extern void parser_set_default_verbosity(int iVerbosity) { ::iVerbosity = iVerbosity; }
 
 // there are two versions of these functions:
 // the first includes a vector of free parameters, e.g. x,y,z
@@ -123,12 +120,12 @@ static std::string get_op_name(int iOp)
 		case NODE_IDENT: return "ident";
 		case NODE_CALL: return "call";
 		case NODE_NOP: return "nop";
-		
+
 		case NODE_INVALID: return "invalid";
 		case NODE_MINUS_INV: return "minus_inv";
 		case NODE_DIV_INV: return "div_inv";
 	}
-	
+
 	return "<unknown>";
 }
 
@@ -185,9 +182,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 	{
 		if(node.vecChildren.size()!=2)
 		{
-			if(iVerbosity >= 1)
-				std::cerr << "Error: operation 'pow' needs exactly two operands."
-							<< std::endl;
+			log_err("operation 'pow' needs exactly two operands.");
 			return 0.;
 		}
 
@@ -212,9 +207,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 		bool bSymInMap = is_symbol_in_map(syms, node.strIdent, vecFreeParams, &dVal);
 		if(!bSymInMap)
 		{
-			if(iVerbosity >= 1)
-				std::cerr << "Symbol \"" << node.strIdent << "\" is not in map!"
-					  	  	  << std::endl;
+			log_err("Symbol \"", node.strIdent, "\" is not in map!");
 		}
 		return dVal;
 	}
@@ -257,9 +250,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 			}
 		}
 
-		if(iVerbosity >= 1)
-			std::cerr << "No function \"" << strFkt << "\" taking " << iNumArgs
-						<< " arguments known." << std::endl;
+		log_err("No function \"", strFkt, "\" taking ", iNumArgs, " arguments known.");
 		return 0.;
 	}
 	else if(node.iType == NODE_NOP)
@@ -268,13 +259,11 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 	}
 	else if(node.iType == NODE_INVALID)
 	{
-		if(iVerbosity >= 1)
-			std::cerr << "Error: Syntax tree is invalid." << std::endl;
+		log_err("Syntax tree is invalid.");
 		return 0.;
 	}
 
-	if(iVerbosity >= 1)
-		std::cerr << "Unknown syntax node type " << node.iType << std::endl;
+	log_err("Unknown syntax node type ", node.iType);
 	return 0.;
 }
 
@@ -472,8 +461,7 @@ static std::string get_expression(const Node& node, const std::vector<Symbol>& s
 		return "0";
 	}
 
-	if(iVerbosity >= 1)
-		std::cerr << "Unknown syntax node type " << node.iType << std::endl;
+	log_err("Unknown syntax node type ", node.iType);
 	return "";
 }
 
@@ -490,7 +478,7 @@ static bool check_tree_sanity(const Node& n)
 	for(const  Node& child : n.vecChildren)
 		if(!check_tree_sanity(child))
 			return false;
-		
+
 	if((n.iType==NODE_MINUS_INV || n.iType==NODE_DIV_INV) && n.vecChildren.size() < 2)
 		return false;
 
@@ -827,35 +815,23 @@ static bool is_symbol_in_map(const std::vector<Symbol>& syms, const std::string&
 
 static void print_symbol_map(const std::vector<Symbol>& syms)
 {
-	std::cout << "Symbols map: ";
+	log_info("Symbols map: ");
 	for(const Symbol& sym : syms)
-	{
-		std::cout << sym.strIdent << "=" << sym.dVal;
-		std::cout << ", ";
-	}
-	std::cout << "\n";
+		log_info("\t", sym.strIdent, " = ", sym.dVal);
 
-	std::cout << "Constants map: ";
-	std::map<std::string,double>::const_iterator iter;
-
+	log_info("Constants map: ");
 	for(const auto& sym : g_syms)
-	{
-		std::cout << sym.first << "=" << sym.second;
-		std::cout << ", ";
-	}
-	std::cout << "\n";
+		log_info("\t", sym.first, " = ", sym.second);
 
-	std::cout << "Functions map: ";
+	std::ostringstream ostrFkts;
+	log_info("Functions map: ");
 	for(const auto& pairFkt : g_map_fkt0)
-		std::cout << pairFkt.first << ", ";
-
+		ostrFkts << pairFkt.first << "(), ";
 	for(const auto& pairFkt : g_map_fkt1)
-		std::cout << pairFkt.first << ", ";
-
+		ostrFkts << pairFkt.first << "(a), ";
 	for(const auto& pairFkt : g_map_fkt2)
-		std::cout << pairFkt.first << ", ";
-	
-	std::cout << "\n";
+		ostrFkts << pairFkt.first << "(a,b), ";
+	log_info(ostrFkts.str());
 }
 
 static void add_constants()
@@ -935,16 +911,13 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 	bool bOk = qi::phrase_parse(str.begin(), str.end(), pars, ascii::space, node);
 	if(!bOk)
 	{
-		if(iVerbosity >= 1)
-			std::cerr << "Error parsing expression \"" << str << "\": "
-						<< pars.ostrErr.str() << std::endl;
+		log_err("Error parsing expression \"", str, "\": ", pars.ostrErr.str());
 		return false;
 	}
 
 	if(!check_tree_sanity(node))
 	{
-		if(iVerbosity >= 1)
-			std::cerr << "Syntax tree is not sane." << std::endl;
+		log_err("Syntax tree is not sane.");
 		return false;
 	}
 
@@ -952,8 +925,7 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 
 	if(!check_tree_sanity(node))
 	{
-		if(iVerbosity >= 1)
-			std::cerr << "Optimized syntax tree is not sane." << std::endl;
+		log_err("Optimized syntax tree is not sane.");
 		return false;
 	}
 
@@ -976,7 +948,7 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 // class interface
 
 Parser::Parser(const std::vector<Symbol>* pvecFreeParams)
-	: m_iVerbosity(::iVerbosity), m_bOk(false)
+	: m_bOk(false)
 {
 	// set "x" as default free param if no others given
 	if(!pvecFreeParams)
@@ -987,12 +959,11 @@ Parser::Parser(const std::vector<Symbol>* pvecFreeParams)
 		m_vecFreeParams.push_back(sym);
 	}
 }
-	
+
 Parser::Parser(const Parser& parser) { this->operator=(parser); }
-	
+
 Parser& Parser::operator=(const Parser& parser)
 {
-	this->m_iVerbosity = parser.m_iVerbosity;
 	this->m_node = parser.m_node;
 	this->m_syms = parser.m_syms;
 	this->m_vecFreeParams = parser.m_vecFreeParams;
@@ -1039,17 +1010,12 @@ bool Parser::ParseExpression(const std::string& str)
 	clear(false);
 	m_bOk = ::parse_expression(m_node, m_syms, str, m_vecFreeParams);
 
-	if(m_iVerbosity >= 3)
-	{
-		std::cout << "\n--------------------------------------------------------------------------------\n";
-		std::cout << "Parsing " << (m_bOk ? "successful" : "failed") << ".\n";
-		std::cout << "Parsed expression: "
-					<< GetExpression(false, false)
-					<< "\n";
-		PrintSymbolMap();
-		std::cout << "--------------------------------------------------------------------------------\n\n";
-	}
-	
+	//log_info("--------------------------------------------------------------------------------");
+	log_info("Parsing ", (m_bOk ? "successful" : "failed"));
+	log_info("Parsed expression: ", GetExpression(false, false));
+	PrintSymbolMap();
+	//log_info("--------------------------------------------------------------------------------");
+
 	return m_bOk;
 }
 
@@ -1068,9 +1034,7 @@ double Parser::EvalTree(double x)
 {
 	if(m_vecFreeParams.size() != 1)
 	{
-		if(m_iVerbosity>=1)
-			std::cerr << "Symbol table has more than one free parameter, but only one given!"
-						<< std::endl;
+		log_err("Symbol table has more than one free parameter, but only one given!");
 		return 0.;
 	}
 
@@ -1084,11 +1048,6 @@ std::string Parser::GetExpression(bool bFillInSyms, bool bGnuPlotSyntax) const
 	return ::get_expression(m_node, m_syms, m_vecFreeParams, bFillInSyms, bGnuPlotSyntax);
 }
 
-void Parser::SetVerbosity(int iVerbosity)
-{
-	m_iVerbosity = iVerbosity;
-	::iVerbosity = iVerbosity;
-}
 bool Parser::IsOk() const { return m_bOk; }
 
 // print tree & symbol map
@@ -1198,16 +1157,12 @@ static void symbol_with_2values_fill_in(std::vector<SymbolWith2Values>& vec,
 
 		if(syms0.size()!=0 || syms1.size()!=0)
 		{
-			if(iVerbosity>=2)
-				std::cerr << "Warning: Free parameters specified in " << strWhich
-							<< ", assuming value 0." << std::endl;
+			log_warn("Free parameters specified in ", strWhich, ", assuming value 0.");
 		}
 
 		if(!bOk0 || !bOk1)
 		{
-			if(iVerbosity>=1)
-				std::cerr << "Error: Could not parse " << strWhich << " expression."
-							<< std::endl;
+			log_err("Could not parse ", strWhich, " expression.");
 		}
 
 		sym2.dVal0 = eval_tree(node0, syms0, 0);
@@ -1224,9 +1179,7 @@ static std::vector<SymbolWith2Values> parse_symbol_with_2values(const std::strin
 	bool bOk = qi::phrase_parse(str.begin(), str.end(), lp, ascii::space, params);
 	if(!bOk)
 	{
-		if(iVerbosity>=1)
-			std::cerr << "Error parsing " << strWhich << ": "
-					 	 << lp.ostrErr.str() << std::endl;
+		log_err("Error parsing ", strWhich, ": ", lp.ostrErr.str());
 	}
 
 	symbol_with_2values_fill_in(params, strWhich);

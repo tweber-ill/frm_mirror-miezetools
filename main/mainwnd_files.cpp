@@ -11,6 +11,7 @@
 #include "../helper/misc.h"
 #include "../helper/comp.h"
 #include "../helper/file.h"
+#include "../helper/log.h"
 #include "settings.h"
 #include "../loader/loadtxt.h"
 #include "../loader/loadnicos.h"
@@ -39,18 +40,14 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 
 		if(!tmp.open())
 		{
-			std::cerr << "Error: Cannot create temporary file for \""
-						<< strFile << "\"."
-						<< std::endl;
+			log_err("Cannot create temporary file for \"", strFile, "\".");
 			return;
 		}
 
 		strFile = tmp.GetFileName();
 		if(!decomp_file_to_file(_strFile.c_str(), strFile.c_str()))
 		{
-			std::cerr << "Error: Cannot decompress file \""
-						<< strFile << "\"."
-						<< std::endl;
+			log_err("Cannot decompress file \"", strFile, "\".");
 			return;
 		}
 	}
@@ -81,7 +78,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			const uint* pDat = tof.GetData(iFoil);
 			if(!pDat)
 			{
-				std::cerr << "Error: Could not load \"" << strFileNoDir << "\" correctly." << std::endl;
+				log_err("Could not load \"", strFileNoDir, "\" correctly.");
 				break;
 			}
 			convert(pdDat, pDat, iW*iH*iTcCnt);
@@ -121,7 +118,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		const uint* pDat = pad.GetData();
 		if(!pDat)
 		{
-			std::cerr << "Error: Could not load \"" << strFileNoDir << "\"." << std::endl;
+			log_err("Could not load \"", strFileNoDir, "\".");
 			return;
 		}
 
@@ -193,7 +190,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				const double *pdy = pdat1d->GetColumn(iY);
 				const double *pdyerr = pdat1d->GetColumn(iYErr);
 
-				if(Settings::Get<int>("general/sort_x"))
+				if(Settings::Get<int>("misc/sort_x"))
 				{
 					if(pdyerr)
 						::sort_3<double*, double>((double*)pdx,
@@ -384,7 +381,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			double *pdyerr = new double[pnicosdat->GetDim()];
 			::apply_fkt<double>(pdy, pdyerr, sqrt, pnicosdat->GetDim());
 
-			if(Settings::Get<int>("general/sort_x"))
+			if(Settings::Get<int>("misc/sort_x"))
 			{
 				if(pdyerr)
 					::sort_3<double*, double>((double*)pdx,
@@ -503,7 +500,7 @@ void MiezeMainWnd::AddRecentFile(const QString& strFile)
 		m_lstRecentFiles.erase(iter, m_lstRecentFiles.end());
 	}
 
-	Settings::Set<QStringList>("general/recent_files", m_lstRecentFiles);
+	Settings::Set<QStringList>("misc/recent_files", m_lstRecentFiles);
 	UpdateRecentFileMenu();
 }
 
@@ -526,7 +523,7 @@ void MiezeMainWnd::UpdateRecentFileMenu()
 
 void MiezeMainWnd::LoadRecentFileList()
 {
-	m_lstRecentFiles = Settings::Get<QStringList>("general/recent_files");
+	m_lstRecentFiles = Settings::Get<QStringList>("misc/recent_files");
 	m_lstRecentFiles.removeDuplicates();
 
 	UpdateRecentFileMenu();

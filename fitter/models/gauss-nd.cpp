@@ -6,6 +6,7 @@
  */
 
 // TODO: normalize
+// TODO: use logger
 
 #include "gauss-nd.h"
 
@@ -293,7 +294,7 @@ int get_gauss_nd(unsigned int uiDim, unsigned int iLen,
 
 
 	//if(bValidFit)
-	if(iFitterVerbosity >= 3)
+	//if(iFitterVerbosity >= 3)
 	{
 		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		std::cerr << "result of fit" << std::endl;

@@ -6,6 +6,9 @@
  */
 
 #include "../../helper/math.h"
+#include "../../helper/log.h"
+#include "../../helper/misc.h"
+
 #include <limits>
 #include <algorithm>
 #include <boost/algorithm/minmax_element.hpp>
@@ -18,8 +21,6 @@
 
 #include "gauss.h"
 #include "../chi2.h"
-#include "../../helper/misc.h"
-#include "../../helper/math.h"
 #include "interpolation.h"
 
 #include "../../main/settings.h"
@@ -195,8 +196,7 @@ bool get_gauss(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		if(iFitterVerbosity >= 1)
-			std::cerr << "Error: min == max, won't try fitting!" << std::endl;
+		log_err("min == max, won't try fitting!");
 		return 0;
 	}
 
@@ -343,22 +343,20 @@ bool get_gauss(unsigned int iLen,
 
 	bool bNormalized = gmod.IsNormalized();
 
-	if(iFitterVerbosity >= 3)
+	//if(iFitterVerbosity >= 3)
 	{
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			std::cerr << "result of gauss fit step " << (++uiMini) << std::endl;
-			std::cerr << "==========================" << std::endl;
-			std::cerr << mini << std::endl;
+			log_info("result of gauss fit step ", (++uiMini));
+			std::ostringstream ostrMini; ostrMini << mini;
+			log_info(ostrMini.str());
 		}
 
-		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
+		log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
 	}
 
-	
+
 	*pmodel = new GaussModel(dAmp, dSpread, dx0, dAmpErr, dSpreadErr, dx0Err, bNormalized, doffs, doffserr);
 	(*pmodel)->Normalize();
 
@@ -594,8 +592,7 @@ bool get_multigauss(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		if(iFitterVerbosity >= 1)
-			std::cerr << "Error: min == max, won't try fitting!" << std::endl;
+		log_err("min == max, won't try fitting!");
 		return 0;
 	}
 
@@ -836,19 +833,17 @@ bool get_multigauss(unsigned int iLen,
 	bool bNormalized = gmod.IsNormalized();
 
 
-	if(iFitterVerbosity >= 3)
+	//if(iFitterVerbosity >= 3)
 	{
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			std::cerr << "result of multi-gauss fit step " << (++uiMini) << std::endl;
-			std::cerr << "==========================" << std::endl;
-			std::cerr << mini << std::endl;
+			log_info("result of multi-gauss fit step ", (++uiMini));
+			std::ostringstream ostrMini; ostrMini << mini;
+			log_info(ostrMini.str());
 		}
 
-		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
+		log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
 	}
 
 

@@ -6,6 +6,8 @@
  */
 
 #include "../../helper/math.h"
+#include "../../helper/log.h"
+
 #include <limits>
 #include <algorithm>
 #include <boost/algorithm/minmax_element.hpp>
@@ -85,7 +87,6 @@ double MiezeSinModel::GetContrastErr() const
 	double dErr = sqrt((1/m_doffs*m_damperr)*(1/m_doffs*m_damperr)
 				+ (-m_damp/(m_doffs*m_doffs)*m_doffserr)*(-m_damp/(m_doffs*m_doffs)*m_doffserr));
 
-	
 	return dErr;
 }
 
@@ -117,9 +118,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 	if(dNumOsc<0.)
 	{
-		if(iFitterVerbosity >= 2)
-			std::cerr << "Warning: No number of oscillations given, assuming 2 oscillations."
-						<< std::endl;
+		log_warn("No number of oscillations given, assuming 2 oscillations.");
 		dNumOsc = 2.;
 	}
 
@@ -127,10 +126,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	if(dFreq < 0.)
 	{
 		dFreq = 2.*M_PI/double(iLen) * dNumOsc;
-
-		if(iFitterVerbosity >= 2)
-			std::cerr << "Warning: No frequency given, calculating using number of bins."
-				  	  << std::endl;
+		log_warn("No frequency given, calculating using number of bins.");
 
 		px = 0;
 	}
@@ -143,9 +139,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 		px = pdx_predef;
 
-		if(iFitterVerbosity >= 2)
-			std::cerr << "Warning: Using predefined x values."
-				  	  	  << std::endl;
+		log_warn("Using predefined x values.");
 	}
 
 	MiezeSinModel sinmod(dFreq);
@@ -160,8 +154,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		if(iFitterVerbosity >= 1)
-			std::cerr << "Error: min == max, won't try fitting!" << std::endl;
+		log_err("min == max, won't try fitting!");
 		return 0;
 	}
 
@@ -299,31 +292,29 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	if(dPhase<0.)
 		dPhase += 2.*M_PI;
 
-	if(iFitterVerbosity >= 3)
+	//if(iFitterVerbosity >= 3)
 	{
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			std::cerr << "result of MIEZE sinus fit step " << (++uiMini) << std::endl;
-			std::cerr << "================================" << std::endl;
-			std::cerr << mini << std::endl;
+			log_info("result of MIEZE sinus fit step ", (++uiMini));
+			std::ostringstream ostrMini; ostrMini << mini,
+			log_info(ostrMini.str());
 		}
 
-		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
+		log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
 	}
 
 	*pmodel = new MiezeSinModel(dFreq, dAmp, dPhase, dOffs,
 								0., dAmpErr, dPhaseErr, dOffsErr);
-	
+
 	double dContrast = (*pmodel)->GetContrast();
 	double dContrastError = (*pmodel)->GetContrastErr();
 
 	if (has_nan_or_inf(dContrast) || has_nan_or_inf(dContrastError) ||
 		has_nan_or_inf(dPhase) || has_nan_or_inf(dPhaseErr))
 		bValidFit = 0;
-	
+
 	if(pdx_predef) delete[] pdx_predef;
 
 	return bValidFit;

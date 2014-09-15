@@ -15,6 +15,7 @@
 #include "pnpoly.h"
 #include "../helper/math.h"
 #include "../helper/linalg.h"
+#include "../helper/log.h"
 #include "../data/data.h"
 
 //------------------------------------------------------------------------------
@@ -1244,7 +1245,7 @@ bool Roi::LoadXML(Xml& xml, const std::string& strBase)
 			}
 			else
 			{
-				std::cerr << "Roi: Unknown element \"" << strType << "\"." << std::endl;
+				log_err("Roi: Unknown element \"", strType, "\".");
 				continue;
 			}
 
@@ -1277,7 +1278,7 @@ bool Roi::Load(const char* pcFile)
 	Xml xml;
 	if(!xml.Load(pcFile))
 	{
-		std::cerr << "Roi: Cannot load \"" << pcFile << "\"." << std::endl;
+		log_err("Roi: Cannot load \"", pcFile, "\".");
 		return false;
 	}
 
@@ -1320,7 +1321,7 @@ bool Roi::Save(const char* pcFile) const
 	std::ofstream ofstr(pcFile);
 	if(!ofstr.is_open())
 	{
-		std::cerr << "Roi: Cannot save \"" << pcFile << "\"." << std::endl;
+		log_err("Roi: Cannot save \"", pcFile, "\".");
 		return false;
 	}
 

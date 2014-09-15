@@ -7,6 +7,7 @@
 
 #include "mainwnd.h"
 #include "../helper/string.h"
+#include "../helper/log.h"
 #include "settings.h"
 
 #include <QtGui/QMdiSubWindow>
@@ -114,8 +115,7 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 			pSWB = new Plot4dWrapper(pMdi);
 		else
 		{
-			std::cerr << "Error: Unknown plot type: \"" << strSWType << "\"."
-						<< std::endl;
+			log_err("Unknown plot type: \"", strSWType, "\".");
 			continue;
 		}
 		pSWBs[iWnd] = pSWB;
@@ -303,7 +303,7 @@ void MiezeMainWnd::AddRecentSession(const QString& strFile)
 		m_lstRecentSessions.erase(iter, m_lstRecentSessions.end());
 	}
 
-	Settings::Set<QStringList>("general/recent_sessions", m_lstRecentSessions);
+	Settings::Set<QStringList>("misc/recent_sessions", m_lstRecentSessions);
 	UpdateRecentSessionMenu();
 }
 
@@ -328,7 +328,7 @@ void MiezeMainWnd::UpdateRecentSessionMenu()
 
 void MiezeMainWnd::LoadRecentSessionList()
 {
-	m_lstRecentSessions = Settings::Get<QStringList>("general/recent_sessions");
+	m_lstRecentSessions = Settings::Get<QStringList>("misc/recent_sessions");
 	m_lstRecentSessions.removeDuplicates();
 
 	UpdateRecentSessionMenu();

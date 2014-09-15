@@ -6,14 +6,19 @@
  */
 
 #include "fit_data.h"
+
 #include "../fitter/models/freefit.h"
 #include "../fitter/models/msin.h"
 #include "../fitter/models/gauss.h"
+
 #include "../helper/misc.h"
 #include "../helper/math.h"
 #include "../helper/mieze.hpp"
 #include "../helper/fourier.h"
+#include "../helper/log.h"
+
 #include "../main/settings.h"
+
 
 bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt)
 {
@@ -74,8 +79,7 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 	}
 	else
 	{
-		std::cerr << "Error: Unknown fit function selected."
-				  << std::endl;
+		log_err("Unknown fit function selected.");
 		return false;
 	}
 
@@ -92,7 +96,7 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 {
 	if(vecFoils.size() == 0)
 	{
-		std::cerr << "Error: No foils in dataset." << std::endl;
+		log_err("No foils in dataset.");
 		return Data1();
 	}
 

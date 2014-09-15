@@ -8,6 +8,8 @@
 #include "data.h"
 #include "../helper/comp.h"
 #include "../helper/file.h"
+#include "../helper/log.h"
+
 #include <fstream>
 
 
@@ -26,7 +28,7 @@ bool DataInterface::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	void *pvMem = blob.map(iBlobIdx, iBlobLen);
 	if(!pvMem)
 	{
-		std::cerr << "Error: Cannot map static parameters from blob memory." << std::endl;
+		log_err("Cannot map static parameters from blob memory.");
 		return false;
 	}
 
@@ -49,7 +51,7 @@ bool DataInterface::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	pvMem = blob.map(iBlobIdx, iBlobLen);
 	if(!pvMem)
 	{
-		std::cerr << "Error: Cannot map misc parameters from blob memory." << std::endl;
+		log_err("Cannot map misc parameters from blob memory.");
 		return false;
 	}
 
@@ -118,7 +120,7 @@ void load_xml_vecs(unsigned int iNumVecs,
 
 					double *pdMemUncomp = pvecs[iObj]->data();
 					if(!::decomp_mem_to_mem_fix(pvMemComp, (unsigned int)iLenComp, (void*)pdMemUncomp, pvecs[iObj]->size()*sizeof(double)))
-						std::cerr << "Error: Cannot decompress data in blob." << std::endl;
+						log_err("Cannot decompress data in blob.");
 
 					blob.unmap(pvMemComp);
 				}
@@ -130,8 +132,7 @@ void load_xml_vecs(unsigned int iNumVecs,
 				}
 			}
 			else
-				std::cerr << "Error: Blob usage enabled, but no blob index given!"
-						  << std::endl;
+				log_err("Blob usage enabled, but no blob index given!");
 		}
 		else
 		{
@@ -170,7 +171,7 @@ void save_xml_vecs(unsigned int iNumVecs,
 			else
 			{
 				if(!comp_mem_to_stream((void*)pvecs[iObj]->data(), pvecs[iObj]->size()*sizeof(double), ostrBlob/*, COMP_BZ2*/))
-					std::cerr << "Error: Cannot compress data in blob." << std::endl;
+					log_err("Cannot compress data in blob.");
 			}
 
 			qint64 iBlobIdxNew = ostrBlob.tellp();

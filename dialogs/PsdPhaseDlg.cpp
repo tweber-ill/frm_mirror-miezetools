@@ -17,6 +17,7 @@
 #include "../helper/fourier.h"
 #include "../helper/misc.h"
 #include "../helper/math.h"
+#include "../helper/log.h"
 
 #include "../fitter/models/msin.h"
 
@@ -365,7 +366,7 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 	pDatPlot_shifted->setWindowTitle(pDatPlot_shifted->windowTitle() + " (psd corr)");
 
 	const Data3* pDat = &pDatPlot->GetData();
-	const double dMinCounts = Settings::Get<int>("general/min_counts");
+	const double dMinCounts = Settings::Get<int>("misc/min_counts");
 
 	Data3* pDat_shifted = &pDatPlot_shifted->GetData();
 	const Data2* pPhases = 0;
@@ -373,9 +374,9 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 	{
 		pPhases = &pPhasesPlot->GetData2();
 		if(pDat->GetWidth()!=pPhases->GetWidth() || pDat->GetHeight()!=pPhases->GetHeight())
-			std::cerr << "Warning: Pixel sizes of \"" << pDatPlot->windowTitle().toStdString()
-						  << "\" and \"" << pPhasesPlot->windowTitle().toStdString()
-						  << "\" do not match" << std::endl;
+			log_warn("Pixel sizes of \"", pDatPlot->windowTitle().toStdString(),
+					"\" and \"", pPhasesPlot->windowTitle().toStdString(),
+					"\" do not match.");
 	}
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
@@ -451,8 +452,7 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 
 	if(iUnfittedPixels)
 	{
-		std::cerr << "Error: PSD phase correction: Could not fit "
-					<< iUnfittedPixels << " pixels." << std::endl;
+		log_err("PSD phase correction: Could not fit ", iUnfittedPixels, " pixels.");
 	}
 
 	delete[] pdMem;
@@ -467,7 +467,7 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 	Plot4d* pDatPlot_shifted = (Plot4d*)pDatPlot->clone();
 	bool bIsCountData = pDatPlot_shifted->IsCountData();
 	pDatPlot_shifted->setWindowTitle(pDatPlot_shifted->windowTitle() + " (psd corr)");
-	const double dMinCounts = Settings::Get<int>("general/min_counts");
+	const double dMinCounts = Settings::Get<int>("misc/min_counts");
 
 	const Data4* pDat = &pDatPlot->GetData();
 	Data4* pDat_shifted = &pDatPlot_shifted->GetData();
@@ -476,9 +476,9 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 	{
 		pPhases = &pPhasesPlot->GetData2();
 		if(pDat->GetWidth()!=pPhases->GetWidth() || pDat->GetHeight()!=pPhases->GetHeight())
-			std::cerr << "Warning: Pixel sizes of \"" << pDatPlot->windowTitle().toStdString()
-						  << "\" and \"" << pPhasesPlot->windowTitle().toStdString()
-						  << "\" do not match" << std::endl;
+			log_warn("Pixel sizes of \"", pDatPlot->windowTitle().toStdString(),
+					"\" and \"", pPhasesPlot->windowTitle().toStdString(),
+					"\" do not match.");
 	}
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
@@ -555,8 +555,7 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 
 	if(iUnfittedPixels)
 	{
-		std::cerr << "Error: PSD phase correction: Could not fit "
-					<< iUnfittedPixels << " pixels." << std::endl;
+		log_err("PSD phase correction: Could not fit ", iUnfittedPixels, " pixels.");
 	}
 
 	delete[] pdMem;

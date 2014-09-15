@@ -35,15 +35,14 @@ void Settings::free()
 void Settings::SetDefaults()
 {
 	if(!s_pGlobals) return;
-
 	QStringList keys = s_pGlobals->allKeys();
 
 
 	// --------------------------------------------------------------------------------
 	// General
-	if(!keys.contains("general/sort_x")) s_pGlobals->setValue("general/sort_x", 1);
-	if(!keys.contains("general/debug_level")) s_pGlobals->setValue("general/debug_level", 1);
-	if(!keys.contains("general/min_counts")) s_pGlobals->setValue("general/min_counts", 25);
+	if(!keys.contains("misc/sort_x")) s_pGlobals->setValue("misc/sort_x", 1);
+	if(!keys.contains("misc/debug_level")) s_pGlobals->setValue("misc/debug_level", 2);
+	if(!keys.contains("misc/min_counts")) s_pGlobals->setValue("misc/min_counts", 25);
 	if(!keys.contains("interpolation/spline_degree")) s_pGlobals->setValue("interpolation/spline_degree", 3);
 	// --------------------------------------------------------------------------------
 

@@ -14,6 +14,7 @@
 #include <limits>
 #include <iostream>
 #include "../helper/string.h"
+#include "../helper/log.h"
 #include "../fitter/models/freefit.h"
 
 #define PAD_X 18
@@ -510,7 +511,7 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj, bool bKeepObj)
 	{
 		if(iObj<0 || iObj>=m_vecObjs.size())
 		{
-			std::cerr << "Error: Invalid plot index selected." << std::endl;
+			log_err("Invalid plot index selected.");
 			return;
 		}
 		pltobj = &m_vecObjs[iObj];
@@ -631,7 +632,7 @@ void Plot::replot_fkts()
 	//MergeParamMaps();
 	//emit(ParamsChanged(m_mapMerged));
 #else
-	std::cerr << "Error: Parser not linked." << std::endl;
+	log_err("Parser not linked.");
 #endif
 }
 
@@ -868,16 +869,14 @@ bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	else
 	{
 		plttype = PLOT_DATA;
-		std::cerr << "Error: Unknown plot object type: \"" << strType << "\"." << std::endl;
+		log_err("Unknown plot object type: \"", strType, "\".");
 	}
 
 	std::string strName = xml.QueryString((strBase + "name").c_str(), "");
 	trim(strName);
 	if(strName != "")
 	{
-		std::cerr << "Warning: Deprecated field in data file \"name\" overrides settings in data object."
-				 << std::endl;
-
+		log_warn("Deprecated field in data file \"name\" overrides settings in data object.");
 		dat.GetParamMapDyn()["function_symbolic"] = strName;
 	}
 
@@ -885,9 +884,7 @@ bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	trim(strFkt);
 	if(strFkt != "")
 	{
-		std::cerr << "Warning: Deprecated field in data file \"function\" overrides settings in data object."
-				 << std::endl;
-
+		log_warn("Deprecated field in data file \"function\" overrides settings in data object.");
 		dat.GetParamMapDyn()["function"] = strFkt;
 	}
 

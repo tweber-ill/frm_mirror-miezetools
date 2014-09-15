@@ -18,6 +18,8 @@
 #include "freefit.h"
 #include "../chi2.h"
 
+#include "../../helper/log.h"
+
 //----------------------------------------------------------------------
 // freefit model
 
@@ -60,13 +62,11 @@ FreeFktModel::~FreeFktModel() {}
 bool FreeFktModel::SetParams(const std::vector<double>& vecParams)
 {
 	std::vector<Symbol>& syms = m_parser.GetSymbols();
-	
+
 	if(syms.size() != vecParams.size())
 	{
-		if(iFitterVerbosity >= 1)
-			std::cerr << syms.size() << " symbols in table, but "
-							<< vecParams.size() << " symbols supplied."
-							<< std::endl;
+		log_err(syms.size(), " symbols in table, but ",
+				vecParams.size(), " symbols supplied.");
 
 		return false;
 	}
@@ -157,8 +157,7 @@ bool get_freefit(unsigned int iLen,
 	FreeFktModel freemod(pcExp);
 	if(!freemod.IsOk())
 	{
-		if(iFitterVerbosity >= 1)
-			std::cerr << "Error: Free function model could not be created." << std::endl;
+		log_err("Free function model could not be created.");
 		return 0;
 	}
 	Chi2Function fkt(&freemod, iLen, px, py, pdy);
@@ -172,8 +171,7 @@ bool get_freefit(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		if(iFitterVerbosity >= 2)
-			std::cerr << "Warning: min == max!" << std::endl;
+		log_warn("min == max!");
 		//return 0;
 	}
 
@@ -266,27 +264,24 @@ bool get_freefit(unsigned int iLen,
 		// also write found values back into the symbol table
 		sym.dVal = dVal;
 	}
-	
+
 
 	*pFinalModel = new FreeFktModel(freemod);
 	(*pFinalModel)->m_vecParamNames = vecParamNames;
 	(*pFinalModel)->m_vecParamVals = vecFittedParams;
 	(*pFinalModel)->m_vecParamErrs = vecFittedErrs;
 
-	if(iFitterVerbosity >= 3)
+	//if(iFitterVerbosity >= 3)
 	{
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
-
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			std::cerr << "result of user-defined fit step " << (++uiMini) << std::endl;
-			std::cerr << "=================================" << std::endl;
-			std::cerr << mini << std::endl;
+			log_info("result of user-defined fit step ", (++uiMini));
+			std::ostringstream ostrMini; ostrMini << mini;
+			log_info(ostrMini.str());
 		}
 
-		std::cerr << "values max: " << dMax << ", min: " << dMin << ", nchan=" << iLen << std::endl;
-		std::cerr << "--------------------------------------------------------------------------------" << std::endl;
+		log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
 	}
 
 	return bValidFit;

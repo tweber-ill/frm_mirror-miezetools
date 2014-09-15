@@ -7,6 +7,7 @@
 #include "string_map.h"
 #include "string.h"
 #include "misc.h"
+#include "log.h"
 
 #ifndef NO_COMP
 	#include "comp.h"
@@ -102,9 +103,7 @@ void StringMap::ParseString(const std::string& strConf)
 		bool bInserted = m_map.insert(pairStr).second;
 		if(!bInserted)
 		{
-			std::cerr << "Warning: Key \""
-					<<  pairStr.first
-					<< "\" already exists in map." << std::endl;
+			log_warn("Key \"", pairStr.first, "\" already exists in map.");
 		}
 
 		//std::cout << "key: \"" << pairStr.first <<"\" value:\"" << pairStr.second << "\"" << std::endl;
@@ -181,8 +180,7 @@ bool StringMap::Deserialize(const void* pvMem, unsigned int iLen)
 
 	if(vecStrings.size()%2 != 0)
 	{
-		std::cerr << "Error: Uneven number of strings in key/value map."
-				  << std::endl;
+		log_err("Uneven number of strings in key/value map.");
 		return false;
 	}
 
@@ -200,13 +198,13 @@ bool StringMap::Deserialize(const void* pvMem, unsigned int iLen)
 #else
 bool StringMap::Serialize(std::ostream& ostrSer) const
 {
-	std::cerr << "Error: Serialize not linked." << std::endl;
+	log_err("Serialize not linked.");
 	return false;
 }
 
 bool StringMap::Deserialize(const void* pvMem, unsigned int iLen)
 {
-	std::cerr << "Error: Deserialize not linked." << std::endl;
+	log_err("Deserialize not linked.");
 	return false;
 }
 #endif

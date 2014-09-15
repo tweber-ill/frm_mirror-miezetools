@@ -35,28 +35,25 @@ struct Symbol
 
 class Parser
 {
-	private:
-		int m_iVerbosity;		// 0..3
-	
 	protected:
 		Node m_node;
 		std::vector<Symbol> m_syms;
 		std::vector<Symbol> m_vecFreeParams;
 
 		bool m_bOk;
-	
+
 	public:
 		Parser(const std::vector<Symbol>* pvecFreeParams=0);
 		Parser(const Parser& parser);
-		
+
 		Parser& operator=(const Parser& parser);
 
 		virtual ~Parser();
 
 		void SetFreeParams(const std::vector<Symbol>& vecFreeParams);
-		
+
 		void clear(bool bClearFreeParams=true);
-		
+
 		Node& GetRootNode();
 		std::vector<Symbol>& GetSymbols();
 		std::vector<Symbol>& GetFreeParams();
@@ -64,22 +61,21 @@ class Parser
 		const Node& GetRootNode() const;
 		const std::vector<Symbol>& GetSymbols() const;
 		const std::vector<Symbol>& GetFreeParams() const;
-		
+
 		bool IsSymbolInMap(const std::string& str, double* pdVal=0) const;
 
 		// create a syntax tree out of a expression string
 		bool ParseExpression(const std::string& str);
-		
+
 		// evaluate the syntax tree
 		double EvalTree(const double *px=0);
 		double EvalTree(double x);
-		
+
 		// get a string representation of the syntax tree's expression
 		std::string GetExpression(bool bFillInSyms=false, bool bGnuPlotSyntax=true) const;
-		
-		void SetVerbosity(int iVerbosity);
+
 		bool IsOk() const;
-		
+
 		// print tree & symbol map
 		void PrintTree() const;
 		void PrintSymbolMap() const;
@@ -116,8 +112,5 @@ struct ParameterHints
 std::vector<ParameterHints> parse_parameter_hints(const std::string& str);
 //----------------------------------------------------------------------
 
-
-
-extern void parser_set_default_verbosity(int iVerbosity);
 
 #endif
