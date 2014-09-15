@@ -7,7 +7,7 @@
 #ifndef __SIMPLECALC_H__
 #define __SIMPLECALC_H__
 
-#include "neutrons.hpp"
+#include "../helper/neutrons.hpp"
 #include <boost/units/io.hpp>
 
 using namespace units;
@@ -48,7 +48,7 @@ units::quantity<units::si::energy, long double> operator "" _meV(long double ldE
 // --------------------------------------------------------------------------------
 
 
-#include "linalg.h"
+#include "../helper/linalg.h"
 #include <vector>
 
 using namespace ublas;
