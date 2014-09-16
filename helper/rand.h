@@ -9,6 +9,7 @@
 
 #include <random>
 #include <vector>
+#include <future>
 
 
 extern std::mt19937/*_64*/ g_randeng;
@@ -67,11 +68,19 @@ std::vector<REAL> rand_norm_nd(const std::vector<REAL>& vecMu, const std::vector
 	unsigned int iDim = vecMu.size();
 	vecRet.reserve(iDim);
 
+
+	std::vector<std::future<REAL>> vecFut;
+	vecFut.reserve(iDim);
+
 	for(unsigned int i=0; i<iDim; ++i)
 	{
-		REAL dRes = rand_norm<REAL>(vecMu[i], vecSigma[i]);
-		vecRet.push_back(dRes);
+		std::future<REAL> fut =std::async(std::launch::deferred | std::launch::async,
+										rand_norm<REAL>, vecMu[i], vecSigma[i]);
+		vecFut.push_back(std::move(fut));
 	}
+
+	for(unsigned int i=0; i<iDim; ++i)
+		vecRet.push_back(vecFut[i].get());
 
 	return vecRet;
 }
