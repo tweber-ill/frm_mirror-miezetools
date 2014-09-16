@@ -1,6 +1,8 @@
 // clang -O2 -o colsort colsort.cpp ../helper/string.cpp -lstdc++ -std=c++11 
+// i686-w64-mingw32-gcc -O2 -o colsort.exe colsort.cpp ../helper/string.cpp -lstdc++ -std=c++11 -static
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <unistd.h>
@@ -23,14 +25,14 @@ struct Sorter
 		{
 			unsigned int iCurIdx = vecIdx[iIdx];
 			if(vec1[iCurIdx] < vec2[iCurIdx])
-				return 1;
+				return true;
 			else if(vec1[iCurIdx] == vec2[iCurIdx])
 				continue;
 			else if(vec1[iCurIdx] > vec2[iCurIdx])
 				return false;
 		}
 
-		return 0;
+		return false;
 	}
 };
 
@@ -40,12 +42,6 @@ unsigned int Sorter::iSortSteps = 0;
 
 void sortdata(std::vector<std::vector<double> >& vecData, const std::vector<unsigned int>& vecSortIndices)
 {
-	/*bool (*sortfkt)(const std::vector<double>&, const std::vector<double>&)
-		= [](const std::vector<double>& vec1, const std::vector<double>& vec2) -> bool
-		{
-			return vec1[1] < vec2[1];
-		};*/
-
 	Sorter sortfkt;
 	sortfkt.pvecSortIndices = &vecSortIndices;
 
@@ -134,6 +130,7 @@ int main(int argc, char **argv)
 	}
 
 	std::string strHeader;
+	unsigned int iHeaderLines = 0;
 	unsigned int iNumCols = 0;
 
 	std::vector<std::vector<double>> vecData;
@@ -146,9 +143,10 @@ int main(int argc, char **argv)
 
 		if(strLine.length() == 0)
 			continue;
-		if(!std::isdigit(strLine[0]) && strLine[0]!='.')
+		if(!std::isdigit(strLine[0]) && strLine[0]!='+' && strLine[0]!='-' && strLine[0]!='.')
 		{
 			strHeader += strLine + "\n";
+			++iHeaderLines;
 			continue;
 		}
 
@@ -174,6 +172,7 @@ int main(int argc, char **argv)
 	}
 
 	std::cout << "Number of data rows: " << vecData.size() << std::endl;
+	std::cout << "Number of header lines: " << iHeaderLines << std::endl;
 
 
 
@@ -187,6 +186,8 @@ int main(int argc, char **argv)
 	std::cout << "\n";
 	std::cout << "Writing \"" << strOutFile << "\"." << std::endl;
 	std::ofstream outfile(strOutFile);
+	outfile.precision(16);
+
 	if(!outfile.is_open())
 	{
 		std::cerr << "Cannot open file for output." << std::endl;
@@ -196,7 +197,7 @@ int main(int argc, char **argv)
 	for(unsigned int iRow=0; iRow<vecData.size(); ++iRow)
 	{
 		for(unsigned int iCol=0; iCol<iNumCols; ++iCol)
-			outfile << vecData[iRow][iCol] << "    ";
+			outfile << std::setw(24) << vecData[iRow][iCol] << " ";
 		outfile << "\n";
 	}
 
