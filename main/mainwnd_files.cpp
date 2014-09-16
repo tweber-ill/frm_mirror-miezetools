@@ -193,14 +193,14 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				if(Settings::Get<int>("misc/sort_x"))
 				{
 					if(pdyerr)
-						::sort_3<double*, double>((double*)pdx,
-												(double*)pdx+pdat1d->GetDim(),
-												(double*)pdy,
-												(double*)pdyerr);
+						::sort_3<double*>((double*)pdx,
+								(double*)pdx+pdat1d->GetDim(),
+								(double*)pdy,
+								(double*)pdyerr);
 					else
-						::sort_2<double*, double>((double*)pdx,
-												(double*)pdx+pdat1d->GetDim(),
-												(double*)pdy);
+						::sort_2<double*>((double*)pdx,
+								(double*)pdx+pdat1d->GetDim(),
+								(double*)pdy);
 				}
 
 				std::string strTitle = GetPlotTitle(strFileNoDir);
@@ -384,14 +384,14 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			if(Settings::Get<int>("misc/sort_x"))
 			{
 				if(pdyerr)
-					::sort_3<double*, double>((double*)pdx,
-											(double*)pdx+pnicosdat->GetDim(),
-											(double*)pdy,
-											pdyerr);
+					::sort_3<double*>((double*)pdx,
+							(double*)pdx+pnicosdat->GetDim(),
+							(double*)pdy,
+							pdyerr);
 				else
-					::sort_2<double*, double>((double*)pdx,
-											(double*)pdx+pnicosdat->GetDim(),
-											(double*)pdy);
+					::sort_2<double*>((double*)pdx,
+							(double*)pdx+pnicosdat->GetDim(),
+							(double*)pdy);
 			}
 
 			std::string strTitle = GetPlotTitle(strFileNoDir);

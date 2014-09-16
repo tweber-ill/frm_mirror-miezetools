@@ -206,7 +206,7 @@ void find_peaks(unsigned int iLen, const T* px, const T* py, unsigned int iOrder
 		vecMaximaWidth.push_back(dWidth);
 	}
 
-	::sort_3<std::vector<double>::iterator, double>(vecMaximaSize.begin(), vecMaximaSize.end(), vecMaximaWidth.begin(), vecMaximaX.begin());
+	::sort_3<std::vector<double>::iterator>(vecMaximaSize.begin(), vecMaximaSize.end(), vecMaximaWidth.begin(), vecMaximaX.begin());
 	std::reverse(vecMaximaSize.begin(), vecMaximaSize.end());
 	std::reverse(vecMaximaWidth.begin(), vecMaximaWidth.end());
 	std::reverse(vecMaximaX.begin(), vecMaximaX.end());
