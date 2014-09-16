@@ -7,20 +7,18 @@
 #ifndef __M_RAND_H__
 #define __M_RAND_H__
 
-
 #include <random>
+#include <vector>
 
 
 extern std::mt19937/*_64*/ g_randeng;
 
 
-
 extern void init_rand();
 extern void init_rand_seed(unsigned int uiSeed);
 
+
 extern unsigned int simple_rand(unsigned int iMax);
-
-
 
 
 template<typename INT>
@@ -58,5 +56,24 @@ INT rand_poisson(REAL dMu)
 }
 
 
+template<class REAL>
+std::vector<REAL> rand_norm_nd(const std::vector<REAL>& vecMu, const std::vector<REAL>& vecSigma)
+{
+	std::vector<REAL> vecRet;
+
+	if(vecMu.size() != vecSigma.size())
+		return vecRet;
+
+	unsigned int iDim = vecMu.size();
+	vecRet.reserve(iDim);
+
+	for(unsigned int i=0; i<iDim; ++i)
+	{
+		REAL dRes = rand_norm<REAL>(vecMu[i], vecSigma[i]);
+		vecRet.push_back(dRes);
+	}
+
+	return vecRet;
+}
 
 #endif
