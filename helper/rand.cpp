@@ -42,7 +42,7 @@ void init_rand()
 	// total seed
 	unsigned int uiSeed = uiSeed0 ^ uiSeed1;
 
-	log_debug("Random seed: ", uiSeed0, ", time seed: ", uiSeed1, ", total seed: ", uiSeed);
+	log_debug("Random seed: ", uiSeed0, ", time seed: ", uiSeed1, ", total seed: ", uiSeed, ".");
 	init_rand_seed(uiSeed);
 }
 

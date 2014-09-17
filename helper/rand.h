@@ -75,7 +75,7 @@ std::vector<REAL> rand_norm_nd(const std::vector<REAL>& vecMu, const std::vector
 	for(unsigned int i=0; i<iDim; ++i)
 	{
 		std::future<REAL> fut =std::async(std::launch::deferred | std::launch::async,
-										rand_norm<REAL>, vecMu[i], vecSigma[i]);
+						rand_norm<REAL>, vecMu[i], vecSigma[i]);
 		vecFut.push_back(std::move(fut));
 	}
 

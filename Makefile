@@ -19,7 +19,6 @@ LAPACK_LIBS = -L/usr/local/lib64 -llapacke -llapack -lblas -lgfortran
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns -lQtOpenGL \
 	-lGL -lGLU -lX11
-LIBS_RESO = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${LAPACK_LIBS} ${STD_LIBS}
 LIBS_FORMULA = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${STD_LIBS}
 LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}
 
@@ -50,19 +49,6 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 			obj/log.o \
 			${LIBS}
 	strip bin/cattus
-
-reso: obj/settings.o obj/data.o obj/data1.o obj/reso_main.o obj/string.o obj/xml.o \
-	obj/plot_nopars.o obj/cn.o obj/pop.o obj/ellipse.o obj/roi.o obj/plotgl.o \
-	obj/linalg.o obj/linalg2.o obj/blob.o obj/comp.o obj/ResoDlg.o obj/spec_char.o \
-	obj/string_map.o obj/log.o
-	${CC} ${FLAGS} -o bin/reso obj/settings.o obj/data.o obj/data1.o obj/reso_main.o \
-			obj/string.o obj/xml.o obj/plot_nopars.o obj/cn.o obj/pop.o \
-			obj/ellipse.o obj/roi.o obj/plotgl.o obj/linalg.o obj/blob.o \
-			obj/comp.o obj/ResoDlg.o obj/spec_char.o obj/string_map.o \
-			obj/linalg2.o obj/log.o \
-			${LIBS_RESO}
-	strip bin/reso
-
 
 formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/string.o obj/settings.o obj/plot_nopars.o \
 	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/comp.o obj/export.o obj/data2.o \
@@ -131,12 +117,6 @@ obj/FitDlg.o: dialogs/FitDlg.cpp dialogs/FitDlg.h
 obj/ListDlg.o: dialogs/ListDlg.cpp dialogs/ListDlg.h
 	${CC} ${FLAGS} -c -o obj/ListDlg.o dialogs/ListDlg.cpp
 
-obj/ResoDlg.o: tools/res/ResoDlg.cpp tools/res/ResoDlg.h
-	${CC} ${FLAGS} -c -o obj/ResoDlg.o tools/res/ResoDlg.cpp
-
-obj/reso_main.o: tools/res/reso_main.cpp tools/res/ResoDlg.h
-	${CC} ${FLAGS} -c -o obj/reso_main.o tools/res/reso_main.cpp
-
 obj/FormulaDlg.o: tools/formula/FormulaDlg.cpp tools/formula/FormulaDlg.h
 	${CC} ${FLAGS} -c -o obj/FormulaDlg.o tools/formula/FormulaDlg.cpp
 
@@ -154,9 +134,6 @@ obj/SettingsDlg.o: dialogs/SettingsDlg.cpp dialogs/SettingsDlg.h
 
 obj/RadialIntDlg.o: dialogs/RadialIntDlg.cpp dialogs/RadialIntDlg.h
 	${CC} ${FLAGS} -c -o obj/RadialIntDlg.o dialogs/RadialIntDlg.cpp
-
-#obj/LatticeDlg.o: dialogs/LatticeDlg.cpp dialogs/LatticeDlg.h
-#	${CC} ${FLAGS} -c -o obj/LatticeDlg.o dialogs/LatticeDlg.cpp
 
 obj/ExportDlg.o: dialogs/ExportDlg.cpp dialogs/ExportDlg.h
 	${CC} ${FLAGS} -c -o obj/ExportDlg.o dialogs/ExportDlg.cpp
@@ -194,9 +171,6 @@ obj/linalg.o: helper/linalg.cpp helper/linalg.h
 
 obj/linalg2.o: helper/linalg2.cpp helper/linalg2.h
 	${CC} ${FLAGS} -c -o obj/linalg2.o helper/linalg2.cpp
-
-#obj/lattice.o: helper/lattice.cpp helper/lattice.h
-#	${CC} ${FLAGS} -c -o obj/lattice.o helper/lattice.cpp
 
 obj/blob.o: helper/blob.cpp helper/blob.h
 	${CC} ${FLAGS} -c -o obj/blob.o helper/blob.cpp
@@ -247,25 +221,8 @@ obj/plot3d.o: plot/plot3d.cpp plot/plot3d.h
 obj/plot4d.o: plot/plot4d.cpp plot/plot4d.h
 	${CC} ${FLAGS} -c -o obj/plot4d.o plot/plot4d.cpp
 
-
-
-
 obj/roi.o: roi/roi.cpp roi/roi.h
 	${CC} ${FLAGS} -c -o obj/roi.o roi/roi.cpp
-
-
-
-
-obj/cn.o: tools/res/cn.cpp tools/res/cn.h
-	${CC} ${FLAGS} -c -o obj/cn.o tools/res/cn.cpp
-
-obj/pop.o: tools/res/pop.cpp tools/res/pop.h
-	${CC} ${FLAGS} -c -o obj/pop.o tools/res/pop.cpp
-
-obj/ellipse.o: tools/res/ellipse.cpp tools/res/ellipse.h
-	${CC} ${FLAGS} -c -o obj/ellipse.o tools/res/ellipse.cpp
-
-
 
 obj/chi2.o: fitter/chi2.cpp fitter/chi2.h
 	${CC} ${FLAGS} -c -o obj/chi2.o fitter/chi2.cpp
@@ -308,5 +265,4 @@ clean:
 	rm -f ui/*.h
 	rm -f *.moc
 	rm -f dialogs/*.moc
-	rm -f tools/res/*.moc
 	rm -f plot/*.moc

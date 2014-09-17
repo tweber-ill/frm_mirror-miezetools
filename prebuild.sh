@@ -43,13 +43,11 @@ declare -a hfiles=(
 	"dialogs/ComboDlg.h"
 	"dialogs/PsdPhaseDlg.h"
 	"dialogs/RadialIntDlg.h"
-	"dialogs/LatticeDlg.h"
 	"dialogs/PlotPropDlg.h"
 	"dialogs/RebinDlg.h"
 	"dialogs/ExportDlg.h"
 	"dialogs/InfoDock.h"
 	"dialogs/NormDlg.h"
-	"tools/res/ResoDlg.h"
 	"tools/formula/FormulaDlg.h"
 )
 
