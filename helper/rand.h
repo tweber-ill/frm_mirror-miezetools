@@ -9,6 +9,8 @@
 
 #include <random>
 #include <vector>
+#include <initializer_list>
+#include <type_traits>
 #include <future>
 
 
@@ -57,30 +59,32 @@ INT rand_poisson(REAL dMu)
 }
 
 
-template<class REAL>
-std::vector<REAL> rand_norm_nd(const std::vector<REAL>& vecMu, const std::vector<REAL>& vecSigma)
+template<class t_vec=std::vector<double>, class REAL=typename t_vec::value_type,
+	class t_initlst=std::initializer_list<REAL>>
+t_vec rand_norm_nd(const t_initlst& vecMu, const t_initlst& vecSigma)
 {
-	std::vector<REAL> vecRet;
-
 	if(vecMu.size() != vecSigma.size())
-		return vecRet;
+		return t_vec();
 
 	unsigned int iDim = vecMu.size();
-	vecRet.reserve(iDim);
-
+	t_vec vecRet(iDim);
 
 	std::vector<std::future<REAL>> vecFut;
 	vecFut.reserve(iDim);
 
-	for(unsigned int i=0; i<iDim; ++i)
+	using iter = typename t_initlst::const_iterator;
+	iter iterMu = vecMu.begin();
+	iter iterSig = vecSigma.begin();
+
+	for(; iterMu!=vecMu.end(); ++iterMu, ++iterSig)
 	{
-		std::future<REAL> fut =std::async(std::launch::deferred | std::launch::async,
-						rand_norm<REAL>, vecMu[i], vecSigma[i]);
+		std::future<REAL> fut = std::async(std::launch::deferred | std::launch::async,
+						std::function<REAL(REAL,REAL)>(rand_norm<REAL>), *iterMu, *iterSig);
 		vecFut.push_back(std::move(fut));
 	}
 
 	for(unsigned int i=0; i<iDim; ++i)
-		vecRet.push_back(vecFut[i].get());
+		vecRet[i] = vecFut[i].get();
 
 	return vecRet;
 }
