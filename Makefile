@@ -34,226 +34,146 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
 	obj/spec_char.o obj/string_map.o obj/log.o
-	${CC} ${FLAGS} -o bin/cattus obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o \
-			obj/mainwnd_mdi.o obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o \
-			obj/data3.o obj/data4.o obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o \
-			obj/FitDlg.o obj/ListDlg.o obj/RoiDlg.o obj/SettingsDlg.o \
-			obj/PsdPhaseDlg.o obj/RadialIntDlg.o obj/ExportDlg.o obj/PlotPropDlg.o \
-			obj/fourier.o obj/string.o obj/xml.o obj/loadcasc.o obj/loadnicos.o \
-			obj/loadtxt.o obj/plotgl.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o \
-			obj/roi.o obj/chi2.o obj/fitter.o obj/functions.o \
-			obj/parser.o obj/freefit.o obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o \
-			obj/interpolation.o obj/linalg.o obj/blob.o obj/export.o \
-			obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o obj/rand.o obj/InfoDock.o \
-			obj/NormDlg.o obj/RebinDlg.o obj/spec_char.o obj/string_map.o \
-			obj/log.o \
-			${LIBS}
+	${CC} ${FLAGS} -o bin/cattus $+ ${LIBS}
 	strip bin/cattus
 
 formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/string.o obj/settings.o obj/plot_nopars.o \
 	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/comp.o obj/export.o obj/data2.o \
 	obj/string_map.o obj/log.o
-	${CC} ${FLAGS} -o bin/formula obj/FormulaDlg.o obj/formulas.o obj/string.o obj/settings.o \
-			obj/plot_nopars.o obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o \
-			obj/comp.o obj/export.o obj/data2.o obj/formula_main.o obj/string_map.o \
-			obj/log.o \
-			${LIBS_FORMULA}
+	${CC} ${FLAGS} -o bin/formula $+ ${LIBS_FORMULA}
 	strip bin/formula
 
 
 obj/main.o: main/main.cpp
-	${CC} ${FLAGS} -c -o obj/main.o main/main.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/mainwnd.o: main/mainwnd.cpp main/mainwnd.h
-	${CC} ${FLAGS} -c -o obj/mainwnd.o main/mainwnd.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/mainwnd_files.o: main/mainwnd_files.cpp main/mainwnd.h
-	${CC} ${FLAGS} -c -o obj/mainwnd_files.o main/mainwnd_files.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/mainwnd_session.o: main/mainwnd_session.cpp main/mainwnd.h
-	${CC} ${FLAGS} -c -o obj/mainwnd_session.o main/mainwnd_session.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/mainwnd_mdi.o: main/mainwnd_mdi.cpp main/mainwnd.h
-	${CC} ${FLAGS} -c -o obj/mainwnd_mdi.o main/mainwnd_mdi.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/subwnd.o: main/subwnd.cpp main/subwnd.h
-	${CC} ${FLAGS} -c -o obj/subwnd.o main/subwnd.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/settings.o: main/settings.cpp main/settings.h
-	${CC} ${FLAGS} -c -o obj/settings.o main/settings.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 
 obj/data.o: data/data.cpp data/data.h
-	${CC} ${FLAGS} -c -o obj/data.o data/data.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/data1.o: data/data1.cpp data/data1.h
-	${CC} ${FLAGS} -c -o obj/data1.o data/data1.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/data2.o: data/data2.cpp data/data2.h
-	${CC} ${FLAGS} -c -o obj/data2.o data/data2.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/data3.o: data/data3.cpp data/data3.h
-	${CC} ${FLAGS} -c -o obj/data3.o data/data3.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/data4.o: data/data4.cpp data/data4.h
-	${CC} ${FLAGS} -c -o obj/data4.o data/data4.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/fit_data.o: data/fit_data.cpp data/fit_data.h
-	${CC} ${FLAGS} -c -o obj/fit_data.o data/fit_data.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/export.o: data/export.cpp data/export.h
-	${CC} ${FLAGS} -c -o obj/export.o data/export.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 
 obj/CombineDlg.o: dialogs/CombineDlg.cpp dialogs/CombineDlg.h
-	${CC} ${FLAGS} -c -o obj/CombineDlg.o dialogs/CombineDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/ComboDlg.o: dialogs/ComboDlg.cpp dialogs/ComboDlg.h
-	${CC} ${FLAGS} -c -o obj/ComboDlg.o dialogs/ComboDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/FitDlg.o: dialogs/FitDlg.cpp dialogs/FitDlg.h
-	${CC} ${FLAGS} -c -o obj/FitDlg.o dialogs/FitDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/ListDlg.o: dialogs/ListDlg.cpp dialogs/ListDlg.h
-	${CC} ${FLAGS} -c -o obj/ListDlg.o dialogs/ListDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/FormulaDlg.o: tools/formula/FormulaDlg.cpp tools/formula/FormulaDlg.h
-	${CC} ${FLAGS} -c -o obj/FormulaDlg.o tools/formula/FormulaDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/formula_main.o: tools/formula/formula_main.cpp tools/formula/FormulaDlg.h
-	${CC} ${FLAGS} -c -o obj/formula_main.o tools/formula/formula_main.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/PsdPhaseDlg.o: dialogs/PsdPhaseDlg.cpp dialogs/PsdPhaseDlg.h
-	${CC} ${FLAGS} -c -o obj/PsdPhaseDlg.o dialogs/PsdPhaseDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/RoiDlg.o: dialogs/RoiDlg.cpp dialogs/RoiDlg.h
-	${CC} ${FLAGS} -c -o obj/RoiDlg.o dialogs/RoiDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/SettingsDlg.o: dialogs/SettingsDlg.cpp dialogs/SettingsDlg.h
-	${CC} ${FLAGS} -c -o obj/SettingsDlg.o dialogs/SettingsDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/RadialIntDlg.o: dialogs/RadialIntDlg.cpp dialogs/RadialIntDlg.h
-	${CC} ${FLAGS} -c -o obj/RadialIntDlg.o dialogs/RadialIntDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/ExportDlg.o: dialogs/ExportDlg.cpp dialogs/ExportDlg.h
-	${CC} ${FLAGS} -c -o obj/ExportDlg.o dialogs/ExportDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/PlotPropDlg.o: dialogs/PlotPropDlg.cpp dialogs/PlotPropDlg.h
-	${CC} ${FLAGS} -c -o obj/PlotPropDlg.o dialogs/PlotPropDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/InfoDock.o: dialogs/InfoDock.cpp dialogs/InfoDock.h
-	${CC} ${FLAGS} -c -o obj/InfoDock.o dialogs/InfoDock.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/NormDlg.o: dialogs/NormDlg.cpp dialogs/NormDlg.h
-	${CC} ${FLAGS} -c -o obj/NormDlg.o dialogs/NormDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/RebinDlg.o: dialogs/RebinDlg.cpp dialogs/RebinDlg.h
-	${CC} ${FLAGS} -c -o obj/RebinDlg.o dialogs/RebinDlg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 
 obj/fourier.o: helper/fourier.cpp helper/fourier.h
-	${CC} ${FLAGS} -c -o obj/fourier.o helper/fourier.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/string.o: helper/string.cpp helper/string.h
-	${CC} ${FLAGS} -c -o obj/string.o helper/string.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/string_map.o: helper/string_map.cpp helper/string_map.h
-	${CC} ${FLAGS} -c -o obj/string_map.o helper/string_map.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/spec_char.o: helper/spec_char.cpp helper/spec_char.h
-	${CC} ${FLAGS} -c -o obj/spec_char.o helper/spec_char.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/xml.o: helper/xml.cpp helper/xml.h
-	${CC} ${FLAGS} -c -o obj/xml.o helper/xml.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/linalg.o: helper/linalg.cpp helper/linalg.h
-	${CC} ${FLAGS} -c -o obj/linalg.o helper/linalg.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/linalg2.o: helper/linalg2.cpp helper/linalg2.h
-	${CC} ${FLAGS} -c -o obj/linalg2.o helper/linalg2.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/blob.o: helper/blob.cpp helper/blob.h
-	${CC} ${FLAGS} -c -o obj/blob.o helper/blob.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/formulas.o: helper/formulas.cpp helper/formulas.h
-	${CC} ${FLAGS} -c -o obj/formulas.o helper/formulas.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/comp.o: helper/comp.cpp helper/comp.h
-	${CC} ${FLAGS} -c -o obj/comp.o helper/comp.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/file.o: helper/file.cpp helper/file.h
-	${CC} ${FLAGS} -c -o obj/file.o helper/file.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/rand.o: helper/rand.cpp helper/rand.h
-	${CC} ${FLAGS} -c -o obj/rand.o helper/rand.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/log.o: helper/log.cpp helper/log.h
-	${CC} ${FLAGS} -c -o obj/log.o helper/log.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 
 obj/loadcasc.o: loader/loadcasc.cpp loader/loadcasc.h
-	${CC} ${FLAGS} -c -o obj/loadcasc.o loader/loadcasc.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/loadnicos.o: loader/loadnicos.cpp loader/loadnicos.h
-	${CC} ${FLAGS} -c -o obj/loadnicos.o loader/loadnicos.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/loadtxt.o: loader/loadtxt.cpp loader/loadtxt.h
-	${CC} ${FLAGS} -c -o obj/loadtxt.o loader/loadtxt.cpp
-
-
-
+	${CC} ${FLAGS} -c -o $@ $<
 
 obj/plot.o: plot/plot.cpp plot/plot.h
-	${CC} ${FLAGS} -c -o obj/plot.o plot/plot.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/plot_nopars.o: plot/plot.cpp plot/plot.h
-	${CC} ${FLAGS} -DNO_PARSER -c -o obj/plot_nopars.o plot/plot.cpp
-
+	${CC} ${FLAGS} -DNO_PARSER -c -o $@ $<
 obj/plotgl.o: plot/plotgl.cpp plot/plotgl.h
-	${CC} ${FLAGS} -c -o obj/plotgl.o plot/plotgl.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/plot2d.o: plot/plot2d.cpp plot/plot2d.h
-	${CC} ${FLAGS} -c -o obj/plot2d.o plot/plot2d.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/plot3d.o: plot/plot3d.cpp plot/plot3d.h
-	${CC} ${FLAGS} -c -o obj/plot3d.o plot/plot3d.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/plot4d.o: plot/plot4d.cpp plot/plot4d.h
-	${CC} ${FLAGS} -c -o obj/plot4d.o plot/plot4d.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/roi.o: roi/roi.cpp roi/roi.h
-	${CC} ${FLAGS} -c -o obj/roi.o roi/roi.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/chi2.o: fitter/chi2.cpp fitter/chi2.h
-	${CC} ${FLAGS} -c -o obj/chi2.o fitter/chi2.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/fitter.o: fitter/fitter.cpp fitter/fitter.h
-	${CC} ${FLAGS} -c -o obj/fitter.o fitter/fitter.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/functions.o: fitter/functions.cpp fitter/functions.h
-	${CC} ${FLAGS} -c -o obj/functions.o fitter/functions.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/parser.o: fitter/parser.cpp fitter/parser.h
-	${CC} ${FLAGS} -c -o obj/parser.o fitter/parser.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 
 obj/freefit.o: fitter/models/freefit.cpp fitter/models/freefit.h
-	${CC} ${FLAGS} -c -o obj/freefit.o fitter/models/freefit.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/freefit-nd.o: fitter/models/freefit-nd.cpp fitter/models/freefit-nd.h
-	${CC} ${FLAGS} -c -o obj/freefit-nd.o fitter/models/freefit-nd.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/gauss.o: fitter/models/gauss.cpp fitter/models/gauss.h
-	${CC} ${FLAGS} -c -o obj/gauss.o fitter/models/gauss.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/gauss-nd.o: fitter/models/gauss-nd.cpp fitter/models/gauss-nd.h
-	${CC} ${FLAGS} -c -o obj/gauss-nd.o fitter/models/gauss-nd.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/msin.o: fitter/models/msin.cpp fitter/models/msin.h
-	${CC} ${FLAGS} -c -o obj/msin.o fitter/models/msin.cpp
-
+	${CC} ${FLAGS} -c -o $@ $<
 obj/interpolation.o: fitter/models/interpolation.cpp fitter/models/interpolation.h
-	${CC} ${FLAGS} -c -o obj/interpolation.o fitter/models/interpolation.cpp
+	${CC} ${FLAGS} -c -o $@ $<
 
 
 
