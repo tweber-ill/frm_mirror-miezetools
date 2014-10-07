@@ -24,7 +24,7 @@ static inline std::string ux2loc(double dTimestamp)
 	std::tm tm = *std::localtime(&tt);
 
 	char cTime[128];
-	std::strftime(cTime, sizeof cTime, "%a %Y-%b-%d %H:%M:%S", &tm);
+	std::strftime(cTime, sizeof cTime, "%a %Y-%b-%d %H:%M:%S %Z (UTC%z)", &tm);
 
 	double dRem = dTimestamp - double(long(dTimestamp));
 	dRem *= 1000.;
@@ -49,7 +49,13 @@ int main(int argc, char** argv)
 		double dTimestamp = std::stod(argv[i]);
 		std::string strLoc = ux2loc(dTimestamp);
 
-		std::cout << std::fixed << dTimestamp << ": " << strLoc << "\n";
+		double dRem = dTimestamp - double(long(dTimestamp));
+		if(dRem != 0.)
+			std::cout << std::fixed << dTimestamp;
+		else
+			std::cout << long(dTimestamp);
+
+		std::cout << ": " << strLoc << "\n";
 	}
 
 	std::cout.flush();
