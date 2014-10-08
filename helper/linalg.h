@@ -38,11 +38,12 @@ template<class V=ublas::vector<double> >
 V make_vec(const std::initializer_list<typename V::value_type>& lst)
 {
 	typedef typename V::value_type T;
+	typedef typename std::initializer_list<T>::const_iterator t_iter;
 
 	V vec(lst.size());
 
-	typename std::initializer_list<T>::const_iterator iter = lst.begin();
-	for(std::size_t i=0; i<lst.size(); ++i, ++iter)
+	std::size_t i=0;
+	for(t_iter iter = lst.begin(); iter!=lst.end(); ++i, ++iter)
 		vec[i] = *iter;
 
 	return vec;
@@ -863,8 +864,8 @@ typename vec_type::value_type vec_angle(const vec_type& vec0,
 	}
 	if(vec0.size() == 3)
 	{
-		real_type dNorm0 = ublas::norm_2(vec0);
-		real_type dNorm1 = ublas::norm_2(vec1);
+		//real_type dNorm0 = ublas::norm_2(vec0);
+		//real_type dNorm1 = ublas::norm_2(vec1);
 
 		real_type dC = ublas::inner_prod(vec0, vec1);
 		vec_type veccross = cross_3<vec_type>(vec0, vec1);
@@ -930,6 +931,48 @@ T slerp(const T& q1, const T& q2, typename T::value_type t)
 			std::sin(t*angle)/std::sin(angle) * q2;
 
 	return q;
+}
+
+
+
+// --------------------------------------------------------------------------------
+
+
+template<typename T=double>
+ublas::matrix<T> covariance(const std::vector<ublas::vector<T>>& vecVals,
+							const std::vector<T>* pProb = 0)
+{
+	if(vecVals.size() == 0) return ublas::matrix<T>();
+
+	using t_vecvec = typename std::remove_reference<decltype(vecVals)>::type;
+	using t_innervec_org = decltype(vecVals[0]);
+	using t_innervec = typename std::remove_const<typename std::remove_reference<t_innervec_org>::type>::type;
+
+	t_innervec vecMean = mean_value<t_vecvec>(vecVals);
+	//std::cout << "Mean: " << vecMean << std::endl;
+
+	ublas::matrix<T> matCov(vecVals[0].size(), vecVals[0].size());
+
+	T tSum = T(0);
+	const std::size_t N = vecVals.size();
+	for(std::size_t i=0; i<N; ++i)
+	{
+		T tprob = 1.;
+
+		t_innervec vec = vecVals[i] - vecMean;
+		if(pProb)
+		{
+			tprob = (*pProb)[i];
+			vec *= std::sqrt(tprob);
+			tSum += tprob;
+		}
+
+		matCov += ublas::outer_prod(vec, vec);
+		tSum += tprob;
+	}
+	matCov /= tSum;
+
+	return matCov;
 }
 
 #endif
