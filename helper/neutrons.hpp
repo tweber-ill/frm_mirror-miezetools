@@ -34,6 +34,8 @@ static const auto one_eV = co::e * units::si::volts;
 
 static const double SIGMA2FWHM = 2.*sqrt(2.*log(2.));
 static const double SIGMA2HWHM = SIGMA2FWHM/2.;
+static const double HWHM2SIGMA = 1./ SIGMA2HWHM;
+static const double FWHM2SIGMA = 1./ SIGMA2FWHM;
 
 static const units::quantity<units::si::length> angstrom = 1e-10 * units::si::meter;
 
@@ -314,12 +316,20 @@ template<class Sys, class Y>
 units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y>
 get_angle_ki_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& ki,
 		const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& kf,
-		const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& Q)
+		const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& Q,
+		bool bPosSense=1)
 {
-	if(Q*(1e-10 * units::si::meter) == 0.)
-		return M_PI/2. * units::si::radians;
+	units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y> angle;
 
-	return units::acos((ki*ki - kf*kf + Q*Q)/(2.*ki*Q));
+	if(Q*(1e-10 * units::si::meter) == 0.)
+		angle = M_PI/2. * units::si::radians;
+	else
+		angle = units::acos((ki*ki - kf*kf + Q*Q)/(2.*ki*Q));
+
+	if(!bPosSense)
+		angle = -angle;
+
+	return angle;
 }
 
 // Q_vec = ki_vec - kf_vec
@@ -330,12 +340,20 @@ template<class Sys, class Y>
 units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y>
 get_angle_kf_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& ki,
 		const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& kf,
-		const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& Q)
+		const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& Q,
+		bool bPosSense=1)
 {
-	if(Q*(1e-10 * units::si::meter) == 0.)
-		return M_PI/2. * units::si::radians;
+	units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y> angle;
 
-	return units::acos((-kf*kf + ki*ki - Q*Q)/(2.*kf*Q));
+	if(Q*(1e-10 * units::si::meter) == 0.)
+		angle = M_PI/2. * units::si::radians;
+	else
+		angle = units::acos((-kf*kf + ki*ki - Q*Q)/(2.*kf*Q));
+
+	if(!bPosSense)
+		angle = -angle;
+
+	return angle;
 }
 
 template<class Sys, class Y>
