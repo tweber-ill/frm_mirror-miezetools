@@ -1,4 +1,5 @@
 CC = gcc
+#CC = i686-w64-mingw32-gcc
 INC = -I/usr/include/qt4 -I/usr/local/include -I/usr/include/qt4/QtCore \
 	-I/usr/include/qt4/QtGui -I./tools/plot_gpl/src/qtterminal \
 	-I/usr/include/root -I/usr/include/lapacke
