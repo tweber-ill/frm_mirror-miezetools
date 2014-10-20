@@ -837,7 +837,7 @@ static void print_symbol_map(const std::vector<Symbol>& syms)
 static void add_constants()
 {
 	// already inited?
-	if(g_syms.size()!=0)
+	if(!g_syms.empty())
 		return;
 
 	g_syms["pi"] = M_PI;
@@ -846,7 +846,7 @@ static void add_constants()
 static void add_functions()
 {
 	// already inited?
-	if(g_map_fkt0.size()!=0 || g_map_fkt1.size()!=0 || g_map_fkt2.size()!=0)
+	if(!g_map_fkt0.empty() || !g_map_fkt1.empty() || !g_map_fkt2.empty())
 		return;
 
 	init_special_functions();

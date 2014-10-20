@@ -324,7 +324,13 @@ get_angle_ki_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sy
 	if(Q*(1e-10 * units::si::meter) == 0.)
 		angle = M_PI/2. * units::si::radians;
 	else
-		angle = units::acos((ki*ki - kf*kf + Q*Q)/(2.*ki*Q));
+	{
+		auto c = (ki*ki - kf*kf + Q*Q)/(2.*ki*Q);
+		if(units::abs(c) > 1.)
+			throw Err("Scattering triangle not closed.");
+
+		angle = units::acos(c);
+	}
 
 	if(!bPosSense)
 		angle = -angle;
@@ -348,13 +354,20 @@ get_angle_kf_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sy
 	if(Q*(1e-10 * units::si::meter) == 0.)
 		angle = M_PI/2. * units::si::radians;
 	else
-		angle = units::acos((-kf*kf + ki*ki - Q*Q)/(2.*kf*Q));
+	{
+		auto c = (-kf*kf + ki*ki - Q*Q)/(2.*kf*Q);
+		if(units::abs(c) > 1.)
+			throw Err("Scattering triangle not closed.");
+
+		angle = units::acos(c);
+	}
 
 	if(!bPosSense)
 		angle = -angle;
 
 	return angle;
 }
+
 
 template<class Sys, class Y>
 units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y>
@@ -369,6 +382,20 @@ get_mono_twotheta(const units::quantity<units::unit<units::wavenumber_dimension,
 	return tt;
 }
 
+template<class Sys, class Y>
+units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>
+get_mono_k(const units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y>& _theta,
+				const units::quantity<units::unit<units::length_dimension, Sys>, Y>& d,
+				bool bPosSense=1)
+{
+	units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y> theta = _theta;
+	if(!bPosSense)
+		theta = -theta;
+
+	return M_PI/(units::sin(theta) * d);
+}
+
+
 // Q_vec = ki_vec - kf_vec
 // Q^2 = ki^2 + kf^2 - 2ki kf cos 2th
 // cos 2th = (-Q^2 + ki^2 + kf^2) / (2ki kf)
@@ -382,7 +409,7 @@ get_sample_twotheta(const units::quantity<units::unit<units::wavenumber_dimensio
 	units::quantity<units::si::dimensionless> ttCos
 							= (ki*ki + kf*kf - Q*Q)/(2.*ki*kf);
 	if(units::abs(ttCos) > 1.)
-		throw Err("Error: Scattering triangle not closed.");
+		throw Err("Scattering triangle not closed.");
 
 	units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y> tt;
 	tt = units::acos(ttCos);
@@ -391,6 +418,20 @@ get_sample_twotheta(const units::quantity<units::unit<units::wavenumber_dimensio
 
 	return tt;
 }
+
+template<class Sys, class Y>
+const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>
+get_sample_Q(const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& ki,
+					const units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>& kf,
+					const units::quantity<units::unit<units::plane_angle_dimension, Sys>, Y>& tt)
+{
+	units::quantity<units::si::dimensionless> ctt = units::cos(tt);
+	units::quantity<units::unit<units::wavenumber_dimension, Sys>, Y>
+		Q = units::sqrt(-ctt*(2.*ki*kf) + ki*ki + kf*kf);
+	return Q;
+}
+
+
 
 template<class Sys, class Y>
 units::quantity<units::unit<units::energy_dimension, Sys>, Y>
