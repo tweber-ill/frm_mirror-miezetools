@@ -55,7 +55,7 @@ std::map<T, T> vecmap_to_map(const std::map<T, std::vector<T> >& themap)
 
 	for(const auto& pair : themap)
 	{
-		const T& key = pair.first;
+		//const T& key = pair.first;
 		const std::vector<T>& vect = pair.second;
 
 		T tval;

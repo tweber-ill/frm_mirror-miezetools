@@ -50,10 +50,12 @@ int main(int argc, char **argv)
 	{
 		log_info("Starting up Cattus.");
 
+/*
 #ifdef Q_WS_X11
 		XInitThreads();
 #endif
 		QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
+*/
 
 		int iRet = -1;
 		init_rand();
