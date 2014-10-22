@@ -34,5 +34,6 @@ script/.codelite/*
 ./Makefile
 .clang/*
 .codelite/*
+.settings/*
 cattus.mk
 cattus.txt
