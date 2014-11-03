@@ -1,0 +1,51 @@
+#!./hermelin
+#
+# Coil Test
+# Author: TW
+#
+
+__init__()
+{
+	global INSTR = "coiltest";
+	global num_neutrons = 1e4;
+
+	import("mcstas.scr");
+	import("plot.scr");
+	import("fit.scr");
+	import("colors.scr");
+}
+
+main()
+{
+	do_compile = 1;
+
+	if(do_compile)
+	{
+		mcclean(INSTR);
+		if(!mccompile(INSTR))
+			return -1;
+	}
+
+	lam = 5.;
+	dlam = lam/10.;
+
+	simBaseParams = "dLam=" + lam 
+			+ " dDeltaLam=" + dlam;
+
+	print("\n\n");
+	print("="*80);
+	print(BLUE + "Starting simulation." + NOCOLOR);
+	print("\n");
+
+	if(!mcrun(INSTR, num_neutrons, "output", simBaseParams))
+		return -1;
+
+	#mcplot2d("output/psd.dat");
+	mcplot2d("output/pollam.dat");
+
+	print("\n");
+	print(GREEN + "Simulation finished." + NOCOLOR);
+	print("="*80);
+
+	return 0;
+}

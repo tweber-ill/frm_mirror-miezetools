@@ -11,6 +11,8 @@ __init__()
 	global mcmutex = mutex();
 	global totalsimcount = 1;
 	global finishedsims = 0;
+	global use_cpp = 1;
+	global use_cpp_opt = 1;
 }
 
 mcclean(instr)
@@ -27,7 +29,10 @@ mccompile(instr)
 	instr_out = instr + ".out";
 
 	print("="*80);
-	print(BLUE + "Compiling McStas -> C++..." + NOCOLOR);
+	print(BLUE + "Compiling McStas -> C/C++..." + NOCOLOR);
+	output("Language: "); if(use_cpp) output("C++"); else output("C");
+	if(use_cpp_opt) output(", using optimisations.\n"); else output(".\n");
+
 	#flags = "--verbose -t";
 	flags = "-t";
 	status = exec("mcstas " + flags + " -o " + instr_cpp + " " + instr_mc);
@@ -48,11 +53,18 @@ mccompile(instr)
 
 
 	cc = "gcc";
+	#cc = "clang";
 	print("="*80);
-	print(BLUE + "Compiling C++ -> native using " + cc + "..." + NOCOLOR);
+	print(BLUE + "Compiling C/C++ -> native using " + cc + "..." + NOCOLOR);
 	
-	flags = "-g -O2 -march=native -xc++ -lm -lstdc++ -fpermissive -w -std=gnu++11 -undef__STRICT_ANSI__";
-	status = exec(cc + " " + flags + " " + "-o " + instr_out + " " + instr_cpp);
+	if(use_cpp)
+		cc_lang = "-xc++ -lstdc++ -std=gnu++11 -fpermissive -w -undef__STRICT_ANSI__ -DHAVE_STRCASESTR";
+	else
+		cc_lang = "-xc";
+	cc_flags = "-g -lm";
+	if(use_cpp_opt)
+		cc_flags += " -O2 -march=native";
+	status = exec(cc + " " + cc_flags + " " + cc_lang + " " + "-o " + instr_out + " " + instr_cpp);
 
 	print("\n");
 	if(status)

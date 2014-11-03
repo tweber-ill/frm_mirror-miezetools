@@ -1,0 +1,110 @@
+/*
+ * Coil Test
+ * @author tweber
+ * @date 3-nov-14
+ */
+
+DEFINE INSTRUMENT CoilTest
+(
+	double dLam = 5.0,
+	double dDeltaLam = 0.5
+)
+
+DECLARE
+%{
+
+
+int coilfield(double x, double y, double z, double t, 
+		double *pBx, double *pBy, double *pBz, 
+		void *pData)
+{
+	//printf("x=%g, y=%g, z=%g, t=%g\n", x,y,z,t);
+
+        *pBx = 0.;
+        *pBy = 0.01;
+        *pBz = 0.;
+
+	return 1;
+}
+%}
+
+
+
+INITIALIZE
+%{
+%}
+
+
+
+
+
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+	 	AT (0,0,0) ABSOLUTE
+
+
+
+//----------------------------------------------------------------------------------------------------
+// source
+
+COMPONENT Source = Source_simple(
+	yheight = 0.01, xwidth = 0.01, 
+	focus_xw = 0.01, focus_yh = 0.01, dist = 0.5,
+	lambda0 = dLam, dlambda = dDeltaLam, gauss = 1)
+		AT (0, 0, 0) RELATIVE Origin
+		EXTEND
+		%{
+			//t = rand01() * dMiezeNumOsc/dMiezeFm;
+
+			// polarised
+			sx = 1.;
+			sy = 0.;
+			sz = 0.;
+		%}
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// coil
+
+COMPONENT coil = Pol_simpleBfield(
+	fieldFunction = coilfield /*const_magnetic_field*/, Bx=0, By=1, Bz=0, filename = 0,
+	xwidth = 0.05, yheight = 0.05, zdepth=0.01)
+		AT (0.0, 0.0, 1.0) RELATIVE Origin
+
+COMPONENT coilstop = Pol_simpleBfield_stop(
+		magnet_comp_stop=coil)
+		AT (0.0, 0.0, 1.01)  RELATIVE Origin
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// detectors
+
+COMPONENT pollam = PolLambda_monitor(
+	nL = 128, npol = 128, restore_neutron = 1, filename = "pollam",
+	mx = 1.0, my = 0.0, mz = 0.0,
+	Lmin = 4.0, Lmax = 6.0,
+	xwidth = 0.04, yheight = 0.04)
+		AT (0.0, 0.0, 2.0) RELATIVE Origin
+
+COMPONENT psd = PSD_monitor(
+	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
+	xwidth = 0.04, yheight = 0.04)
+		AT (0.0, 0.0, 2.0) RELATIVE Origin
+
+//----------------------------------------------------------------------------------------------------
+
+
+FINALLY
+%{
+%}
+
+
+END

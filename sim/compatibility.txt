@@ -1,0 +1,6 @@
+McStas C++ compatibility:
+
+* share/interpolation/array-utils.c -> rename "this" variables to non-keyword
+* share/interpolation/natural/delaunay.h/.c -> rename "new" variables, cast last argument in calls to "inspherefast"
+* share/interpolation/natural/predicates.c -> lots of K&R style function declarations
+* share/interpolation/natural/natural.c -> rename "this"
