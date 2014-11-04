@@ -12,26 +12,30 @@ DEFINE INSTRUMENT CoilTest
 
 DECLARE
 %{
+	#include "neutrons.h"
 
+	double dVel;
+	double dCoilLen = 0.01;
 
-int coilfield(double x, double y, double z, double t, 
-		double *pBx, double *pBy, double *pBz, 
-		void *pData)
-{
-	//printf("x=%g, y=%g, z=%g, t=%g\n", x,y,z,t);
+	int coilfield(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		//printf("x=%g, y=%g, z=%g, t=%g\n", x,y,z,t);
 
-        *pBx = 0.;
-        *pBy = 0.01;
-        *pBz = 0.;
+	        *pBx = 0.;
+	        *pBy = larmor_B(dVel, dCoilLen);
+	        *pBz = 0.;
 
-	return 1;
-}
+		return 1;
+	}
 %}
 
 
 
 INITIALIZE
 %{
+	dVel = neutron_v(dLam);
 %}
 
 
@@ -74,12 +78,12 @@ COMPONENT Source = Source_simple(
 
 COMPONENT coil = Pol_simpleBfield(
 	fieldFunction = coilfield /*const_magnetic_field*/, Bx=0, By=1, Bz=0, filename = 0,
-	xwidth = 0.05, yheight = 0.05, zdepth=0.01)
+	xwidth = 0.05, yheight = 0.05, zdepth=dCoilLen)
 		AT (0.0, 0.0, 1.0) RELATIVE Origin
 
 COMPONENT coilstop = Pol_simpleBfield_stop(
 		magnet_comp_stop=coil)
-		AT (0.0, 0.0, 1.01)  RELATIVE Origin
+		AT (0.0, 0.0, 1.0+dCoilLen)  RELATIVE Origin
 
 
 
