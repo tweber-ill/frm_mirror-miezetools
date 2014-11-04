@@ -15,7 +15,12 @@ DECLARE
 	#include "neutrons.h"
 
 	double dVel;
-	double dCoilLen = 0.01;
+	double dB_rf;
+
+	const double dCoilLen = 0.005;
+	const double dDistCoil = 1.0;
+	const double dOm = 1.5e6 * 2.*M_PI;
+	const double dB0 = -dOm / GAMMA_N;
 
 	int coilfield(double x, double y, double z, double t, 
 			double *pBx, double *pBy, double *pBz, 
@@ -23,9 +28,10 @@ DECLARE
 	{
 		//printf("x=%g, y=%g, z=%g, t=%g\n", x,y,z,t);
 
-	        *pBx = 0.;
-	        *pBy = larmor_B(dVel, dCoilLen);
-	        *pBz = 0.;
+		t -= dDistCoil/dVel;
+		*pBx = dB_rf*cos(dOm*t);
+		*pBy = dB0;
+		*pBz = dB_rf*sin(dOm*t);
 
 		return 1;
 	}
@@ -36,6 +42,7 @@ DECLARE
 INITIALIZE
 %{
 	dVel = neutron_v(dLam);
+	dB_rf = larmor_B(dVel, dCoilLen);
 %}
 
 
@@ -60,7 +67,7 @@ COMPONENT Source = Source_simple(
 		AT (0, 0, 0) RELATIVE Origin
 		EXTEND
 		%{
-			//t = rand01() * dMiezeNumOsc/dMiezeFm;
+			t = rand01();
 
 			// polarised
 			sx = 1.;
@@ -79,11 +86,11 @@ COMPONENT Source = Source_simple(
 COMPONENT coil = Pol_simpleBfield(
 	fieldFunction = coilfield /*const_magnetic_field*/, Bx=0, By=1, Bz=0, filename = 0,
 	xwidth = 0.05, yheight = 0.05, zdepth=dCoilLen)
-		AT (0.0, 0.0, 1.0) RELATIVE Origin
+		AT (0.0, 0.0, dDistCoil) RELATIVE Origin
 
 COMPONENT coilstop = Pol_simpleBfield_stop(
 		magnet_comp_stop=coil)
-		AT (0.0, 0.0, 1.0+dCoilLen)  RELATIVE Origin
+		AT (0.0, 0.0, dDistCoil+dCoilLen)  RELATIVE Origin
 
 
 
@@ -94,7 +101,7 @@ COMPONENT coilstop = Pol_simpleBfield_stop(
 COMPONENT pollam = PolLambda_monitor(
 	nL = 128, npol = 128, restore_neutron = 1, filename = "pollam",
 	mx = 1.0, my = 0.0, mz = 0.0,
-	Lmin = 4.0, Lmax = 6.0,
+	Lmin = dLam-2*dDeltaLam, Lmax = dLam+2*dDeltaLam,
 	xwidth = 0.04, yheight = 0.04)
 		AT (0.0, 0.0, 2.0) RELATIVE Origin
 
