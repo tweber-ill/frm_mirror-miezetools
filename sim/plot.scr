@@ -22,6 +22,12 @@ mcplot2d(file)
 	plot2d(dat, params);
 }
 
+mcplot(file)
+{
+	dat = loadtxt(file);
+	plot(dat[0],dat[1],dat[2],dat[-1]);
+}
+
 
 main(args)
 {

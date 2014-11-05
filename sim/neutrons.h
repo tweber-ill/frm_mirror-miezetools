@@ -16,15 +16,17 @@ double neutron_v(double dLam)
 	return HBAR*2.*M_PI / (dLam*1e-10 * MNEUTRON);
 }
 
-double larmor_B(double dv, double dl)
-{
-                // omega = -gamma*B
-                // omega*t = -gamma*B*t
-                // phi = - gamma * B * l/v
-                // B = -phi*v / (gamma*l)
-                // phi = -pi  =>  B = pi*v / (gamma*l)
 
-                return M_PI*dv / (GAMMA_N*dl);
+double larmor_B(double dv, double dl, double dPhase)
+{
+	/* omega = -gamma*B
+	 * omega*t = -gamma*B*t
+	 * phi = - gamma * B * l/v
+	 * B = -phi*v / (gamma*l)
+	 * phi = -pi  =>  B = pi*v / (gamma*l)
+	 */
+
+	return -dPhase*dv / (GAMMA_N*dl);
 }
 
 #endif

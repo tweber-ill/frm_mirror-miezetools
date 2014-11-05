@@ -15,23 +15,42 @@ DECLARE
 	#include "neutrons.h"
 
 	double dVel;
-	double dB_rf;
+	double dB_rf0, dB_rf1;
+	
+	double dOm0 = 45000. * 2.*M_PI;
+	double dOm1 = 64000. * 2.*M_PI;
+	double dB00, dB01;
 
 	const double dCoilLen = 0.005;
 	const double dDistCoil = 1.0;
-	const double dOm = 1.5e6 * 2.*M_PI;
-	const double dB0 = -dOm / GAMMA_N;
 
-	int coilfield(double x, double y, double z, double t, 
+	const double dL1 = 1.0;
+
+
+	int coil0_field(double x, double y, double z, double t, 
 			double *pBx, double *pBy, double *pBz, 
 			void *pData)
 	{
 		//printf("x=%g, y=%g, z=%g, t=%g\n", x,y,z,t);
 
-		t -= dDistCoil/dVel;
-		*pBx = dB_rf*cos(dOm*t);
-		*pBy = dB0;
-		*pBz = dB_rf*sin(dOm*t);
+		//t -= dDistCoil/dVel;
+		*pBx = dB_rf0*cos(dOm0*t);
+		*pBy = dB00;
+		*pBz = dB_rf0*sin(dOm0*t);
+
+		return 1;
+	}
+
+	int coil1_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		//printf("x=%g, y=%g, z=%g, t=%g\n", x,y,z,t);
+
+		//t -= dDistCoil/dVel;
+		*pBx = dB_rf1*cos(dOm1*t);
+		*pBy = dB01;
+		*pBz = dB_rf1*sin(dOm1*t);
 
 		return 1;
 	}
@@ -42,7 +61,18 @@ DECLARE
 INITIALIZE
 %{
 	dVel = neutron_v(dLam);
-	dB_rf = larmor_B(dVel, dCoilLen);
+	dB_rf0 = larmor_B(dVel, dCoilLen, -M_PI);
+	dB_rf1 = larmor_B(dVel, dCoilLen, -M_PI);
+
+	dB00 = dOm0 / GAMMA_N;
+	dB01 = dOm1 / GAMMA_N;
+
+	//dB00 = dB_rf0;
+	//dOm0 = dB00 * GAMMA_N;
+
+	printf("lam=%g, v=%g\n", dLam, dVel);
+	printf("coil 0: B_0=%g, B_rf=%g, om=%g\n", dB00, dB_rf0, dOm0);
+	printf("coil 1: B_0=%g, B_rf=%g, om=%g\n", dB01, dB_rf1, dOm1);
 %}
 
 
@@ -67,7 +97,7 @@ COMPONENT Source = Source_simple(
 		AT (0, 0, 0) RELATIVE Origin
 		EXTEND
 		%{
-			t = rand01();
+			t = rand01()*1./(64000.-45000.) * 4.;
 
 			// polarised
 			sx = 1.;
@@ -81,34 +111,61 @@ COMPONENT Source = Source_simple(
 
 
 //----------------------------------------------------------------------------------------------------
-// coil
+// coils
 
-COMPONENT coil = Pol_simpleBfield(
-	fieldFunction = coilfield /*const_magnetic_field*/, Bx=0, By=1, Bz=0, filename = 0,
+COMPONENT coil0 = Pol_simpleBfield(
+	fieldFunction = coil0_field, Bx=0, By=0, Bz=0, filename = 0,
 	xwidth = 0.05, yheight = 0.05, zdepth=dCoilLen)
 		AT (0.0, 0.0, dDistCoil) RELATIVE Origin
-
-COMPONENT coilstop = Pol_simpleBfield_stop(
-		magnet_comp_stop=coil)
+COMPONENT coil0_stop = Pol_simpleBfield_stop(
+		magnet_comp_stop=coil0)
 		AT (0.0, 0.0, dDistCoil+dCoilLen)  RELATIVE Origin
 
-
+COMPONENT coil1 = Pol_simpleBfield(
+	fieldFunction = coil1_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = 0.05, yheight = 0.05, zdepth=dCoilLen)
+		AT (0.0, 0.0, dDistCoil+dL1) RELATIVE Origin
+COMPONENT coil1_stop = Pol_simpleBfield_stop(
+		magnet_comp_stop=coil1)
+		AT (0.0, 0.0, dDistCoil+dL1+dCoilLen)  RELATIVE Origin
+		EXTEND
+		%{
+			p *= 0.5 * (1. + sx);
+		%}
 
 
 //----------------------------------------------------------------------------------------------------
 // detectors
 
-COMPONENT pollam = PolLambda_monitor(
-	nL = 128, npol = 128, restore_neutron = 1, filename = "pollam",
+COMPONENT pollam_x = PolLambda_monitor(
+	nL = 128, npol = 128, restore_neutron = 1, filename = "pollam_x",
 	mx = 1.0, my = 0.0, mz = 0.0,
 	Lmin = dLam-2*dDeltaLam, Lmax = dLam+2*dDeltaLam,
 	xwidth = 0.04, yheight = 0.04)
-		AT (0.0, 0.0, 2.0) RELATIVE Origin
+		AT (0.0, 0.0, 5.0) RELATIVE Origin
+COMPONENT pollam_y = PolLambda_monitor(
+	nL = 128, npol = 128, restore_neutron = 1, filename = "pollam_y",
+	mx = 0.0, my = 1.0, mz = 0.0,
+	Lmin = dLam-2*dDeltaLam, Lmax = dLam+2*dDeltaLam,
+	xwidth = 0.04, yheight = 0.04)
+		AT (0.0, 0.0, 5.0) RELATIVE Origin
+COMPONENT pollam_z = PolLambda_monitor(
+	nL = 128, npol = 128, restore_neutron = 1, filename = "pollam_z",
+	mx = 0.0, my = 0.0, mz = 1.0,
+	Lmin = dLam-2*dDeltaLam, Lmax = dLam+2*dDeltaLam,
+	xwidth = 0.04, yheight = 0.04)
+		AT (0.0, 0.0, 5.0) RELATIVE Origin
+
+COMPONENT tof = TOF_monitor(
+	nt=128, tmin=5600, tmax=5750, //tmax=1.0/(64000.0-45000.0)*10.0 * 1e6,
+	xwidth = 0.04, yheight = 0.04,
+	filename = "tof", restore_neutron = 1)
+		AT (0, 0, 4.4) RELATIVE Origin
 
 COMPONENT psd = PSD_monitor(
 	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
 	xwidth = 0.04, yheight = 0.04)
-		AT (0.0, 0.0, 2.0) RELATIVE Origin
+		AT (0.0, 0.0, 5.0) RELATIVE Origin
 
 //----------------------------------------------------------------------------------------------------
 
