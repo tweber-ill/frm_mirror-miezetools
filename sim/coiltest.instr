@@ -7,7 +7,13 @@
 DEFINE INSTRUMENT CoilTest
 (
 	double dLam = 5.0,
-	double dDeltaLam = 0.5
+	double dDeltaLam = 0.5,
+
+	double dL1 = 1.0,
+	double dL2 = 2.0,
+
+	double dOm0 = 45000.0,
+	double dOm1 = 64000.0
 )
 
 DECLARE
@@ -17,14 +23,13 @@ DECLARE
 	double dVel;
 	double dB_rf0, dB_rf1;
 	
-	double dOm0 = 45000. * 2.*M_PI;
-	double dOm1 = 64000. * 2.*M_PI;
 	double dB00, dB01;
 
 	const double dCoilLen = 0.005;
 	const double dDistCoil = 1.0;
 
-	const double dL1 = 1.0;
+	double dfM;
+	double dDetT0, dDetT1;
 
 
 	int coil0_field(double x, double y, double z, double t, 
@@ -32,11 +37,8 @@ DECLARE
 			void *pData)
 	{
 		//printf("x=%g, y=%g, z=%g, t=%g\n", x,y,z,t);
-
 		//t -= dDistCoil/dVel;
-		*pBx = dB_rf0*cos(dOm0*t);
-		*pBy = dB00;
-		*pBz = dB_rf0*sin(dOm0*t);
+		rf_flipper_rot(x,y,z,t, dOm0,dB_rf0,dB00, pBx,pBy,pBz);
 
 		return 1;
 	}
@@ -46,11 +48,8 @@ DECLARE
 			void *pData)
 	{
 		//printf("x=%g, y=%g, z=%g, t=%g\n", x,y,z,t);
-
 		//t -= dDistCoil/dVel;
-		*pBx = dB_rf1*cos(dOm1*t);
-		*pBy = dB01;
-		*pBz = dB_rf1*sin(dOm1*t);
+		rf_flipper_rot(x,y,z,t, dOm1,dB_rf1,dB01, pBx,pBy,pBz);
 
 		return 1;
 	}
@@ -67,12 +66,16 @@ INITIALIZE
 	dB00 = dOm0 / GAMMA_N;
 	dB01 = dOm1 / GAMMA_N;
 
-	//dB00 = dB_rf0;
-	//dOm0 = dB00 * GAMMA_N;
+	dfM = 2.*(dOm1-dOm0)/(2.*M_PI);
 
 	printf("lam=%g, v=%g\n", dLam, dVel);
+	printf("L1=%g, L2=%g, fM=%g\n", dL1, dL2, dfM);
 	printf("coil 0: B_0=%g, B_rf=%g, om=%g\n", dB00, dB_rf0, dOm0);
 	printf("coil 1: B_0=%g, B_rf=%g, om=%g\n", dB01, dB_rf1, dOm1);
+
+	double dDistDet = dDistCoil + dL1 + dCoilLen + dL2;
+	dDetT0 = dDistDet/dVel;
+	dDetT1 = dDetT0 + 1./dfM * 4.;
 %}
 
 
@@ -97,7 +100,8 @@ COMPONENT Source = Source_simple(
 		AT (0, 0, 0) RELATIVE Origin
 		EXTEND
 		%{
-			t = rand01()*1./(64000.-45000.) * 4.;
+			//t = rand01()*1./(mcipdOm1-mcipdOm0)*20.;
+			t = rand01() * (dDetT1-dDetT0);
 
 			// polarised
 			sx = 1.;
@@ -142,30 +146,30 @@ COMPONENT pollam_x = PolLambda_monitor(
 	mx = 1.0, my = 0.0, mz = 0.0,
 	Lmin = dLam-2*dDeltaLam, Lmax = dLam+2*dDeltaLam,
 	xwidth = 0.04, yheight = 0.04)
-		AT (0.0, 0.0, 5.0) RELATIVE Origin
+		AT (0.0, 0.0, dL2) RELATIVE coil1_stop
 COMPONENT pollam_y = PolLambda_monitor(
 	nL = 128, npol = 128, restore_neutron = 1, filename = "pollam_y",
 	mx = 0.0, my = 1.0, mz = 0.0,
 	Lmin = dLam-2*dDeltaLam, Lmax = dLam+2*dDeltaLam,
 	xwidth = 0.04, yheight = 0.04)
-		AT (0.0, 0.0, 5.0) RELATIVE Origin
+		AT (0.0, 0.0, dL2) RELATIVE coil1_stop
 COMPONENT pollam_z = PolLambda_monitor(
 	nL = 128, npol = 128, restore_neutron = 1, filename = "pollam_z",
 	mx = 0.0, my = 0.0, mz = 1.0,
 	Lmin = dLam-2*dDeltaLam, Lmax = dLam+2*dDeltaLam,
 	xwidth = 0.04, yheight = 0.04)
-		AT (0.0, 0.0, 5.0) RELATIVE Origin
+		AT (0.0, 0.0, dL2) RELATIVE coil1_stop
 
 COMPONENT tof = TOF_monitor(
-	nt=128, tmin=5600, tmax=5750, //tmax=1.0/(64000.0-45000.0)*10.0 * 1e6,
+	nt=128, tmin=dDetT0*1e6, tmax=dDetT1*1e6, //tmax=1.0/(64000.0-45000.0)*10.0 * 1e6,
 	xwidth = 0.04, yheight = 0.04,
 	filename = "tof", restore_neutron = 1)
-		AT (0, 0, 4.4) RELATIVE Origin
+		AT (0, 0, dL2) RELATIVE coil1_stop
 
 COMPONENT psd = PSD_monitor(
 	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
 	xwidth = 0.04, yheight = 0.04)
-		AT (0.0, 0.0, 5.0) RELATIVE Origin
+		AT (0.0, 0.0, dL2) RELATIVE coil1_stop
 
 //----------------------------------------------------------------------------------------------------
 

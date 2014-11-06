@@ -43,6 +43,11 @@ mieze_fm(tau, Ls, lam_A)
 	return fm;
 }
 
+mieze_fm_from_f1f2(f1, f2)
+{
+	return 4.*pi*(f2-f1);
+}
+
 mieze_f1f2(L1, L2, Ls, lam_A, tau_ps)
 {
 	tau = tau_ps * 1e-12;

@@ -12,6 +12,7 @@ __init__()
 	import("mcstas.scr");
 	import("plot.scr");
 	import("fit.scr");
+	import("mieze.scr");
 	import("colors.scr");
 }
 
@@ -29,9 +30,17 @@ main()
 
 	lam = 5.;
 	dlam = lam * 0.01;
+	L1 = 1.0;
+	L2 = 2.0;
+	om0 = 20000. * 2.*pi;
+	om1 = mieze_f2(L1, L2, om0);
 
 	simBaseParams = "dLam=" + lam 
-			+ " dDeltaLam=" + dlam;
+			+ " dDeltaLam=" + dlam
+			+ " dL1=" + L1
+			+ " dL2=" + L2
+			+ " dOm0=" + om0
+			+ " dOm1=" + om1;
 
 	print("\n\n");
 	print("="*80);
