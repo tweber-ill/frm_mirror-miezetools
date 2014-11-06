@@ -6,6 +6,9 @@
 
 __init__()
 {
+	import("neutrons.scr");
+	import("hkl.scr");
+
 	global mono_order = 2.0;
 	global ana_order = 2.0;
 
@@ -13,18 +16,7 @@ __init__()
 	global ana_d = 6.79;
 }
 
-get_mono_tt(k, d)
-{
-	ttsin = pi / (d*k);
-	if(abs(ttsin) greater 1.)
-	{
-		print("Error: Invalid monochromator/analyser angle.");
-		exit(-1);
-	}
-
-	tt = 2.*asin(ttsin);
-	return tt;
-}
+get_mono_tt(k, d) { return angle_mono_tt(d, k); }
 
 get_mono_Q(d)
 {
@@ -36,67 +28,9 @@ get_mono_Q(d)
 get_tt(ki, kf, Q)
 {
 	sample_sense = -1.0;
-
-	ttcos = (ki*ki + kf*kf - Q*Q) / (2.*ki*kf);
-	if(abs(ttcos) greater 1.)
-	{
-		print("Error: Scattering triangle not closed.");
-		exit(-1);
-	}
-
-	tt = sample_sense*acos(ttcos);
-	return tt;
+	return sample_sense * angle_sample_tt(ki, kf, Q);
 }
 
-lam2k(lam)
-{
-	return 2.*pi / lam;
-}
-
-k2lam(k)
-{
-	return 2.*pi / k;
-}
-
-lam2v(lam_A)
-{
-	lam = lam_A * 1e-10;
-	p = hbar*2.*pi/lam;
-	v = p/m_n;
-
-	return v;
-}
-
-k2E(k)
-{
-	k = k*1e10;
-
-	p = hbar*k;
-	E = p^2. / (2. * m_n);
-
-	E_meV = E/q_e * 1000.;
-	return E_meV;
-}
-
-E2k(E_meV)
-{
-	imag = 0;
-	if(E_meV less 0.)
-		imag = 1;
-
-	E = E_meV / 1000. * q_e;
-	E = abs(E);
-
-	p = sqrt(2.*m_n*E);
-	k = p / hbar;
-	return k / 1e10;
-}
-
-E2lam(E_meV)
-{
-	return k2lam(E2k(E_meV));
-	
-}
 
 main()
 {
