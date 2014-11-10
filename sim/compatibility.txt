@@ -10,4 +10,4 @@ McStas C++ compatibility:
 Misc compatibility:
 
 * /usr/local/mcstas/2.1/share/pol-lib.c -> lower "mc_pol_startTimeStep" in "SimpleNumMagnetPrecession"
-	taus > 100 has wrong results with standard value
+	taus > 100 have wrong results with standard mc_pol_startTimeStep value

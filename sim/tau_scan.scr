@@ -1,8 +1,8 @@
 #!./hermelin
 
 #
-# Single invokation of tasmieze sim
-# Author: TW
+# tau scan
+# @author: tw
 #
 
 __init__()
@@ -99,7 +99,7 @@ main()
 
 
 
-        taus = linspace(10, 200, 24);
+        taus = linspace(10, 500, 24);
         indices = linspace(0, vec_size(taus)-1, vec_size(taus));
         global contrasts = vec(vec_size(taus));
         global contrasts_err = vec(vec_size(taus));

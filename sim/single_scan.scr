@@ -2,7 +2,7 @@
 
 #
 # Single invokation of tasmieze sim
-# Author: TW
+# @author: tw
 #
 
 __init__()
