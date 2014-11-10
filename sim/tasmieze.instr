@@ -119,13 +119,12 @@ DECLARE
 	double dMiezeWidth = 0.35, dMiezeHeight = 0.35;
 	double dMiezeCoilThick = 0.005;
 	double dMiezeCoilTilt = 0.;
-
-	double dMiezeLs = -1.;
 	
 	int iMiezeNumCoils = 1;
 	double dMiezeNumOsc = 2.;
 	double dMiezeFm = -1.;
 	
+	// coils
 	double dB_rf0, dB_rf1;
 	double dB00, dB01;
 
@@ -135,6 +134,7 @@ DECLARE
 	double dDetSphTheta = 0.;	
 	
 	double E_i;
+	double dMiezeLs = -1.;
 	
 	
 	int coil0_field(double x, double y, double z, double t, 
@@ -164,6 +164,7 @@ INITIALIZE
 	double v_i = neutron_v(dLam);
 	double v_f = neutron_v(dLam_f);
 	E_i = VS2E*v_i*v_i;
+	double E_f = VS2E*v_f*v_f;
 
 	if(bAutoSetAngles)
 	{
@@ -190,7 +191,8 @@ INITIALIZE
 	printf("Ideal: Mono=%d, Ana=%d, MIEZE=%d\n", bMonoIdeal, bAnaIdeal, bMiezeIdeal);
 	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
 	printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
-	printf("Sample: theta_s=%f deg, 2theta_s=%f deg, lam_f=%f A, v_f=%f m/s\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f);
+	printf("Sample: theta_s=%f deg, 2theta_s=%f deg,\n"
+		"\texpected lam_f=%f A, v_f=%f m/s, E_f=%f meV\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f, E_f);
 	printf("Analyser: theta_a=%f deg, 2thetaa_=%f deg\n", dAnaTheta, 2.*dAnaTheta);
 
 
@@ -212,9 +214,6 @@ INITIALIZE
 	dMiezeLs = dDistSampleAna + dDistAnaDet;
 	double dMiezeL2 = dMiezeLs + dDistMonoSample - dMiezeL1 - dDistMonoMieze;
 	double dMiezeLb = dMiezeL2 - dMiezeLs;
-
-	// for Mieze Box component: Origin is at center
-	//dDistMonoMieze += dMiezeL1/2.;
 
 	printf("MIEZE: L1=%f m, L2=%f m, Ls=%f m, Lb=%f m, f1=%f Hz, f2=%f Hz, offs=%f m\n", 
 		dMiezeL1, dMiezeL2, dMiezeLs, dMiezeLb, dMiezeF1, dMiezeF2, dDetOffs);
@@ -250,15 +249,10 @@ COMPONENT Source = Source_simple(
 	focus_xw = dMonoWidth, focus_yh = dMonoHeight,
 	lambda0 = dLam, dlambda = dDeltaLam, gauss = 0, dist = dDistSrcMono)
 		AT (0, 0, 0) RELATIVE Origin
-		EXTEND
-		%{
-			//t = 0.;
-			t = rand01() * dMiezeNumOsc/dMiezeFm;
-
-			sx = 1.;
-			sy = 0.;
-			sz = 0.;
-		%}
+	EXTEND
+	%{
+		t = rand0max(dMiezeNumOsc/dMiezeFm);
+	%}
 //----------------------------------------------------------------------------------------------------
 
 
@@ -274,14 +268,6 @@ COMPONENT CollBeforeMono = Collimator_linear(
 			xwidth=dMonoWidth*2.0, yheight=dMonoHeight*2.0, length=0.1,
 			divergence=dCollBeforeMonoDivH, divergenceV=dCollBeforeMonoDivV)
 	AT (0, 0, -dDistSrcMono*0.1 - 0.1) RELATIVE MonoAxisBegin
-
-/*
-COMPONENT Mono_pseudo = Redirector(xwidth=dMonoWidth, yheight=dMonoHeight,
-			rot_y = 2.0*dMonoTheta)
-		WHEN(bMonoIdeal == 2)
-		AT (0,0,0) RELATIVE MonoAxisBegin
-		ROTATED (0,0,0) RELATIVE MonoAxisBegin
-*/
 
 COMPONENT Mono_flat = Monochromator_flat(
 	zwidth = dMonoWidth, yheight = dMonoHeight, mosaich = dMonoMosaic, mosaicv = dMonoMosaic,
@@ -314,12 +300,9 @@ COMPONENT Mono_crystal = Single_crystal(
 				ABSORB;
 		%}
 
-
 COMPONENT MonoAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE MonoAxisBegin
 	ROTATED (0, 2.0*dMonoTheta, 0) RELATIVE MonoAxisBegin
-
-
 
 //----------------------------------------------------------------------------------------------------
 
@@ -328,6 +311,7 @@ COMPONENT MonoAxisEnd = Arm()
 
 //----------------------------------------------------------------------------------------------------
 // MIEZE
+
 COMPONENT MiezeBox = MIEZE_box(N=1,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, 
 	L1 = dMiezeL1,
@@ -341,6 +325,10 @@ COMPONENT MiezeBox = MIEZE_box(N=1,
 				ABSORB;
 		%}
 
+
+COMPONENT Polariser = Set_pol(px=1, py=0, pz=0, randomOn=0)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dDistMonoMieze) RELATIVE MonoAxisEnd
 
 COMPONENT coil0 = Pol_simpleBfield(
 	fieldFunction = coil0_field, Bx=0, By=0, Bz=0, filename = 0,
@@ -412,8 +400,6 @@ COMPONENT Sample_phonon = Phonon_simple(
 		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin
 
 
-		
-		
 COMPONENT SampleAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE SampleAxisBegin
 	ROTATED (0, dSampleTwoTheta, 0) RELATIVE SampleAxisBegin

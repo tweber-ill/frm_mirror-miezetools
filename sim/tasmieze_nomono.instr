@@ -1,5 +1,5 @@
 /*
- * new TAS-MIEZE instrument without monochromator
+ * new TAS-MIEZE instrument without monochromator (for performance)
  * @author tweber
  * @date 25-nov-13
  */
@@ -87,7 +87,6 @@ DEFINE INSTRUMENT TasMieze
 	int bAutoSetAngles = 1,
  
  
- 
 	// collimators / slits
 	double dCollBeforeMonoDivH = 60.0,
 	double dCollBeforeSampleDivH = 60.0,
@@ -98,7 +97,6 @@ DEFINE INSTRUMENT TasMieze
 	double dCollBeforeSampleDivV = 60.0,
 	double dCollAfterSampleDivV = 30.0,
 	double dCollAfterAnaDivV = 30.0,
-
 
 
 	// expected lambda after inelastic scattering
@@ -126,6 +124,7 @@ DECLARE
 	double dMiezeNumOsc = 2.;
 	double dMiezeFm = -1.;
 
+	// coils
 	double dB_rf0, dB_rf1;
 	double dB00, dB01;
 
@@ -135,8 +134,7 @@ DECLARE
 	double dDetSphTheta = 0.;
 	
 	double E_i;
-	double dMiezeLs = -1.0;
-
+	double dMiezeLs = -1.;
 
 
 	int coil0_field(double x, double y, double z, double t, 
@@ -167,7 +165,6 @@ INITIALIZE
 	double v_f = neutron_v(dLam_f);
 	E_i = VS2E*v_i*v_i;
 	double E_f = VS2E*v_f*v_f;
-
 
 	if(bAutoSetAngles)
 	{
@@ -244,7 +241,6 @@ COMPONENT Origin = Progress_bar()
 
 
 
-
 //----------------------------------------------------------------------------------------------------
 // source
 
@@ -259,8 +255,7 @@ COMPONENT Source = Source_simple(
 		AT (0, 0, 0) RELATIVE MonoAxisBegin
 		EXTEND
 		%{
-			//t = 0.;
-			t = rand01() * dMiezeNumOsc/dMiezeFm;
+			t = rand0max(dMiezeNumOsc/dMiezeFm);
 
 			sx = 1.;
 			sy = 0.;
@@ -285,6 +280,7 @@ COMPONENT MonoAxisEnd = Arm()
 
 //----------------------------------------------------------------------------------------------------
 // MIEZE
+
 COMPONENT MiezeBox = MIEZE_box(N=1,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, 
 	L1 = dMiezeL1,
@@ -377,7 +373,6 @@ COMPONENT CollAfterSample = Collimator_linear(
 			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
 			divergence=dCollAfterSampleDivH, divergenceV=dCollAfterSampleDivV)
 	AT (0, 0, dDistMonoSample*0.1 + 0.1) RELATIVE SampleAxisEnd
-
 
 //----------------------------------------------------------------------------------------------------
 
