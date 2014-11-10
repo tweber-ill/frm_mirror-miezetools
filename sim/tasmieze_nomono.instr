@@ -14,6 +14,8 @@ DEFINE INSTRUMENT TasMieze
 
 
 	// MIEZE
+	int bMiezeIdeal = 1,
+
 	double dMiezeL1 = 0.9,
 	double dMiezeF1 = 46000.0, 
 	double dMiezeF2 = 61920.0,
@@ -106,6 +108,9 @@ DEFINE INSTRUMENT TasMieze
 
 DECLARE
 %{
+	#include "neutrons.h"
+
+
 	int bAbsorbNonScattered = 1;
 
 	// sample
@@ -113,14 +118,16 @@ DECLARE
 
 
 	// MIEZE
-	bool bMiezeIdeal = 1;
 	double dMiezeWidth = 0.35, dMiezeHeight = 0.35;
-	double dMiezeCoilThick = 0.;
+	double dMiezeCoilThick = 0.005;
 	double dMiezeCoilTilt = 0.;
 	
 	int iMiezeNumCoils = 1;
 	double dMiezeNumOsc = 2.;
 	double dMiezeFm = -1.;
+
+	double dB_rf0, dB_rf1;
+	double dB00, dB01;
 
 	// detector
 	double dDetTofBase = 0.;
@@ -129,6 +136,24 @@ DECLARE
 	
 	double E_i;
 	double dMiezeLs = -1.0;
+
+
+
+	int coil0_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		rf_flipper_rot(x,y,z,t, dMiezeF1*2.*M_PI,dB_rf0,dB00, pBx,pBy,pBz);
+		return 1;
+	}
+
+	int coil1_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		rf_flipper_rot(x,y,z,t, dMiezeF2*2.*M_PI,dB_rf1,dB01, pBx,pBy,pBz);
+		return 1;
+	}
 %}
 
 
@@ -138,10 +163,11 @@ INITIALIZE
 	if(dLam_f < 0.)
 		dLam_f = dLam;
 
-	double v_i = HBAR*2.*M_PI / (dLam*1e-10 * MNEUTRON);
-	double v_f = HBAR*2.*M_PI / (dLam_f*1e-10 * MNEUTRON);
+	double v_i = neutron_v(dLam);
+	double v_f = neutron_v(dLam_f);
 	E_i = VS2E*v_i*v_i;
 	double E_f = VS2E*v_f*v_f;
+
 
 	if(bAutoSetAngles)
 	{
@@ -165,6 +191,7 @@ INITIALIZE
 		dDeltaEMon = E_i*0.5;
 
 	printf("--------------------------------------------------------------------------------\n");
+	printf("Ideal: Mono=%d, Ana=%d, MIEZE=%d\n", bMonoIdeal, bAnaIdeal, bMiezeIdeal);
 	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
 	//printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
 	printf("Sample: theta_s=%f deg, 2theta_s=%f deg,\n"
@@ -172,7 +199,20 @@ INITIALIZE
 	printf("Analyser: theta_a=%f deg, 2thetaa_=%f deg\n", dAnaTheta, 2.*dAnaTheta);
 
 
-	dMiezeFm = 2.*double(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
+	dMiezeFm = 2.*(double)(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
+
+	if(!bMiezeIdeal)
+	{
+		dB_rf0 = larmor_B(v_i, dMiezeCoilThick, -M_PI);
+		dB_rf1 = larmor_B(v_i, dMiezeCoilThick, -M_PI);
+
+		dB00 = dMiezeF1*2.*M_PI / GAMMA_N;
+		dB01 = dMiezeF2*2.*M_PI / GAMMA_N;
+
+		printf("Coil 0: B_0=%g T, B_rf=%g T, freq=%g Hz\n", dB00, dB_rf0, dMiezeF1);
+		printf("Coil 1: B_0=%g T, B_rf=%g T, freq=%g Hz\n", dB01, dB_rf1, dMiezeF2);
+	}
+
 
 	dMiezeLs = dDistSampleAna + dDistAnaDet;
 	double dMiezeL2 = dMiezeLs + dDistMonoSample - dMiezeL1 - dDistMonoMieze;
@@ -221,6 +261,10 @@ COMPONENT Source = Source_simple(
 		%{
 			//t = 0.;
 			t = rand01() * dMiezeNumOsc/dMiezeFm;
+
+			sx = 1.;
+			sy = 0.;
+			sz = 0.;
 		%}
 		
 COMPONENT CollBeforeMono = Collimator_linear(
@@ -255,6 +299,27 @@ COMPONENT MiezeBox = MIEZE_box(N=1,
 		%}
 
 
+COMPONENT coil0 = Pol_simpleBfield(
+	fieldFunction = coil0_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dDistMonoMieze) RELATIVE MonoAxisEnd
+COMPONENT coil0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil0
+
+COMPONENT coil1 = Pol_simpleBfield(
+	fieldFunction = coil1_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeL1) RELATIVE coil0
+COMPONENT coil1_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil1
+		EXTEND
+		%{
+			p *= 0.5 * (1. + sx);
+		%}
 //----------------------------------------------------------------------------------------------------
 
 

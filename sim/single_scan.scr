@@ -39,6 +39,7 @@ run(simParams)
 main()
 {
 	do_compile = 1;
+	use_cpp = 0;
 
 	lam = 3.;		# A
 	dlam = 0.01 * lam;
@@ -48,6 +49,7 @@ main()
 	mono_ana_ideal = 0;
 	mono_ana_width = 0.005;
 	mono_ana_mosaic = 30.0;
+	mieze_ideal = 0;
 	sample_idx = 100;
 	sample_width = 0.004;
 	sample_depth = 0.002;
@@ -155,6 +157,7 @@ main()
 			+ " dAnaMosaic=" + mono_ana_mosaic
 			+ " bMonoIdeal=" + mono_ana_ideal
 			+ " bAnaIdeal=" + mono_ana_ideal
+			+ " bMiezeIdeal=" + mieze_ideal
 			+ " dSourceWidth=" + source_width
 			+ " dSourceHeight=" + source_width
 			+ " dDetWidth=" + det_width
