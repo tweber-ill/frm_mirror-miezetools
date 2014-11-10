@@ -6,7 +6,7 @@
 
 __init__()
 {
-	import("colors.scr");
+	import("apps/colors.scr");
 
 	global mcmutex = mutex();
 	global totalsimcount = 1;

@@ -8,20 +8,21 @@ __init__()
 {
 	#global INSTR = "tasmieze";
 	global INSTR = "tasmieze_nomono";
-	global num_neutrons = 1e5;
+	global num_neutrons = 5e4;
 
-	import("mcstas.scr");
+	import("apps/mcstas.scr");
+	import("apps/phonon_1atom.scr");
+	import("apps/mieze.scr");
+	import("apps/colors.scr");
 	import("sim.scr");
 	import("tas.scr");
-	import("mieze.scr");
-	import("colors.scr");
-	import("phonon.scr");
 }
 
 main()
 {
 #	global NUM_THREADS = 1;
 	do_compile = 1;
+	use_cpp = 0;
 
 	if(do_compile)
 	{
@@ -69,9 +70,11 @@ main()
 
 		register_var(varmap);
 
+		mono_ana_ideal = 0;
+		mieze_ideal = 0;
+
 		source_width = 0.001;
 		det_width = 0.04;
-		mono_ana_ideal = 0;
 		mono_ana_width = 0.0075;
 		mono_ana_mosaic = 15.0;
 		sample_idx = 100;
@@ -115,19 +118,19 @@ main()
 
 		k_i = lam2k(lam);
 		E_i = k2E(k_i);
-		mono_tt = get_mono_tt(k_i, mono_d/mono_order);
+		mono_tt = angle_mono_tt(mono_d/mono_order, k_i);
 
 		# sample_d = mono_d/mono_order;
-		# Q = get_mono_Q(sample_d);
+		# Q = mono_Q(sample_d);
 
 		E_f = E_i - dE;
 		k_f = E2k(E_f);
 		lam_f = E2lam(E_f);
 
-		sample_tt = get_tt(k_i, k_f, Q);
+		sample_tt = -angle_sample_tt(k_i, k_f, Q);
 		#sample_tt = mono_tt;
 
-		ana_tt = get_mono_tt(k_f, ana_d/ana_order);
+		ana_tt = angle_mono_tt(ana_d/ana_order, k_f);
 
 		emon_range = abs(dE*2.);
 		# --------------------------------------------------------------------------------
@@ -173,6 +176,7 @@ main()
 			+ " dAnaMosaic=" + mono_ana_mosaic
 			+ " bMonoIdeal=" + mono_ana_ideal
 			+ " bAnaIdeal=" + mono_ana_ideal
+			+ " bMiezeIdeal=" + mieze_ideal
 			+ " dSourceWidth=" + source_width
 			+ " dSourceHeight=" + source_width
 			+ " dDetWidth=" + det_width

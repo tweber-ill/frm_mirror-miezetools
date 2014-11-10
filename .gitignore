@@ -28,6 +28,8 @@ sim/tasmieze.out
 sim/tasmieze_nomono.out
 sim/coiltest.cpp
 sim/coiltest.out
+sim/test/coiltest.cpp
+sim/test/coiltest.out
 script/tokens.h
 script/script.tab.cc
 script/script.cc

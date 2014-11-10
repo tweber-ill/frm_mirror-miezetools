@@ -6,8 +6,8 @@
 
 __init__()
 {
-	import("neutrons.scr");
-	import("hkl.scr");
+	import("apps/neutrons.scr");
+	import("apps/hkl.scr");
 
 	global mono_order = 2.0;
 	global ana_order = 2.0;
@@ -16,28 +16,12 @@ __init__()
 	global ana_d = 6.79;
 }
 
-get_mono_tt(k, d) { return angle_mono_tt(d, k); }
-
-get_mono_Q(d)
-{
-	n = 1.;
-	Q = n * 2.*pi / d;
-	return Q;
-}
-
-get_tt(ki, kf, Q)
-{
-	sample_sense = -1.0;
-	return sample_sense * angle_sample_tt(ki, kf, Q);
-}
-
-
 main()
 {
 	lam_i = real(input("lam_i [A] = "));
 	k_i = lam2k(lam_i);
 	E_i = k2E(k_i);
-	mono_tt = get_mono_tt(k_i, mono_d/mono_order);
+	mono_tt = angle_mono_tt(mono_d/mono_order, k_i);
 
 	Q = real(input("Q [1/A] = "));
 	dE = real(input("dE [meV] = "));
@@ -45,8 +29,8 @@ main()
 	E_f = E_i - dE;
 	k_f = E2k(E_f);	
 
-	tt = get_tt(k_i, k_f, Q);
-	ana_tt = get_mono_tt(k_f, ana_d/ana_order);
+	tt = -angle_sample_tt(k_i, k_f, Q);
+	ana_tt = angle_mono_tt(ana_d/ana_order, k_f);
 
 
 	print("\n" + "-"*80);

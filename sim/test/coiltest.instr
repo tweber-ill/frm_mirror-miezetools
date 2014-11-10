@@ -18,7 +18,7 @@ DEFINE INSTRUMENT CoilTest
 
 DECLARE
 %{
-	#include "neutrons.h"
+	#include "../neutrons.h"
 
 	double dVel;
 	double dB_rf0, dB_rf1;

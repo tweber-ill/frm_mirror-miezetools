@@ -6,14 +6,14 @@
 
 __init__()
 {
-	global INSTR = "coiltest";
+	global INSTR = "test/coiltest";
 	global num_neutrons = 5e4;
 
-	import("mcstas.scr");
-	import("plot.scr");
-	import("fit.scr");
-	import("mieze.scr");
-	import("colors.scr");
+	import("apps/mcstas.scr");
+	import("apps/colors.scr");
+	import("apps/plot.scr");
+	import("apps/fit.scr");
+	import("apps/mieze.scr");
 }
 
 main()

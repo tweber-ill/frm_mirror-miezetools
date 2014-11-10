@@ -8,10 +8,10 @@ __init__()
 	global INSTR = "tasmieze";
 	global num_neutrons = 1e6;
 
-	import("mcstas.scr");
+	import("apps/mcstas.scr");
+	import("apps/mieze.scr");
+	import("apps/colors.scr");
 	import("sim.scr");
-	import("mieze.scr");
-	import("colors.scr");
 }
 
 main()

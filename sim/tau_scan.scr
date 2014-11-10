@@ -9,7 +9,7 @@ __init__()
 {
 #	global INSTR = "tasmieze";
 	global INSTR = "tasmieze_nomono";
-	global num_neutrons = 1e5;
+	global num_neutrons = 2e5;
 
 	print("Running on " + interp_ver() + "\n");
 
@@ -19,23 +19,9 @@ __init__()
 	import("sim.scr");
 }
 
-run(simParams)
-{
-	dir = "output/single";
-
-	if(mcrun(INSTR, num_neutrons, dir, simParams))
-	{
-		result = sim_evaluate(dir, 1);
-		eval_Emon(dir, 0);
-		print(YELLOW + "Result: " + str(result) + NOCOLOR);
-		return result;
-	}
-
-	return 0.;
-}
-
 main()
 {
+#	global NUM_THREADS = 1;
 	do_compile = 1;
 	use_cpp = 0;
 
@@ -63,9 +49,9 @@ main()
 	print("Q = " + Q + " 1/A");
 	print("E = " + dE + " meV");
 
+	
 	# -------------------------------------------------------------------------------- 
 	# MIEZE stuff
-
 	L_sample_ana = 0.5;
 	L_ana_det = 0.5;
 	L_mono_sample = 2.;
@@ -74,12 +60,6 @@ main()
 	L1 = 0.9;
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
-	tau = 100.;		# ps
-
-	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
-	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
-
-	print("Detector offset: " + det_offs + " m");
 	# -------------------------------------------------------------------------------- 
 
 
@@ -118,10 +98,29 @@ main()
 	}
 
 
+
+        taus = linspace(10, 200, 24);
+        indices = linspace(0, vec_size(taus)-1, vec_size(taus));
+        global contrasts = vec(vec_size(taus));
+        global contrasts_err = vec(vec_size(taus));
+        totalsimcount = length(taus);
+
+	f1f2s = vec(vec_size(taus));
+	det_offsets = vec(vec_size(taus));
+
+	for(tau : taus)
+	{
+		f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
+		det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
+
+		f1f2s[cur_iter(tau)] = f1f2;
+		det_offsets[cur_iter(tau)] = det_offs;
+	}
+
 	simBaseParams = "dLam=" + lam 
 			+ " dDeltaLam=" + dlam 
-			+ " dMiezeF1=" + f1f2[0] 
-			+ " dMiezeF2=" + f1f2[1]
+			#+ " dMiezeF1=" + f1f2[0] 
+			#+ " dMiezeF2=" + f1f2[1]
 			+ " dMiezeL1=" + L1
 			+ " dDistMonoMieze=" + L_mono_mieze
 			+ " dDistMonoSample=" +  L_mono_sample
@@ -133,7 +132,7 @@ main()
 			+ " dSampleTwoTheta=" + sample_tt /pi*180.
 			+ " bAutoSetAngles=0" 
 			+ " iSample=" + sample_idx
-			+ " dDetOffs=" + det_offs
+			#+ " dDetOffs=" + det_offs
 			+ " dMonoD=" + mono_d
 			+ " dAnaD=" + ana_d
 			+ " dMonoOrder=" + mono_order
@@ -163,11 +162,40 @@ main()
 			+ " dDetHeight=" + det_width
 			+ " dLam_f=" + lam_f;
 
+
+
 	print("\n\n");
 	print("="*80);
-	print(BLUE + "Starting simulation..." + NOCOLOR);
+	print(BLUE + "Starting simulation in " + NUM_THREADS + " threads." + NOCOLOR);
 	print("\n");
 
 
-	result = run(simBaseParams);
+
+	f1s = trans(f1f2s)[0];
+	f2s = trans(f1f2s)[1];
+	sim_params = zip(indices, trans([f1s, f2s, det_offsets]));
+
+	threads = nthread(NUM_THREADS, "run_thread_multi", sim_params, ["dMiezeF1","dMiezeF2","dDetOffs"], simBaseParams, "tau");
+	join(threads);
+
+
+
+
+	print("\n");
+	print(GREEN + "All thread runs have finished." + NOCOLOR);
+	print("="*80);
+
+
+	print("Taus: " + str(taus));
+	print("Contrasts: " + str(contrasts));
+        
+	params = map();
+	params["xlabel"] = "MIEZE time (ps)";
+	params["ylabel"] = "Contrast";
+	params["title"] = "Result";
+	params["xlimits"] = min(taus) + " " + max(taus);
+	params["ylimits"] = "0 1";
+	params["term"] = "x11";
+
+	plot(taus, contrasts, contrasts_err, params);
 }

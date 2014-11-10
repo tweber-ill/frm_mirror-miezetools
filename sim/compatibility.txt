@@ -4,3 +4,10 @@ McStas C++ compatibility:
 * share/interpolation/natural/delaunay.h/.c -> rename "new" variables, cast last argument in calls to "inspherefast"
 * share/interpolation/natural/predicates.c -> lots of K&R style function declarations
 * share/interpolation/natural/natural.c -> rename "this"
+
+
+
+Misc compatibility:
+
+* /usr/local/mcstas/2.1/share/pol-lib.c -> lower "mc_pol_startTimeStep" in "SimpleNumMagnetPrecession"
+	taus > 100 has wrong results with standard value
