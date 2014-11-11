@@ -1,7 +1,7 @@
 #!./hermelin
 
 #
-# tau scan
+# tilt scan
 # @author: tw
 #
 
@@ -9,7 +9,7 @@ __init__()
 {
 #	global INSTR = "tasmieze";
 	global INSTR = "tasmieze_nomono";
-	global num_neutrons = 2e5;
+	global num_neutrons = 1e6;
 
 	print("Running on " + interp_ver());
 

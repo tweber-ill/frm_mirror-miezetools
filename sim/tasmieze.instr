@@ -166,6 +166,8 @@ DECLARE
 
 INITIALIZE
 %{
+	random_seed();
+
 	if(dLam_f < 0.)
 		dLam_f = dLam;
 

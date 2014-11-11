@@ -7,6 +7,8 @@
 #ifndef __NEUTRONS_H__
 #define __NEUTRONS_H__
 
+#include <time.h>
+
 
 #define GAMMA_N 1.83247185e+08           /* 1/(Ts), value from: boost/units/systems/si/codata/neutron_constants.hpp */
 
@@ -44,6 +46,20 @@ void rf_flipper_rot(double x, double y, double z, double t, double dOm, double d
 	*pBx = dB_rf*cos(-dOm*t);
 	*pBy = dB_rf*sin(-dOm*t);
 	*pBz = dB0;
+}
+
+void random_seed()
+{
+	struct timeval tv;
+	gettimeofday(&tv, 0);
+
+	mcseed = tv.tv_usec;
+#ifdef USE_MPI
+	mcseed += mpi_node_rank;
+#endif
+
+	printf("Seed: %li\n", mcseed);
+	srandom(mcseed);
 }
 
 #endif
