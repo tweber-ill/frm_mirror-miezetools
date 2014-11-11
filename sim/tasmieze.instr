@@ -13,6 +13,7 @@ DEFINE INSTRUMENT TasMieze
 	double dDeltaLam = 0.1,
 
 
+
 	// MIEZE
 	int bMiezeIdeal = 1,
 
@@ -20,6 +21,12 @@ DEFINE INSTRUMENT TasMieze
 	double dMiezeF1 = 46000.0, 
 	double dMiezeF2 = 61920.0,
 	double dDistMonoMieze = 0.5,
+	double dMiezeCoilTilt = 0.0,
+
+	double dMiezeWidth = 0.35, 
+	double dMiezeHeight = 0.35,
+	double dMiezeCoilThick = 0.005,
+
 
 
 	// mono
@@ -36,6 +43,7 @@ DEFINE INSTRUMENT TasMieze
 	double dMonoTheta = 0.0,
 
 	double dDistSrcMono = 1.0,
+
 
 
 	// sample
@@ -59,6 +67,7 @@ DEFINE INSTRUMENT TasMieze
 	double dSamplePhononVel = 1.0,
 
 
+
 	// analyser
 	int bAnaIdeal = 0,
 
@@ -74,6 +83,7 @@ DEFINE INSTRUMENT TasMieze
 	double dDistSampleAna = 1.0,
 
 
+
 	// detector
 	double dDetWidth = 0.1, 
 	double dDetHeight = 0.1,
@@ -85,6 +95,7 @@ DEFINE INSTRUMENT TasMieze
 	// 1: calculate TAS angles internally
 	// 0: calculate TAS angles externally
 	int bAutoSetAngles = 1,
+
  
  
 	// collimators / slits
@@ -97,6 +108,7 @@ DEFINE INSTRUMENT TasMieze
 	double dCollBeforeSampleDivV = 60.0,
 	double dCollAfterSampleDivV = 30.0,
 	double dCollAfterAnaDivV = 30.0,
+
 
  
 	// expected lambda after inelastic scattering
@@ -115,11 +127,7 @@ DECLARE
 	double dTargetSampleAna[3];
 
 
-	// MIEZE
-	double dMiezeWidth = 0.35, dMiezeHeight = 0.35;
-	double dMiezeCoilThick = 0.005;
-	double dMiezeCoilTilt = 0.;
-	
+	// MIEZE	
 	int iMiezeNumCoils = 1;
 	double dMiezeNumOsc = 2.;
 	double dMiezeFm = -1.;
@@ -335,18 +343,22 @@ COMPONENT coil0 = Pol_simpleBfield(
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dDistMonoMieze) RELATIVE MonoAxisEnd
+		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 COMPONENT coil0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil0
+		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 
 COMPONENT coil1 = Pol_simpleBfield(
 	fieldFunction = coil1_field, Bx=0, By=0, Bz=0, filename = 0,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dMiezeL1) RELATIVE coil0
+		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 COMPONENT coil1_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil1
+		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 		EXTEND
 		%{
 			p *= 0.5 * (1. + sx);

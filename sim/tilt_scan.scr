@@ -56,10 +56,15 @@ main()
 	L_ana_det = 0.5;
 	L_mono_sample = 2.;
 	L_mono_mieze = 0.5;
+	coil_wh = 0.75;
 
 	L1 = 0.9;
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
+
+	tau = 100.;
+	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
+	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
 	# -------------------------------------------------------------------------------- 
 
 
@@ -99,29 +104,20 @@ main()
 
 
 
-        taus = linspace(10, 250, 24);
-        indices = linspace(0, vec_size(taus)-1, vec_size(taus));
-        global contrasts = vec(vec_size(taus));
-        global contrasts_err = vec(vec_size(taus));
-        totalsimcount = length(taus);
+	tilts = linspace(-20., 20., 24);
+	indices = linspace(0, vec_size(tilts)-1, vec_size(tilts));
+	global contrasts = vec(vec_size(tilts));
+	global contrasts_err = vec(vec_size(tilts));
+	totalsimcount = length(tilts);
 
-	f1f2s = vec(vec_size(taus));
-	det_offsets = vec(vec_size(taus));
-
-	for(tau : taus)
-	{
-		f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
-		det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
-
-		f1f2s[cur_iter(tau)] = f1f2;
-		det_offsets[cur_iter(tau)] = det_offs;
-	}
 
 	simBaseParams = "dLam=" + lam 
 			+ " dDeltaLam=" + dlam 
-			#+ " dMiezeF1=" + f1f2[0] 
-			#+ " dMiezeF2=" + f1f2[1]
+			+ " dMiezeF1=" + f1f2[0] 
+			+ " dMiezeF2=" + f1f2[1]
 			+ " dMiezeL1=" + L1
+			+ " dMiezeWidth=" + coil_wh
+			+ " dMiezeHeight=" + coil_wh
 			+ " dDistMonoMieze=" + L_mono_mieze
 			+ " dDistMonoSample=" +  L_mono_sample
 			+ " dDistSampleAna=" + L_sample_ana
@@ -132,7 +128,7 @@ main()
 			+ " dSampleTwoTheta=" + sample_tt /pi*180.
 			+ " bAutoSetAngles=0" 
 			+ " iSample=" + sample_idx
-			#+ " dDetOffs=" + det_offs
+			+ " dDetOffs=" + det_offs
 			+ " dMonoD=" + mono_d
 			+ " dAnaD=" + ana_d
 			+ " dMonoOrder=" + mono_order
@@ -171,12 +167,7 @@ main()
 
 
 
-	f1s = trans(f1f2s)[0];
-	f2s = trans(f1f2s)[1];
-	sim_params = zip(indices, trans([f1s, f2s, det_offsets]));
-
-	threads = nthread(NUM_THREADS, "run_thread_multi", 
-		sim_params, ["dMiezeF1", "dMiezeF2", "dDetOffs"], simBaseParams, "tau");
+	threads = nthread(NUM_THREADS, "run_thread", zip(indices, tilts), "dMiezeCoilTilt", simBaseParams, "tilt");
 	join(threads);
 
 
@@ -187,16 +178,17 @@ main()
 	print("="*80);
 
 
-	print("Taus: " + str(taus));
+	print("Tilt angles: " + str(tilts));
 	print("Contrasts: " + str(contrasts));
         
 	params = map();
-	params["xlabel"] = "MIEZE time (ps)";
+	params["xlabel"] = "Tilt angle (deg)";
 	params["ylabel"] = "Contrast";
 	params["title"] = "Result";
-	params["xlimits"] = min(taus) + " " + max(taus);
+	params["xlimits"] = min(tilts) + " " + max(tilts);
 	params["ylimits"] = "0 1";
 	params["term"] = "x11";
 
-	plot(taus, contrasts, contrasts_err, params);
+	savetxt("output/tilt.dat", [tilts, contrasts, contrasts_err, params]);
+	plot(tilts, contrasts, contrasts_err, params);
 }
