@@ -53,7 +53,7 @@ void random_seed()
 	struct timeval tv;
 	gettimeofday(&tv, 0);
 
-	mcseed = tv.tv_sec + tv.tv_usec;
+	mcseed = tv.tv_sec ^ tv.tv_usec;
 #ifdef USE_MPI
 	mcseed += mpi_node_rank;
 #endif
