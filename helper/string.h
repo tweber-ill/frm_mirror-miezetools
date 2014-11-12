@@ -197,7 +197,7 @@ struct _str_to_var_impl
 template<typename T, class t_str>
 struct _str_to_var_impl<T, t_str, 1>
 {
-	inline T operator()(const t_str& str) const
+	inline const T& operator()(const t_str& str) const
 	{
 		return str;
 	}
