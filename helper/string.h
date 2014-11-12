@@ -197,7 +197,7 @@ struct _str_to_var_impl
 template<typename T, class t_str>
 struct _str_to_var_impl<T, t_str, 1>
 {
-	inline T operator()(const t_str& str)
+	inline T operator()(const t_str& str) const
 	{
 		return str;
 	}
@@ -206,7 +206,7 @@ struct _str_to_var_impl<T, t_str, 1>
 template<typename T, class t_str>
 struct _str_to_var_impl<T, t_str, 0>
 {
-	inline T operator()(const t_str& str)
+	inline T operator()(const t_str& str) const
 	{
 		typedef typename t_str::value_type t_char;
 		std::basic_istringstream<t_char> istr(str);
