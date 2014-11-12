@@ -36,7 +36,7 @@ void init_rand()
 	// seed 1: time
 	struct timeval timev;
 	gettimeofday(&timev, 0);
-	unsigned int uiSeed1 = timev.tv_usec;
+	unsigned int uiSeed1 = timev.tv_sec + timev.tv_usec;
 
 
 	// total seed

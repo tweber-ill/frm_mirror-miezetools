@@ -7,7 +7,7 @@
 #ifndef __NEUTRONS_H__
 #define __NEUTRONS_H__
 
-#include <time.h>
+#include <sys/time.h>
 
 
 #define GAMMA_N 1.83247185e+08           /* 1/(Ts), value from: boost/units/systems/si/codata/neutron_constants.hpp */
@@ -53,7 +53,7 @@ void random_seed()
 	struct timeval tv;
 	gettimeofday(&tv, 0);
 
-	mcseed = tv.tv_usec;
+	mcseed = tv.tv_sec + tv.tv_usec;
 #ifdef USE_MPI
 	mcseed += mpi_node_rank;
 #endif
