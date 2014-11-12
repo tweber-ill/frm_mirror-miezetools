@@ -118,7 +118,7 @@ main()
 
 		k_i = lam2k(lam);
 		E_i = k2E(k_i);
-		mono_tt = angle_mono_tt(mono_d/mono_order, k_i);
+		mono_tt = -angle_mono_tt(mono_d/mono_order, k_i);
 
 		# sample_d = mono_d/mono_order;
 		# Q = mono_Q(sample_d);
@@ -127,10 +127,10 @@ main()
 		k_f = E2k(E_f);
 		lam_f = E2lam(E_f);
 
-		sample_tt = -angle_sample_tt(k_i, k_f, Q);
+		sample_tt = angle_sample_tt(k_i, k_f, Q);
 		#sample_tt = mono_tt;
 
-		ana_tt = angle_mono_tt(ana_d/ana_order, k_f);
+		ana_tt = -angle_mono_tt(ana_d/ana_order, k_f);
 
 		emon_range = abs(dE*2.);
 		# --------------------------------------------------------------------------------

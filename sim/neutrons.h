@@ -58,8 +58,8 @@ void random_seed()
 	mcseed += mpi_node_rank;
 #endif
 
-	printf("Seed: %li\n", mcseed);
 	srandom(mcseed);
+	printf("Seed: %li\n", mcseed);
 }
 
 #endif

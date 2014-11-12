@@ -49,6 +49,7 @@ DEFINE INSTRUMENT TasMieze
 	// sample
 	// 001: C Single_crystal
 	// 100: Phonon_simple
+	// 200: Reso
 	int iSample = 1,
 	double dDistMonoSample = 2.0,
 	double dSampleTheta = 0.0, 
@@ -141,7 +142,7 @@ DECLARE
 	double dDetSphPhi = 0.;
 	double dDetSphTheta = 0.;	
 	
-	double E_i;
+	double E_i, E_f;
 	double dMiezeLs = -1.;
 	
 	
@@ -174,7 +175,7 @@ INITIALIZE
 	double v_i = neutron_v(dLam);
 	double v_f = neutron_v(dLam_f);
 	E_i = VS2E*v_i*v_i;
-	double E_f = VS2E*v_f*v_f;
+	E_f = VS2E*v_f*v_f;
 
 	if(bAutoSetAngles)
 	{
@@ -413,6 +414,20 @@ COMPONENT Sample_phonon = Phonon_simple(
 		AT (0, 0, 0) RELATIVE SampleAxisBegin
 		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin
 
+COMPONENT Sample_reso = Res_sample(
+	radius = dSampleWidth, yheight = dSampleHeight,
+	target_x = dTargetSampleAna[0], target_y = dTargetSampleAna[1], target_z = dTargetSampleAna[2],
+	focus_xw = dAnaWidth, focus_yh = dAnaHeight,
+	E0 = E_f, dE = E_f/10.0)
+		WHEN(iSample == 200)
+		AT (0, 0, 0) RELATIVE SampleAxisBegin
+		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
 
 COMPONENT SampleAxisEnd = Arm()
 	AT (0, 0, 0) RELATIVE SampleAxisBegin
@@ -503,7 +518,7 @@ COMPONENT lam = L_monitor(
 */
 
 COMPONENT oscpsd_sph = Osc_PSD_monitor(
-	nchan=32, nx=128, ny=128, filename="oscpsd_sph",
+	nchan = 32, nx = 128, ny = 128, filename = "oscpsd_sph",
 	xwidth = dDetWidth, yheight = dDetHeight, geo = 1,
 	radius = dMiezeLs+dDetOffs,
 	thetamin = -dDetSphTheta, thetamax = dDetSphTheta,
@@ -539,6 +554,14 @@ COMPONENT oscpsd = Osc_PSD_monitor(
 	restore_neutron = 1)
 		AT (0, 0, 0) RELATIVE DetAxis
 		
+COMPONENT Mon_reso = Res_monitor(
+	filename = "reso",
+	xwidth = dDetWidth, yheight = dDetHeight, zdepth = 0,
+	bufsize = 0, options = "square",
+	res_sample_comp = Sample_reso, restore_neutron = 1)
+		WHEN(iSample == 200)
+		AT (0, 0, 0) RELATIVE DetAxis
+
 //----------------------------------------------------------------------------------------------------
 
 
