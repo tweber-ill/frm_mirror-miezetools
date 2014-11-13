@@ -1,0 +1,64 @@
+/*
+ * Ess Mod Test
+ * @author tweber
+ * @date 13-nov-14
+ */
+
+DEFINE INSTRUMENT EssModTest
+()
+
+DECLARE
+%{
+	const double lmin = 0.1;
+	const double lmax = 7.0;
+%}
+
+
+
+INITIALIZE
+%{
+%}
+
+
+
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+	 	AT (0,0,0) ABSOLUTE
+
+
+//----------------------------------------------------------------------------------------------------
+// source
+
+COMPONENT Source_ess = ESS_moderator(
+	Lmin = lmin, Lmax = lmax, sourcedef = "2014", cold_frac = 1.0,
+	focus_xw = 0.05, focus_yh = 0.05, dist = 1.0, target_index=1)
+		AT (0, 0, 0) RELATIVE Origin
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// detectors
+
+COMPONENT lam = L_monitor(
+	Lmin = lmin, Lmax = lmax, nL = 128, restore_neutron = 1, filename = "lam",
+	xwidth = 0.05, yheight=0.05)
+		AT (0.0, 0.0, 1.0) RELATIVE Origin
+
+COMPONENT psd = PSD_monitor(
+	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
+	xwidth = 0.05, yheight = 0.05)
+		AT (0.0, 0.0, 1.0) RELATIVE Origin
+
+//----------------------------------------------------------------------------------------------------
+
+
+FINALLY
+%{
+%}
+
+END

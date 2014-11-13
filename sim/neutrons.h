@@ -48,6 +48,14 @@ void rf_flipper_rot(double x, double y, double z, double t, double dOm, double d
 	*pBz = dB0;
 }
 
+void rf_rot_xy(double x, double y, double z, double t, double dOm, double dB_rf,
+		double *pBx, double *pBy, double *pBz)
+{
+	*pBx = dB_rf*cos(-dOm*t);
+	*pBy = dB_rf*sin(-dOm*t);
+	*pBz = 0.;
+}
+
 void random_seed()
 {
 	struct timeval tv;

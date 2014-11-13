@@ -8,7 +8,8 @@
 __init__()
 {
 #	global INSTR = "tasmieze";
-	global INSTR = "tasmieze_nomono";
+#	global INSTR = "tasmieze_nomono";
+	global INSTR = "tasmieze_esstst";
 	global num_neutrons = 1e5;
 
 	print("Running on " + interp_ver() + "\n");

@@ -1,0 +1,585 @@
+/*
+ * TAS-MIEZE instrument for ess test
+ * @author tweber
+ * @date 25-nov-13
+ */
+
+DEFINE INSTRUMENT TasMieze
+(
+	// source
+	double dSourceWidth = 0.001,
+	double dSourceHeight = 0.001,
+	double dLam = 5.0, 
+	double dDeltaLam = 0.1,
+
+
+
+	// MIEZE
+	int bMiezeIdeal = 1,
+
+	double dMiezeL1 = 0.9,
+	double dMiezeF1 = 46000.0, 
+	double dMiezeF2 = 61920.0,
+	double dDistMonoMieze = 0.5,
+	double dMiezeCoilTilt = 0.0,
+
+	double dMiezeWidth = 0.35, 
+	double dMiezeHeight = 0.35,
+	double dMiezeCoilThick = 0.005,
+
+
+
+	// mono, unused
+	int bMonoIdeal = 0,
+
+	double dMonoWidth = 0.0025, 
+	double dMonoHeight = 0.0025,
+	double dMonoDepth = 0.001,
+
+	double dMonoMosaic = 10.0,
+
+	double dMonoD = 6.79,
+	double dMonoOrder = 2.0,
+	double dMonoTheta = 0.0,
+
+	double dDistSrcMono = 1.0,
+
+
+
+	// sample
+	// 001: C Single_crystal
+	// 100: Phonon_simple
+	// 200: Reso
+	int iSample = 1,
+	double dDistMonoSample = 2.0,
+	double dSampleTheta = 0.0, 
+	double dSampleTwoTheta = 0.0,
+
+	double dSampleWidth = 0.05, 
+	double dSampleHeight = 0.05, 
+	double dSampleDepth = 0.001,
+
+	double dTemp = 20.0,
+	double dSampleD = 6.79,
+	double dSampleOrder = 2.0,
+	double dSampleB = 1.0,
+	double dSampleM = 1.0,
+
+	double dSamplePhononVel = 1.0,
+
+
+
+	// analyser
+	int bAnaIdeal = 0,
+
+	double dAnaWidth = 0.0025, 
+	double dAnaHeight = 0.0025,
+	double dAnaDepth = 0.001,
+
+	double dAnaMosaic = 10.0,
+
+	double dAnaD = 6.79,
+	double dAnaOrder = 2.0,
+	double dAnaTheta=0.0,
+	double dDistSampleAna = 1.0,
+
+
+
+	// detector
+	double dDetWidth = 0.1, 
+	double dDetHeight = 0.1,
+
+	double dDistAnaDet = 1.0,
+	double dDetOffs = 0.0,
+	double dDeltaEMon = -1.0,
+
+	// 1: calculate TAS angles internally
+	// 0: calculate TAS angles externally
+	int bAutoSetAngles = 1,
+ 
+
+ 
+	// collimators / slits
+	double dCollBeforeMonoDivH = 60.0,
+	double dCollBeforeSampleDivH = 60.0,
+	double dCollAfterSampleDivH = 30.0,
+	double dCollAfterAnaDivH = 30.0,
+ 
+	double dCollBeforeMonoDivV = 60.0,
+	double dCollBeforeSampleDivV = 60.0,
+	double dCollAfterSampleDivV = 30.0,
+	double dCollAfterAnaDivV = 30.0,
+
+
+
+	// expected lambda after inelastic scattering
+	double dLam_f = -1.0
+)
+
+
+DECLARE
+%{
+	#include "neutrons.h"
+
+
+	int bAbsorbNonScattered = 1;
+
+	// sample
+	double dTargetSampleAna[3];
+
+
+	// MIEZE	
+	int iMiezeNumCoils = 1;
+	double dMiezeNumOsc = 2.;
+	double dMiezeFm = -1.;
+
+	// coils
+	double dB_rf0, dB_rf1;
+	double dB00, dB01;
+	double dB0BrfDist = 0.1;
+
+	// detector
+	double dDetTofBase = 0.;
+	double dDetSphPhi = 0.;
+	double dDetSphTheta = 0.;
+	
+	double E_i, E_f;
+	double dMiezeLs = -1.;
+
+
+	int coil0_B0_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		*pBx = *pBy = 0.;
+		*pBz = dB00;
+
+		return 1;
+	}
+
+	int coil1_B0_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		*pBx = *pBy = 0.;
+		*pBz = dB01;
+
+		return 1;
+	}
+
+	int coil0_rf_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		rf_rot_xy(x,y,z,t, dMiezeF1*2.*M_PI,dB_rf0, pBx,pBy,pBz);
+		return 1;
+	}
+
+	int coil1_rf_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		rf_rot_xy(x,y,z,t, dMiezeF2*2.*M_PI,dB_rf1, pBx,pBy,pBz);
+		return 1;
+	}
+%}
+
+
+
+INITIALIZE
+%{
+	random_seed();
+
+	if(dLam_f < 0.)
+		dLam_f = dLam;
+
+	double v_i = neutron_v(dLam);
+	double v_f = neutron_v(dLam_f);
+	E_i = VS2E*v_i*v_i;
+	E_f = VS2E*v_f*v_f;
+
+	if(bAutoSetAngles)
+	{
+		//double dMonoScatterSense = -1.;
+		//dMonoTheta = dMonoScatterSense*asin(dMonoOrder*dLam / (2.*dMonoD)) / M_PI * 180.;
+
+		double dSampleScatterSense = 1.;
+		dSampleTheta = dSampleScatterSense*asin(dSampleOrder*dLam / (2.*dSampleD)) / M_PI * 180.;
+		dSampleTwoTheta = dSampleTheta * 2.;
+
+		double dAnaScatterSense = -1.;
+		dAnaTheta = dAnaScatterSense*asin(dAnaOrder*dLam / (2.*dAnaD)) / M_PI * 180.;
+	}
+
+	dTargetSampleAna[0] = sin((dSampleTwoTheta-dSampleTheta)/180.*M_PI) * dDistSampleAna;
+	dTargetSampleAna[1] = 0.;
+	dTargetSampleAna[2] = cos((dSampleTwoTheta-dSampleTheta)/180.*M_PI) * dDistSampleAna;
+
+
+	if(dDeltaEMon < 0.)
+		dDeltaEMon = E_i*0.5;
+
+	printf("--------------------------------------------------------------------------------\n");
+	printf("Ideal: Mono=%d, Ana=%d, MIEZE=%d\n", bMonoIdeal, bAnaIdeal, bMiezeIdeal);
+	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
+	//printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
+	printf("Sample: theta_s=%f deg, 2theta_s=%f deg,\n"
+		"\texpected lam_f=%f A, v_f=%f m/s, E_f=%f meV\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f, E_f);
+	printf("Analyser: theta_a=%f deg, 2thetaa_=%f deg\n", dAnaTheta, 2.*dAnaTheta);
+
+
+	dMiezeFm = 2.*(double)(iMiezeNumCoils)*(dMiezeF2 - dMiezeF1);
+
+	if(!bMiezeIdeal)
+	{
+		dB_rf0 = larmor_B(v_i, dMiezeCoilThick, -M_PI);
+		dB_rf1 = larmor_B(v_i, dMiezeCoilThick, -M_PI);
+
+		dB00 = dMiezeF1*2.*M_PI / GAMMA_N;
+		dB01 = dMiezeF2*2.*M_PI / GAMMA_N;
+
+		printf("Coil 0: B_0=%g T, B_rf=%g T, freq=%g Hz\n", dB00, dB_rf0, dMiezeF1);
+		printf("Coil 1: B_0=%g T, B_rf=%g T, freq=%g Hz\n", dB01, dB_rf1, dMiezeF2);
+	}
+
+
+	dMiezeLs = dDistSampleAna + dDistAnaDet;
+	double dMiezeL2 = dMiezeLs + dDistMonoSample - dMiezeL1 - dDistMonoMieze;
+	double dMiezeLb = dMiezeL2 - dMiezeLs;
+
+	printf("MIEZE: L1=%f m, L2=%f m, Ls=%f m, Lb=%f m, f1=%f Hz, f2=%f Hz, offs=%f m tilt=%f deg\n", 
+		dMiezeL1, dMiezeL2, dMiezeLs, dMiezeLb, dMiezeF1, dMiezeF2, dDetOffs, dMiezeCoilTilt);
+	printf("--------------------------------------------------------------------------------\n");
+
+
+
+	dDetTofBase = (/*dDistSrcMono +*/ dDistMonoSample) / v_i + (dDistSampleAna + dDistAnaDet + dDetOffs) / v_f;
+	dDetTofBase += 0.5*dMiezeNumOsc/dMiezeFm;
+
+
+	dDetSphTheta = atan2(0.5*dDetHeight, dMiezeLs+dDetOffs) / M_PI*180.;
+	dDetSphPhi = atan2(0.5*dDetWidth, dMiezeLs+dDetOffs) / M_PI*180.;
+%}
+
+
+
+
+
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+	 	AT (0,0,0) ABSOLUTE
+
+
+
+//----------------------------------------------------------------------------------------------------
+// source
+
+COMPONENT MonoAxisBegin = Arm()
+	AT (0, 0, 0) RELATIVE Origin
+
+	
+COMPONENT Source = Source_simple(
+	yheight = dSourceHeight, xwidth = dSourceWidth, 
+	focus_xw = dSampleWidth, focus_yh = dSampleHeight,
+	lambda0 = dLam, dlambda = dDeltaLam, gauss = 0, dist = dDistMonoSample)
+		AT (0, 0, 0) RELATIVE MonoAxisBegin
+		EXTEND
+		%{
+			t = rand0max(dMiezeNumOsc/dMiezeFm);
+
+			sx = 1.;
+			sy = 0.;
+			sz = 0.;
+		%}
+		
+COMPONENT CollBeforeMono = Collimator_linear(
+			xwidth=dMonoWidth*2.0, yheight=dMonoHeight*2.0, length=0.1,
+			divergence=dCollBeforeMonoDivH, divergenceV=dCollBeforeMonoDivV)
+	AT (0, 0, 0) RELATIVE MonoAxisBegin	
+
+COMPONENT MonoAxisEnd = Arm()
+	AT (0, 0, 0) RELATIVE MonoAxisBegin
+	ROTATED (0, 0, 0) RELATIVE MonoAxisBegin
+
+
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// MIEZE
+
+COMPONENT MiezeBox = MIEZE_box(N=1,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, 
+	L1 = dMiezeL1,
+	f1 = dMiezeF1, f2 = dMiezeF2, coil_thickness = dMiezeCoilThick,
+	coil_tilt = dMiezeCoilTilt)
+		WHEN(bMiezeIdeal == 1)
+		AT (0, 0, dDistMonoMieze) RELATIVE MonoAxisEnd
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
+
+
+COMPONENT coil0_B0 = Pol_simpleBfield(
+	fieldFunction = coil0_B0_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick+2*dB0BrfDist)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dDistMonoMieze-dB0BrfDist) RELATIVE MonoAxisEnd
+		/*ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE*/
+
+COMPONENT coil0_rf = Pol_simpleBfield(
+	fieldFunction = coil0_rf_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dDistMonoMieze) RELATIVE MonoAxisEnd
+		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+COMPONENT coil0_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_rf)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil0_rf
+		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+
+COMPONENT coil0_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_B0)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeCoilThick+dB0BrfDist)  RELATIVE coil0_rf
+		/*ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE*/
+
+
+COMPONENT coil1_B0 = Pol_simpleBfield(
+	fieldFunction = coil1_B0_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick+2*dB0BrfDist)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeL1-dB0BrfDist) RELATIVE coil0_rf
+		/*ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE*/
+
+COMPONENT coil1_rf = Pol_simpleBfield(
+	fieldFunction = coil1_rf_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeL1) RELATIVE coil0_rf
+		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+COMPONENT coil1_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_rf)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil1_rf
+		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+
+COMPONENT coil1_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_B0)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dMiezeCoilThick+dB0BrfDist)  RELATIVE coil1_rf
+		/*ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE*/
+		EXTEND
+		%{
+			p *= 0.5 * (1. + sx);
+		%}
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// sample
+
+COMPONENT SampleAxisBegin = Arm()
+	AT (0, 0, dDistMonoSample) RELATIVE MonoAxisEnd
+
+COMPONENT CollBeforeSample = Collimator_linear(
+			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
+			divergence=dCollBeforeSampleDivH, divergenceV=dCollBeforeSampleDivV)
+	AT (0, 0, -dDistMonoSample*0.1 - 0.1) RELATIVE SampleAxisBegin
+
+
+
+COMPONENT Sample_crystal_C = Single_crystal(
+	reflections = "C_graphite.lau", 
+	xwidth = dSampleWidth, yheight = dSampleHeight, zdepth = dSampleDepth, 
+	delta_d_d = 1e-4, mosaic = 10, recip_cell = 0, barns = 0, 
+	ax = 2.464, ay = 0, az = 0, 
+	bx = 0, by = 2.464, bz = 0, 
+	cx = 0, cy = 0, cz = dSampleD,
+	aa = 0, bb = 0, cc = 120,
+	sigma_abs = 0.0035, sigma_inc = 0.001, 
+	order = 0, RX = 0, RY = 0, RZ = 0)
+		WHEN(iSample == 1)
+		AT (0, 0, 0) RELATIVE SampleAxisBegin
+		ROTATED (0, 90+dSampleTheta, 0) RELATIVE SampleAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
+COMPONENT Sample_phonon = Phonon_simple(
+	radius = dSampleWidth, yheight = dSampleHeight,
+	//target_index = +4, focus_r=dAnaWidth/2.0,
+	target_x = dTargetSampleAna[0], target_y = dTargetSampleAna[1], target_z = dTargetSampleAna[2],
+	focus_xw = dAnaWidth, focus_yh = dAnaHeight,
+	a=dSampleD, b=dSampleB, M=dSampleM, c=dSamplePhononVel, DW=1, T=dTemp, sigma_abs=0.0, sigma_inc=0.0)
+		WHEN(iSample == 100)
+		AT (0, 0, 0) RELATIVE SampleAxisBegin
+		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin
+
+COMPONENT Sample_reso = Res_sample(
+	radius = dSampleWidth, yheight = dSampleHeight,
+	target_x = dTargetSampleAna[0], target_y = dTargetSampleAna[1], target_z = dTargetSampleAna[2],
+	focus_xw = dAnaWidth, focus_yh = dAnaHeight,
+	E0 = E_f, dE = E_f/10.0)
+		WHEN(iSample == 200)
+		AT (0, 0, 0) RELATIVE SampleAxisBegin
+		ROTATED (0, dSampleTheta, 0) RELATIVE SampleAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
+
+COMPONENT SampleAxisEnd = Arm()
+	AT (0, 0, 0) RELATIVE SampleAxisBegin
+	ROTATED (0, dSampleTwoTheta, 0) RELATIVE SampleAxisBegin
+
+COMPONENT CollAfterSample = Collimator_linear(
+			xwidth=dSampleWidth*2.0, yheight=dSampleHeight*2.0, length=0.1,
+			divergence=dCollAfterSampleDivH, divergenceV=dCollAfterSampleDivV)
+	AT (0, 0, dDistMonoSample*0.1 + 0.1) RELATIVE SampleAxisEnd
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// analyser
+
+COMPONENT AnaAxisBegin = Arm()
+	AT (0, 0, dDistSampleAna) RELATIVE SampleAxisEnd
+
+COMPONENT E_mon = E_monitor(
+	xwidth = dAnaWidth, yheight = dAnaHeight,
+	nE = 512, filename = "E_mon_pre_ana",
+	Emin = E_i - dDeltaEMon, Emax = E_i + dDeltaEMon,
+	restore_neutron = 1)
+		AT (0,0,0) RELATIVE AnaAxisBegin
+
+COMPONENT Ana_flat = Monochromator_flat(
+	zwidth = dAnaWidth, yheight = dAnaHeight, mosaich = dAnaMosaic, mosaicv = dAnaMosaic,
+	r0 = 1, DM = dAnaD)
+		WHEN(bAnaIdeal == 1)
+  		AT (0, 0, 0) RELATIVE AnaAxisBegin
+	  	ROTATED (0, dAnaTheta, 0) RELATIVE AnaAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
+COMPONENT Ana_crystal = Single_crystal(
+	reflections = "C_graphite.lau", 
+	xwidth = dAnaWidth, yheight = dAnaHeight, zdepth = dAnaDepth, 
+	delta_d_d = 1e-4, mosaic = dAnaMosaic, recip_cell = 0, barns = 0, 
+	ax = 2.464, ay = 0, az = 0, 
+	bx = 0, by = 2.464, bz = 0, 
+	cx = 0, cy = 0, cz = dAnaD,
+	aa = 0, bb = 0, cc = 120,
+	sigma_abs = 0.0035, sigma_inc = 0.001, 
+	order = 0, RX = 0, RY = 0, RZ = 0)
+		WHEN(bAnaIdeal == 0)
+		AT (0, 0, 0) RELATIVE AnaAxisBegin
+		ROTATED (0, 90+dAnaTheta, 0) RELATIVE AnaAxisBegin
+		EXTEND
+		%{
+			if(bAbsorbNonScattered && !SCATTERED)
+				ABSORB;
+		%}
+
+
+COMPONENT AnaAxisEnd = Arm()
+	AT (0, 0, 0) RELATIVE AnaAxisBegin
+	ROTATED (0, 2.0*dAnaTheta, 0) RELATIVE AnaAxisBegin
+	
+COMPONENT CollAfterAna = Collimator_linear(
+			xwidth=dAnaWidth*2.0, yheight=dAnaHeight*2.0, length=0.1,
+			divergence=dCollAfterAnaDivH, divergenceV=dCollAfterAnaDivV)
+	AT (0, 0, dDistSampleAna*0.1 + 0.1) RELATIVE AnaAxisEnd	
+
+//----------------------------------------------------------------------------------------------------
+
+
+
+
+//----------------------------------------------------------------------------------------------------
+// detectors
+
+COMPONENT DetAxis = Arm()
+	AT (0, 0, dDistAnaDet + dDetOffs) RELATIVE AnaAxisEnd
+
+/*
+COMPONENT lam = L_monitor(
+	nL = 64, filename = "lam", xwidth = dDetWidth, yheight = dDetHeight,
+	Lmin = 0, Lmax = 10, restore_neutron = 1)
+		AT (0, 0, 0) RELATIVE DetAxis
+*/
+
+COMPONENT oscpsd_sph = Osc_PSD_monitor(
+	nchan = 32, nx = 128, ny = 128, filename = "oscpsd_sph",
+	xwidth = dDetWidth, yheight = dDetHeight, geo = 1,
+	radius = dMiezeLs+dDetOffs,
+	thetamin = -dDetSphTheta, thetamax = dDetSphTheta,
+	phimin = -dDetSphPhi, phimax = dDetSphPhi,
+	period = dMiezeNumOsc/dMiezeFm,
+	restore_neutron = 1)
+		AT (0, 0, -dMiezeLs-dDetOffs) RELATIVE DetAxis
+
+COMPONENT E_mon_post_ana = E_monitor(
+	xwidth = dDetWidth, yheight = dDetHeight,
+	nE = 512, filename = "E_mon_post_ana",
+	Emin = E_i - dDeltaEMon, Emax = E_i + dDeltaEMon,
+	restore_neutron = 1)
+		AT (0,0,0) RELATIVE DetAxis
+
+COMPONENT psd = PSD_monitor(
+	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
+	xwidth = dDetWidth, yheight = dDetHeight)
+		AT (0, 0, 0) RELATIVE DetAxis
+
+COMPONENT tof = TOF_monitor(nt=128, 
+		tmin=(dDetTofBase-dMiezeNumOsc/dMiezeFm)*1e6, 
+		tmax=(dDetTofBase+dMiezeNumOsc/dMiezeFm)*1e6, 
+	xwidth = dDetWidth, yheight = dDetHeight, 
+	filename = "tof",
+	restore_neutron = 1)
+		AT (0, 0, 0) RELATIVE DetAxis
+
+COMPONENT oscpsd = Osc_PSD_monitor(
+	nchan=32, nx=128, ny=128, filename="oscpsd",
+	xwidth = dDetWidth, yheight = dDetHeight, geo = 0,
+	period = dMiezeNumOsc/dMiezeFm,
+	restore_neutron = 1)
+		AT (0, 0, 0) RELATIVE DetAxis
+
+COMPONENT Mon_reso = Res_monitor(
+	filename = "reso",
+	xwidth = dDetWidth, yheight = dDetHeight, zdepth = 0,
+	bufsize = 0, options = "square",
+	res_sample_comp = Sample_reso, restore_neutron = 1)
+		WHEN(iSample == 200)
+		AT (0, 0, 0) RELATIVE DetAxis
+
+//----------------------------------------------------------------------------------------------------
+
+
+FINALLY
+%{
+%}
+
+
+END
