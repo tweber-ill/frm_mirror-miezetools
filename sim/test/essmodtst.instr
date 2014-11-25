@@ -10,7 +10,7 @@ DEFINE INSTRUMENT EssModTest
 DECLARE
 %{
 	const double lmin = 0.1;
-	const double lmax = 7.0;
+	const double lmax = 30.0;
 %}
 
 
@@ -45,7 +45,7 @@ COMPONENT Source_ess = ESS_moderator(
 // detectors
 
 COMPONENT lam = L_monitor(
-	Lmin = lmin, Lmax = lmax, nL = 128, restore_neutron = 1, filename = "lam",
+	Lmin = lmin, Lmax = lmax, nL = 256, restore_neutron = 1, filename = "lam",
 	xwidth = 0.05, yheight=0.05)
 		AT (0.0, 0.0, 1.0) RELATIVE Origin
 

@@ -6,6 +6,7 @@
  */
 
 #include "../../helper/math.h"
+#include "../../helper/linalg.h"
 #include "../../helper/log.h"
 
 #include <limits>
@@ -311,8 +312,8 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	double dContrast = (*pmodel)->GetContrast();
 	double dContrastError = (*pmodel)->GetContrastErr();
 
-	if (has_nan_or_inf(dContrast) || has_nan_or_inf(dContrastError) ||
-		has_nan_or_inf(dPhase) || has_nan_or_inf(dPhaseErr))
+	if (is_nan_or_inf(dContrast) || is_nan_or_inf(dContrastError) ||
+		is_nan_or_inf(dPhase) || is_nan_or_inf(dPhaseErr))
 		bValidFit = 0;
 
 	if(pdx_predef) delete[] pdx_predef;

@@ -10,7 +10,7 @@ __init__()
 #	global INSTR = "tasmieze";
 #	global INSTR = "tasmieze_nomono";
 	global INSTR = "tasmieze_esstst";
-	global num_neutrons = 2e6;
+	global num_neutrons = 5e5;
 
 	print("Running on " + interp_ver());
 
@@ -26,7 +26,7 @@ main()
 	do_compile = 1;
 	use_cpp = 0;
 
-	lam = 5.;		# A
+	lam = 4.;		# A
 	dlam = 0.01 * lam;
 
 	mono_ana_ideal = 0;
@@ -39,18 +39,37 @@ main()
 	sample_idx = 100;
 	sample_width = 0.004;
 	sample_depth = 0.002;
-	sample_d = 1.0;
+	sample_d = 5.0;
 	sample_b = 1.0;
 	sample_m = 1.0;
-	sample_vel = 1.5;
+	sample_vel = 20.;
 
-	Q = 0.2;							# 1/A
-	dE = -phonon_disp(sample_vel, sample_m, Q, sample_d);		# meV
 
-	print("Q = " + Q + " 1/A");
+	q_rlu = 0.05;						# rlu
+	#Q = 2.* 2.*pi/sample_d + 0.01;				# 1/A
+	q = q_rlu * 2.*pi/sample_d;
+	dE = -phonon_disp(sample_vel, sample_m, q, sample_d);	# meV
+
+	k_i = lam2k(lam);
+	E_i = k2E(k_i);
+
+	E_f = E_i - dE;
+	k_f = E2k(E_f);
+	lam_f = E2lam(E_f);
+
+	[theta_m, theta_a, theta_s, ttheta_s] = hkl2tas(sample_d,sample_d,sample_d, pi/2.,pi/2.,pi/2., 
+							[1.,0.,0.],[0.,1.,0.], 2.,q_rlu,0., 
+							k_i,k_f, mono_d/mono_order,ana_d/ana_order);
+	theta_m = -theta_m;
+	theta_a = -theta_a;
+
+
+	print("q = " + q + " 1/A");
 	print("E = " + dE + " meV");
 
+	emon_range = abs(dE*2.);
 	
+
 	# -------------------------------------------------------------------------------- 
 	# MIEZE stuff
 	L_sample_ana = 0.5;
@@ -63,34 +82,12 @@ main()
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
 
-	tau = 100.;
+	tau = 30.;
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
+
+	print("det_offs = " + det_offs + " m");
 	# -------------------------------------------------------------------------------- 
-
-
-
-	# -------------------------------------------------------------------------------- 
-	# TAS stuff
-
-	k_i = lam2k(lam);
-	E_i = k2E(k_i);
-	mono_tt = -angle_mono_tt(mono_d/mono_order, k_i);
-
-	# sample_d = mono_d/mono_order;
-	# Q = mono_Q(sample_d);
-
-	E_f = E_i - dE;
-	k_f = E2k(E_f);
-	lam_f = E2lam(E_f);
-
-	sample_tt = angle_sample_tt(k_i, k_f, Q);
-	#sample_tt = mono_tt;
-
-	ana_tt = -angle_mono_tt(ana_d/ana_order, k_f);
-
-	emon_range = abs(dE*2.);
-	# --------------------------------------------------------------------------------
 
 
 
@@ -105,7 +102,7 @@ main()
 
 
 
-	tilts = linspace(-20., 20., 24);
+	tilts = linspace(-10., 20., 24);
 	indices = linspace(0, vec_size(tilts)-1, vec_size(tilts));
 	global contrasts = vec(vec_size(tilts));
 	global contrasts_err = vec(vec_size(tilts));
@@ -123,10 +120,10 @@ main()
 			+ " dDistMonoSample=" +  L_mono_sample
 			+ " dDistSampleAna=" + L_sample_ana
 			+ " dDistAnaDet=" + L_ana_det
-			+ " dMonoTheta=" + mono_tt/2 /pi*180.
-			+ " dAnaTheta=" + ana_tt/2 /pi*180.
-			+ " dSampleTheta=" + sample_tt/2 /pi*180.
-			+ " dSampleTwoTheta=" + sample_tt /pi*180.
+			+ " dMonoTheta=" + theta_m /pi*180.
+			+ " dAnaTheta=" + theta_a /pi*180.
+			+ " dSampleTheta=" + theta_s /pi*180.
+			+ " dSampleTwoTheta=" + ttheta_s /pi*180.
 			+ " bAutoSetAngles=0" 
 			+ " iSample=" + sample_idx
 			+ " dDetOffs=" + det_offs

@@ -15,4 +15,24 @@
 void *my_popen(const char* pcCmd, const char* pcType="w");
 int my_pclose(void*);
 
+#ifdef __CYGWIN__
+	#include "string.h"
+
+	// missing functions
+	namespace std
+	{
+		template<typename T, class t_str=std::string>
+		t_str to_string(T t)
+		{
+			return var_to_str<T, t_str>(t);
+		}
+
+		template<class t_str=std::string>
+		double stod(const t_str& str)
+		{
+			return str_to_var<double, t_str>(str);
+		}
+	}
+#endif
+
 #endif

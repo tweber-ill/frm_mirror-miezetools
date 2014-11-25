@@ -12,6 +12,7 @@
 #include "exception.h"
 #include "math.h"
 #include "log.h"
+#include "traits.h"
 
 #include <cmath>
 
@@ -352,27 +353,87 @@ typename matrix_type::value_type trace(const matrix_type& mat)
 }
 
 
-
-
-template<class matrix_type=ublas::matrix<double> >
-bool isnan(const matrix_type& mat)
+// -----------------------------------------------------------------------------
+template<typename T, class FKT, const int iDim=get_type_dim<T>::value>
+struct is_nan_or_inf_impl
 {
-	for(unsigned int i=0; i<mat.size1(); ++i)
-		for(unsigned int j=0; j<mat.size2(); ++j)
-			if(std::isnan(mat(i,j)))
+	is_nan_or_inf_impl(const FKT&) {}
+	bool operator()(T) const { throw Err("No implementation of is_nan_or_inf!"); }
+};
+
+template<typename real_type, class FKT>
+struct is_nan_or_inf_impl<real_type, FKT, 0>	// scalar impl.
+{
+	const FKT& m_fkt;
+	is_nan_or_inf_impl(const FKT& fkt) : m_fkt(fkt) {}
+	bool operator()(real_type d) const { return m_fkt(d); }
+};
+
+template<typename vec_type, class FKT>
+struct is_nan_or_inf_impl<vec_type, FKT, 1>		// vector impl.
+{
+	const FKT& m_fkt;
+	is_nan_or_inf_impl(const FKT& fkt) : m_fkt(fkt) {}
+
+	bool operator()(const vec_type& vec) const
+	{
+		for(unsigned int i=0; i<vec.size(); ++i)
+			if(m_fkt(vec[i]))
 				return true;
-	return false;
+		return false;
+	}
+};
+
+template<typename mat_type, class FKT>
+struct is_nan_or_inf_impl<mat_type, FKT, 2>		// matrix impl.
+{
+	const FKT& m_fkt;
+	is_nan_or_inf_impl(const FKT& fkt) : m_fkt(fkt) {}
+
+	bool operator()(const mat_type& mat) const
+	{
+		for(unsigned int i=0; i<mat.size1(); ++i)
+			for(unsigned int j=0; j<mat.size2(); ++j)
+				if(m_fkt(mat(i,j)))
+					return true;
+		return false;
+	}
+};
+
+template<class T=ublas::matrix<double> >
+bool isnan(const T& mat)
+{
+	typedef typename underlying_value_type<T>::value_type real_type;
+
+	using fkt = std::function<bool(real_type)>;
+	fkt stdisnan = (bool(*)(real_type))std::isnan;
+	is_nan_or_inf_impl<T, fkt> _isnan(stdisnan);
+	return _isnan(mat);
 }
 
-template<class matrix_type=ublas::matrix<double> >
-bool isinf(const matrix_type& mat)
+template<class T=ublas::matrix<double> >
+bool isinf(const T& mat)
 {
-	for(unsigned int i=0; i<mat.size1(); ++i)
-		for(unsigned int j=0; j<mat.size2(); ++j)
-			if(std::isinf(mat(i,j)))
-				return true;
-	return false;
+	typedef typename underlying_value_type<T>::value_type real_type;
+
+	using fkt = std::function<bool(real_type)>;
+	fkt stdisinf = (bool(*)(real_type))std::isinf;
+	is_nan_or_inf_impl<T, fkt> _isinf(stdisinf);
+	return _isinf(mat);
 }
+
+template<class T=ublas::matrix<double> >
+bool is_nan_or_inf(const T& mat)
+{
+	typedef typename underlying_value_type<T>::value_type real_type;
+
+	using fkt = std::function<bool(real_type)>;
+	fkt stdisnaninf = [](real_type d)->bool { return std::isnan(d) || std::isinf(d); };
+	is_nan_or_inf_impl<T, fkt> _isnaninf(stdisnaninf);
+	return _isnaninf(mat);
+}
+// -----------------------------------------------------------------------------
+
 
 // code for inverse based on boost/libs/numeric/ublas/test/test_lu.cpp
 template<typename T=double>
