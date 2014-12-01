@@ -10,7 +10,7 @@ __init__()
 #	global INSTR = "tasmieze";
 #	global INSTR = "tasmieze_nomono";
 	global INSTR = "tasmieze_esstst";
-	global num_neutrons = 1e6;
+	global num_neutrons = 1e5;
 
 	print("Running on " + interp_ver());
 
@@ -37,8 +37,8 @@ main()
 	mono_ana_width = 0.005;
 	mono_ana_mosaic = 30.0;
 	sample_idx = 100;
-	sample_width = 0.004;
-	sample_depth = 0.002;
+	sample_width = 0.01;
+	sample_depth = 0.01;
 	sample_d = 4.95;
 	sample_b = 1.0;
 	sample_m = 207.0;
@@ -74,7 +74,7 @@ main()
 
 	# -------------------------------------------------------------------------------- 
 	# MIEZE stuff
-	L_sample_ana = 0.5;
+	L_sample_ana = 1.0;
 	L_ana_det = 0.5;
 	L_mono_sample = 3.;
 	L_mono_mieze = 0.5;
@@ -84,7 +84,7 @@ main()
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
 
-	tau = 25.;
+	tau = 10.;
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
 

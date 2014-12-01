@@ -339,41 +339,45 @@ COMPONENT coil0_rf = Pol_simpleBfield(
 	fieldFunction = coil0_rf_field, Bx=0, By=0, Bz=0, filename = 0,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dDistMonoMieze) RELATIVE MonoAxisEnd
+		AT (0.0, 0.0, dDistMonoMieze-0.5*dMiezeCoilThick) RELATIVE MonoAxisEnd
 		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 COMPONENT coil0_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_rf)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil0_rf
-		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+		AT (0.0, 0.0, dMiezeCoilThick) RELATIVE coil0_rf
+		//AT (0.0, 0.0, dDistMonoMieze+dMiezeCoilThick) RELATIVE MonoAxisEnd
+		//ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 
 COMPONENT coil0_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_B0)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeCoilThick+dB0BrfDist)  RELATIVE coil0_rf
-		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+		AT (0.0, 0.0, dMiezeCoilThick+2*dB0BrfDist)  RELATIVE coil0_B0
+		//AT (0.0, 0.0, dDistMonoMieze+dMiezeCoilThick+dB0BrfDist)  RELATIVE MonoAxisEnd
+		//ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 
 
 COMPONENT coil1_B0 = Pol_simpleBfield(
 	fieldFunction = coil1_B0_field, Bx=0, By=0, Bz=0, filename = 0,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick+2*dB0BrfDist)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeL1-dB0BrfDist) RELATIVE coil0_rf
+		AT (0.0, 0.0, dDistMonoMieze+dMiezeL1-dB0BrfDist) RELATIVE MonoAxisEnd
 		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 
 COMPONENT coil1_rf = Pol_simpleBfield(
 	fieldFunction = coil1_rf_field, Bx=0, By=0, Bz=0, filename = 0,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeL1) RELATIVE coil0_rf
+		AT (0.0, 0.0, dDistMonoMieze+dMiezeL1-0.5*dMiezeCoilThick) RELATIVE MonoAxisEnd
 		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 COMPONENT coil1_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_rf)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil1_rf
-		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+		AT (0.0, 0.0, dMiezeCoilThick) RELATIVE coil1_rf
+		//AT (0.0, 0.0, dDistMonoMieze+dMiezeL1+dMiezeCoilThick)  RELATIVE MonoAxisEnd
+		//ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 
 COMPONENT coil1_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_B0)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeCoilThick+dB0BrfDist)  RELATIVE coil1_rf
-		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+		AT (0.0, 0.0, dMiezeCoilThick+2*dB0BrfDist)  RELATIVE coil1_B0
+		//AT (0.0, 0.0, dDistMonoMieze+dMiezeL1+dMiezeCoilThick+dB0BrfDist) RELATIVE MonoAxisEnd
+		//ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 		EXTEND
 		%{
 			p *= 0.5 * (1. + sx);
