@@ -1,4 +1,4 @@
-// gcc -o mergetof mergetof.cpp ../helper/file.cpp ../helper/string.cpp ../helper/rand.cpp ../helper/comp.cpp -lstdc++ -lQtCore -lboost_iostreams -std=c++11
+// gcc -o mergetof mergetof.cpp ../../helper/string.cpp ../../helper/comp.cpp ../../helper/log.cpp ../../helper/file.cpp ../../helper/rand.cpp -lstdc++ -std=c++11 -lboost_iostreams -lQtCore
 
 #include <iostream>
 #include <fstream>
@@ -35,10 +35,10 @@ int main(int argc, char** argv)
 
 		const char* pcFile = argv[iInFile+1];
 		std::string strFile = pcFile;
-		
+
 		std::cout << strFile << "...";
 
-		std::string strExt = get_fileext(pcFile);
+		std::string strExt = get_fileext(strFile);
 		if(strExt == "gz" || strExt == "bz2" || strExt == "xz")
 		{
 			pTmp = new TmpFile();
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 
 		if(!pcStrings)
 		{
-			iRemaining = get_file_size(ifstr) - iTOFSize*sizeof(int);
+			iRemaining = unsigned(get_file_size(ifstr)) - iTOFSize*sizeof(int);
 			pcStrings = new char[iRemaining];
 			ifstr.read(pcStrings, iRemaining);
 
