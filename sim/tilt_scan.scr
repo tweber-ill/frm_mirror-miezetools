@@ -27,13 +27,13 @@ main()
 	use_cpp = 0;
 
 	lam = 2.36;		# A
-	dlam = 0.05 * lam;
+	dlam = 0.01 * lam;
 
 	mono_ana_ideal = 0;
 	mieze_ideal = 0;
 
 	source_width = 0.001;
-	det_width = 0.02;
+	det_width = 0.01;
 	mono_ana_width = 0.005;
 	mono_ana_mosaic = 30.0;
 	sample_idx = 100;
@@ -45,7 +45,7 @@ main()
 	sample_vel = 40.;
 
 
-	q_rlu = 0.1;						# rlu
+	q_rlu = 0.075;						# rlu
 	#Q = 2.* 2.*pi/sample_d + 0.01;				# 1/A
 	q = q_rlu * 2.*pi/sample_d;
 	dE = -phonon_disp(sample_vel, sample_m, q, sample_d);	# meV
@@ -84,7 +84,7 @@ main()
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
 
-	tau = 10.;
+	tau = 25.;
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
 
@@ -104,7 +104,7 @@ main()
 
 
 
-	tilts = linspace(-5., 30., 24);
+	tilts = linspace(-5., 30., 16);
 	indices = linspace(0, vec_size(tilts)-1, vec_size(tilts));
 	global contrasts = vec(vec_size(tilts));
 	global contrasts_err = vec(vec_size(tilts));
