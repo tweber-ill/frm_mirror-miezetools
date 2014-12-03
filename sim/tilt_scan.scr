@@ -84,7 +84,7 @@ main()
 	Ls = L_sample_ana + L_ana_det;
 	L2 = Ls + L_mono_sample - L1 - L_mono_mieze;
 
-	tau = 25.;
+	tau = 20.;
 	f1f2 = mieze_f1f2(L1, L2, Ls, lam, tau);
 	det_offs = mieze_det_offs(L1, L2-Ls, f1f2[0], f1f2[1], lam, -dE);
 

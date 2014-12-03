@@ -32,7 +32,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/loadtxt.o obj/plotgl.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o obj/roi.o \
 	obj/chi2.o obj/fitter.o obj/functions.o obj/parser.o obj/freefit.o \
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o \
-	obj/linalg.o obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
+	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
 	obj/spec_char.o obj/string_map.o obj/log.o
 	${CC} ${FLAGS} -o bin/cattus $+ ${LIBS}
@@ -115,8 +115,6 @@ obj/string_map.o: helper/string_map.cpp helper/string_map.h
 obj/spec_char.o: helper/spec_char.cpp helper/spec_char.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/xml.o: helper/xml.cpp helper/xml.h
-	${CC} ${FLAGS} -c -o $@ $<
-obj/linalg.o: helper/linalg.cpp helper/linalg.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/linalg2.o: helper/linalg2.cpp helper/linalg2.h
 	${CC} ${FLAGS} -c -o $@ $<

@@ -292,40 +292,51 @@ COMPONENT MonoAxisEnd = Arm()
 //----------------------------------------------------------------------------------------------------
 // MIEZE
 
+COMPONENT MiezeAxisBegin = Arm()
+	AT (0, 0, dDistMonoMieze) RELATIVE MonoAxisEnd
+
+
 COMPONENT MiezeBox = MIEZE_box(N=1,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, 
 	L1 = dMiezeL1,
 	f1 = dMiezeF1, f2 = dMiezeF2, coil_thickness = dMiezeCoilThick,
 	coil_tilt = dMiezeCoilTilt)
 		WHEN(bMiezeIdeal == 1)
-		AT (0, 0, dDistMonoMieze) RELATIVE MonoAxisEnd
+		AT (0, 0, 0) RELATIVE MiezeAxisBegin
 		EXTEND
 		%{
 			if(bAbsorbNonScattered && !SCATTERED)
 				ABSORB;
 		%}
 
+		
+COMPONENT MiezeCoil0Mid = Arm()
+	AT (0, 0, 0.5*dMiezeCoilThick) RELATIVE MiezeAxisBegin
 
 COMPONENT coil0 = Pol_simpleBfield(
 	fieldFunction = coil0_field, Bx=0, By=0, Bz=0, filename = 0,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dDistMonoMieze) RELATIVE MonoAxisEnd
+		AT (0.0, 0.0, -0.5*dMiezeCoilThick) RELATIVE MiezeCoil0Mid
 		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 COMPONENT coil0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil0
+		AT (0.0, 0.0, 0.5*dMiezeCoilThick) RELATIVE MiezeCoil0Mid
 		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
+
+		
+COMPONENT MiezeCoil1Mid = Arm()
+	AT (0, 0, dMiezeL1 + 0.5*dMiezeCoilThick) RELATIVE MiezeCoil0Mid
 
 COMPONENT coil1 = Pol_simpleBfield(
 	fieldFunction = coil1_field, Bx=0, By=0, Bz=0, filename = 0,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=dMiezeCoilThick)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeL1) RELATIVE coil0
+		AT (0.0, 0.0, -0.5*dMiezeCoilThick) RELATIVE MiezeCoil1Mid
 		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 COMPONENT coil1_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1)
 		WHEN(bMiezeIdeal == 0)
-		AT (0.0, 0.0, dMiezeCoilThick)  RELATIVE coil1
+		AT (0.0, 0.0, 0.5*dMiezeCoilThick) RELATIVE MiezeCoil1Mid
 		ROTATED (0, dMiezeCoilTilt, 0) ABSOLUTE
 		EXTEND
 		%{

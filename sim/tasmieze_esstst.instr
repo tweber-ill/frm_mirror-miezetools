@@ -314,6 +314,7 @@ COMPONENT MonoAxisEnd = Arm()
 COMPONENT MiezeAxisBegin = Arm()
 	AT (0, 0, dDistMonoMieze) RELATIVE MonoAxisEnd
 
+
 COMPONENT MiezeBox = MIEZE_box(N=1,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, 
 	L1 = dMiezeL1,
