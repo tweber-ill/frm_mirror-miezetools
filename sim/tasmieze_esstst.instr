@@ -100,15 +100,15 @@ DEFINE INSTRUMENT TasMieze
 
  
 	// collimators / slits
-	double dCollBeforeMonoDivH = 60.0,
-	double dCollBeforeSampleDivH = 60.0,
+	double dCollBeforeMonoDivH = 120.0,
+	double dCollBeforeSampleDivH = 30.0,
 	double dCollAfterSampleDivH = 30.0,
-	double dCollAfterAnaDivH = 30.0,
+	double dCollAfterAnaDivH = 120.0,
  
-	double dCollBeforeMonoDivV = 60.0,
-	double dCollBeforeSampleDivV = 60.0,
-	double dCollAfterSampleDivV = 30.0,
-	double dCollAfterAnaDivV = 30.0,
+	double dCollBeforeMonoDivV = 9999.0,
+	double dCollBeforeSampleDivV = 9999.0,
+	double dCollAfterSampleDivV = 9999.0,
+	double dCollAfterAnaDivV = 9999.0,
 
 
 

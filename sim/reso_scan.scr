@@ -9,7 +9,7 @@ __init__()
 {
 #	global INSTR = "tasmieze";
 	global INSTR = "tasmieze_nomono";
-	global num_neutrons = 2e5;
+	global num_neutrons = 4e5;
 
 	print("Running on " + interp_ver() + "\n");
 
@@ -45,19 +45,19 @@ main()
 	mono_ana_ideal = 0;
 	mieze_ideal = 0;
 
-	source_width = 0.001;
+	source_width = 0.01;
 	det_width = 0.02;
-	mono_ana_width = 0.005;
-	mono_ana_mosaic = 30.0;
+	mono_ana_width = 0.01;
+	mono_ana_mosaic = 60.0;
 	sample_idx = 200;
-	sample_width = 0.004;
-	sample_depth = 0.002;
+	sample_width = 0.01;
+	sample_depth = 0.01;
 	sample_d = 1.0;
 	sample_b = 1.0;
 	sample_m = 1.0;
 	sample_vel = 1.5;
 
-	Q = 0.1;							# 1/A
+	Q = 0.2;							# 1/A
 	dE = 0.;							# meV
 
 	print("Q = " + Q + " 1/A");

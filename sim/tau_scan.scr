@@ -145,7 +145,7 @@ main()
 			+ " dSampleB=" + sample_b
 			+ " dSampleM=" + sample_m
 			+ " dSamplePhononVel=" + sample_vel
-			+ " dTemp=100"
+			+ " dTemp=300"
 			+ " dDeltaEMon=" + emon_range
 			+ " dMonoWidth=" + mono_ana_width
 			+ " dMonoHeight=" + mono_ana_width
