@@ -60,6 +60,19 @@ void rf_rot_xy(double x, double y, double z, double t, double dOm, double dB_rf,
 	*pBz = 0.;
 }
 
+double fuzzy_border(double x, double amp/*=1.*/, double const_size/*=1.5*/, double x0/*=0.*/, double slope_scale/*=1.*/)
+{
+	x -= x0;
+	double(*fkt)(double) = tanh;
+
+	if(x<-const_size/2.)
+		return fkt(x*slope_scale + 3. + const_size/2.) * amp*0.5 + amp*0.5;
+	else if(x>=-const_size/2. && x<=const_size/2.)
+		return amp;
+	else
+		return fkt(-x*slope_scale + 3. + const_size/2.) * amp*0.5 + amp*0.5;
+}
+
 void random_seed()
 {
 	struct timeval tv;
