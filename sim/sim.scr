@@ -104,11 +104,15 @@ contrast(num_osc, datxy, dattof, want_plot)
 
 sim_evaluate(dir, show_plots)
 {
-	#dat = loadtxt(dir + "/oscpsd_1d.dat");
-	if(file_exists(dir + "/oscpsd_sph_1d.sim"))
-		dat = loadtxt(dir + "/oscpsd_sph_1d.sim");
-	else if(file_exists(dir + "/oscpsd_sph_1d.dat"))
-		dat = loadtxt(dir + "/oscpsd_sph_1d.dat");
+	#oscfile = dir + "/oscpsd_1d";
+	oscfile = dir + "/oscpsd_sph_1d";
+	oscfile_sim = oscfile + ".sim";
+	oscfile_dat = oscfile + ".dat";
+
+	if(file_exists(oscfile_sim))
+		dat = loadtxt(oscfile_sim);
+	else if(file_exists(oscfile_dat))
+		dat = loadtxt(oscfile_dat);
 	else
 		return 0;
 

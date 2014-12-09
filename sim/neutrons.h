@@ -18,6 +18,10 @@ double neutron_v(double dLam)
 	return HBAR*2.*M_PI / (dLam*1e-10 * MNEUTRON);
 }
 
+double neutron_k(double dLam)
+{
+	return 2.*M_PI / dLam;
+}
 
 double larmor_B(double dv, double dl, double dPhase)
 {

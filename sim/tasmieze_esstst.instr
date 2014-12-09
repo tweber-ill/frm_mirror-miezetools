@@ -194,8 +194,11 @@ INITIALIZE
 		dLam_f = dLam;
 
 	double v_i = neutron_v(dLam);
-	double v_f = neutron_v(dLam_f);
+	double k_i = neutron_k(dLam);
 	E_i = VS2E*v_i*v_i;
+
+	double v_f = neutron_v(dLam_f);
+	double k_f = neutron_k(dLam_f);
 	E_f = VS2E*v_f*v_f;
 
 	if(bAutoSetAngles)
@@ -221,10 +224,10 @@ INITIALIZE
 
 	printf("--------------------------------------------------------------------------------\n");
 	printf("Ideal: Mono=%d, Ana=%d, MIEZE=%d\n", bMonoIdeal, bAnaIdeal, bMiezeIdeal);
-	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
+	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV, k_i=%f /A\n", dLam, v_i, E_i, k_i);
 	//printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
 	printf("Sample: theta_s=%f deg, 2theta_s=%f deg,\n"
-		"\texpected lam_f=%f A, v_f=%f m/s, E_f=%f meV\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f, E_f);
+		"\texpected lam_f=%f A, v_f=%f m/s, E_f=%f meV, k_f=%f /A\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f, E_f, k_f);
 	printf("Analyser: theta_a=%f deg, 2thetaa_=%f deg\n", dAnaTheta, 2.*dAnaTheta);
 
 
@@ -338,7 +341,7 @@ COMPONENT coil0_B0 = Pol_simpleBfield(
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=2*dB0BrfDist)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, -dB0BrfDist) RELATIVE MiezeCoil0Mid
-		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid
+		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid*/
 
 COMPONENT coil0_rf = Pol_simpleBfield(
 	fieldFunction = coil0_rf_field, Bx=0, By=0, Bz=0, filename = 0,
@@ -354,7 +357,7 @@ COMPONENT coil0_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_rf)
 COMPONENT coil0_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_B0)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dB0BrfDist) RELATIVE MiezeCoil0Mid
-		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid
+		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid*/
 
 
 
@@ -366,7 +369,7 @@ COMPONENT coil1_B0 = Pol_simpleBfield(
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=2*dB0BrfDist)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, -dB0BrfDist) RELATIVE MiezeCoil1Mid
-		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid
+		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid*/
 
 COMPONENT coil1_rf = Pol_simpleBfield(
 	fieldFunction = coil1_rf_field, Bx=0, By=0, Bz=0, filename = 0,
@@ -382,7 +385,7 @@ COMPONENT coil1_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_rf)
 COMPONENT coil1_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_B0)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dB0BrfDist)  RELATIVE MiezeCoil1Mid
-		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid
+		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid*/
 		EXTEND
 		%{
 			p *= 0.5 * (1. + sx);
@@ -539,7 +542,7 @@ COMPONENT lam = L_monitor(
 */
 
 COMPONENT oscpsd_sph = Osc_PSD_monitor(
-	nchan = 32, nx = 128, ny = 128, filename = "oscpsd_sph",
+	nchan = 64, nx = 256, ny = 256, filename = "oscpsd_sph",
 	xwidth = dDetWidth, yheight = dDetHeight, geo = 1,
 	radius = dMiezeLs+dDetOffs,
 	thetamin = -dDetSphTheta, thetamax = dDetSphTheta,
@@ -556,11 +559,11 @@ COMPONENT E_mon_post_ana = E_monitor(
 		AT (0,0,0) RELATIVE DetAxis
 
 COMPONENT psd = PSD_monitor(
-	nx = 128, ny = 128, restore_neutron = 1, filename = "psd",
+	nx = 256, ny = 256, restore_neutron = 1, filename = "psd",
 	xwidth = dDetWidth, yheight = dDetHeight)
 		AT (0, 0, 0) RELATIVE DetAxis
 
-COMPONENT tof = TOF_monitor(nt=128, 
+COMPONENT tof = TOF_monitor(nt=256, 
 		tmin=(dDetTofBase-dMiezeNumOsc/dMiezeFm)*1e6, 
 		tmax=(dDetTofBase+dMiezeNumOsc/dMiezeFm)*1e6, 
 	xwidth = dDetWidth, yheight = dDetHeight, 
@@ -569,7 +572,7 @@ COMPONENT tof = TOF_monitor(nt=128,
 		AT (0, 0, 0) RELATIVE DetAxis
 
 COMPONENT oscpsd = Osc_PSD_monitor(
-	nchan=32, nx=128, ny=128, filename="oscpsd",
+	nchan=64, nx=256, ny=256, filename="oscpsd",
 	xwidth = dDetWidth, yheight = dDetHeight, geo = 0,
 	period = dMiezeNumOsc/dMiezeFm,
 	restore_neutron = 1)

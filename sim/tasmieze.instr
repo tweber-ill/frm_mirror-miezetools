@@ -173,8 +173,11 @@ INITIALIZE
 		dLam_f = dLam;
 
 	double v_i = neutron_v(dLam);
-	double v_f = neutron_v(dLam_f);
+	double k_i = neutron_k(dLam);
 	E_i = VS2E*v_i*v_i;
+
+	double v_f = neutron_v(dLam_f);
+	double k_f = neutron_k(dLam_f);
 	E_f = VS2E*v_f*v_f;
 
 	if(bAutoSetAngles)
@@ -200,10 +203,10 @@ INITIALIZE
 
 	printf("--------------------------------------------------------------------------------\n");
 	printf("Ideal: Mono=%d, Ana=%d, MIEZE=%d\n", bMonoIdeal, bAnaIdeal, bMiezeIdeal);
-	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV\n", dLam, v_i, E_i);
+	printf("Source: lam_i=%f A, v_i=%f m/s, E_i=%f meV, k_i=%f /A\n", dLam, v_i, E_i, k_i);
 	printf("Monochromator: theta_m=%f deg, 2theta_m=%f deg\n", dMonoTheta, 2.*dMonoTheta);
 	printf("Sample: theta_s=%f deg, 2theta_s=%f deg,\n"
-		"\texpected lam_f=%f A, v_f=%f m/s, E_f=%f meV\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f, E_f);
+		"\texpected lam_f=%f A, v_f=%f m/s, E_f=%f meV, k_f=%f /A\n", dSampleTheta, dSampleTwoTheta, dLam_f, v_f, E_f, k_f);
 	printf("Analyser: theta_a=%f deg, 2thetaa_=%f deg\n", dAnaTheta, 2.*dAnaTheta);
 
 
