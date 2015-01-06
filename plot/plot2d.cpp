@@ -25,25 +25,15 @@ Plot2d::Plot2d(QWidget* pParent, const char* pcTitle, bool bCountData, bool bPha
 			  m_bLog(bCountData), m_bCountData(bCountData), m_bCyclicData(0),
 			  m_bPhaseData(bPhaseData)
 {
-#ifdef USE_MGL
-	CreateMGL();
-#endif
-
 	this->setAttribute(Qt::WA_DeleteOnClose);
 	if(pcTitle) this->setWindowTitle(QString(pcTitle));
 
-#ifndef USE_MGL
 	this->setMouseTracking(true);
-#endif
 }
 
 Plot2d::Plot2d(const Plot2d& plot)
 			: SubWindowBase(plot.parentWidget()), m_pImg(0)
 {
-#ifdef USE_MGL
-	CreateMGL();
-#endif
-
 	this->m_bLog = plot.m_bLog;
 	this->m_bCountData = plot.m_bCountData;
 	this->m_bCyclicData = plot.m_bCyclicData;
@@ -61,18 +51,6 @@ Plot2d::Plot2d(const Plot2d& plot)
 	this->plot(plot.GetData2());
 }
 
-#ifdef USE_MGL
-void Plot2d::CreateMGL()
-{
-	m_pMGL = new QMathGL(this);
-	m_pMGL->setDraw(this);
-	m_pMGL->setZoom(false);
-	m_pMGL->autoResize = 0;
-	QGridLayout *pLayout = new QGridLayout(this);
-	pLayout->addWidget(m_pMGL, 0, 0, 1, 1);
-}
-#endif
-
 SubWindowBase* Plot2d::clone() const
 {
 	Plot2d* pPlot = new Plot2d(*this);
@@ -82,9 +60,6 @@ SubWindowBase* Plot2d::clone() const
 Plot2d::~Plot2d()
 {
 	clear();
-#ifdef USE_MGL
-	delete m_pMGL;
-#endif
 }
 
 void Plot2d::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts)
@@ -110,7 +85,6 @@ void Plot2d::clear()
 	}
 }
 
-#ifndef USE_MGL
 uint Plot2d::GetSpectroColor01(double dVal) const
 {
 	const uint blue = 0xff0000ff;
@@ -174,7 +148,6 @@ uint Plot2d::GetSpectroColor(double dVal) const
 	double dSpec = (dVal-dMin) / (dMax-dMin);
 	return GetSpectroColor01(dSpec);
 }
-#endif
 
 QSize Plot2d::minimumSizeHint() const
 {
@@ -183,15 +156,10 @@ QSize Plot2d::minimumSizeHint() const
 
 void Plot2d::resizeEvent(QResizeEvent *pEvent)
 {
-#ifdef USE_MGL
-	m_pMGL->adjust();
-#endif
 }
 
 void Plot2d::paintEvent (QPaintEvent *pEvent)
 {
-#ifdef USE_MGL
-#else
 	if(!m_pImg) return;
 	QSize size = this->size();
 
@@ -265,7 +233,6 @@ void Plot2d::paintEvent (QPaintEvent *pEvent)
 
 
 	painter.restore();
-#endif
 }
 
 void Plot2d::plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr)
@@ -304,20 +271,6 @@ void Plot2d::RefreshPlot()
 {
 	clear();
 
-#ifdef USE_MGL
-	m_pImg = new mglData(m_dat.GetWidth(), m_dat.GetHeight());
-	for(uint iY=0; iY<m_dat.GetHeight(); ++iY)
-		for(uint iX=0; iX<m_dat.GetWidth(); ++iX)
-		{
-			double dVal = m_dat.GetValRaw(iX, iY);
-			//if(m_bLog) dVal = safe_log10(dVal);
-			m_pImg->a[iY*m_dat.GetWidth() + iX] = dVal;
-		}
-
-	m_pMGL->update();
-
-#else
-
 	m_pImg = new QImage(m_dat.GetWidth(), m_dat.GetHeight(), QImage::Format_RGB32);
 
 	for(uint iY=0; iY<m_dat.GetHeight(); ++iY)
@@ -331,8 +284,6 @@ void Plot2d::RefreshPlot()
 	}
 
 	this->repaint(rect());
-#endif
-
 	RefreshStatusMsgs();
 }
 
@@ -343,12 +294,7 @@ void Plot2d::SetLog(bool bLog)
 
 	m_bLog = bLog;
 
-#ifdef USE_MGL
-	m_pMGL->update();
-	RefreshStatusMsgs();
-#else
 	RefreshPlot();
-#endif
 }
 
 bool Plot2d::GetLog() const
@@ -378,47 +324,8 @@ void Plot2d::RefreshStatusMsgs()
 	emit SetStatusMsg(strTitle.toAscii().data(), 0);
 }
 
-#ifdef USE_MGL
-int Plot2d::Draw(mglGraph *pg)
-{
-	pg->LoadFont("heros");
-	pg->Box();
-	pg->Axis();
-
-	double dMin = m_dat.GetMin();
-	double dMax = m_dat.GetMax();
-	if(m_bLog)
-	{
-		dMin = floor(safe_log10(dMin));
-		dMax = ceil(safe_log10(dMax));
-
-		if(m_bCountData)
-		{
-			if(dMin < -1)
-				dMin = -1;
-		}
-
-		pg->SetRange('c', pow(10., dMin), pow(10., dMax));
-		pg->SetFunc("","","","lg(c)");
-	}
-	else
-	{
-		pg->SetRange('c', dMin, dMax);
-	}
-
-	pg->Dens(*m_pImg);
-	pg->Colorbar(">");
-
-    //pg->Title(m_strTitle.toStdString().c_str(), "", -1);
-    pg->Label('x', m_strXAxis.toStdString().c_str(), 0);
-    pg->Label('y', m_strYAxis.toStdString().c_str(), 0);
-
-	return 0;
-}
-#endif
 
 
-#ifndef USE_MGL
 void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 {
 	const QPoint& pt = pEvent->pos();
@@ -526,7 +433,6 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 		this->setCursor(Qt::ArrowCursor);
 	}
 }
-#endif
 
 void Plot2d::SetROI(const Roi* pROI, bool bAntiRoi)
 {

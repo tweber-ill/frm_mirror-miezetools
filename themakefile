@@ -18,8 +18,8 @@ MATH_LIBS = -lMinuit2 -lfftw3
 MISC_LIBS = 
 LAPACK_LIBS = -L/usr/local/lib64 -llapacke -llapack -lblas -lgfortran
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
-	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns -lQtOpenGL \
-	-lGL -lGLU -lX11
+	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns
+#QT_LIBS += -lQtOpenGL -lGL -lGLU -lX11
 LIBS_FORMULA = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${STD_LIBS}
 LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}
 
@@ -29,7 +29,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o obj/FitDlg.o obj/ListDlg.o \
 	obj/RoiDlg.o obj/SettingsDlg.o obj/PsdPhaseDlg.o obj/RadialIntDlg.o obj/ExportDlg.o \
 	obj/PlotPropDlg.o obj/fourier.o obj/string.o obj/xml.o obj/loadcasc.o obj/loadnicos.o \
-	obj/loadtxt.o obj/plotgl.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o obj/roi.o \
+	obj/loadtxt.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o obj/roi.o \
 	obj/chi2.o obj/fitter.o obj/functions.o obj/parser.o obj/freefit.o \
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o \
 	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
@@ -142,8 +142,8 @@ obj/plot.o: plot/plot.cpp plot/plot.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/plot_nopars.o: plot/plot.cpp plot/plot.h
 	${CC} ${FLAGS} -DNO_PARSER -c -o $@ $<
-obj/plotgl.o: plot/plotgl.cpp plot/plotgl.h
-	${CC} ${FLAGS} -c -o $@ $<
+#obj/plotgl.o: plot/plotgl.cpp plot/plotgl.h
+#	${CC} ${FLAGS} -c -o $@ $<
 obj/plot2d.o: plot/plot2d.cpp plot/plot2d.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/plot3d.o: plot/plot3d.cpp plot/plot3d.h

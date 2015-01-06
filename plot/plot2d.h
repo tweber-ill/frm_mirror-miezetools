@@ -13,21 +13,11 @@
 #include <QtGui/QKeyEvent>
 #include <vector>
 
-#ifdef USE_MGL
-	#include <mgl2/base_cf.h>
-	#include <mgl2/qt.h>
-	#include <mgl2/qmathgl.h>
-#endif
-
-
 #include "../main/subwnd.h"
 #include "../data/data.h"
 #include "../roi/roi.h"
 
 class Plot2d : public SubWindowBase
-					#ifdef USE_MGL
-						, mglDraw
-					#endif
 { Q_OBJECT
 protected:
 	virtual QSize	minimumSizeHint () const;
@@ -35,21 +25,13 @@ protected:
 	virtual void resizeEvent(QResizeEvent *pEvent);
 	virtual void RefreshStatusMsgs();
 
-#ifdef USE_MGL
-	QMathGL *m_pMGL;
-	void CreateMGL();
-#else
 	virtual void mouseMoveEvent(QMouseEvent* pEvent);
 	uint GetSpectroColor(double dVal) const;
 	uint GetSpectroColor01(double dVal) const;
-#endif
 
 	Data2 m_dat;
-#ifdef USE_MGL
-	mglData *m_pImg;
-#else
 	QImage *m_pImg;
-#endif
+
 	bool m_bLog;
 	bool m_bCountData;
 	bool m_bCyclicData;
@@ -72,10 +54,6 @@ public:
 	void plot(const Data2& dat);
 	void clear();
 	virtual void RefreshPlot();
-
-#ifdef USE_MGL
-	int Draw(mglGraph *pg);
-#endif
 
 	void SetLog(bool bLog);
 	bool GetLog() const;

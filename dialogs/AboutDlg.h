@@ -21,8 +21,7 @@ public:
 	AboutDlg(QWidget* pParent) : QDialog(pParent)
 	{
 		this->setupUi(this);
-		QObject::connect(btnAboutQt, SIGNAL(clicked()), this, SLOT(ShowAboutQt()));
-		
+		QObject::connect(btnAboutQt, SIGNAL(clicked()), this, SLOT(ShowAboutQt()));	
 		QString strLic;
 		strLic += "Cattus is free software: you can redistribute it and/or modify\n";
 		strLic += "it under the terms of the GNU General Public License as published by\n";
@@ -35,15 +34,16 @@ public:
 		strLic += "You should have received a copy of the GNU General Public License\n";
 		strLic += "along with Cattus.  If not, see <http://www.gnu.org/licenses/>.";
 
-		QString strBuild;
-		strBuild += "Built with CC version ";
-		strBuild += QString(__VERSION__);
+		QString strBuild = QString("Built with ");
+		strBuild += QString(BOOST_COMPILER);
+		strBuild += ".";
 
 		QString strDate;
 		strDate += "Build date: ";
 		strDate += QString(__DATE__);
 		strDate += ", ";
 		strDate += QString(__TIME__);
+		strDate += ".";
 
 		QString strLibs;
 		strLibs += "Uses Qt version ";
@@ -61,7 +61,7 @@ public:
 
 		this->labelTitle->setText("Cattus");
 		this->labelVersion->setText("Version 0.4");
-		this->labelAuthor->setText("Written by Tobias Weber, 2012-2014");
+		this->labelAuthor->setText("Written by Tobias Weber, 2012-2014.");
 		this->labelLic->setText(strLic);
 		this->labelBuild->setText(strBuild);
 		this->labelDate->setText(strDate);

@@ -52,6 +52,22 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 		QObject::connect(pRadio, SIGNAL(toggled(bool)), this, SLOT(CalcBraggReciprocal()));
 
 
+	//--------------------------------------------------------------------------------
+	// el. MIEZE
+
+	std::vector<QDoubleSpinBox*> vecMCondSpins = {spinMF1, spinMF2, spinML1, spinML2};
+	for(QDoubleSpinBox* pSpin : vecMCondSpins)
+	{
+		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeCond()));
+		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeTime()));
+	}
+
+	std::vector<QDoubleSpinBox*> vecMTimeSpins = {spinMLam, spinMTau, spinMLs};
+	for(QDoubleSpinBox* pSpin : vecMTimeSpins)
+	{
+		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeTime()));
+		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeCond()));
+	}
 
 
 	//--------------------------------------------------------------------------------
@@ -87,6 +103,8 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 
 
 	CalcNeutronLam();
+	CalcMiezeCond();
+	CalcMiezeTime();
 	CalcBraggDirect();
 	CalcBraggReciprocal();
 	CalcMIEZE();
@@ -845,6 +863,82 @@ void FormulaDlg::CalcPowderLines()
 		tablePowderLines->item(iRow, 0)->setText(vecPowderLines[iRow].strAngle.c_str());
 		tablePowderLines->item(iRow, 1)->setText(vecPowderLines[iRow].strQ.c_str());
 		tablePowderLines->item(iRow, 2)->setText(vecPowderLines[iRow].strPeaks.c_str());
+	}
+}
+
+
+// --------------------------------------------------------------------------------
+// el. MIEZE
+
+void FormulaDlg::CalcMiezeCond()
+{
+	typedef units::quantity<units::si::length> length;
+	typedef units::quantity<units::si::frequency> freq;
+
+	const bool bF1 = radioMF1->isChecked();
+	const bool bF2 = radioMF2->isChecked();
+	const bool bL1 = radioML1->isChecked();
+	const bool bL2 = radioML2->isChecked();
+
+	freq f1 = spinMF1->value() * 1000./units::si::second;
+	freq f2 = spinMF2->value() * 1000./units::si::second;
+	length L1 = spinML1->value() * 0.01*units::si::meter;
+	length L2 = spinML2->value() * 0.01*units::si::meter;
+
+	if(bF1)
+	{
+		f1 = f2/(L1/L2 + 1.);
+		spinMF1->setValue(double(f1 / 1000.*units::si::second));
+	}
+	else if(bF2)
+	{
+		f2 = (L1/L2 + 1.)*f1;
+		spinMF2->setValue(double(f2 / 1000.*units::si::second));
+	}
+	else if(bL1)
+	{
+		L1 = (f2/f1 - 1.)*L2;
+		spinML1->setValue(double(L1 / 0.01/units::si::meter));
+	}
+	else if(bL2)
+	{
+		L2 = L1/(f2/f1 - 1.);
+		spinML2->setValue(double(L2 / 0.01/units::si::meter));
+	}
+}
+
+void FormulaDlg::CalcMiezeTime()
+{
+	typedef units::quantity<units::si::length> length;
+	typedef units::quantity<units::si::time> time;
+	typedef units::quantity<units::si::frequency> freq;
+
+	const bool bF1 = radioMF1->isChecked();
+	const bool bF2 = radioMF2->isChecked();
+	const bool bLam = radioMLam->isChecked();
+	const bool bTau = radioMTau->isChecked();
+	const bool bLs = radioMLs->isChecked();
+
+	freq f1 = spinMF1->value() * 1000./units::si::second;
+	freq f2 = spinMF2->value() * 1000./units::si::second;
+	length Lam = spinMLam->value() * angstrom;
+	time Tau = spinMTau->value() * 1e-12 * units::si::second;
+	length Ls = spinMLs->value() * 0.01*units::si::meter;
+
+	if(bLam)
+	{
+		Lam = mieze_tau_lam(Tau, 2.*(f2-f1), Ls);
+		spinMLam->setValue(double(Lam / angstrom));
+	}
+	else if(bTau)
+	{
+		Tau = mieze_tau(2.*(f2-f1), Ls, Lam);
+		spinMTau->setValue(double(Tau / 1e-12 / units::si::second));
+	}
+	else if(bLs)
+	{
+		Ls = mieze_tau_Ls(Tau, 2.*(f2-f1), Lam);
+		spinMLs->setValue(double(Ls / 0.01/units::si::meter));
 	}
 }
 

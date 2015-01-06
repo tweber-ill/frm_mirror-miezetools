@@ -11,6 +11,7 @@
 #include "flags.h"
 #include "exception.h"
 #include "linalg.h"
+#include "linalg2.h"
 #include "log.h"
 
 #include <iostream>
@@ -23,6 +24,8 @@
 namespace ublas = boost::numeric::ublas;
 namespace math = boost::math;
 
+
+//------------------------------------------------------------------------------
 
 template<typename T> class Line;
 
@@ -115,6 +118,9 @@ public:
 };
 
 
+//------------------------------------------------------------------------------
+
+
 template<typename T> class Line
 {
 protected:
@@ -199,7 +205,7 @@ public:
 
 
 	// http://mathworld.wolfram.com/Line-PlaneIntersection.html
-	bool intersect(const Plane<T>& plane, T& t)
+	bool intersect(const Plane<T>& plane, T& t) const
 	{
 		const unsigned int N = m_vecDir.size();
 		if(N != 3)
@@ -307,6 +313,248 @@ std::ostream& operator<<(std::ostream& ostr, const Line<T>& line)
 	ostr << line.GetX0() << " + t*" << line.GetDir();
 	return ostr;
 }
+
+
+//------------------------------------------------------------------------------
+
+template<class T=double>
+class Quadric
+{
+protected:
+	// general: x^T Q x  +  r x  +  s  =  0
+	// here: x^T Q x + s  =  0
+	ublas::matrix<T> m_Q = ublas::zero_matrix<T>(3,3);
+	//ublas::vector<T> m_r = ublas::zero_vector<T>(3);
+	T m_s = 0;
+
+	ublas::vector<T> m_vecOffs = ublas::zero_vector<T>(3);
+
+public:
+	Quadric(unsigned int iDim)
+		: m_Q(ublas::zero_matrix<T>(iDim,iDim))/*, m_r(ublas::zero_vector<T>(iDim))*/
+	{}
+	Quadric(const ublas::matrix<T>& Q) : m_Q(Q) {}
+	Quadric(const ublas::matrix<T>& Q, /*const ublas::vector<T>& r,*/ T s)
+			: m_Q(Q), /*m_r(r),*/ m_s(s) {}
+	virtual ~Quadric() {}
+
+	const Quadric<T>& operator=(const Quadric<T>& quad)
+	{
+		this->m_Q = quad.m_Q;
+		//this->m_r = quad.m_r;
+		this->m_s = quad.m_s;
+		this->m_vecOffs = quad.m_vecOffs;
+
+		return *this;
+	}
+
+	Quadric<T>& operator=(Quadric<T>&& quad)
+	{
+		this->m_Q = std::move(quad.m_Q);
+		//this->m_r = std::move(quad.m_r);
+		this->m_s = std::move(quad.m_s);
+		this->m_vecOffs = std::move(quad.m_vecOffs);
+
+		return *this;
+	}
+
+	Quadric(const Quadric<T>& quad) { *this = quad; }
+	Quadric(Quadric<T>&& quad) { *this = quad; }
+
+	void SetOffset(const ublas::vector<T>& vec) { m_vecOffs = vec; }
+	const ublas::vector<T>& GetOffset() const { return m_vecOffs; }
+
+	const ublas::matrix<T>& GetQ() const { return m_Q; }
+	//const ublas::vector<T>& GetR() const { return m_r; }
+	T GetS() const { return m_s; }
+
+	void SetQ(const ublas::matrix<T>& Q) { m_Q = Q; }
+	//void SetR(const ublas::vector<T>& r) { m_r = r; }
+	void SetS(T s) { m_s = s; }
+
+	T operator()(const ublas::vector<T>& _x) const
+	{
+		ublas::vector<T> x = x-m_vecOffs;
+
+		ublas::vector<T> vecQ = ublas::prod(m_Q, x);
+		T dQ = ublas::inner_prod(x, vecQ);
+		//T dR = ublas::inner_prod(m_r, x);
+
+		return dQ /*+ dR*/ + m_s;
+	}
+
+	// remove column and row iIdx
+	void RemoveElems(unsigned int iIdx)
+	{
+		m_Q = remove_elems(m_Q, iIdx);
+		//m_r = remove_elem(m_r, iIdx);
+		m_vecOffs = remove_elem(m_vecOffs, iIdx);
+	}
+
+	void transform(const ublas::matrix<T>& S)
+	{
+		ublas::matrix<T> TS = ublas::trans(S);
+		ublas::matrix<T> QS = ublas::prod(m_Q, S);
+		m_Q = ublas::prod(TS, QS);
+	}
+
+	// Q = O D O^T
+	// O: eigenvecs, D: eigenvals
+	bool GetPrincipalAxes(ublas::matrix<T>& matEvecs, std::vector<T>& vecEvals) const
+	{
+		std::vector<ublas::vector<T> > evecs;
+		if(!eigenvec_sym(m_Q, evecs, vecEvals))
+		{
+			log_err("Cannot determine eigenvectors.");
+			return false;
+		}
+
+		sort_eigenvecs<double>(evecs, vecEvals, 1,
+			[](double d) -> double { return 1./std::sqrt(d); });
+
+		matEvecs = column_matrix(evecs);
+		return true;
+	}
+
+	// quad: x^T Q x + s = 0; line: x = x0 + t d
+	// (x0 + t d)^T Q (x0 + t d) + s = 0
+	// (x0 + t d)^T Q x0 + (x0 + t d)^T Q t d + s = 0
+	// (x0^T + t d^T) Q x0 + (x0^T + t d^T) Q t d + s = 0
+	// x0^T Q x0 + s  +  (d^T Q x0 + x0^T Q d) t  +  d^T Q d t^2 = 0
+	std::vector<T> intersect(const Line<T>& line) const
+	{
+		const ublas::matrix<T>& Q = GetQ();
+		const T& s = m_s;
+		const ublas::vector<T>& d = line.GetDir();
+		const ublas::vector<T> x0 = line.GetX0() - m_vecOffs;;
+
+		// solving at^2 + bt + c = 0 for t
+		ublas::vector<T> vecQd = ublas::prod(Q, d);
+		T a = ublas::inner_prod(d, vecQd);
+
+		ublas::vector<T> vecQx0 = ublas::prod(Q, x0);
+		T c = ublas::inner_prod(x0, vecQx0) + s;
+
+		T b = ublas::inner_prod(x0, vecQd);
+		b += ublas::inner_prod(d, vecQx0);
+
+		//std::cout << "a=" << a << ", b=" << b << ", c=" << c << std::endl;
+		return quadratic_solve(a,b,c);
+	}
+};
+
+template<class T=double>
+std::ostream& operator<<(std::ostream& ostr, const Quadric<T>& quad)
+{
+	ostr << "Q = " << quad.GetQ() << ", ";
+	//ostr << "r = " << quad.GetR() << ", ";
+	ostr << "s = " << quad.GetS();
+	return ostr;
+}
+
+
+template<class T=double>
+class QuadSphere : public Quadric<T>
+{
+protected:
+
+public:
+	QuadSphere(unsigned int iDim) : Quadric<T>(iDim) {}
+
+	QuadSphere(T r) : Quadric<T>(3)
+	{
+		this->m_Q(0,0) =
+		this->m_Q(1,1) =
+		this->m_Q(2,2) = 1./(r*r);
+
+		this->m_s = -1.;
+	}
+
+	QuadSphere(unsigned int iDim, T r) : Quadric<T>(iDim)
+	{
+		for(unsigned int i=0; i<iDim; ++i)
+			this->m_Q(i,i) = 1./(r*r);
+
+		this->m_s = -1.;
+	}
+
+	// only valid in principal axis system
+	T GetRadius() const { return 1./std::sqrt(this->m_Q(0,0)); }
+	T GetVolume() const { return get_ellipsoid_volume(this->m_Q); }
+
+	virtual ~QuadSphere() {}
+};
+
+
+/*
+ * this is a 1:1 C++ reimplementation of 'rc_int' from 'mcresplot' and 'rescal5'
+ * integrate over row/column iIdx
+ */
+template<class T = double>
+ublas::matrix<T> ellipsoid_gauss_int(const ublas::matrix<T>& mat, unsigned int iIdx)
+{
+	ublas::vector<T> b(mat.size1());
+	for(unsigned int i=0; i<mat.size1(); ++i)
+		b[i] = 2.*mat(i,iIdx);
+	b = remove_elem(b, iIdx);
+	ublas::matrix<T> bb = outer_prod(b,b)/4.;
+
+	ublas::matrix<T> m = remove_elems(mat, iIdx);
+	m -= bb/mat(iIdx, iIdx);
+	return m;
+}
+
+template<class T=double>
+class QuadEllipsoid : public Quadric<T>
+{
+protected:
+
+public:
+	QuadEllipsoid(unsigned int iDim) : Quadric<T>(iDim) {}
+
+	QuadEllipsoid(T a, T b) : Quadric<T>(2)
+	{
+		this->m_Q(0,0) = 1./(a*a);
+		this->m_Q(1,1) = 1./(b*b);
+
+		this->m_s = -1.;
+	}
+
+	QuadEllipsoid(T a, T b, T c) : Quadric<T>(3)
+	{
+		this->m_Q(0,0) = 1./(a*a);
+		this->m_Q(1,1) = 1./(b*b);
+		this->m_Q(2,2) = 1./(c*c);
+
+		this->m_s = -1.;
+	}
+
+	QuadEllipsoid(T a, T b, T c, T d) : Quadric<T>(4)
+	{
+		this->m_Q(0,0) = 1./(a*a);
+		this->m_Q(1,1) = 1./(b*b);
+		this->m_Q(2,2) = 1./(c*c);
+		this->m_Q(3,3) = 1./(d*d);
+
+		this->m_s = -1.;
+	}
+
+	virtual ~QuadEllipsoid() {}
+
+	// only valid in principal axis system
+	T GetRadius(unsigned int i) const { return 1./std::sqrt(this->m_Q(i,i)); }
+	T GetVolume() const { return get_ellipsoid_volume(this->m_Q); }
+
+	void GaussInt(unsigned int iIdx)
+	{
+		ublas::matrix<T> m_Qint = ellipsoid_gauss_int(this->m_Q, iIdx);
+		this->RemoveElems(iIdx);
+		this->m_Q = m_Qint;
+	}
+};
+
+
+//------------------------------------------------------------------------------
 
 
 template<typename T=double>

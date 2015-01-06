@@ -35,6 +35,9 @@ protected slots:
 	void CalcNeutronE();
 	void CalcNeutronT();
 
+	void CalcMiezeCond();
+	void CalcMiezeTime();
+
 	void CalcBraggDirect();
 	void CalcBraggReciprocal();
 
