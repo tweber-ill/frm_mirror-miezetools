@@ -8,6 +8,7 @@
 #include "../../helper/math.h"
 #include "../../helper/log.h"
 #include "../../helper/misc.h"
+#include "../../helper/interpolation.h"
 
 #include <limits>
 #include <algorithm>
@@ -21,7 +22,6 @@
 
 #include "gauss.h"
 #include "../chi2.h"
-#include "interpolation.h"
 
 #include "../../main/settings.h"
 

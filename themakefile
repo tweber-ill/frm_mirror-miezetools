@@ -171,7 +171,7 @@ obj/gauss-nd.o: fitter/models/gauss-nd.cpp fitter/models/gauss-nd.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/msin.o: fitter/models/msin.cpp fitter/models/msin.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/interpolation.o: fitter/models/interpolation.cpp fitter/models/interpolation.h
+obj/interpolation.o: helper/interpolation.cpp helper/interpolation.h
 	${CC} ${FLAGS} -c -o $@ $<
 
 

@@ -22,6 +22,7 @@
 #include "../main/subwnd.h"
 #include "../data/data.h"
 #include "../fitter/fitter.h"
+#include "../helper/funcmod.h"
 #include "../helper/string.h"
 
 enum PlotType

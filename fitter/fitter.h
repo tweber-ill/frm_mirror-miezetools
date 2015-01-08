@@ -57,6 +57,7 @@ std::ostream& operator<<(std::ostream& ostr, const FunctionModel& fkt);
 std::ostream& operator<<(std::ostream& ostr, const FunctionModel_nd& fkt);
 
 
+/*
 // parametric function
 class FunctionModel_param
 {
@@ -67,7 +68,7 @@ class FunctionModel_param
 		virtual boost::numeric::ublas::vector<double> operator()(double t) const = 0;
 		virtual const char* GetModelName() const = 0;
 };
-
+*/
 
 //----------------------------------------------------------------------
 #endif	// __FITTER__H__

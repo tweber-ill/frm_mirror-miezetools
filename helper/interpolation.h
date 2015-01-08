@@ -5,19 +5,19 @@
  * @date: 25-04-2013
  */
 
-#ifndef __MIEZE_INTERPOLATION__
-#define __MIEZE_INTERPOLATION__
+#ifndef __INTERPOLATION_H__
+#define __INTERPOLATION_H__
 
-#include "../fitter.h"
 #include <cmath>
 #include <boost/math/special_functions/binomial.hpp>
 #include <vector>
 #include <algorithm>
 
-#include "../../helper/math.h"
-#include "../../helper/geo.h"
-#include "../../helper/misc.h"
-#include "../../helper/log.h"
+#include "math.h"
+#include "geo.h"
+#include "misc.h"
+#include "log.h"
+#include "funcmod.h"
 
 
 // see:
