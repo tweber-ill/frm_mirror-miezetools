@@ -45,3 +45,5 @@ script/.codelite/*
 .settings/*
 cattus.mk
 cattus.txt
+tlibs-master.tar.bz2
+tlibs/*
