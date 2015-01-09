@@ -11,11 +11,11 @@
 #include "../fitter/models/msin.h"
 #include "../fitter/models/gauss.h"
 
-#include "../helper/string.h"
-#include "../helper/misc.h"
-#include "../helper/math.h"
-#include "../helper/fourier.h"
-#include "../helper/mieze.hpp"
+#include "../tlibs/string/string.h"
+#include "../tlibs/helper/misc.h"
+#include "../tlibs/math/math.h"
+#include "../tlibs/math/fourier.h"
+#include "../tlibs/math/mieze.hpp"
 
 #include "../plot/plot.h"
 #include "../plot/plot2d.h"
@@ -140,7 +140,7 @@ void FitDlg::FunctionChanged(const QString& strFkt)
 
 
 	std::string strTheFkt = strFkt.toStdString();
-	::trim(strTheFkt);
+	tl::trim(strTheFkt);
 	if(strTheFkt.length()==0)
 	{
 		labelStatus->setText("No function given.");
@@ -398,7 +398,7 @@ std::string FitDlg::GetTableString(QTableWidget* pTable) const
 
 		QTableWidgetItem* pItem1 = pTable->item(i,0);
 		std::string strVal1 = pItem1->text().toStdString();
-		::trim(strVal1);
+		tl::trim(strVal1);
 		if(strVal1.length() == 0)
 		{
 			if(bActive)
@@ -410,7 +410,7 @@ std::string FitDlg::GetTableString(QTableWidget* pTable) const
 
 		QTableWidgetItem* pItem2 = pTable->item(i,1);
 		std::string strVal2 = pItem2->text().toStdString();
-		::trim(strVal2);
+		tl::trim(strVal2);
 		if(strVal2.length() == 0)
 		{
 			if(bActive)
@@ -426,7 +426,7 @@ std::string FitDlg::GetTableString(QTableWidget* pTable) const
 
 	std::string str = ostr.str();
 	str = str.substr(0, str.length()-2);		// remove last "; "
-	::trim(str);
+	tl::trim(str);
 	//std::cout << str << std::endl;
 	return str;
 }
@@ -567,9 +567,9 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 	const double dMinCts = Settings::Get<int>("misc/min_counts");
 
-	Fourier *pFFT = 0;
+	tl::Fourier *pFFT = 0;
 	if(iFkt == FIT_MIEZE_SINE_PIXELWISE_FFT)
-		pFFT = new Fourier(iTCnt);
+		pFFT = new tl::Fourier(iTCnt);
 
 	for(unsigned int iY=0; iY<iH; ++iY)
 	{
@@ -594,7 +594,7 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 			{
 				double dThisNumOsc = dNumOsc;
 				MiezeSinModel *pModel = 0;
-				double dFreq = get_mieze_freq(px, dat1.GetLength(), dThisNumOsc);
+				double dFreq = tl::get_mieze_freq(px, dat1.GetLength(), dThisNumOsc);
 				bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat1.GetLength(), px, py, pyerr, &pModel);
 
 				dC = pModel->GetContrast();
@@ -724,12 +724,12 @@ void FitDlg::DoFit()
 			const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
 			dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
 
-			double *px = vec_to_array<double>(*pvecDatX);
-			double *py = vec_to_array<double>(*pvecDatY);
-			double *pyerr = vec_to_array<double>(*pvecDatYErr);
-			autodeleter<double> _a0(px, 1);
-			autodeleter<double> _a1(py, 1);
-			autodeleter<double> _a2(pyerr, 1);
+			double *px = tl::vec_to_array<double>(*pvecDatX);
+			double *py = tl::vec_to_array<double>(*pvecDatY);
+			double *pyerr = tl::vec_to_array<double>(*pvecDatYErr);
+			tl::autodeleter<double> _a0(px, 1);
+			tl::autodeleter<double> _a1(py, 1);
+			tl::autodeleter<double> _a2(pyerr, 1);
 			const unsigned int iLen = pvecDatX->size();
 
 			if(bAssumeErrorIfZero)

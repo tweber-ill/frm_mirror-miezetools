@@ -14,7 +14,7 @@
 #include <string>
 
 #include "../ui/ui_infos.h"
-#include "../helper/string.h"
+#include "../tlibs/string/string.h"
 #include "../helper/string_map.h"
 
 

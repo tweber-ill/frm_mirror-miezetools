@@ -7,7 +7,7 @@
 
 #include "data2.h"
 
-#include "../helper/math.h"
+#include "../tlibs/math/math.h"
 #include <limits>
 #include <boost/algorithm/minmax_element.hpp>
 
@@ -241,8 +241,8 @@ void Data2::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 			double dx1y0_err = vecErrs[iY0*m_iWidth + iX1];
 			double dx1y1_err = vecErrs[iY1*m_iWidth + iX1];
 
-			m_vecVals[iY*iNewWidth + iX] = bilinear_interp<double>(dx0y0, dx1y0, dx0y1, dx1y1, dX, dY);
-			m_vecErrs[iY*iNewHeight + iX] = bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
+			m_vecVals[iY*iNewWidth + iX] = tl::bilinear_interp<double>(dx0y0, dx1y0, dx0y1, dx1y1, dX, dY);
+			m_vecErrs[iY*iNewHeight + iX] = tl::bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
 
 			if(bKeepTotalCounts)
 			{
@@ -265,7 +265,7 @@ void Data2::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 }
 
 
-bool Data2::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+bool Data2::LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase)
 {
 	LoadRangeXml(xml, strBase);
 	m_roi.LoadXML(xml, strBase);

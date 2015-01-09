@@ -5,7 +5,7 @@
  */
 
 #include "blob.h"
-#include "log.h"
+#include "../tlibs/helper/log.h"
 #include <iostream>
 
 
@@ -30,7 +30,7 @@ void* Blob::map(qint64 iStart, qint64 iLen)
 	qint64 iSize = m_file.size();
 	if(iStart+iLen > iSize)
 	{
-		log_err("Tried to map beyond size.");
+		tl::log_err("Tried to map beyond size.");
 		return 0;
 	}
 

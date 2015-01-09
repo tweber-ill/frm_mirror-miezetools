@@ -77,7 +77,7 @@ public:
 
 	double SumY() const;
 
-	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob, bool bSaveActualData=1) const;
 };
 

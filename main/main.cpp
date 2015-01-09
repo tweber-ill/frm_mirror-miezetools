@@ -12,10 +12,10 @@
 #include <fstream>
 #include <string>
 
-#include "../helper/string.h"
-#include "../helper/spec_char.h"
-#include "../helper/rand.h"
-#include "../helper/log.h"
+#include "../tlibs/string/string.h"
+#include "../tlibs/string/spec_char.h"
+#include "../tlibs/math/rand.h"
+#include "../tlibs/helper/log.h"
 
 #ifdef Q_WS_X11
 //#include <X11/Xlib.h>
@@ -34,7 +34,7 @@ static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 	for(int iFile=0; iFile<iNum; ++iFile)
 	{
 		std::string strFile = pcFiles[iFile];
-		std::string strExt = get_fileext(strFile);
+		std::string strExt = tl::get_fileext(strFile);
 
 		if(strExt == "cattus")
 			wnd.LoadSession(strFile);
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 {
 	try
 	{
-		log_info("Starting up Cattus.");
+		tl::log_info("Starting up Cattus.");
 
 /*
 #ifdef Q_WS_X11
@@ -58,8 +58,8 @@ int main(int argc, char **argv)
 */
 
 		int iRet = -1;
-		init_rand();
-		init_spec_chars();
+		tl::init_rand();
+		tl::init_spec_chars();
 		init_formulas();
 
 		QSettings *pGlobals = Settings::GetGlobals();
@@ -84,12 +84,12 @@ int main(int argc, char **argv)
 
 		Settings::free();
 
-		log_info("Shutting down Cattus.");
+		tl::log_info("Shutting down Cattus.");
 		return iRet;
 	}
 	catch(const std::exception& ex)
 	{
-		log_crit(ex.what());
+		tl::log_crit(ex.what());
 	}
 
 	return -1;

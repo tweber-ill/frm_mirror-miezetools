@@ -5,10 +5,10 @@
  * Date: April 2012, 25-apr-2013
  */
 
-#include "../../helper/math.h"
-#include "../../helper/log.h"
-#include "../../helper/misc.h"
-#include "../../helper/interpolation.h"
+#include "../../tlibs/math/math.h"
+#include "../../tlibs/helper/log.h"
+#include "../../tlibs/helper/misc.h"
+#include "../../tlibs/math/interpolation.h"
 
 #include <limits>
 #include <algorithm>
@@ -165,7 +165,7 @@ bool get_gauss(unsigned int iLen,
 	std::vector<double> vecMaximaWidth;
 
 	const int iDegree = Settings::Get<int>("interpolation/spline_degree");
-	find_peaks<double>(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
+	tl::find_peaks<double>(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
 
 	bool bPrefitOk = 1;
 	if(vecMaximaX.size() < 1)
@@ -196,7 +196,7 @@ bool get_gauss(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		log_err("min == max, won't try fitting!");
+		tl::log_err("min == max, won't try fitting!");
 		return 0;
 	}
 
@@ -348,12 +348,12 @@ bool get_gauss(unsigned int iLen,
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			log_info("result of gauss fit step ", (++uiMini));
+			tl::log_info("result of gauss fit step ", (++uiMini));
 			std::ostringstream ostrMini; ostrMini << mini;
-			log_info(ostrMini.str());
+			tl::log_info(ostrMini.str());
 		}
 
-		log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
+		tl::log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
 	}
 
 
@@ -569,7 +569,7 @@ bool get_multigauss(unsigned int iLen,
 	std::vector<double> vecMaximaWidth;
 
 	const int iDegree = Settings::Get<int>("interpolation/spline_degree");
-	find_peaks<double>(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
+	tl::find_peaks<double>(iLen, px, py, iDegree, vecMaximaX, vecMaximaSize, vecMaximaWidth);
 
 	if(vecMaximaX.size() < iNumGauss)
 		vecMaximaX.resize(iNumGauss);
@@ -592,7 +592,7 @@ bool get_multigauss(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		log_err("min == max, won't try fitting!");
+		tl::log_err("min == max, won't try fitting!");
 		return 0;
 	}
 
@@ -838,12 +838,12 @@ bool get_multigauss(unsigned int iLen,
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			log_info("result of multi-gauss fit step ", (++uiMini));
+			tl::log_info("result of multi-gauss fit step ", (++uiMini));
 			std::ostringstream ostrMini; ostrMini << mini;
-			log_info(ostrMini.str());
+			tl::log_info(ostrMini.str());
 		}
 
-		log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
+		tl::log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
 	}
 
 

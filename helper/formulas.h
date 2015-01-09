@@ -7,7 +7,10 @@
 #ifndef __NEUTRON_FORMULAS__
 #define __NEUTRON_FORMULAS__
 
-#include "neutrons.hpp"
+#include "../tlibs/math/neutrons.hpp"
+
+namespace units = boost::units;
+namespace co = boost::units::si::constants::codata;
 
 extern void init_formulas();
 extern bool get_val(const std::string& str, double& dVal, std::string& strUnit);

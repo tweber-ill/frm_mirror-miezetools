@@ -9,7 +9,7 @@
 #include "../plot/plot2d.h"
 #include "../plot/plot3d.h"
 #include "../plot/plot4d.h"
-#include "../helper/string.h"
+#include "../tlibs/string/string.h"
 
 PlotPropDlg::PlotPropDlg(QWidget* pParent)
 				: QDialog(pParent), m_pCurPlot(0)
@@ -187,7 +187,7 @@ void PlotPropDlg::SaveSettings()
 
 			std::string strPhases = editPhases->text().toStdString();
 			std::vector<double> vecPhases;
-			::get_tokens<double>(strPhases, std::string(",; "), vecPhases);
+			tl::get_tokens<double>(strPhases, std::string(",; "), vecPhases);
 
 			bool bHasPhases = (vecPhases.size() != 0);
 			dat4.SetHasPhases(bHasPhases);

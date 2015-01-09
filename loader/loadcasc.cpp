@@ -7,7 +7,7 @@
 
 #include "loadcasc.h"
 #include "../main/settings.h"
-#include "../helper/log.h"
+#include "../tlibs/helper/log.h"
 
 #include <QtCore/QVector>
 #include <QtCore/QList>
@@ -68,7 +68,7 @@ const unsigned int* PadFile::GetData()
 	qint64 iSize = m_file.size();
 	if(iLen > iSize)
 	{
-		log_err("Tried to map beyond size.");
+		tl::log_err("Tried to map beyond size.");
 		return 0;
 	}
 
@@ -173,7 +173,7 @@ const unsigned int* TofFile::GetData(unsigned int iFoil)
 	qint64 iSize = m_file.size();
 	if(iStart+iLen > iSize)
 	{
-		log_err("Tried to map beyond size.");
+		tl::log_err("Tried to map beyond size.");
 		return 0;
 	}
 

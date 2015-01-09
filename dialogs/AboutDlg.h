@@ -11,6 +11,7 @@
 #include "../ui/ui_about.h"
 
 #include <boost/version.hpp>
+#include "../tlibs/version.h"
 
 class AboutDlg : public QDialog, Ui::AboutDlg
 {Q_OBJECT
@@ -56,8 +57,9 @@ public:
 		strLibs += "\n";
 		strLibs += "Uses FFTW version 3 (http://www.fftw.org).";
 		strLibs += "\n";
-		strLibs += "Uses Lapack/e version 3 (http://www.netlib.org/lapack).";
-		strLibs += "\n";
+		strLibs += "Uses TLIBS version " + QString(TLIBS_VERSION) + ".";
+		//strLibs += "Uses Lapack/e version 3 (http://www.netlib.org/lapack).";
+		//strLibs += "\n";
 
 		this->labelTitle->setText("Cattus");
 		this->labelVersion->setText("Version 0.4");

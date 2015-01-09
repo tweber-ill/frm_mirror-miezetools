@@ -7,24 +7,24 @@
 #ifndef __LOAD_NICOS__
 #define __LOAD_NICOS__
 
-#include "loadtxt.h"
+#include "../tlibs/file/loadtxt.h"
 #include <vector>
 #include <string>
 
 class NicosData
 {
 	private:
-		static void FilterComments(LoadTxt::t_mapComm& mapComm);
+		static void FilterComments(tl::LoadTxt::t_mapComm& mapComm);
 
 	protected:
-		const LoadTxt& m_data;
+		const tl::LoadTxt& m_data;
 		bool m_bOk;
 
 		std::vector<std::string> m_vecColNames;
 		std::vector<std::string> m_vecColUnits;
 
 	public:
-		NicosData(const LoadTxt& data);
+		NicosData(const tl::LoadTxt& data);
 		virtual ~NicosData();
 
 		bool IsOk() const { return m_bOk; }
@@ -34,7 +34,7 @@ class NicosData
 		bool GetDouble(const std::string& strKey, double& dVal) const
 		{ return m_data.GetMapVal<double>(strKey, dVal); }
 
-		const LoadTxt& GetRawData() const { return m_data; }
+		const tl::LoadTxt& GetRawData() const { return m_data; }
 		const std::string& GetFileName() const { return m_data.GetFileName(); }
 
 		unsigned int GetDim(void) const { return m_data.GetColLen(); }
@@ -46,7 +46,7 @@ class NicosData
 
 		int GetColIdx(const std::string& strName) const;
 
-		std::string TryFindScanVar(LoadTxt::t_mapComm& mapComm) const;
+		std::string TryFindScanVar(tl::LoadTxt::t_mapComm& mapComm) const;
 };
 
 

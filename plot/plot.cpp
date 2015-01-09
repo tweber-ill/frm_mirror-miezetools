@@ -13,8 +13,9 @@
 #include <QtGui/QFrame>
 #include <limits>
 #include <iostream>
-#include "../helper/string.h"
-#include "../helper/log.h"
+
+#include "../tlibs/string/string.h"
+#include "../tlibs/helper/log.h"
 #include "../fitter/models/freefit.h"
 
 #define PAD_X 18
@@ -458,7 +459,7 @@ void Plot::plot(const Data1& dat, PlotType plttype, const char* pcLegend)
 #endif
 }
 
-void Plot::plot_param(const FunctionModel_param& fkt, int iObj)
+void Plot::plot_param(const tl::FunctionModel_param& fkt, int iObj)
 {
 	const uint iCnt = 512;
 
@@ -511,7 +512,7 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj, bool bKeepObj)
 	{
 		if(iObj<0 || iObj>=m_vecObjs.size())
 		{
-			log_err("Invalid plot index selected.");
+			tl::log_err("Invalid plot index selected.");
 			return;
 		}
 		pltobj = &m_vecObjs[iObj];
@@ -586,7 +587,7 @@ void Plot::plot_fkt(const FunctionModel& fkt, int iObj, bool bKeepObj)
 		}
 		else
 		{
-			if(m_vecObjs.size() < iObj+1)
+			if(int(m_vecObjs.size()) < iObj+1)
 				m_vecObjs.resize(iObj+1);
 			m_vecObjs[iObj] = *pltobj;
 		}
@@ -785,7 +786,7 @@ Roi* Plot::GetROI(bool bAntiRoi)
 	return &GetData(0).dat.GetRoi(bAntiRoi);
 }
 
-bool Plot::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+bool Plot::LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase)
 {
 	unsigned int iDatCnt = xml.Query<unsigned int>((strBase + "data_count").c_str(), 0);
 	for(unsigned int iDat=0; iDat<iDatCnt; ++iDat)
@@ -857,7 +858,7 @@ bool Plot::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 	return 1;
 }
 
-bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+bool PlotObj::LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase)
 {
 	bool bOk = dat.LoadXML(xml, blob, strBase + "data/");
 
@@ -869,22 +870,22 @@ bool PlotObj::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	else
 	{
 		plttype = PLOT_DATA;
-		log_err("Unknown plot object type: \"", strType, "\".");
+		tl::log_err("Unknown plot object type: \"", strType, "\".");
 	}
 
 	std::string strName = xml.QueryString((strBase + "name").c_str(), "");
-	trim(strName);
+	tl::trim(strName);
 	if(strName != "")
 	{
-		log_warn("Deprecated field in data file \"name\" overrides settings in data object.");
+		tl::log_warn("Deprecated field in data file \"name\" overrides settings in data object.");
 		dat.GetParamMapDyn()["function_symbolic"] = strName;
 	}
 
 	std::string strFkt = xml.QueryString((strBase + "function").c_str(), "");
-	trim(strFkt);
+	tl::trim(strFkt);
 	if(strFkt != "")
 	{
-		log_warn("Deprecated field in data file \"function\" overrides settings in data object.");
+		tl::log_warn("Deprecated field in data file \"function\" overrides settings in data object.");
 		dat.GetParamMapDyn()["function"] = strFkt;
 	}
 

@@ -6,8 +6,8 @@
 
 #include "SettingsDlg.h"
 #include "../main/settings.h"
-#include "../helper/string.h"
-#include "../helper/log.h"
+#include "../tlibs/string/string.h"
+#include "../tlibs/helper/log.h"
 
 #include "../fitter/parser.h"
 #include "../fitter/fitter.h"
@@ -36,11 +36,11 @@ void SettingsDlg::set_global_defaults()
 {
 	int iDebugLevel = Settings::Get<int>("misc/debug_level");
 
-	log_debug.SetEnabled(iDebugLevel>=4);
-	log_info.SetEnabled(iDebugLevel>=3);
-	log_warn.SetEnabled(iDebugLevel>=2);
-	log_err.SetEnabled(iDebugLevel>=1);
-	log_crit.SetEnabled(1);
+	tl::log_debug.SetEnabled(iDebugLevel>=4);
+	tl::log_info.SetEnabled(iDebugLevel>=3);
+	tl::log_warn.SetEnabled(iDebugLevel>=2);
+	tl::log_err.SetEnabled(iDebugLevel>=1);
+	tl::log_crit.SetEnabled(1);
 }
 
 
@@ -113,7 +113,7 @@ void SettingsDlg::SaveSettings()
 
 	std::string strStartIdx = editStartIndices->text().toStdString();
 	std::vector<unsigned int> vecIndices;
-	::get_tokens<unsigned int>(strStartIdx, std::string(",; "), vecIndices);
+	tl::get_tokens<unsigned int>(strStartIdx, std::string(",; "), vecIndices);
 
 	QList<QVariant> lst;
 	for(unsigned int iIdx : vecIndices)

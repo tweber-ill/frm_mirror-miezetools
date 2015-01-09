@@ -17,7 +17,7 @@ namespace ublas = boost::numeric::ublas;
 class XYRange;
 #include <QtGui/QPainter>
 
-#include "../helper/xml.h"
+#include "../../tlibs/file/xml.h"
 
 #define CIRCLE_VERTICES 256
 
@@ -331,7 +331,7 @@ class Roi
 		bool Load(const char* pcFile);
 		bool Save(const char* pcFile) const;
 
-		bool LoadXML(Xml& xml, const std::string& strBase);
+		bool LoadXML(tl::Xml& xml, const std::string& strBase);
 		bool SaveXML(std::ostream& ostr) const;
 
 		bool IsRoiActive() const { return m_bActive; }

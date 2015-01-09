@@ -18,7 +18,7 @@
 #include "freefit.h"
 #include "../chi2.h"
 
-#include "../../helper/log.h"
+#include "../../tlibs/helper/log.h"
 
 //----------------------------------------------------------------------
 // freefit model
@@ -65,7 +65,7 @@ bool FreeFktModel::SetParams(const std::vector<double>& vecParams)
 
 	if(syms.size() != vecParams.size())
 	{
-		log_err(syms.size(), " symbols in table, but ",
+		tl::log_err(syms.size(), " symbols in table, but ",
 				vecParams.size(), " symbols supplied.");
 
 		return false;
@@ -157,7 +157,7 @@ bool get_freefit(unsigned int iLen,
 	FreeFktModel freemod(pcExp);
 	if(!freemod.IsOk())
 	{
-		log_err("Free function model could not be created.");
+		tl::log_err("Free function model could not be created.");
 		return 0;
 	}
 	Chi2Function fkt(&freemod, iLen, px, py, pdy);
@@ -171,7 +171,7 @@ bool get_freefit(unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		log_warn("min == max!");
+		tl::log_warn("min == max!");
 		//return 0;
 	}
 
@@ -276,12 +276,12 @@ bool get_freefit(unsigned int iLen,
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			log_info("result of user-defined fit step ", (++uiMini));
+			tl::log_info("result of user-defined fit step ", (++uiMini));
 			std::ostringstream ostrMini; ostrMini << mini;
-			log_info(ostrMini.str());
+			tl::log_info(ostrMini.str());
 		}
 
-		log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
+		tl::log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
 	}
 
 	return bValidFit;

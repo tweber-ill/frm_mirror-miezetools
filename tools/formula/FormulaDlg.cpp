@@ -6,12 +6,12 @@
 
 #include "FormulaDlg.h"
 #include <boost/units/io.hpp>
-#include "helper/mieze.hpp"
-#include "helper/string.h"
-#include "helper/math.h"
-#include "helper/formulas.h"
-#include "helper/misc.h"
-#include "helper/log.h"
+#include "../../tlibs/math/mieze.hpp"
+#include "../../tlibs/string/string.h"
+#include "../../tlibs/math/math.h"
+#include "../../helper/formulas.h"
+#include "../../tlibs/helper/misc.h"
+#include "../../tlibs/helper/log.h"
 #include "../../main/settings.h"
 #include "../../data/export.h"
 
@@ -133,12 +133,12 @@ void FormulaDlg::setupConstants()
 	{
 		std::ostringstream ostrVal;
 		ostrVal << std::scientific;
-		ostrVal << one_eV;
+		ostrVal << tl::one_eV;
 
 		Constant constant;
 		constant.strSymbol = "eV";
 		constant.strName = "1 electron volt";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -150,19 +150,19 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "h";
 		constant.strName = "Planck constant";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
 	{
 		std::ostringstream ostrVal;
 		ostrVal << std::scientific;
-		ostrVal << (co::h / one_eV) << " eV";
+		ostrVal << (co::h / tl::one_eV) << " eV";
 
 		Constant constant;
 		constant.strSymbol = "h";
 		constant.strName = "Planck constant";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -174,19 +174,19 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "hbar";
 		constant.strName = "Planck constant";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
 	{
 		std::ostringstream ostrVal;
 		ostrVal << std::scientific;
-		ostrVal << (co::hbar / one_eV) << " eV";
+		ostrVal << (co::hbar / tl::one_eV) << " eV";
 
 		Constant constant;
 		constant.strSymbol = "hbar";
 		constant.strName = "Planck constant";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -198,7 +198,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "m_n";
 		constant.strName = "Neutron mass";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -210,7 +210,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "g_n";
 		constant.strName = "Neutron g";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -222,7 +222,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "gamma_n";
 		constant.strName = "Neutron gyromagnetic ratio";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -246,7 +246,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "mu_n";
 		constant.strName = "Neutron magnetic moment";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -258,7 +258,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "mu_N";
 		constant.strName = "Nuclear magneton";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -270,7 +270,7 @@ void FormulaDlg::setupConstants()
 		Constant constant;
 		constant.strSymbol = "c";
 		constant.strName = "Vacuum speed of light";
-		constant.strVal = insert_before<std::string>(ostrVal.str(), "(", "\n");
+		constant.strVal = tl::insert_before<std::string>(ostrVal.str(), "(", "\n");
 
 		vecConsts.push_back(constant);
 	}
@@ -316,14 +316,14 @@ void FormulaDlg::CalcNeutronLam()
 		return;
 
 	units::quantity<units::si::length> lam_n = get_length(strInput);
-	units::quantity<units::si::wavenumber> k_n = lam2k(lam_n);
-	units::quantity<units::si::momentum> p_n = lam2p(lam_n);
+	units::quantity<units::si::wavenumber> k_n = tl::lam2k(lam_n);
+	units::quantity<units::si::momentum> p_n = tl::lam2p(lam_n);
 	units::quantity<units::si::energy> E_n = p_n*p_n / (2.*co::m_n);
 
 	std::ostringstream ostrk, ostrv, ostrE, ostrT;
 	ostrk << k_n;
 	ostrv << (p_n / co::m_n);
-	ostrE << double(E_n / one_meV) << " meV";
+	ostrE << double(E_n / tl::one_meV) << " meV";
 	ostrT << (E_n / co::k_B);
 
 	editNeutronE->setText(ostrE.str().c_str());
@@ -339,14 +339,14 @@ void FormulaDlg::CalcNeutronk()
 		return;
 
 	units::quantity<units::si::wavenumber> k_n = get_wavenumber(strInput);
-	units::quantity<units::si::length> lam_n = k2lam(k_n);
-	units::quantity<units::si::momentum> p_n = lam2p(lam_n);
+	units::quantity<units::si::length> lam_n = tl::k2lam(k_n);
+	units::quantity<units::si::momentum> p_n = tl::lam2p(lam_n);
 	units::quantity<units::si::energy> E_n = p_n*p_n / (2.*co::m_n);
 
 	std::ostringstream ostrlam, ostrv, ostrE, ostrT;
 	ostrlam << lam_n;
 	ostrv << (p_n / co::m_n);
-	ostrE << double(E_n / one_meV) << " meV";
+	ostrE << double(E_n / tl::one_meV) << " meV";
 	ostrT << (E_n / co::k_B);
 
 	editNeutronLam->setText(ostrlam.str().c_str());
@@ -361,7 +361,7 @@ void FormulaDlg::CalcNeutronv()
 	if(!check_input(strInput))
 		return;
 
-	log_err("Velocity parsing not yet implemented.");
+	tl::log_err("Velocity parsing not yet implemented.");
 }
 
 void FormulaDlg::CalcNeutronE()
@@ -372,9 +372,9 @@ void FormulaDlg::CalcNeutronE()
 
 	bool bImag = 0;
 	units::quantity<units::si::energy> E_n = get_energy(strInput);
-	units::quantity<units::si::wavenumber> k_n = E2k(E_n, bImag);
-	units::quantity<units::si::length> lam_n = k2lam(k_n);
-	units::quantity<units::si::momentum> p_n = lam2p(lam_n);
+	units::quantity<units::si::wavenumber> k_n = tl::E2k(E_n, bImag);
+	units::quantity<units::si::length> lam_n = tl::k2lam(k_n);
+	units::quantity<units::si::momentum> p_n = tl::lam2p(lam_n);
 
 	std::ostringstream ostrlam, ostrv, ostrk, ostrT;
 	ostrlam << lam_n;
@@ -397,15 +397,15 @@ void FormulaDlg::CalcNeutronT()
 	bool bImag;
 	units::quantity<units::si::temperature> T_n = get_temperature(strInput);
 	units::quantity<units::si::energy> E_n = T_n * co::k_B;
-	units::quantity<units::si::wavenumber> k_n = E2k(E_n, bImag);
-	units::quantity<units::si::length> lam_n = k2lam(k_n);
-	units::quantity<units::si::momentum> p_n = lam2p(lam_n);
+	units::quantity<units::si::wavenumber> k_n = tl::E2k(E_n, bImag);
+	units::quantity<units::si::length> lam_n = tl::k2lam(k_n);
+	units::quantity<units::si::momentum> p_n = tl::lam2p(lam_n);
 
 	std::ostringstream ostrlam, ostrv, ostrk, ostrE;
 	ostrlam << lam_n;
 	ostrk << k_n;
 	ostrv << (p_n / co::m_n);
-	ostrE << double(E_n / one_meV) << " meV";
+	ostrE << double(E_n / tl::one_meV) << " meV";
 
 	editNeutronLam->setText(ostrlam.str().c_str());
 	editNeutronK->setText(ostrk.str().c_str());
@@ -421,7 +421,7 @@ void FormulaDlg::CalcBraggDirect()
 	std::string strD = editBraggDirD->text().toStdString();
 	std::string strTT = editBraggDirTT->text().toStdString();
 
-	int iOrder = str_to_var<int>(strN);
+	int iOrder = tl::str_to_var<int>(strN);
 	units::quantity<units::si::length> lam = get_length(strLam);
 	units::quantity<units::si::length> d = get_length(strD);
 	units::quantity<units::si::plane_angle> tt = get_angle(strTT);
@@ -430,19 +430,19 @@ void FormulaDlg::CalcBraggDirect()
 
 	if(radioBraggDirLam->isChecked())
 	{
-		lam = ::bragg_real_lam(d, tt, double(iOrder));
+		lam = tl::bragg_real_lam(d, tt, double(iOrder));
 		ostrOut << lam;
 		editBraggDirLam->setText(ostrOut.str().c_str());
 	}
 	else if(radioBraggDirD->isChecked())
 	{
-		d = ::bragg_real_d(lam, tt, double(iOrder));
+		d = tl::bragg_real_d(lam, tt, double(iOrder));
 		ostrOut << d;
 		editBraggDirD->setText(ostrOut.str().c_str());
 	}
 	else if(radioBraggDirTT->isChecked())
 	{
-		tt = ::bragg_real_twotheta(d, lam, double(iOrder));
+		tt = tl::bragg_real_twotheta(d, lam, double(iOrder));
 		ostrOut << double(tt/units::si::radian) / M_PI * 180. << " deg";
 		editBraggDirTT->setText(ostrOut.str().c_str());
 	}
@@ -455,7 +455,7 @@ void FormulaDlg::CalcBraggReciprocal()
 	std::string strQ = editBraggReciQ->text().toStdString();
 	std::string strTT = editBraggReciTT->text().toStdString();
 
-	int iOrder = str_to_var<int>(strN);
+	int iOrder = tl::str_to_var<int>(strN);
 	units::quantity<units::si::length> lam = get_length(strLam);
 	units::quantity<units::si::wavenumber> Q = get_wavenumber(strQ);
 	units::quantity<units::si::plane_angle> tt = get_angle(strTT);
@@ -464,19 +464,19 @@ void FormulaDlg::CalcBraggReciprocal()
 
 	if(radioBraggReciLam->isChecked())
 	{
-		lam = ::bragg_recip_lam(Q, tt, double(iOrder));
+		lam = tl::bragg_recip_lam(Q, tt, double(iOrder));
 		ostrOut << lam;
 		editBraggReciLam->setText(ostrOut.str().c_str());
 	}
 	else if(radioBraggReciQ->isChecked())
 	{
-		Q = ::bragg_recip_Q(lam, tt, double(iOrder));
+		Q = tl::bragg_recip_Q(lam, tt, double(iOrder));
 		ostrOut << Q;
 		editBraggReciQ->setText(ostrOut.str().c_str());
 	}
 	else if(radioBraggReciTT->isChecked())
 	{
-		tt = ::bragg_recip_twotheta(Q, lam, double(iOrder));
+		tt = tl::bragg_recip_twotheta(Q, lam, double(iOrder));
 		ostrOut << double(tt/units::si::radian) / M_PI * 180. << " deg";
 		editBraggReciTT->setText(ostrOut.str().c_str());
 	}
@@ -489,22 +489,22 @@ void FormulaDlg::CalcMIEZE()
 {
 	static const units::quantity<units::si::length> cm = units::si::meter/100.;
 
-	units::quantity<units::si::length> lam = spinLam->value() * angstrom;
+	units::quantity<units::si::length> lam = spinLam->value() * tl::angstrom;
 	units::quantity<units::si::length> L1 = spinL1->value() * cm;
 	units::quantity<units::si::length> Lb = spinLb->value() * cm;
 	units::quantity<units::si::frequency> f1 = spinF1->value() * 1000. * units::si::hertz;
 	units::quantity<units::si::frequency> f2 = spinF2->value() * 1000. * units::si::hertz;
-	units::quantity<units::si::energy> E = spinE->value() * one_meV;
+	units::quantity<units::si::energy> E = spinE->value() * tl::one_meV;
 
-	units::quantity<units::si::length> L2 = mieze_condition_L2(f1, f2, L1);
+	units::quantity<units::si::length> L2 = tl::mieze_condition_L2(f1, f2, L1);
 	units::quantity<units::si::length> Ls = L2-Lb;
-	units::quantity<units::si::time> tau = mieze_tau(2.*(f2-f1), Ls, lam);
+	units::quantity<units::si::time> tau = tl::mieze_tau(2.*(f2-f1), Ls, lam);
 
-	units::quantity<units::si::length> Ls_inel = mieze_condition_inel_Ls(Ls, E, lam);
+	units::quantity<units::si::length> Ls_inel = tl::mieze_condition_inel_Ls(Ls, E, lam);
 	units::quantity<units::si::length> offs = Ls_inel-Ls;
 
-	units::quantity<units::si::frequency> df1 = mieze_det_misaligned_df1(L1, L2, -offs, f1, f2);
-	units::quantity<units::si::frequency> df2 = mieze_det_misaligned_df2(L1, L2, -offs, f1, f2);
+	units::quantity<units::si::frequency> df1 = tl::mieze_det_misaligned_df1(L1, L2, -offs, f1, f2);
+	units::quantity<units::si::frequency> df2 = tl::mieze_det_misaligned_df2(L1, L2, -offs, f1, f2);
 
 	std::ostringstream ostrResult;
 	ostrResult << "(quasi-)elastic MIEZE\n" << "----------------------------------------\n";
@@ -539,7 +539,7 @@ static inline void export_python(const Plot* pPlot, QWidget* pWid=0)
 		return;
 
 	std::string strFile1 = strFile.toStdString();
-	std::string strExt = get_fileext(strFile1);
+	std::string strExt = tl::get_fileext(strFile1);
 	if(strExt != "py")
 		strFile1 += ".py";
 
@@ -606,20 +606,20 @@ void FormulaDlg::CalcDebye()
 
 	for(unsigned int iPt=0; iPt<NUM_POINTS; ++iPt)
 	{
-		units::quantity<units::si::wavenumber> Q = (dMinQ + (dMaxQ - dMinQ)/double(NUM_POINTS)*double(iPt)) / angstrom;
+		units::quantity<units::si::wavenumber> Q = (dMinQ + (dMaxQ - dMinQ)/double(NUM_POINTS)*double(iPt)) / tl::angstrom;
 		double dDWF = 0.;
-		auto zetasq = 1.*angstrom*angstrom;
+		auto zetasq = 1.*tl::angstrom*tl::angstrom;
 
 		if(T <= T_D)
-			dDWF = ::debye_waller_low_T(T_D, T, M, Q, &zetasq);
+			dDWF = tl::debye_waller_low_T(T_D, T, M, Q, &zetasq);
 		else
-			dDWF = ::debye_waller_high_T(T_D, T, M, Q, &zetasq);
+			dDWF = tl::debye_waller_high_T(T_D, T, M, Q, &zetasq);
 
-		vecQ.push_back(Q * angstrom);
+		vecQ.push_back(Q * tl::angstrom);
 
 		if(!bHasZetaSq)
 		{
-			std::string strZetaSq = var_to_str(units::sqrt(zetasq));
+			std::string strZetaSq = tl::var_to_str(units::sqrt(zetasq));
 			editZetaSq->setText(strZetaSq.c_str());
 
 			bHasZetaSq = 1;
@@ -676,7 +676,7 @@ void FormulaDlg::CalcPlane()
 	double dMaxQ = spinMaxQ->value();
 	double dAngle = spinAngle->value() / 180. * M_PI;
 
-	units::quantity<units::si::energy> EiEf = spinEiEf->value() * one_meV;
+	units::quantity<units::si::energy> EiEf = spinEiEf->value() * tl::one_meV;
 
 
 	m_pPlanePlot->clear();
@@ -691,16 +691,16 @@ void FormulaDlg::CalcPlane()
 	{
 		for(unsigned int iSign=0; iSign<=1; ++iSign)
 		{
-			units::quantity<units::si::wavenumber> Q = (dMinQ + (dMaxQ - dMinQ)/double(NUM_POINTS)*double(iPt)) /angstrom;
-			units::quantity<units::si::energy> dE = ::kinematic_plane(radioFixedKi->isChecked(), iSign, EiEf, Q, twotheta);
+			units::quantity<units::si::wavenumber> Q = (dMinQ + (dMaxQ - dMinQ)/double(NUM_POINTS)*double(iPt)) / tl::angstrom;
+			units::quantity<units::si::energy> dE = tl::kinematic_plane(radioFixedKi->isChecked(), iSign, EiEf, Q, twotheta);
 
-			double _dQ = Q * angstrom;
-			double _dE = dE / one_meV;
+			double _dQ = Q * tl::angstrom;
+			double _dE = dE / tl::one_meV;
 
 			if(!std::isnan(_dQ) && !std::isnan(_dE) && !std::isinf(_dQ) && !std::isinf(_dE))
 			{
-				vecQ[iSign].push_back(Q * angstrom);
-				vecE[iSign].push_back(dE / one_meV);
+				vecQ[iSign].push_back(Q * tl::angstrom);
+				vecE[iSign].push_back(dE / tl::one_meV);
 			}
 		}
 	}
@@ -742,13 +742,14 @@ static inline bool is_peak_allowed_sc(int ih, int ik, int il)
 
 static inline bool is_peak_allowed_fcc(int ih, int ik, int il)
 {
-	return ((is_even(ih) && is_even(ik) && is_even(il)) || (is_odd(ih) && is_odd(ik) && is_odd(il)));
+	return ((tl::is_even(ih) && tl::is_even(ik) && tl::is_even(il)) || 
+			(tl::is_odd(ih) && tl::is_odd(ik) && tl::is_odd(il)));
 }
 
 static bool mixed_even_and_odd(int ih, int ik, int il)
 {
-	bool bHasEven = is_even(ih) || is_even(ik) || is_even(il);
-	bool bHasOdd = is_odd(ih) || is_odd(ik) || is_odd(il);
+	bool bHasEven = tl::is_even(ih) || tl::is_even(ik) || tl::is_even(il);
+	bool bHasOdd = tl::is_odd(ih) || tl::is_odd(ik) || tl::is_odd(il);
 
 	return bHasEven && bHasOdd;
 }
@@ -758,12 +759,12 @@ static inline bool is_peak_allowed_diamond(int ih, int ik, int il)
 	if(mixed_even_and_odd(ih,ik,il))
 		return false;
 
-	return !(is_even(ih+ik+il) && ((ih+ik+il)%4 != 0));
+	return !(tl::is_even(ih+ik+il) && ((ih+ik+il)%4 != 0));
 }
 
 static inline bool is_peak_allowed_bcc(int ih, int ik, int il)
 {
-	return is_even(ih + ik + il);
+	return tl::is_even(ih + ik + il);
 }
 
 
@@ -840,8 +841,8 @@ void FormulaDlg::CalcPowderLines()
 
 		std::istringstream istrAngle(pair.first);
 		istrAngle >> powderline.dAngle;
-		double dQ = ::bragg_recip_Q(dLam*angstrom, powderline.dAngle/180.*M_PI*units::si::radians, 1.)*angstrom;
-		powderline.strQ = var_to_str(dQ);
+		double dQ = tl::bragg_recip_Q(dLam*tl::angstrom, powderline.dAngle/180.*M_PI*units::si::radians, 1.)*tl::angstrom;
+		powderline.strQ = tl::var_to_str(dQ);
 
 		vecPowderLines.push_back(powderline);
 	}
@@ -921,23 +922,23 @@ void FormulaDlg::CalcMiezeTime()
 
 	freq f1 = spinMF1->value() * 1000./units::si::second;
 	freq f2 = spinMF2->value() * 1000./units::si::second;
-	length Lam = spinMLam->value() * angstrom;
+	length Lam = spinMLam->value() * tl::angstrom;
 	time Tau = spinMTau->value() * 1e-12 * units::si::second;
 	length Ls = spinMLs->value() * 0.01*units::si::meter;
 
 	if(bLam)
 	{
-		Lam = mieze_tau_lam(Tau, 2.*(f2-f1), Ls);
-		spinMLam->setValue(double(Lam / angstrom));
+		Lam = tl::mieze_tau_lam(Tau, 2.*(f2-f1), Ls);
+		spinMLam->setValue(double(Lam / tl::angstrom));
 	}
 	else if(bTau)
 	{
-		Tau = mieze_tau(2.*(f2-f1), Ls, Lam);
+		Tau = tl::mieze_tau(2.*(f2-f1), Ls, Lam);
 		spinMTau->setValue(double(Tau / 1e-12 / units::si::second));
 	}
 	else if(bLs)
 	{
-		Ls = mieze_tau_Ls(Tau, 2.*(f2-f1), Lam);
+		Ls = tl::mieze_tau_Ls(Tau, 2.*(f2-f1), Lam);
 		spinMLs->setValue(double(Ls / 0.01/units::si::meter));
 	}
 }

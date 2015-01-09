@@ -11,7 +11,7 @@
 #include <QtCore/QFile>
 #include <vector>
 #include <map>
-#include "../helper/string.h"
+#include "../tlibs/string/string.h"
 #include "../helper/string_map.h"
 
 

@@ -9,7 +9,7 @@
 
 #include "../plot/plot.h"
 #include "../plot/plot2d.h"
-#include "../helper/log.h"
+#include "../tlibs/helper/log.h"
 
 #include <iostream>
 #include <fstream>
@@ -158,7 +158,7 @@ static bool export_single_plot_py(const SubWindowBase *pSWB, std::ostream& ofstr
 	}
 	else
 	{
-		log_err("Data type not (yet) supported.");
+		tl::log_err("Data type not (yet) supported.");
 		return false;
 	}
 	return true;
@@ -174,7 +174,7 @@ bool export_subplots_py(const char* pcFile, const std::vector<SubWindowBase*>& v
 	std::ofstream ofstr(pcFile);
 	if(!ofstr.is_open())
 	{
-		log_err("Cannot open file \"", pcFile, "\".");
+		tl::log_err("Cannot open file \"", pcFile, "\".");
 		return false;
 	}
 
@@ -210,7 +210,7 @@ bool export_py(const char* pcFile, const SubWindowBase *pSWB)
 	std::ofstream ofstr(pcFile);
 	if(!ofstr.is_open())
 	{
-		log_err("Cannot open file \"", pcFile, "\".");
+		tl::log_err("Cannot open file \"", pcFile, "\".");
 		return false;
 	}
 

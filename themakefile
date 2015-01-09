@@ -14,7 +14,6 @@ FLAGS = ${INC} -O2 -march=native -std=c++11 -DNDEBUG ${DEFINES}
 
 STD_LIBS = -lstdc++ -lm
 MATH_LIBS = -lMinuit2 -lfftw3
-#MISC_LIBS = ./gnuplot-qt.so
 MISC_LIBS = 
 LAPACK_LIBS = -L/usr/local/lib64 -llapacke -llapack -lblas -lgfortran
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
@@ -106,36 +105,36 @@ obj/NormDlg.o: dialogs/NormDlg.cpp dialogs/NormDlg.h
 obj/RebinDlg.o: dialogs/RebinDlg.cpp dialogs/RebinDlg.h
 	${CC} ${FLAGS} -c -o $@ $<
 
-obj/fourier.o: helper/fourier.cpp helper/fourier.h
+obj/fourier.o: tlibs/math/fourier.cpp tlibs/math/fourier.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/string.o: helper/string.cpp helper/string.h
+obj/string.o: tlibs/string/string.cpp tlibs/string/string.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/string_map.o: helper/string_map.cpp helper/string_map.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/spec_char.o: helper/spec_char.cpp helper/spec_char.h
+obj/spec_char.o: tlibs/string/spec_char.cpp tlibs/string/spec_char.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/xml.o: helper/xml.cpp helper/xml.h
+obj/xml.o: tlibs/file/xml.cpp tlibs/file/xml.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/linalg2.o: helper/linalg2.cpp helper/linalg2.h
+obj/linalg2.o: tlibs/math/linalg2.cpp tlibs/math/linalg2.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/blob.o: helper/blob.cpp helper/blob.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/formulas.o: helper/formulas.cpp helper/formulas.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/comp.o: helper/comp.cpp helper/comp.h
+obj/comp.o: tlibs/file/comp.cpp tlibs/file/comp.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/file.o: helper/file.cpp helper/file.h
+obj/file.o: tlibs/file/file.cpp tlibs/file/file.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/rand.o: helper/rand.cpp helper/rand.h
+obj/rand.o: tlibs/math/rand.cpp tlibs/math/rand.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/log.o: helper/log.cpp helper/log.h
+obj/log.o: tlibs/helper/log.cpp tlibs/helper/log.h
 	${CC} ${FLAGS} -c -o $@ $<
 
 obj/loadcasc.o: loader/loadcasc.cpp loader/loadcasc.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/loadnicos.o: loader/loadnicos.cpp loader/loadnicos.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/loadtxt.o: loader/loadtxt.cpp loader/loadtxt.h
+obj/loadtxt.o: tlibs/file/loadtxt.cpp tlibs/file/loadtxt.h
 	${CC} ${FLAGS} -c -o $@ $<
 
 obj/plot.o: plot/plot.cpp plot/plot.h
@@ -171,7 +170,7 @@ obj/gauss-nd.o: fitter/models/gauss-nd.cpp fitter/models/gauss-nd.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/msin.o: fitter/models/msin.cpp fitter/models/msin.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/interpolation.o: helper/interpolation.cpp helper/interpolation.h
+obj/interpolation.o: tlibs/math/interpolation.cpp tlibs/math/interpolation.h
 	${CC} ${FLAGS} -c -o $@ $<
 
 

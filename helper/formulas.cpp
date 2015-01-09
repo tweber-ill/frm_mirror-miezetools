@@ -5,7 +5,7 @@
  */
 
 #include "formulas.h"
-#include "log.h"
+#include "../tlibs/helper/log.h"
 #include <map>
 
 static std::map<std::string, double> g_mapPrefixes;
@@ -64,7 +64,7 @@ static bool ends_with(const std::string& str, const std::string& strEnd, double&
 												g_mapPrefixes.find(strPrefix);
 	if(iter==g_mapPrefixes.end())
 	{
-		log_err("Unknown prefix \"", strPrefix, "\".");;
+		tl::log_err("Unknown prefix \"", strPrefix, "\".");;
 		dPow = 1.;
 	}
 	else
@@ -98,7 +98,7 @@ get_freq(const std::string& strVar)
 	}
 	else
 	{
-		log_err("Unknown frequency unit: \"", strUnit, "\".");
+		tl::log_err("Unknown frequency unit: \"", strUnit, "\".");
 		return 0. * units::si::hertz;
 	}
 
@@ -121,11 +121,11 @@ get_energy(const std::string& strVar)
 	}
 	else if(ends_with(strUnit,"eV", dPow))
 	{
-		energy = dPow * dVal * one_eV;
+		energy = dPow * dVal * tl::one_eV;
 	}
 	else
 	{
-		log_err("Unknown energy unit: \"", strUnit, "\".");
+		tl::log_err("Unknown energy unit: \"", strUnit, "\".");
 		return 0. * units::si::joules;
 	}
 
@@ -152,7 +152,7 @@ get_length(const std::string& strVar)
 	}
 	else
 	{
-		log_err("Unknown length unit: \"", strUnit, "\".");
+		tl::log_err("Unknown length unit: \"", strUnit, "\".");
 		return 0. * units::si::meter;
 	}
 
@@ -179,7 +179,7 @@ get_wavenumber(const std::string& strVar)
 	}
 	else
 	{
-		log_err("Unknown wavenumber unit: \"", strUnit, "\".");
+		tl::log_err("Unknown wavenumber unit: \"", strUnit, "\".");
 		return 0. * units::si::reciprocal_meter;
 	}
 
@@ -202,7 +202,7 @@ get_time(const std::string& strVar)
 	}
 	else
 	{
-		log_err("Unknown length unit: \"", strUnit, "\".");
+		tl::log_err("Unknown length unit: \"", strUnit, "\".");
 		return 0. * units::si::second;
 	}
 
@@ -234,7 +234,7 @@ get_temperature(const std::string& strVar)
 	}*/
 	else
 	{
-		log_err("Error: Unknown temperature unit: \"", strUnit, "\".");
+		tl::log_err("Error: Unknown temperature unit: \"", strUnit, "\".");
 		return 0. * units::si::kelvin;
 	}
 
@@ -261,7 +261,7 @@ get_angle(const std::string& strVar)
 	}
 	else
 	{
-		log_err("Unknown angle unit: \"", strUnit, "\".");
+		tl::log_err("Unknown angle unit: \"", strUnit, "\".");
 		return 0. * units::si::radian;
 	}
 
@@ -283,7 +283,7 @@ double get_scalar(const std::string& strVar)
 	}
 	else
 	{
-		log_err("Unknown scalar unit: \"", strUnit, "\".");
+		tl::log_err("Unknown scalar unit: \"", strUnit, "\".");
 		return 0.;
 	}
 

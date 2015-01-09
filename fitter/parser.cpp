@@ -25,8 +25,8 @@ namespace fus = boost::fusion;
 #include "parser.h"
 #include "functions.h"
 
-#include "../helper/math.h"
-#include "../helper/log.h"
+#include "../tlibs/math/math.h"
+#include "../tlibs/helper/log.h"
 
 //----------------------------------------------------------------------
 // old procedural interface
@@ -182,7 +182,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 	{
 		if(node.vecChildren.size()!=2)
 		{
-			log_err("operation 'pow' needs exactly two operands.");
+			tl::log_err("operation 'pow' needs exactly two operands.");
 			return 0.;
 		}
 
@@ -207,7 +207,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 		bool bSymInMap = is_symbol_in_map(syms, node.strIdent, vecFreeParams, &dVal);
 		if(!bSymInMap)
 		{
-			log_err("Symbol \"", node.strIdent, "\" is not in map!");
+			tl::log_err("Symbol \"", node.strIdent, "\" is not in map!");
 		}
 		return dVal;
 	}
@@ -250,7 +250,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 			}
 		}
 
-		log_err("No function \"", strFkt, "\" taking ", iNumArgs, " arguments known.");
+		tl::log_err("No function \"", strFkt, "\" taking ", iNumArgs, " arguments known.");
 		return 0.;
 	}
 	else if(node.iType == NODE_NOP)
@@ -259,11 +259,11 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 	}
 	else if(node.iType == NODE_INVALID)
 	{
-		log_err("Syntax tree is invalid.");
+		tl::log_err("Syntax tree is invalid.");
 		return 0.;
 	}
 
-	log_err("Unknown syntax node type ", node.iType);
+	tl::log_err("Unknown syntax node type ", node.iType);
 	return 0.;
 }
 
@@ -461,7 +461,7 @@ static std::string get_expression(const Node& node, const std::vector<Symbol>& s
 		return "0";
 	}
 
-	log_err("Unknown syntax node type ", node.iType);
+	tl::log_err("Unknown syntax node type ", node.iType);
 	return "";
 }
 
@@ -815,23 +815,23 @@ static bool is_symbol_in_map(const std::vector<Symbol>& syms, const std::string&
 
 static void print_symbol_map(const std::vector<Symbol>& syms)
 {
-	log_info("Symbols map: ");
+	tl::log_info("Symbols map: ");
 	for(const Symbol& sym : syms)
-		log_info("\t", sym.strIdent, " = ", sym.dVal);
+		tl::log_info("\t", sym.strIdent, " = ", sym.dVal);
 
-	log_info("Constants map: ");
+	tl::log_info("Constants map: ");
 	for(const auto& sym : g_syms)
-		log_info("\t", sym.first, " = ", sym.second);
+		tl::log_info("\t", sym.first, " = ", sym.second);
 
 	std::ostringstream ostrFkts;
-	log_info("Functions map: ");
+	tl::log_info("Functions map: ");
 	for(const auto& pairFkt : g_map_fkt0)
 		ostrFkts << pairFkt.first << "(), ";
 	for(const auto& pairFkt : g_map_fkt1)
 		ostrFkts << pairFkt.first << "(a), ";
 	for(const auto& pairFkt : g_map_fkt2)
 		ostrFkts << pairFkt.first << "(a,b), ";
-	log_info(ostrFkts.str());
+	tl::log_info(ostrFkts.str());
 }
 
 static void add_constants()
@@ -911,13 +911,13 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 	bool bOk = qi::phrase_parse(str.begin(), str.end(), pars, ascii::space, node);
 	if(!bOk)
 	{
-		log_err("Error parsing expression \"", str, "\": ", pars.ostrErr.str());
+		tl::log_err("Error parsing expression \"", str, "\": ", pars.ostrErr.str());
 		return false;
 	}
 
 	if(!check_tree_sanity(node))
 	{
-		log_err("Syntax tree is not sane.");
+		tl::log_err("Syntax tree is not sane.");
 		return false;
 	}
 
@@ -925,7 +925,7 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 
 	if(!check_tree_sanity(node))
 	{
-		log_err("Optimized syntax tree is not sane.");
+		tl::log_err("Optimized syntax tree is not sane.");
 		return false;
 	}
 
@@ -1011,8 +1011,8 @@ bool Parser::ParseExpression(const std::string& str)
 	m_bOk = ::parse_expression(m_node, m_syms, str, m_vecFreeParams);
 
 	//log_info("--------------------------------------------------------------------------------");
-	log_info("Parsing ", (m_bOk ? "successful" : "failed"));
-	log_info("Parsed expression: ", GetExpression(false, false));
+	tl::log_info("Parsing ", (m_bOk ? "successful" : "failed"));
+	tl::log_info("Parsed expression: ", GetExpression(false, false));
 	PrintSymbolMap();
 	//log_info("--------------------------------------------------------------------------------");
 
@@ -1034,7 +1034,7 @@ double Parser::EvalTree(double x)
 {
 	if(m_vecFreeParams.size() != 1)
 	{
-		log_err("Symbol table has more than one free parameter, but only one given!");
+		tl::log_err("Symbol table has more than one free parameter, but only one given!");
 		return 0.;
 	}
 
@@ -1157,12 +1157,12 @@ static void symbol_with_2values_fill_in(std::vector<SymbolWith2Values>& vec,
 
 		if(syms0.size()!=0 || syms1.size()!=0)
 		{
-			log_warn("Free parameters specified in ", strWhich, ", assuming value 0.");
+			tl::log_warn("Free parameters specified in ", strWhich, ", assuming value 0.");
 		}
 
 		if(!bOk0 || !bOk1)
 		{
-			log_err("Could not parse ", strWhich, " expression.");
+			tl::log_err("Could not parse ", strWhich, " expression.");
 		}
 
 		sym2.dVal0 = eval_tree(node0, syms0, 0);
@@ -1179,7 +1179,7 @@ static std::vector<SymbolWith2Values> parse_symbol_with_2values(const std::strin
 	bool bOk = qi::phrase_parse(str.begin(), str.end(), lp, ascii::space, params);
 	if(!bOk)
 	{
-		log_err("Error parsing ", strWhich, ": ", lp.ostrErr.str());
+		tl::log_err("Error parsing ", strWhich, ": ", lp.ostrErr.str());
 	}
 
 	symbol_with_2values_fill_in(params, strWhich);

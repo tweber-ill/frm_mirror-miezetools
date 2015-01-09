@@ -6,7 +6,7 @@
 
 #include "RoiDlg.h"
 #include "../main/settings.h"
-#include "../helper/string.h"
+#include "../tlibs/string/string.h"
 
 #include <QtGui/QMenu>
 #include <QtGui/QFileDialog>
@@ -230,7 +230,7 @@ void RoiDlg::LoadRoi()
 
 	if(!bDirSet)
 	{
-		pGlobals->setValue("main/lastdir_roi", QString(::get_dir(strFile1).c_str()));
+		pGlobals->setValue("main/lastdir_roi", QString(tl::get_dir(strFile1).c_str()));
 		bDirSet = true;
 	}
 
@@ -261,7 +261,7 @@ void RoiDlg::SaveRoi()
 
 	if(!bDirSet)
 	{
-		pGlobals->setValue("main/lastdir_roi", QString(::get_dir(strFile1).c_str()));
+		pGlobals->setValue("main/lastdir_roi", QString(tl::get_dir(strFile1).c_str()));
 		bDirSet = true;
 	}
 

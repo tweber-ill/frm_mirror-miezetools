@@ -18,9 +18,9 @@ typedef unsigned char uchar;
 namespace ublas = boost::numeric::ublas;
 
 #include "../roi/roi.h"
-#include "../helper/xml.h"
+#include "../tlibs/file/xml.h"
 #include "../helper/blob.h"
-#include "../helper/string.h"
+#include "../tlibs/string/string.h"
 #include "../helper/string_map.h"
 
 enum DataType
@@ -44,7 +44,7 @@ class Data4;
 extern void load_xml_vecs(unsigned int iNumVecs,
 		std::vector<double>** pvecs,
 		const std::string* pstrs,
-		Xml& xml,
+		tl::Xml& xml,
 		const std::string& strBase,
 		Blob& blob);
 
@@ -142,7 +142,7 @@ public:
 	virtual ~DataInterface() {}
 	virtual DataType GetType() const = 0;
 
-	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 
 	StringMap& GetParamMapDyn() { return m_mapDynData; }
@@ -197,7 +197,7 @@ public:
 
 	void CopyXYRangeFrom(const XYRange* pRan);
 
-	bool LoadRangeXml(Xml& xml, const std::string& strBase);
+	bool LoadRangeXml(tl::Xml& xml, const std::string& strBase);
 	bool SaveRangeXml(std::ostream& ostr) const;
 };
 

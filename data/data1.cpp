@@ -7,7 +7,7 @@
 
 #include "data1.h"
 
-#include "../helper/math.h"
+#include "../tlibs/math/math.h"
 #include <limits>
 #include <boost/algorithm/minmax_element.hpp>
 
@@ -157,7 +157,7 @@ void Data1::GetYErrMinMax(double& dYMin, double& dYMax) const
 }
 
 
-bool Data1::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+bool Data1::LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase)
 {
 	unsigned int uiLen = xml.Query<unsigned int>((strBase + "length").c_str(), 0);
 	m_vecValsX.resize(uiLen);

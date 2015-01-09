@@ -22,11 +22,11 @@
 
 #include "settings.h"
 
-#include "../helper/string.h"
-#include "../helper/file.h"
-#include "../helper/misc.h"
-#include "../helper/mieze.hpp"
-#include "../helper/xml.h"
+#include "../tlibs/string/string.h"
+#include "../tlibs/file/file.h"
+#include "../tlibs/helper/misc.h"
+#include "../tlibs/math/mieze.hpp"
+#include "../tlibs/file/xml.h"
 
 #include "../dialogs/ListDlg.h"
 #include "../dialogs/SettingsDlg.h"
@@ -35,7 +35,7 @@
 
 #include "../fitter/models/msin.h"
 #include "../fitter/models/gauss.h"
-#include "../helper/interpolation.h"
+#include "../tlibs/math/interpolation.h"
 
 #include "../data/export.h"
 
@@ -796,20 +796,20 @@ void MiezeMainWnd::Interpolation(SubWindowBase* pSWB, InterpFkt iFkt)
 
 	const std::vector<double> *pvecDatX, *pvecDatY;
 	dat.GetData(&pvecDatX, &pvecDatY);
-	const double *px = ::vec_to_array(*pvecDatX);
-	const double *py = ::vec_to_array(*pvecDatY);
+	const double *px = tl::vec_to_array(*pvecDatX);
+	const double *py = tl::vec_to_array(*pvecDatY);
 	const unsigned int iLen = pvecDatX->size();
 
 	if(iFkt == INTERP_BEZIER)
 	{
-		Bezier bezier(iLen, px, py);
+		tl::Bezier bezier(iLen, px, py);
 		pPlot->plot_param(bezier);
 	}
 	else if(iFkt == INTERP_BSPLINE)
 	{
 		const int iDegree = Settings::Get<int>("interpolation/spline_degree");
 
-		BSpline spline(iLen, px, py, iDegree);
+		tl::BSpline spline(iLen, px, py, iDegree);
 		pPlot->plot_param(spline);
 	}
 	else

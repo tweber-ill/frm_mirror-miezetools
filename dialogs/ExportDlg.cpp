@@ -6,7 +6,7 @@
 
 #include "ExportDlg.h"
 #include "ListDlg.h"
-#include "../helper/string.h"
+#include "../tlibs/string/string.h"
 #include "../main/settings.h"
 #include "../data/export.h"
 
@@ -150,7 +150,7 @@ void ExportDlg::Export()
 		return;
 
 	std::string strFile1 = strFile.toStdString();
-	std::string strExt = get_fileext(strFile1);
+	std::string strExt = tl::get_fileext(strFile1);
 	if(strExt != "py")
 		strFile1 += ".py";
 
@@ -164,7 +164,7 @@ void ExportDlg::Export()
 
 
 	if(export_subplots_py(strFile1.c_str(), vecSWB, spinSubplotH->value(), spinSubplotV->value()))
-		pGlobals->setValue("main/lastdir_py", QString(::get_dir(strFile1).c_str()));
+		pGlobals->setValue("main/lastdir_py", QString(tl::get_dir(strFile1).c_str()));
 	else
 		QMessageBox::critical(this, "Error", "Export to Python failed.");
 

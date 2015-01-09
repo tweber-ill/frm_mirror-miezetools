@@ -12,9 +12,9 @@
 #include <string>
 #include <iostream>
 #include "../roi/roi.h"
-#include "../helper/xml.h"
+#include "../tlibs/file/xml.h"
 #include "../helper/blob.h"
-#include "../helper/string.h"
+#include "../tlibs/string/string.h"
 #include "../helper/string_map.h"
 
 class DataInterface;
@@ -86,7 +86,7 @@ public:
 	virtual Roi* GetROI(bool bAntiRoi=0) { return 0; }
 
 
-	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase) { return false; }
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase) { return false; }
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return false; }
 
 	virtual void RefreshPlot() {}

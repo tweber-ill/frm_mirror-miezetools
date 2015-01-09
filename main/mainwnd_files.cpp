@@ -6,14 +6,14 @@
  */
 
 #include "mainwnd.h"
-#include "../dialogs/ComboDlg.h"
-#include "../helper/string.h"
-#include "../helper/misc.h"
-#include "../helper/comp.h"
-#include "../helper/file.h"
-#include "../helper/log.h"
 #include "settings.h"
-#include "../loader/loadtxt.h"
+#include "../dialogs/ComboDlg.h"
+#include "../tlibs/string/string.h"
+#include "../tlibs/helper/misc.h"
+#include "../tlibs/file/comp.h"
+#include "../tlibs/file/file.h"
+#include "../tlibs/helper/log.h"
+#include "../tlibs/file/loadtxt.h"
 #include "../loader/loadnicos.h"
 #include "../loader/loadcasc.h"
 
@@ -30,31 +30,31 @@
 
 void MiezeMainWnd::LoadFile(const std::string& _strFile)
 {
-	TmpFile tmp;
+	tl::TmpFile tmp;
 
 	std::string strFile = _strFile;
-	std::string strExt = get_fileext(strFile);
+	std::string strExt = tl::get_fileext(strFile);
 	if(strExt == "gz" || strExt == "bz2")
 	{
-		strExt = get_fileext2(strFile);
+		strExt = tl::get_fileext2(strFile);
 
 		if(!tmp.open())
 		{
-			log_err("Cannot create temporary file for \"", strFile, "\".");
+			tl::log_err("Cannot create temporary file for \"", strFile, "\".");
 			return;
 		}
 
 		strFile = tmp.GetFileName();
-		if(!decomp_file_to_file(_strFile.c_str(), strFile.c_str()))
+		if(!tl::decomp_file_to_file(_strFile.c_str(), strFile.c_str()))
 		{
-			log_err("Cannot decompress file \"", strFile, "\".");
+			tl::log_err("Cannot decompress file \"", strFile, "\".");
 			return;
 		}
 	}
 
-	std::string strFileNoDir = ::get_file(_strFile);
+	std::string strFileNoDir = tl::get_file(_strFile);
 
-	if(str_is_equal(strExt, std::string("tof")))
+	if(tl::str_is_equal(strExt, std::string("tof")))
 	{
 		TofFile tof(strFile.c_str());
 		if(!tof.IsOpen())
@@ -78,10 +78,10 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			const uint* pDat = tof.GetData(iFoil);
 			if(!pDat)
 			{
-				log_err("Could not load \"", strFileNoDir, "\" correctly.");
+				tl::log_err("Could not load \"", strFileNoDir, "\" correctly.");
 				break;
 			}
-			convert(pdDat, pDat, iW*iH*iTcCnt);
+			tl::convert(pdDat, pDat, iW*iH*iTcCnt);
 
 			//for(unsigned int iTc=0; iTc<iTcCnt; ++iTc)
 			//	for(unsigned int iY=0; iY<iH; ++iY)
@@ -89,7 +89,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 
 			tof.ReleaseData(pDat);
 
-			apply_fkt(pdDat, pdErr, ::sqrt, iW*iH*iTcCnt);
+			tl::apply_fkt(pdDat, pdErr, ::sqrt, iW*iH*iTcCnt);
 			dat4.SetVals(iFoil, pdDat, pdErr);
 		}
 		delete[] pdDat;
@@ -109,7 +109,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		AddSubWindow(pSWB);
 		pSWB->GetActualWidget()->RefreshPlot();*/
 	}
-	else if(str_is_equal(strExt, std::string("pad")))
+	else if(tl::str_is_equal(strExt, std::string("pad")))
 	{
 		PadFile pad(strFile.c_str());
 		if(!pad.IsOpen())
@@ -118,7 +118,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		const uint* pDat = pad.GetData();
 		if(!pDat)
 		{
-			log_err("Could not load \"", strFileNoDir, "\".");
+			tl::log_err("Could not load \"", strFileNoDir, "\".");
 			return;
 		}
 
@@ -126,7 +126,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		const uint iH = pad.GetHeight();
 
 		double *pdDat = new double[iW*iH];
-		convert(pdDat, pDat, iW*iH);
+		tl::convert(pdDat, pDat, iW*iH);
 		//for(unsigned int iY=0; iY<iH; ++iY)
 		//	convert(pdDat+iY*iW, pDat+(iH-iY-1)*iW, iW);
 
@@ -143,9 +143,9 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		AddSubWindow(pPlot);
 		pPlot->GetActualWidget()->RefreshPlot();
 	}
-	else if(str_is_equal(strExt, std::string("dat")) || str_is_equal(strExt, std::string("sim")))
+	else if(tl::str_is_equal(strExt, std::string("dat")) || tl::str_is_equal(strExt, std::string("sim")))
 	{
-		LoadTxt * pdat = new LoadTxt();
+		tl::LoadTxt * pdat = new tl::LoadTxt();
 		if(!pdat->Load(strFile.c_str()))
 		{
 			QString strErr = QString("Could not load \"") + QString(strFile.c_str()) +QString("\".");
@@ -154,9 +154,9 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		}
 
 
-		TxtType dattype = pdat->GetFileType();
+		tl::TxtType dattype = pdat->GetFileType();
 
-		if(dattype == MCSTAS_DATA)
+		if(dattype == tl::MCSTAS_DATA)
 		{
 			StringMap mapStr;
 			mapStr.SetMap(vecmap_to_map<std::string>(pdat->GetCommMap()));
@@ -166,8 +166,8 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			//dat.SetMapVal<int>("which-col-is-yerr", 2);
 
 			int iArrayDim = 1;
-			const LoadTxt::t_mapComm& mapComm = pdat->GetCommMap();
-			LoadTxt::t_mapComm::const_iterator iter = mapComm.find("type");
+			const tl::LoadTxt::t_mapComm& mapComm = pdat->GetCommMap();
+			tl::LoadTxt::t_mapComm::const_iterator iter = mapComm.find("type");
 			if(iter != mapComm.end() && (*iter).second.size()>=1)
 			{
 				const std::string& strType = (*iter).second[0];
@@ -182,7 +182,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 
 			if(iArrayDim == 1)
 			{
-				Data1D * pdat1d = new Data1D(*pdat);
+				tl::Data1D * pdat1d = new tl::Data1D(*pdat);
 
 				int iX=0, iY=1, iYErr=2;
 				pdat1d->GetColumnIndices(iX, iY, iYErr);
@@ -193,12 +193,12 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				if(Settings::Get<int>("misc/sort_x"))
 				{
 					if(pdyerr)
-						::sort_3<double*>((double*)pdx,
+						tl::sort_3<double*>((double*)pdx,
 								(double*)pdx+pdat1d->GetDim(),
 								(double*)pdy,
 								(double*)pdyerr);
 					else
-						::sort_2<double*>((double*)pdx,
+						tl::sort_2<double*>((double*)pdx,
 								(double*)pdx+pdat1d->GetDim(),
 								(double*)pdy);
 				}
@@ -227,7 +227,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			}
 			else if(iArrayDim == 2)
 			{
-				Data2D* pdat2d = new Data2D(*pdat);
+				tl::Data2D* pdat2d = new tl::Data2D(*pdat);
 
 				const uint iW = pdat2d->GetXDim();
 				const uint iH = pdat2d->GetYDim();
@@ -275,7 +275,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			}
 			else if(iArrayDim == 3)
 			{
-				Data3D* pdat3d = new Data3D(*pdat);
+				tl::Data3D* pdat3d = new tl::Data3D(*pdat);
 
 				const uint iW = pdat3d->GetXDim();
 				const uint iH = pdat3d->GetYDim();
@@ -326,13 +326,13 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 				AddSubWindow(pPlotWrapper);
 			}
 		}
-		else if(dattype == NICOS_DATA)
+		else if(dattype == tl::NICOS_DATA)
 		{
 			NicosData * pnicosdat = new NicosData(*pdat);
 			StringMap mapStr;
 			mapStr.SetMap(vecmap_to_map<std::string>(pdat->GetCommMap()));
 
-			::autodeleter<NicosData> _a0(pnicosdat);
+			tl::autodeleter<NicosData> _a0(pnicosdat);
 			std::string strCtrName = Settings::Get<QString>("nicos/counter_name").toStdString();
 
 			bool bSelectNewXColumn = 0;
@@ -379,17 +379,17 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			const double *pdx = pnicosdat->GetColumn(iX);
 			const double *pdy = pnicosdat->GetColumn(iY);
 			double *pdyerr = new double[pnicosdat->GetDim()];
-			::apply_fkt<double>(pdy, pdyerr, sqrt, pnicosdat->GetDim());
+			tl::apply_fkt<double>(pdy, pdyerr, sqrt, pnicosdat->GetDim());
 
 			if(Settings::Get<int>("misc/sort_x"))
 			{
 				if(pdyerr)
-					::sort_3<double*>((double*)pdx,
+					tl::sort_3<double*>((double*)pdx,
 							(double*)pdx+pnicosdat->GetDim(),
 							(double*)pdy,
 							pdyerr);
 				else
-					::sort_2<double*>((double*)pdx,
+					tl::sort_2<double*>((double*)pdx,
 							(double*)pdx+pnicosdat->GetDim(),
 							(double*)pdy);
 			}
@@ -446,7 +446,7 @@ void MiezeMainWnd::FileLoadTriggered()
 	for(const QString& strFile : strFiles)
 	{
 		std::string strFile1 = strFile.toStdString();
-		std::string strFileNoDir = ::get_file(strFile1);
+		std::string strFileNoDir = tl::get_file(strFile1);
 
 		std::ostringstream ostrMsg;
 		ostrMsg << "Loading " << (iFile+1) << " of " << strFiles.size() << ": "
@@ -456,11 +456,11 @@ void MiezeMainWnd::FileLoadTriggered()
 		if(strFile == "")
 			continue;
 
-		std::string strExt = get_fileext(strFile1);
+		std::string strExt = tl::get_fileext(strFile1);
 
 		if(!bDirSet)
 		{
-			pGlobals->setValue("main/lastdir", QString(::get_dir(strFile1).c_str()));
+			pGlobals->setValue("main/lastdir", QString(tl::get_dir(strFile1).c_str()));
 			bDirSet = true;
 		}
 
@@ -585,12 +585,12 @@ void MiezeMainWnd::FileExportPyTriggered()
 		return;
 
 	std::string strFile1 = strFile.toStdString();
-	std::string strExt = get_fileext(strFile1);
+	std::string strExt = tl::get_fileext(strFile1);
 	if(strExt != "py")
 		strFile1 += ".py";
 
 	if(export_py(strFile1.c_str(), pSWB))
-		pGlobals->setValue("main/lastdir_py", QString(::get_dir(strFile1).c_str()));
+		pGlobals->setValue("main/lastdir_py", QString(tl::get_dir(strFile1).c_str()));
 	else
 		QMessageBox::critical(this, "Error", "Export to Python failed.");
 }

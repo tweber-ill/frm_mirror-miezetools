@@ -9,7 +9,7 @@
 #include <cmath>
 
 #include "chi2.h"
-#include "../helper/misc.h"
+#include "../tlibs/helper/misc.h"
 
 // chi^2 calculation
 // based on the example in the Minuit user's guide:
@@ -19,7 +19,7 @@ double Chi2Function::chi2(const std::vector<double>& vecParams) const
 	// cannot operate on m_pfkt directly, because Minuit
 	// uses more than one thread!
 	FunctionModel* pfkt = m_pfkt->copy();
-	autodeleter<FunctionModel> a(pfkt);
+	tl::autodeleter<FunctionModel> a(pfkt);
 
 	bool bParamsOk = pfkt->SetParams(vecParams);
 	//if(!bParamsOk)
@@ -45,12 +45,12 @@ double Chi2Function::chi2(const std::vector<double>& vecParams) const
 double Chi2Function_nd::chi2(const std::vector<double>& vecParams) const
 {
 	FunctionModel_nd* pfkt = m_pfkt->copy();
-	autodeleter<FunctionModel_nd> _a0(pfkt);
+	tl::autodeleter<FunctionModel_nd> _a0(pfkt);
 
 	bool bParamsOk = pfkt->SetParams(vecParams);
 
 	double *px = new double[m_uiDim];
-	autodeleter<double> _a1(px, 1);
+	tl::autodeleter<double> _a1(px, 1);
 
 	double dChi2 = 0.;
 

@@ -18,7 +18,7 @@
 #include "freefit-nd.h"
 #include "freefit.h"
 #include "../chi2.h"
-#include "../../helper/log.h"
+#include "../../tlibs/helper/log.h"
 
 
 static std::string get_param_name(unsigned int iNum)
@@ -44,7 +44,7 @@ FreeFktModel_nd::FreeFktModel_nd(unsigned int uiDim, const char* pcExp)
 	{
 		std::vector<Symbol> vecFreeParams = GetFreeParams();
 		m_parser.SetFreeParams(vecFreeParams);
-		
+
 		std::string strExpression = pcExp;
 		m_parser.ParseExpression(strExpression);
 	}
@@ -92,7 +92,7 @@ bool FreeFktModel_nd::SetParams(const std::vector<double>& vecParams)
 
 	if(syms.size() != vecParams.size())
 	{
-		log_err(syms.size(), " symbols in table, but ",
+		tl::log_err(syms.size(), " symbols in table, but ",
 			vecParams.size(), " symbols supplied.");
 
 		return false;
@@ -115,7 +115,7 @@ double FreeFktModel_nd::operator()(const double* px) const
 	std::cout << ") = ";
 	std::cout << dVal << std::endl;
 	*/
-	
+
 	return dVal;
 }
 
@@ -140,7 +140,7 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 					FreeFktModel_nd** pFinalModel)
 {
 	//std::cout << "dim = " << uiDim << ", len = " << iLen << std::endl;
-	
+
 	std::vector<ParameterLimits> vecLimits;
 	std::vector<ParameterHints> vecHints;
 
@@ -160,14 +160,14 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 	FreeFktModel_nd freemod(uiDim, pcExp);
 	if(!freemod.IsOk())
 	{
-		log_err("N-dim free function model could not be created.");
+		tl::log_err("N-dim free function model could not be created.");
 		return 0;
 	}
-	
+
 	Chi2Function_nd fkt(&freemod, iLen, ppx, py, pdy);
 
 	std::vector<Symbol>& syms = freemod.GetSymbols();
-	
+
 
 	ROOT::Minuit2::MnUserParameters params;
 	for(const Symbol& sym : syms)
@@ -233,12 +233,12 @@ bool get_freefit_nd(unsigned int uiDim, unsigned int iLen,
 
 	//if(iFitterVerbosity >= 3)
 	{
-		log_info("result of user-defined fit step 1");
+		tl::log_info("result of user-defined fit step 1");
 		std::ostringstream ostrMini; ostrMini << mini;
-		log_info(ostrMini.str());
-		log_info("result of user-defined fit step 2");
+		tl::log_info(ostrMini.str());
+		tl::log_info("result of user-defined fit step 2");
 		std::ostringstream ostrMini2; ostrMini2 << mini2;
-		log_info(ostrMini2.str());
+		tl::log_info(ostrMini2.str());
 	}
 
 	return bValidFit;

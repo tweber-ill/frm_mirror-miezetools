@@ -13,11 +13,11 @@
 #include "ListDlg.h"
 #include "../main/settings.h"
 
-#include "../helper/mieze.hpp"
-#include "../helper/fourier.h"
-#include "../helper/misc.h"
-#include "../helper/math.h"
-#include "../helper/log.h"
+#include "../tlibs/math/mieze.hpp"
+#include "../tlibs/math/fourier.h"
+#include "../tlibs/helper/misc.h"
+#include "../tlibs/math/math.h"
+#include "../tlibs/helper/log.h"
 
 #include "../fitter/models/msin.h"
 
@@ -77,7 +77,7 @@ void PsdPhaseDlg::Update()
 	units::quantity<units::si::plane_angle> pase_offs = spinPhase->value()*units::si::radians;
 
 	ublas::matrix<double> matPhases;
-	mieze_reduction_det(lx, ly, xpos, ypos, Ls, tau, lam, pase_offs, iXPixels, iYPixels, &matPhases);
+	tl::mieze_reduction_det(lx, ly, xpos, ypos, Ls, tau, lam, pase_offs, iXPixels, iYPixels, &matPhases);
 
 	m_dat.FromMatrix(matPhases);
 	m_dat.SetXRange(-lx/2./cm, lx/2./cm);
@@ -257,7 +257,7 @@ void PsdPhaseCorrDlg::RefreshPhaseCombo()
 	// get previously selected item
 	const int iLastIdx = comboPhaseImg->currentIndex();
 	const Plot2d* pLastPlt = 0;
-	if(iLastIdx>=0 && iLastIdx<m_vecPhaseImgs.size())
+	if(iLastIdx>=0 && iLastIdx<int(m_vecPhaseImgs.size()))
 		pLastPlt = m_vecPhaseImgs[iLastIdx];
 
 
@@ -331,7 +331,7 @@ void PsdPhaseCorrDlg::DoPhaseCorr()
 	if(meth == METH_THEO)
 	{
 		int iPhaseIdx = comboPhaseImg->currentIndex();
-		if(iPhaseIdx<0 || iPhaseIdx>=m_vecPhaseImgs.size())
+		if(iPhaseIdx<0 || iPhaseIdx>=int(m_vecPhaseImgs.size()))
 		{
 			QMessageBox::critical(this, "Error", "No phase image selected.");
 			return;
@@ -374,14 +374,14 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 	{
 		pPhases = &pPhasesPlot->GetData2();
 		if(pDat->GetWidth()!=pPhases->GetWidth() || pDat->GetHeight()!=pPhases->GetHeight())
-			log_warn("Pixel sizes of \"", pDatPlot->windowTitle().toStdString(),
+			tl::log_warn("Pixel sizes of \"", pDatPlot->windowTitle().toStdString(),
 					"\" and \"", pPhasesPlot->windowTitle().toStdString(),
 					"\" do not match.");
 	}
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 
-	Fourier fourier(pDat->GetDepth());
+	tl::Fourier fourier(pDat->GetDepth());
 	double *pdMem = new double[pDat->GetDepth()*5];
 	double *pdY = pdMem;
 	double *pdY_shift = pdMem + 1*pDat->GetDepth();
@@ -423,7 +423,7 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 				}
 				else if(meth == METH_FIT)
 				{
-					double dFreq = get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
+					double dFreq = tl::get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
 					double dThisNumOsc = dNumOsc;
 
 					MiezeSinModel* pModel = 0;
@@ -452,7 +452,7 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 
 	if(iUnfittedPixels)
 	{
-		log_err("PSD phase correction: Could not fit ", iUnfittedPixels, " pixels.");
+		tl::log_err("PSD phase correction: Could not fit ", iUnfittedPixels, " pixels.");
 	}
 
 	delete[] pdMem;
@@ -476,14 +476,14 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 	{
 		pPhases = &pPhasesPlot->GetData2();
 		if(pDat->GetWidth()!=pPhases->GetWidth() || pDat->GetHeight()!=pPhases->GetHeight())
-			log_warn("Pixel sizes of \"", pDatPlot->windowTitle().toStdString(),
+			tl::log_warn("Pixel sizes of \"", pDatPlot->windowTitle().toStdString(),
 					"\" and \"", pPhasesPlot->windowTitle().toStdString(),
 					"\" do not match.");
 	}
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 
-	Fourier fourier(pDat->GetDepth());
+	tl::Fourier fourier(pDat->GetDepth());
 	double *pdMem = new double[pDat->GetDepth()*5];
 	double *pdY = pdMem;
 	double *pdY_shift = pdMem + 1*pDat->GetDepth();
@@ -526,7 +526,7 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 					}
 					else if(meth == METH_FIT)
 					{
-						double dFreq = get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
+						double dFreq = tl::get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
 						double dThisNumOsc = dNumOsc;
 
 						MiezeSinModel* pModel = 0;
@@ -555,7 +555,7 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 
 	if(iUnfittedPixels)
 	{
-		log_err("PSD phase correction: Could not fit ", iUnfittedPixels, " pixels.");
+		tl::log_err("PSD phase correction: Could not fit ", iUnfittedPixels, " pixels.");
 	}
 
 	delete[] pdMem;

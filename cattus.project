@@ -26,6 +26,54 @@
  }]]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="tlibs">
+    <VirtualDirectory Name="file">
+      <File Name="tlibs/file/comp.cpp"/>
+      <File Name="tlibs/file/xml.cpp"/>
+      <File Name="tlibs/file/file.cpp"/>
+      <File Name="tlibs/file/loadtxt.cpp"/>
+      <File Name="tlibs/file/file.h"/>
+      <File Name="tlibs/file/loadtxt.h"/>
+      <File Name="tlibs/file/comp.h"/>
+      <File Name="tlibs/file/xml.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="helper">
+      <File Name="tlibs/helper/log.h"/>
+      <File Name="tlibs/helper/flags.cpp"/>
+      <File Name="tlibs/helper/flags.h"/>
+      <File Name="tlibs/helper/misc.h"/>
+      <File Name="tlibs/helper/exception.h"/>
+      <File Name="tlibs/helper/log.cpp"/>
+      <File Name="tlibs/helper/traits.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="math">
+      <File Name="tlibs/math/fourier.h"/>
+      <File Name="tlibs/math/rand.h"/>
+      <File Name="tlibs/math/linalg2.h" ExcludeProjConfig="Debug;Release"/>
+      <File Name="tlibs/math/fourier.cpp"/>
+      <File Name="tlibs/math/linalg2.cpp" ExcludeProjConfig="Debug;Release"/>
+      <File Name="tlibs/math/linalg.h"/>
+      <File Name="tlibs/math/lattice.h"/>
+      <File Name="tlibs/math/minuit.h" ExcludeProjConfig="Debug;Release"/>
+      <File Name="tlibs/math/rand.cpp"/>
+      <File Name="tlibs/math/interpolation.h"/>
+      <File Name="tlibs/math/bz.h"/>
+      <File Name="tlibs/math/quat.h"/>
+      <File Name="tlibs/math/geo.h"/>
+      <File Name="tlibs/math/neutrons.hpp"/>
+      <File Name="tlibs/math/mieze.hpp"/>
+      <File Name="tlibs/math/funcmod.h"/>
+      <File Name="tlibs/math/math.h"/>
+      <File Name="tlibs/math/minuit.cpp" ExcludeProjConfig="Debug;Release"/>
+      <File Name="tlibs/math/interpolation.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="string">
+      <File Name="tlibs/string/spec_char.cpp"/>
+      <File Name="tlibs/string/string.h"/>
+      <File Name="tlibs/string/spec_char.h"/>
+      <File Name="tlibs/string/string.cpp"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
   <VirtualDirectory Name="tools">
     <VirtualDirectory Name="formula">
       <File Name="tools/formula/formula_main.cpp" ExcludeProjConfig="Debug;Release"/>
@@ -54,8 +102,6 @@
   <VirtualDirectory Name="dialogs">
     <File Name="dialogs/CombineDlg.cpp"/>
     <File Name="dialogs/ComboDlg.cpp"/>
-    <File Name="dialogs/LatticeDlg.h" ExcludeProjConfig="Debug;Release"/>
-    <File Name="dialogs/LatticeDlg.cpp" ExcludeProjConfig="Debug;Release"/>
     <File Name="dialogs/InfoDock.cpp"/>
     <File Name="dialogs/NormDlg.h"/>
     <File Name="dialogs/SettingsDlg.h"/>
@@ -98,61 +144,25 @@
       <File Name="fitter/models/msin.cpp"/>
       <File Name="fitter/models/msin.h"/>
       <File Name="fitter/models/gauss-nd.h" ExcludeProjConfig="Debug;Release"/>
-      <File Name="fitter/models/interpolation.h"/>
       <File Name="fitter/models/gauss-nd.cpp" ExcludeProjConfig="Debug;Release"/>
       <File Name="fitter/models/freefit-nd.h" ExcludeProjConfig="Debug;Release"/>
       <File Name="fitter/models/freefit.cpp"/>
       <File Name="fitter/models/gauss.cpp"/>
-      <File Name="fitter/models/interpolation.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="helper">
-    <File Name="helper/fourier.h"/>
     <File Name="helper/string_map.cpp"/>
-    <File Name="helper/spec_char.cpp"/>
-    <File Name="helper/rand.h"/>
-    <File Name="helper/linalg2.h" ExcludeProjConfig="Debug;Release"/>
     <File Name="helper/blob.h"/>
-    <File Name="helper/fourier.cpp"/>
-    <File Name="helper/comp.cpp"/>
-    <File Name="helper/linalg2.cpp" ExcludeProjConfig="Debug;Release"/>
-    <File Name="helper/string.h"/>
-    <File Name="helper/log.h"/>
-    <File Name="helper/flags.cpp" ExcludeProjConfig="Debug;Release"/>
-    <File Name="helper/lattice.cpp" ExcludeProjConfig="Debug;Release"/>
     <File Name="helper/string_map.h"/>
-    <File Name="helper/linalg.h"/>
-    <File Name="helper/gnuplot.cpp" ExcludeProjConfig="Debug;Release"/>
-    <File Name="helper/lattice.h" ExcludeProjConfig="Debug;Release"/>
     <File Name="helper/formulas.h"/>
-    <File Name="helper/flags.h" ExcludeProjConfig="Debug;Release"/>
-    <File Name="helper/rand.cpp"/>
-    <File Name="helper/spec_char.h"/>
     <File Name="helper/blob.cpp"/>
-    <File Name="helper/xml.cpp"/>
-    <File Name="helper/misc.h"/>
-    <File Name="helper/gnuplot.h" ExcludeProjConfig="Debug;Release"/>
-    <File Name="helper/linalg.cpp"/>
-    <File Name="helper/string.cpp"/>
-    <File Name="helper/geo.h" ExcludeProjConfig="Debug;Release"/>
-    <File Name="helper/neutrons.hpp"/>
-    <File Name="helper/mieze.hpp"/>
     <File Name="helper/formulas.cpp"/>
-    <File Name="helper/file.cpp"/>
-    <File Name="helper/math.h"/>
-    <File Name="helper/file.h"/>
-    <File Name="helper/exception.h"/>
-    <File Name="helper/log.cpp"/>
-    <File Name="helper/comp.h"/>
-    <File Name="helper/xml.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="loader">
     <File Name="loader/loadcasc.cpp"/>
     <File Name="loader/loadnicos.cpp"/>
     <File Name="loader/loadcasc.h"/>
-    <File Name="loader/loadtxt.cpp"/>
     <File Name="loader/loadnicos.h"/>
-    <File Name="loader/loadtxt.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="main">
     <File Name="main/settings.cpp"/>
@@ -173,9 +183,7 @@
     <File Name="plot/plot3d.cpp"/>
     <File Name="plot/plot2d.cpp"/>
     <File Name="plot/plot.cpp"/>
-    <File Name="plot/plotgl.cpp" ExcludeProjConfig="Debug;Release"/>
     <File Name="plot/plot.h"/>
-    <File Name="plot/plotgl.h" ExcludeProjConfig="Debug;Release"/>
     <File Name="plot/plot3d.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="roi">

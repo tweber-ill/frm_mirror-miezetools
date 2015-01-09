@@ -5,7 +5,6 @@
  * @date 2011, 23-apr-2013
  */
 
-#include "../helper/math.h"
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -13,9 +12,9 @@
 
 #include "roi.h"
 #include "pnpoly.h"
-#include "../helper/math.h"
-#include "../helper/linalg.h"
-#include "../helper/log.h"
+#include "../tlibs/math/math.h"
+#include "../tlibs/math/linalg.h"
+#include "../tlibs/helper/log.h"
 #include "../data/data.h"
 
 //------------------------------------------------------------------------------
@@ -158,10 +157,10 @@ bool RoiRect::IsInside(double dX, double dY) const
 	vecPoint[0] = dX;
 	vecPoint[1] = dY;
 
-	if(!float_equal(m_dAngle, 0.))
+	if(!tl::float_equal(m_dAngle, 0.))
 	{
 		ublas::vector<double> vecCenter = m_bottomleft + (m_topright-m_bottomleft)*.5;
-		ublas::matrix<double> matRot_inv = ::rotation_matrix_2d(-m_dAngle/180.*M_PI);
+		ublas::matrix<double> matRot_inv = tl::rotation_matrix_2d(-m_dAngle/180.*M_PI);
 		vecPoint = ublas::prod(matRot_inv, (vecPoint-vecCenter)) + vecCenter;
 	}
 
@@ -252,7 +251,7 @@ ublas::vector<double> RoiRect::GetVertex(unsigned int i) const
 	}
 
 	ublas::vector<double> vecCenter = bottomleft + (topright-bottomleft)*.5;
-	ublas::matrix<double> matRot = ::rotation_matrix_2d(m_dAngle / 180. * M_PI);
+	ublas::matrix<double> matRot = tl::rotation_matrix_2d(m_dAngle / 180. * M_PI);
 
 	vecRet = ublas::prod(matRot, (vecRet-vecCenter)) + vecCenter;
 	return vecRet;
@@ -1019,7 +1018,7 @@ void RoiPolygon::SetParam(int iParam, double dVal)
 	int iVertex = iParam/2;
 	int iCoord = iParam%2;
 
-	if(iVertex < GetVertexCount())
+	if(iVertex < int(GetVertexCount()))
 		m_vertices[iVertex][iCoord] = dVal;
 	else
 	{
@@ -1081,7 +1080,7 @@ Roi& Roi::operator=(const Roi& roi)
 {
 	clear();
 
-	for(int i=0; i<roi.GetNumElements(); ++i)
+	for(unsigned int i=0; i<roi.GetNumElements(); ++i)
 	{
 		const RoiElement& elem = roi.GetElement(i);
 		RoiElement* pNewElem = elem.copy();
@@ -1187,7 +1186,7 @@ BoundingRect Roi::GetBoundingRect() const
 	BoundingRect totalrect;
 	totalrect.SetInvalidBounds();
 
-	for(int i=0; i<GetNumElements(); ++i)
+	for(unsigned int i=0; i<GetNumElements(); ++i)
 	{
 		const BoundingRect& rect = GetElement(i).GetBoundingRect();
 
@@ -1198,7 +1197,7 @@ BoundingRect Roi::GetBoundingRect() const
 	return totalrect;
 }
 
-bool Roi::LoadXML(Xml& xml, const std::string& strBase)
+bool Roi::LoadXML(tl::Xml& xml, const std::string& strBase)
 {
 	bool bOKActive=false;
 	SetRoiActive(xml.Query<bool>((strBase+m_strName+"/active").c_str(), 0, &bOKActive));
@@ -1245,7 +1244,7 @@ bool Roi::LoadXML(Xml& xml, const std::string& strBase)
 			}
 			else
 			{
-				log_err("Roi: Unknown element \"", strType, "\".");
+				tl::log_err("Roi: Unknown element \"", strType, "\".");
 				continue;
 			}
 
@@ -1275,10 +1274,10 @@ bool Roi::Load(const char* pcFile)
 {
 	clear();
 
-	Xml xml;
+	tl::Xml xml;
 	if(!xml.Load(pcFile))
 	{
-		log_err("Roi: Cannot load \"", pcFile, "\".");
+		tl::log_err("Roi: Cannot load \"", pcFile, "\".");
 		return false;
 	}
 
@@ -1291,7 +1290,7 @@ bool Roi::SaveXML(std::ostream& ostr) const
 	ostr << "<active> " << IsRoiActive() << " </active>\n\n";
 	ostr << "<elements>\n\n";
 
-	for(int i=0; i<GetNumElements(); ++i)
+	for(unsigned int i=0; i<GetNumElements(); ++i)
 	{
 		const RoiElement& elem = GetElement(i);
 		ostr << "\t<element_" << i << ">\n";
@@ -1321,7 +1320,7 @@ bool Roi::Save(const char* pcFile) const
 	std::ofstream ofstr(pcFile);
 	if(!ofstr.is_open())
 	{
-		log_err("Roi: Cannot save \"", pcFile, "\".");
+		tl::log_err("Roi: Cannot save \"", pcFile, "\".");
 		return false;
 	}
 

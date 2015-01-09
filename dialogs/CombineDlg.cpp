@@ -246,7 +246,7 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 				strXVal = (*pParamsStat)[strXParam];
 
 			double dXErr = 0.;
-			get_val_and_err(strXVal, pdX[iCur], dXErr);
+			tl::get_val_and_err(strXVal, pdX[iCur], dXErr);
 			strLabX = strXParam;
 		}
 		else
@@ -305,7 +305,7 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 			else if(pParamsStat && pParamsStat->HasKey(strParam))
 				strVal = (*pParamsStat)[strParam];
 
-			get_val_and_err(strVal, pdY[iCur], pdYErr[iCur]);
+			tl::get_val_and_err(strVal, pdY[iCur], pdYErr[iCur]);
 			strLabY = strParam;
 		}
 

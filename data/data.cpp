@@ -6,14 +6,14 @@
  */
 
 #include "data.h"
-#include "../helper/comp.h"
-#include "../helper/file.h"
-#include "../helper/log.h"
+#include "../tlibs/file/comp.h"
+#include "../tlibs/file/file.h"
+#include "../tlibs/helper/log.h"
 
 #include <fstream>
 
 
-bool DataInterface::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+bool DataInterface::LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase)
 {
 	// static parameters
 	bool bHasBlobIdx = 0;
@@ -28,7 +28,7 @@ bool DataInterface::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	void *pvMem = blob.map(iBlobIdx, iBlobLen);
 	if(!pvMem)
 	{
-		log_err("Cannot map static parameters from blob memory.");
+		tl::log_err("Cannot map static parameters from blob memory.");
 		return false;
 	}
 
@@ -51,7 +51,7 @@ bool DataInterface::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	pvMem = blob.map(iBlobIdx, iBlobLen);
 	if(!pvMem)
 	{
-		log_err("Cannot map misc parameters from blob memory.");
+		tl::log_err("Cannot map misc parameters from blob memory.");
 		return false;
 	}
 
@@ -97,7 +97,7 @@ bool DataInterface::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 void load_xml_vecs(unsigned int iNumVecs,
 						std::vector<double>** pvecs,
 						const std::string* pstrs,
-						Xml& xml,
+						tl::Xml& xml,
 						const std::string& strBase,
 						Blob& blob)
 {
@@ -119,8 +119,8 @@ void load_xml_vecs(unsigned int iNumVecs,
 					void *pvMemComp = blob.map(iBlobIdx, iLenComp);
 
 					double *pdMemUncomp = pvecs[iObj]->data();
-					if(!::decomp_mem_to_mem_fix(pvMemComp, (unsigned int)iLenComp, (void*)pdMemUncomp, pvecs[iObj]->size()*sizeof(double)))
-						log_err("Cannot decompress data in blob.");
+					if(!tl::decomp_mem_to_mem_fix(pvMemComp, (unsigned int)iLenComp, (void*)pdMemUncomp, pvecs[iObj]->size()*sizeof(double)))
+						tl::log_err("Cannot decompress data in blob.");
 
 					blob.unmap(pvMemComp);
 				}
@@ -132,7 +132,7 @@ void load_xml_vecs(unsigned int iNumVecs,
 				}
 			}
 			else
-				log_err("Blob usage enabled, but no blob index given!");
+				tl::log_err("Blob usage enabled, but no blob index given!");
 		}
 		else
 		{
@@ -170,8 +170,8 @@ void save_xml_vecs(unsigned int iNumVecs,
 			}
 			else
 			{
-				if(!comp_mem_to_stream((void*)pvecs[iObj]->data(), pvecs[iObj]->size()*sizeof(double), ostrBlob/*, COMP_BZ2*/))
-					log_err("Cannot compress data in blob.");
+				if(!tl::comp_mem_to_stream((void*)pvecs[iObj]->data(), pvecs[iObj]->size()*sizeof(double), ostrBlob/*, COMP_BZ2*/))
+					tl::log_err("Cannot compress data in blob.");
 			}
 
 			qint64 iBlobIdxNew = ostrBlob.tellp();
@@ -273,7 +273,7 @@ void XYRange::CopyXYRangeFrom(const XYRange* pRan)
 }
 
 
-bool XYRange::LoadRangeXml(Xml& xml, const std::string& strBase)
+bool XYRange::LoadRangeXml(tl::Xml& xml, const std::string& strBase)
 {
 	m_bHasRange = xml.Query<bool>((strBase+"range/active").c_str(), 0);
 	m_iWidth = xml.Query<unsigned int>((strBase+"range/width").c_str(), 0);

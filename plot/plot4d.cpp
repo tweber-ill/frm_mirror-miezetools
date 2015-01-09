@@ -11,10 +11,10 @@
 #include <sstream>
 #include <math.h>
 
-#include "../helper/string.h"
-#include "../helper/misc.h"
-#include "../helper/fourier.h"
-#include "../helper/mieze.hpp"
+#include "../tlibs/string/string.h"
+#include "../tlibs/helper/misc.h"
+#include "../tlibs/math/fourier.h"
+#include "../tlibs/math/mieze.hpp"
 #include "../data/fit_data.h"
 #include "../fitter/models/msin.h"
 #include "../main/settings.h"
@@ -75,8 +75,8 @@ void Plot4d::RefreshStatusMsgs()
 	if(m_bCountData)
 	{
 		std::ostringstream ostr_total;
-		ostr_total << "total counts: " << group_numbers<uint>(GetData().GetTotal())
-					  << ", counts: " << group_numbers<uint>(GetData2().GetTotal());
+		ostr_total << "total counts: " << tl::group_numbers<uint>(GetData().GetTotal())
+					  << ", counts: " << tl::group_numbers<uint>(GetData2().GetTotal());
 		emit SetStatusMsg(ostr_total.str().c_str(), 1);
 	}
 	else
@@ -129,12 +129,12 @@ Plot* Plot4d::ConvertTo1d(int iFoil)
 	const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
 	dat.GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
 
-	double *pdx = vec_to_array<double>(*pvecDatX);
-	double *pdy = vec_to_array<double>(*pvecDatY);
-	double *pdyerr = vec_to_array<double>(*pvecDatYErr);
-	autodeleter<double> _a0(pdx, 1);
-	autodeleter<double> _a1(pdy, 1);
-	autodeleter<double> _a2(pdyerr, 1);
+	double *pdx = tl::vec_to_array<double>(*pvecDatX);
+	double *pdy = tl::vec_to_array<double>(*pvecDatY);
+	double *pdyerr = tl::vec_to_array<double>(*pvecDatYErr);
+	tl::autodeleter<double> _a0(pdx, 1);
+	tl::autodeleter<double> _a1(pdy, 1);
+	tl::autodeleter<double> _a2(pdyerr, 1);
 
 
 	Plot *pPlot = new Plot(0, strTitle.c_str());
@@ -216,7 +216,7 @@ Plot3d* Plot4d::ConvertTo3d(int iFoil)
 }
 
 
-bool Plot4d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+bool Plot4d::LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase)
 {
 	m_dat4.LoadXML(xml, blob, strBase + "data/");
 	Plot2d::LoadXML(xml, blob, strBase+"sub_2d/");

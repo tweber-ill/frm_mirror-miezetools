@@ -12,9 +12,9 @@
 #include <iostream>
 #include <sstream>
 
-#include "../helper/misc.h"
-#include "../helper/math.h"
-#include "../helper/string.h"
+#include "../tlibs/helper/misc.h"
+#include "../tlibs/math/math.h"
+#include "../tlibs/string/string.h"
 
 #define PAD_X 24
 #define PAD_Y 24
@@ -113,7 +113,7 @@ uint Plot2d::GetSpectroColor01(double dVal) const
 
 	if(dLerpVal < 0.) dLerpVal = 0.;
 	if(dLerpVal > 1.) dLerpVal = 1.;
-	uint col = lerprgb(pcol1[iIdx], pcol2[iIdx], dLerpVal);
+	uint col = tl::lerprgb(pcol1[iIdx], pcol2[iIdx], dLerpVal);
 
 	return col;
 }
@@ -131,9 +131,9 @@ uint Plot2d::GetSpectroColor(double dVal) const
 
 	if(m_bLog)
 	{
-		dVal = safe_log10(dVal);
-		dMin = floor(safe_log10(dMin));
-		dMax = ceil(safe_log10(dMax));
+		dVal = tl::safe_log10(dVal);
+		dMin = floor(tl::safe_log10(dMin));
+		dMax = ceil(tl::safe_log10(dMax));
 
 		if(m_bCountData)
 		{
@@ -309,7 +309,7 @@ void Plot2d::RefreshStatusMsgs()
 		if(m_bCountData)
 		{
 			std::ostringstream ostr_total;
-			ostr_total << "total counts: " << group_numbers<uint>(m_dat.GetTotal());
+			ostr_total << "total counts: " << tl::group_numbers<uint>(m_dat.GetTotal());
 			emit SetStatusMsg(ostr_total.str().c_str(), 1);
 		}
 		else
@@ -372,7 +372,7 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 		}
 
 		if(m_bCountData)
-			ostr << group_numbers<uint>(iPixelVal);
+			ostr << tl::group_numbers<uint>(iPixelVal);
 		else
 			ostr << dPixelVal;
 
@@ -408,8 +408,8 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 
 		if(m_bLog)
 		{
-			dMin = floor(safe_log10(dMin));
-			dMax = ceil(safe_log10(dMax));
+			dMin = floor(tl::safe_log10(dMin));
+			dMax = ceil(tl::safe_log10(dMax));
 			if(m_bCountData)
 			{
 				if(dMin < -1)
@@ -455,7 +455,7 @@ Roi* Plot2d::GetROI(bool bAntiRoi)
 }
 
 
-bool Plot2d::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+bool Plot2d::LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase)
 {
 	m_dat.LoadXML(xml, blob, strBase + "data/");
 

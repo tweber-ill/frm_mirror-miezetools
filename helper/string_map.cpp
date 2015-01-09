@@ -5,12 +5,12 @@
  */
 
 #include "string_map.h"
-#include "string.h"
-#include "misc.h"
-#include "log.h"
+#include "../tlibs/string/string.h"
+#include "../tlibs/helper/misc.h"
+#include "../tlibs/helper/log.h"
 
 #ifndef NO_COMP
-	#include "comp.h"
+	#include "../tlibs/file/comp.h"
 #endif
 
 StringMap::StringMap(const char* pcKeyValSep, const char* pcComment)
@@ -66,7 +66,7 @@ void StringMap::Trim()
 {
 	for(t_map::value_type& pair : m_map)
 	{
-		trim(pair.second);
+		tl::trim(pair.second);
 
 		if(pair.first == "" || pair.second == "")
 			m_map.erase(pair.first);
@@ -78,7 +78,7 @@ void StringMap::MergeFrom(const std::vector<const StringMap*>& vecMaps)
 	m_map.clear();
 
 	for(const StringMap* pMap : vecMaps)
-		merge_map<std::string, std::string>(m_map, pMap->GetMap());
+		tl::merge_map<std::string, std::string>(m_map, pMap->GetMap());
 }
 
 void StringMap::ParseString(const std::string& strConf)
@@ -89,21 +89,21 @@ void StringMap::ParseString(const std::string& strConf)
 		std::string strLine;
 		std::getline(istr, strLine);
 
-		trim(strLine);
+		tl::trim(strLine);
 		if(strLine.length()==0)
 			continue;
 
 		if(m_strComment.length()>0 && strLine.substr(0,m_strComment.length())==m_strComment)
 			continue;
 
-		std::pair<std::string, std::string> pairStr = split_first(strLine, m_strKeyValSeparator, 1);
+		std::pair<std::string, std::string> pairStr = tl::split_first(strLine, m_strKeyValSeparator, 1);
 		if(pairStr.first.length()==0 && pairStr.second.length()==0)
 			continue;
 
 		bool bInserted = m_map.insert(pairStr).second;
 		if(!bInserted)
 		{
-			log_warn("Key \"", pairStr.first, "\" already exists in map.");
+			tl::log_warn("Key \"", pairStr.first, "\" already exists in map.");
 		}
 
 		//std::cout << "key: \"" << pairStr.first <<"\" value:\"" << pairStr.second << "\"" << std::endl;
@@ -138,7 +138,7 @@ bool StringMap::Serialize(std::ostream& ostrSer) const
 		iCurIdx += strVal.length()+1;
 	}
 
-	bool bOk = comp_mem_to_stream(pcMem, iLen, ostrSer, COMP_BZ2);
+	bool bOk = tl::comp_mem_to_stream(pcMem, iLen, ostrSer, tl::COMP_BZ2);
 	delete[] pcMem;
 
 	return bOk;
@@ -158,7 +158,7 @@ static inline std::vector<std::string> split0(const char* pcMem, unsigned int iL
 		if(pcMem[iIdx] == 0)
 		{
 			std::string str = pcMem+iIdx+1;
-			trim(str);
+			tl::trim(str);
 			vecStr.push_back(str);
 
 			//std::cout << str << std::endl;
@@ -172,7 +172,7 @@ bool StringMap::Deserialize(const void* pvMem, unsigned int iLen)
 {
 	char *pcUncomp = 0;
 	unsigned int iLenUncomp = 0;
-	if(!::decomp_mem_to_mem(pvMem, iLen, (void*&)pcUncomp, iLenUncomp))
+	if(!tl::decomp_mem_to_mem(pvMem, iLen, (void*&)pcUncomp, iLenUncomp))
 		return false;
 
 	std::vector<std::string> vecStrings = split0(pcUncomp, iLenUncomp);
@@ -180,7 +180,7 @@ bool StringMap::Deserialize(const void* pvMem, unsigned int iLen)
 
 	if(vecStrings.size()%2 != 0)
 	{
-		log_err("Uneven number of strings in key/value map.");
+		tl::log_err("Uneven number of strings in key/value map.");
 		return false;
 	}
 

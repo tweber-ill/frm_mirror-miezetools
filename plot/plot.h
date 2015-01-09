@@ -22,8 +22,8 @@
 #include "../main/subwnd.h"
 #include "../data/data.h"
 #include "../fitter/fitter.h"
-#include "../helper/funcmod.h"
-#include "../helper/string.h"
+#include "../tlibs/math/funcmod.h"
+#include "../tlibs/string/string.h"
 
 enum PlotType
 {
@@ -39,7 +39,7 @@ struct PlotObj
 	PlotType plttype;
 
 	bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
-	bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
+	bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase);
 };
 
 class Plot : public SubWindowBase
@@ -87,7 +87,7 @@ public:
 	void plot(const Data1& dat, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
 	void plot_fkt(const FunctionModel& fkt, int iObj=-1, bool bKeepObj=false);
 	void replot_fkts();
-	void plot_param(const FunctionModel_param& fkt, int iObj=-1);
+	void plot_param(const tl::FunctionModel_param& fkt, int iObj=-1);
 
 	void clear();
 	void clearfkt();
@@ -143,7 +143,7 @@ public:
 	virtual void SetROI(const Roi* pROI, bool bAntiRoi=0);
 	virtual Roi* GetROI(bool bAntiRoi=0);
 
-	virtual bool LoadXML(Xml& xml, Blob& blob, const std::string& strBase);
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase);
 	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
 
 	virtual void SaveImageAs() const;

@@ -6,8 +6,8 @@
  */
 
 #include "mainwnd.h"
-#include "../helper/string.h"
-#include "../helper/log.h"
+#include "../tlibs/string/string.h"
+#include "../tlibs/helper/log.h"
 #include "settings.h"
 
 #include <QtGui/QMdiSubWindow>
@@ -46,7 +46,7 @@ static void session_load_progress_thread(std::vector<int>* pvecProgress, bool* p
 	}
 }
 
-static void session_load_thread(Xml* xml, Blob* blob,
+static void session_load_thread(tl::Xml* xml, Blob* blob,
 								const std::vector<std::string>* vecBase,
 								const std::vector<unsigned int>* vecWndIdx,
 								SubWindowBase **pSWBs, int *piProgress)
@@ -61,7 +61,7 @@ static void session_load_thread(Xml* xml, Blob* blob,
 // session loading/saving
 void MiezeMainWnd::LoadSession(const std::string& strSess)
 {
-	Xml xml;
+	tl::Xml xml;
 	if(!xml.Load(strSess.c_str()))
 	{
 		QMessageBox::critical(this, "Error", "Failed to load session.");
@@ -115,7 +115,7 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 			pSWB = new Plot4dWrapper(pMdi);
 		else
 		{
-			log_err("Unknown plot type: \"", strSWType, "\".");
+			tl::log_err("Unknown plot type: \"", strSWType, "\".");
 			continue;
 		}
 		pSWBs[iWnd] = pSWB;
@@ -168,7 +168,7 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 		{
 			const std::string& strSWBase = vecSWBase[iWnd];
 			std::string strGeo = xml.QueryString((strSWBase+"geo").c_str(), "");
-			::trim(strGeo);
+			tl::trim(strGeo);
 			if(strGeo != "")
 				pSubWnd->restoreGeometry(QByteArray::fromHex(strGeo.c_str()));
 
@@ -188,10 +188,10 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 	delete[] pSWBs;
 
 	SetStatusMsg("Session loaded.", 2);
-	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
+	setWindowTitle((std::string(WND_TITLE) + " - " + tl::get_file(m_strCurSess)).c_str());
 
 	QSettings *pGlobals = Settings::GetGlobals();
-	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strSess).c_str()));
+	pGlobals->setValue("main/lastdir_session", QString(tl::get_dir(strSess).c_str()));
 	AddRecentSession(QString(strSess.c_str()));
 }
 
@@ -274,15 +274,15 @@ void MiezeMainWnd::SessionSaveAsTriggered()
 		return;
 
 	std::string strFile1 = strFile.toStdString();
-	std::string strExt = get_fileext(strFile1);
+	std::string strExt = tl::get_fileext(strFile1);
 	if(strExt != "cattus")
 		strFile1 += ".cattus";
 
 	m_strCurSess = strFile1;
 	SessionSaveTriggered();
 
-	setWindowTitle((std::string(WND_TITLE) + " - " + get_file(m_strCurSess)).c_str());
-	pGlobals->setValue("main/lastdir_session", QString(::get_dir(strFile1).c_str()));
+	setWindowTitle((std::string(WND_TITLE) + " - " + tl::get_file(m_strCurSess)).c_str());
+	pGlobals->setValue("main/lastdir_session", QString(tl::get_dir(strFile1).c_str()));
 }
 // --------------------------------------------------------------------------------
 

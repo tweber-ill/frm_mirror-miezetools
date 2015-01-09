@@ -6,8 +6,8 @@
  */
 
 #include "data4.h"
-#include "../helper/math.h"
-#include "../helper/string.h"
+#include "../tlibs/math/math.h"
+#include "../tlibs/string/string.h"
 
 #include <limits>
 #include <boost/algorithm/minmax_element.hpp>
@@ -290,10 +290,10 @@ void Data4::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 
 	double dAreaFactor = double(m_iWidth*m_iHeight)/double(iNewWidth*iNewHeight);
 
-	for(int iF=0; iF<m_iDepth2; ++iF)
-		for(int iT=0; iT<m_iDepth; ++iT)
-			for(int iY=0; iY<iNewHeight; ++iY)
-				for(int iX=0; iX<iNewWidth; ++iX)
+	for(int iF=0; iF<int(m_iDepth2); ++iF)
+		for(int iT=0; iT<int(m_iDepth); ++iT)
+			for(int iY=0; iY<int(iNewHeight); ++iY)
+				for(int iX=0; iX<int(iNewWidth); ++iX)
 				{
 					double dOldY0 = ((iY+0.5)*double(m_iHeight))/double(iNewHeight) - 0.5;
 					double dOldX0 = ((iX+0.5)*double(m_iWidth))/double(iNewWidth) - 0.5;
@@ -308,10 +308,10 @@ void Data4::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 					if(iX1<0) iX1=0;
 					if(iY1<0) iY1=0;
 
-					if(iX0>=m_iWidth) iX0=m_iWidth-1;
-					if(iY0>=m_iHeight) iY0=m_iHeight-1;
-					if(iX1>=m_iWidth) iX1=m_iWidth-1;
-					if(iY1>=m_iHeight) iY1=m_iHeight-1;
+					if(iX0>=int(m_iWidth)) iX0=m_iWidth-1;
+					if(iY0>=int(m_iHeight)) iY0=m_iHeight-1;
+					if(iX1>=int(m_iWidth)) iX1=m_iWidth-1;
+					if(iY1>=int(m_iHeight)) iY1=m_iHeight-1;
 
 					double dX = (dOldX0 - double(iX0));
 					double dY = (dOldY0 - double(iY0));
@@ -342,9 +342,9 @@ void Data4::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 
 					const uint iNewIdx = iF*m_iDepth*iNewWidth*iNewHeight + iT*iNewWidth*iNewHeight + iY*iNewWidth + iX;
 
-					m_vecVals[iNewIdx] = bilinear_interp<double>(dx0y0, dx1y0, dx0y1, dx1y1, dX, dY);
+					m_vecVals[iNewIdx] = tl::bilinear_interp<double>(dx0y0, dx1y0, dx0y1, dx1y1, dX, dY);
 					if(m_bUseErrs)
-						m_vecErrs[iNewIdx] = bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
+						m_vecErrs[iNewIdx] = tl::bilinear_interp<double>(dx0y0_err, dx1y0_err, dx0y1_err, dx1y1_err, dX, dY);
 
 					if(bKeepTotalCounts)
 					{
@@ -365,7 +365,7 @@ void Data4::ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bo
 }
 
 
-bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
+bool Data4::LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase)
 {
 	LoadRangeXml(xml, strBase);
 	m_iDepth = xml.Query<unsigned int>((strBase+"depth").c_str(), 0);
@@ -390,7 +390,7 @@ bool Data4::LoadXML(Xml& xml, Blob& blob, const std::string& strBase)
 	m_dTotal = xml.Query<double>((strBase+"total").c_str(), 0.);
 
 	std::string strPhases = xml.QueryString((strBase+"phases").c_str(), "");
-	::get_tokens<double>(strPhases, std::string(",; "), m_vecPhases);
+	tl::get_tokens<double>(strPhases, std::string(",; "), m_vecPhases);
 
 	return DataInterface::LoadXML(xml, blob, strBase);;
 }

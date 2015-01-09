@@ -5,9 +5,9 @@
  * Date: April 2012
  */
 
-#include "../../helper/math.h"
-#include "../../helper/linalg.h"
-#include "../../helper/log.h"
+#include "../../tlibs/math/math.h"
+#include "../../tlibs/math/linalg.h"
+#include "../../tlibs/helper/log.h"
 
 #include <limits>
 #include <algorithm>
@@ -22,8 +22,8 @@
 
 #include "msin.h"
 #include "../chi2.h"
-#include "../../helper/misc.h"
-#include "../../helper/fourier.h"
+#include "../../tlibs/helper/misc.h"
+#include "../../tlibs/math/fourier.h"
 
 
 //----------------------------------------------------------------------
@@ -119,7 +119,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 	if(dNumOsc<0.)
 	{
-		log_warn("No number of oscillations given, assuming 2 oscillations.");
+		tl::log_warn("No number of oscillations given, assuming 2 oscillations.");
 		dNumOsc = 2.;
 	}
 
@@ -127,7 +127,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	if(dFreq < 0.)
 	{
 		dFreq = 2.*M_PI/double(iLen) * dNumOsc;
-		log_warn("No frequency given, calculating using number of bins.");
+		tl::log_warn("No frequency given, calculating using number of bins.");
 
 		px = 0;
 	}
@@ -140,7 +140,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 		px = pdx_predef;
 
-		log_warn("Using predefined x values.");
+		tl::log_warn("Using predefined x values.");
 	}
 
 	MiezeSinModel sinmod(dFreq);
@@ -155,7 +155,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 
 	if(dMax==dMin)
 	{
-		log_err("min == max, won't try fitting!");
+		tl::log_err("min == max, won't try fitting!");
 		return 0;
 	}
 
@@ -163,7 +163,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	double dPhase = 0.;
 	double dContrast_tmp = 0.;
 
-	Fourier fourier(iLen);
+	tl::Fourier fourier(iLen);
 	fourier.get_contrast(dNumOsc, py, dContrast_tmp, dPhase);
 
 	// shift phase half a bin for correct alignment with mcstas data
@@ -298,12 +298,12 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 		unsigned int uiMini=0;
 		for(const auto& mini : minis)
 		{
-			log_info("result of MIEZE sinus fit step ", (++uiMini));
+			tl::log_info("result of MIEZE sinus fit step ", (++uiMini));
 			std::ostringstream ostrMini; ostrMini << mini,
-			log_info(ostrMini.str());
+			tl::log_info(ostrMini.str());
 		}
 
-		log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
+		tl::log_info("values max: ", dMax, ", min: ", dMin, ", nchan=", iLen);
 	}
 
 	*pmodel = new MiezeSinModel(dFreq, dAmp, dPhase, dOffs,
@@ -312,8 +312,8 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	double dContrast = (*pmodel)->GetContrast();
 	double dContrastError = (*pmodel)->GetContrastErr();
 
-	if (is_nan_or_inf(dContrast) || is_nan_or_inf(dContrastError) ||
-		is_nan_or_inf(dPhase) || is_nan_or_inf(dPhaseErr))
+	if (tl::is_nan_or_inf(dContrast) || tl::is_nan_or_inf(dContrastError) ||
+		tl::is_nan_or_inf(dPhase) || tl::is_nan_or_inf(dPhaseErr))
 		bValidFit = 0;
 
 	if(pdx_predef) delete[] pdx_predef;
