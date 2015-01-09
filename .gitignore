@@ -39,7 +39,7 @@ script/script.tab.cc
 script/script.cc
 script/.clang/*
 script/.codelite/*
-./Makefile
+Makefile
 .clang/*
 .codelite/*
 .settings/*
@@ -47,3 +47,4 @@ cattus.mk
 cattus.txt
 tlibs-master.tar.bz2
 tlibs/*
+tlibs

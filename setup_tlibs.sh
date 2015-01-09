@@ -1,6 +1,13 @@
 #!/bin/bash
 
 TLIBS=tlibs-master.tar.bz2
+TLIBS_DIR=tlibs
+
+if [ -L ${TLIBS_DIR} ]
+then
+	echo -e "Error: Symbolic link \"${TLIBS_DIR}\" exists. Aborting.";
+	exit -1;
+fi
 
 rm ${TLIBS}
 
@@ -16,5 +23,5 @@ then
 	exit -1;
 fi
 
-mv tlibs-master tlibs
+mv tlibs-master ${TLIBS_DIR}
 rm ${TLIBS}
