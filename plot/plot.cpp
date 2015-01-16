@@ -633,7 +633,7 @@ void Plot::replot_fkts()
 	//MergeParamMaps();
 	//emit(ParamsChanged(m_mapMerged));
 #else
-	log_err("Parser not linked.");
+	tl::log_err("Parser not linked.");
 #endif
 }
 
