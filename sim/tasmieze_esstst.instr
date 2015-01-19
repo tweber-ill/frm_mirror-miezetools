@@ -28,7 +28,6 @@ DEFINE INSTRUMENT TasMieze
 	double dMiezeCoilThick = 0.01,
 
 
-
 	// mono, unused
 	int bMonoIdeal = 0,
 
@@ -137,6 +136,9 @@ DECLARE
 	double dB_rf0, dB_rf1;
 	double dB00, dB01;
 	double dB0BrfDist = 0.1;
+	double dGradCoilDepth = 0.05;
+	double dBGrad0, dBGrad1;
+
 
 	// detector
 	double dDetTofBase = 0.;
@@ -156,7 +158,6 @@ DECLARE
 
 		return 1;
 	}
-
 	int coil1_B0_field(double x, double y, double z, double t, 
 			double *pBx, double *pBy, double *pBz, 
 			void *pData)
@@ -174,12 +175,30 @@ DECLARE
 		rf_rot_xy(x,y,z,t, dMiezeF1*2.*M_PI,dB_rf0, pBx,pBy,pBz);
 		return 1;
 	}
-
 	int coil1_rf_field(double x, double y, double z, double t, 
 			double *pBx, double *pBy, double *pBz, 
 			void *pData)
 	{
 		rf_rot_xy(x,y,z,t, dMiezeF2*2.*M_PI,dB_rf1, pBx,pBy,pBz);
+		return 1;
+	}
+
+	int coil0_grad_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		*pBx = *pBy = 0.;
+		*pBz = dBGrad0 * grad_field(x, dMiezeWidth);
+
+		return 1;
+	}
+	int coil1_grad_field(double x, double y, double z, double t, 
+			double *pBx, double *pBy, double *pBz, 
+			void *pData)
+	{
+		*pBx = *pBy = 0.;
+		*pBz = dBGrad1 * grad_field(-x, dMiezeWidth);
+
 		return 1;
 	}
 %}
@@ -235,11 +254,13 @@ INITIALIZE
 
 	if(!bMiezeIdeal)
 	{
-		dB_rf0 = larmor_B(v_i, dMiezeCoilThick, -M_PI);
-		dB_rf1 = larmor_B(v_i, dMiezeCoilThick, -M_PI);
+		dB_rf1 = dB_rf0 = larmor_B(v_i, dMiezeCoilThick, -M_PI);
 
 		dB00 = dMiezeF1*2.*M_PI / GAMMA_N;
 		dB01 = dMiezeF2*2.*M_PI / GAMMA_N;
+
+		dBGrad0 = dB00*2.;	// TODO
+		dBGrad1 = dB01*2.;
 
 		printf("Coil 0: B_0=%g T, B_rf=%g T, freq=%g Hz\n", dB00, dB_rf0, dMiezeF1);
 		printf("Coil 1: B_0=%g T, B_rf=%g T, freq=%g Hz\n", dB01, dB_rf1, dMiezeF2);
@@ -336,12 +357,23 @@ COMPONENT MiezeBox = MIEZE_box(N=1,
 COMPONENT MiezeCoil0Mid = Arm()
 	AT (0, 0, 0.5*dMiezeCoilThick) RELATIVE MiezeAxisBegin
 
+
+COMPONENT coil0_grad = Pol_simpleBfield(
+	fieldFunction = coil0_grad_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth = dGradCoilDepth)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, -dB0BrfDist-dGradCoilDepth) RELATIVE MiezeCoil0Mid
+COMPONENT coil0_grad_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_grad)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, -dB0BrfDist) RELATIVE MiezeCoil0Mid
+
+
 COMPONENT coil0_B0 = Pol_simpleBfield(
 	fieldFunction = coil0_B0_field, Bx=0, By=0, Bz=0, filename = 0,
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=2*dB0BrfDist)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, -dB0BrfDist) RELATIVE MiezeCoil0Mid
-		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid
+		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid*/
 
 COMPONENT coil0_rf = Pol_simpleBfield(
 	fieldFunction = coil0_rf_field, Bx=0, By=0, Bz=0, filename = 0,
@@ -357,7 +389,7 @@ COMPONENT coil0_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_rf)
 COMPONENT coil0_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_B0)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dB0BrfDist) RELATIVE MiezeCoil0Mid
-		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid
+		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid*/
 
 
 
@@ -369,7 +401,7 @@ COMPONENT coil1_B0 = Pol_simpleBfield(
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=2*dB0BrfDist)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, -dB0BrfDist) RELATIVE MiezeCoil1Mid
-		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid
+		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid*/
 
 COMPONENT coil1_rf = Pol_simpleBfield(
 	fieldFunction = coil1_rf_field, Bx=0, By=0, Bz=0, filename = 0,
@@ -385,7 +417,18 @@ COMPONENT coil1_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_rf)
 COMPONENT coil1_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_B0)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dB0BrfDist)  RELATIVE MiezeCoil1Mid
-		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid
+		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid*/
+
+
+COMPONENT coil1_grad = Pol_simpleBfield(
+	fieldFunction = coil1_grad_field, Bx=0, By=0, Bz=0, filename = 0,
+	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth = dGradCoilDepth)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dB0BrfDist) RELATIVE MiezeCoil1Mid
+COMPONENT coil1_grad_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_grad)
+		WHEN(bMiezeIdeal == 0)
+		AT (0.0, 0.0, dB0BrfDist+dGradCoilDepth) RELATIVE MiezeCoil1Mid
+
 		EXTEND
 		%{
 			p *= 0.5 * (1. + sx);

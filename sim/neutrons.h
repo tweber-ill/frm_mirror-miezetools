@@ -73,6 +73,30 @@ double fuzzy_border(double x, double amp/*=1.*/, double const_size/*=1.5*/, doub
 		return fkt(-x*slope_scale + 3. + const_size/2.) * amp*0.5 + amp*0.5;
 }
 
+double triangle_border(double x, double z, double xw, double zl)
+{
+	if(x < -0.5*xw || x > 0.5*xw)
+		return 0.;
+
+	double dXPos = x + 0.5*xw;
+	double dZLen = dXPos/xw * zl;
+
+	if(z < -0.5*dZLen || z > 0.5*dZLen)
+		return 0.;
+
+	return 1.;
+}
+
+double grad_field(double x, double xw)
+{
+	if(x < -0.5*xw || x > 0.5*xw)
+		return 0.;
+
+	double dXPos = x + 0.5*xw;
+	return dXPos / xw;
+}
+
+
 void random_seed()
 {
 	struct timeval tv;

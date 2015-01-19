@@ -76,7 +76,7 @@ main()
 	# MIEZE stuff
 	L_sample_ana = 0.75;
 	L_ana_det = 0.75;
-	L_mono_sample = 2.0;
+	L_mono_sample = 2.5;
 	L_mono_mieze = 0.75;
 	coil_wh = 1.5;
 
