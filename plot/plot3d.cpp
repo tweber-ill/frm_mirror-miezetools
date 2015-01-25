@@ -72,8 +72,8 @@ void Plot3d::RefreshStatusMsgs()
 	if(m_bCountData)
 	{
 		std::ostringstream ostr_total;
-		ostr_total << "total counts: " << tl::group_numbers<uint>(GetData().GetTotal())
-					  << ", counts: " << tl::group_numbers<uint>(GetData2().GetTotal());
+		ostr_total << "total counts: " << tl::var_to_str<uint>(GetData().GetTotal(),10,3)
+					  << ", counts: " << tl::var_to_str<uint>(GetData2().GetTotal(),10,3);
 		emit SetStatusMsg(ostr_total.str().c_str(), 1);
 	}
 	else

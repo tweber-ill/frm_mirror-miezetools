@@ -309,7 +309,7 @@ void Plot2d::RefreshStatusMsgs()
 		if(m_bCountData)
 		{
 			std::ostringstream ostr_total;
-			ostr_total << "total counts: " << tl::group_numbers<uint>(m_dat.GetTotal());
+			ostr_total << "total counts: " << tl::var_to_str<uint>(m_dat.GetTotal(),10,3);
 			emit SetStatusMsg(ostr_total.str().c_str(), 1);
 		}
 		else
@@ -372,7 +372,7 @@ void Plot2d::mouseMoveEvent(QMouseEvent* pEvent)
 		}
 
 		if(m_bCountData)
-			ostr << tl::group_numbers<uint>(iPixelVal);
+			ostr << tl::var_to_str<uint>(iPixelVal,10,3);
 		else
 			ostr << dPixelVal;
 
