@@ -12,6 +12,7 @@
 #include "PsdPhaseDlg.h"
 #include "ListDlg.h"
 #include "../main/settings.h"
+#include "../helper/mieze.h"
 
 #include "../tlibs/math/mieze.hpp"
 #include "../tlibs/math/fourier.h"
@@ -20,6 +21,13 @@
 #include "../tlibs/helper/log.h"
 
 #include "../fitter/models/msin.h"
+
+namespace units = boost::units;
+namespace co = boost::units::si::constants::codata;
+
+using tl::cm;
+using tl::angstrom;
+using tl::ps;
 
 
 PsdPhaseDlg::PsdPhaseDlg(QWidget* pParent)
@@ -60,10 +68,6 @@ void PsdPhaseDlg::Update()
 {
 	if(!m_bAllowUpdate)
 		return;
-
-	const units::quantity<units::si::length> cm = units::si::meter/100.;
-	const units::quantity<units::si::length> angstrom = 1e-10 * units::si::meter;
-	const units::quantity<units::si::time> ps = 1e-12 * units::si::second;
 
 	units::quantity<units::si::length> lx = spinlx->value() *cm;
 	units::quantity<units::si::length> ly = spinly->value()*cm;
@@ -423,7 +427,7 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 				}
 				else if(meth == METH_FIT)
 				{
-					double dFreq = tl::get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
+					double dFreq = ::get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
 					double dThisNumOsc = dNumOsc;
 
 					MiezeSinModel* pModel = 0;
@@ -526,7 +530,7 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 					}
 					else if(meth == METH_FIT)
 					{
-						double dFreq = tl::get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
+						double dFreq = ::get_mieze_freq(pdX, dat.GetLength(), dNumOsc);
 						double dThisNumOsc = dNumOsc;
 
 						MiezeSinModel* pModel = 0;

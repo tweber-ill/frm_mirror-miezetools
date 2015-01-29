@@ -22,6 +22,8 @@
 #include "../plot/plot3d.h"
 #include "../plot/plot4d.h"
 
+#include "../helper/mieze.h"
+
 #include "../main/settings.h"
 
 #include <QtGui/QMdiSubWindow>
@@ -594,7 +596,7 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 			{
 				double dThisNumOsc = dNumOsc;
 				MiezeSinModel *pModel = 0;
-				double dFreq = tl::get_mieze_freq(px, dat1.GetLength(), dThisNumOsc);
+				double dFreq = ::get_mieze_freq(px, dat1.GetLength(), dThisNumOsc);
 				bOk = ::get_mieze_contrast(dFreq, dThisNumOsc, dat1.GetLength(), px, py, pyerr, &pModel);
 
 				dC = pModel->GetContrast();

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>477</width>
-    <height>479</height>
+    <width>492</width>
+    <height>475</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -240,6 +240,111 @@
        <string>MIEZE (el.)</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_9">
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="groupBox_7">
+         <property name="title">
+          <string>Flipper Coil Fields</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_10">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_25">
+            <property name="text">
+             <string>l1 (cm):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="spinMl1">
+            <property name="maximum">
+             <double>999.990000000000009</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_26">
+            <property name="text">
+             <string>l2 (cm):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QDoubleSpinBox" name="spinMl2">
+            <property name="maximum">
+             <double>999.990000000000009</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>B01 (mT):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="editMB01">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_29">
+            <property name="text">
+             <string>B02 (mT):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QLineEdit" name="editMB02">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_28">
+            <property name="text">
+             <string>Brf1 (mT):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="editMBrf1">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_30">
+            <property name="text">
+             <string>Brf2 (mT):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLineEdit" name="editMBrf2">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QGroupBox" name="groupBox_5">
          <property name="title">
@@ -447,15 +552,15 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>408</width>
-           <height>177</height>
+           <width>20</width>
+           <height>40</height>
           </size>
          </property>
         </spacer>
@@ -1155,6 +1260,12 @@
   <tabstop>spinMTau</tabstop>
   <tabstop>radioMLs</tabstop>
   <tabstop>spinMLs</tabstop>
+  <tabstop>spinMl1</tabstop>
+  <tabstop>spinMl2</tabstop>
+  <tabstop>editMB01</tabstop>
+  <tabstop>editMB02</tabstop>
+  <tabstop>editMBrf1</tabstop>
+  <tabstop>editMBrf2</tabstop>
   <tabstop>spinLam</tabstop>
   <tabstop>spinF1</tabstop>
   <tabstop>spinF2</tabstop>
@@ -1181,8 +1292,8 @@
   <tabstop>spinMaxQ_deb</tabstop>
   <tabstop>editZetaSq</tabstop>
   <tabstop>btnPython_deb</tabstop>
-  <tabstop>tabWidget</tabstop>
   <tabstop>buttonBox</tabstop>
+  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources/>
  <connections>

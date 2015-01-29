@@ -19,6 +19,8 @@
 
 #include "../main/settings.h"
 
+#include "../helper/mieze.h"
+
 
 bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt)
 {
@@ -51,7 +53,7 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 	if(params.iFkt == FIT_MIEZE_SINE) 				// MIEZE sine
 	{
 		double dNumOsc = Settings::Get<double>("mieze/num_osc");
-		double dFreq = tl::get_mieze_freq(px, dat.GetLength(), dNumOsc);
+		double dFreq = ::get_mieze_freq(px, dat.GetLength(), dNumOsc);
 
 		MiezeSinModel *pModel = 0;
 

@@ -37,6 +37,7 @@ protected slots:
 
 	void CalcMiezeCond();
 	void CalcMiezeTime();
+	void CalcMiezeFields();
 
 	void CalcBraggDirect();
 	void CalcBraggReciprocal();

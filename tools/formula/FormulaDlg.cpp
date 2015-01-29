@@ -60,6 +60,7 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 	{
 		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeCond()));
 		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeTime()));
+		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeFields()));
 	}
 
 	std::vector<QDoubleSpinBox*> vecMTimeSpins = {spinMLam, spinMTau, spinMLs};
@@ -67,7 +68,11 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 	{
 		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeTime()));
 		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeCond()));
+		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeFields()));
 	}
+	
+	QObject::connect(spinMl1, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeFields()));
+	QObject::connect(spinMl2, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeFields()));
 
 
 	//--------------------------------------------------------------------------------
@@ -105,6 +110,7 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 	CalcNeutronLam();
 	CalcMiezeCond();
 	CalcMiezeTime();
+	CalcMiezeFields();
 	CalcBraggDirect();
 	CalcBraggReciprocal();
 	CalcMIEZE();
@@ -873,8 +879,8 @@ void FormulaDlg::CalcPowderLines()
 
 void FormulaDlg::CalcMiezeCond()
 {
-	typedef units::quantity<units::si::length> length;
-	typedef units::quantity<units::si::frequency> freq;
+	using tl::length;
+	using tl::freq;
 
 	const bool bF1 = radioMF1->isChecked();
 	const bool bF2 = radioMF2->isChecked();
@@ -910,9 +916,9 @@ void FormulaDlg::CalcMiezeCond()
 
 void FormulaDlg::CalcMiezeTime()
 {
-	typedef units::quantity<units::si::length> length;
-	typedef units::quantity<units::si::time> time;
-	typedef units::quantity<units::si::frequency> freq;
+	using tl::length;
+	using tl::time;
+	using tl::freq;
 
 	const bool bF1 = radioMF1->isChecked();
 	const bool bF2 = radioMF2->isChecked();
@@ -943,8 +949,34 @@ void FormulaDlg::CalcMiezeTime()
 	}
 }
 
+void FormulaDlg::CalcMiezeFields()
+{	
+	static const tl::angle ang = -M_PI*tl::radians;
+	
+	tl::length l1 = spinMl1->value()*tl::cm;
+	tl::length l2 = spinMl2->value()*tl::cm;
+	tl::freq om1 = 2.*M_PI * spinMF1->value() * 1000./tl::seconds;
+	tl::freq om2 = 2.*M_PI * spinMF2->value() * 1000./tl::seconds;
+	tl::length lam = spinMLam->value() * tl::angstrom;
 
-// --------------------------------------------------------------------------------
+	tl::flux Brf1 = tl::larmor_field(lam, l1, ang);
+	tl::flux Brf2 = tl::larmor_field(lam, l2, ang);
+	
+	tl::flux B01 = tl::larmor_B(om1);
+	tl::flux B02 = tl::larmor_B(om2);
+	
+	std::string strB01 = tl::var_to_str(double(B01/tl::teslas * 1000.));
+	std::string strB02 = tl::var_to_str(double(B02/tl::teslas * 1000.));
+	std::string strBrf1 = tl::var_to_str(double(Brf1/tl::teslas * 1000.));
+	std::string strBrf2 = tl::var_to_str(double(Brf2/tl::teslas * 1000.));
+
+	editMB01->setText(strB01.c_str());
+	editMB02->setText(strB02.c_str());
+	editMBrf1->setText(strBrf1.c_str());
+	editMBrf2->setText(strBrf2.c_str());
+}
+
+// -------------------------------------------------------------------------------
 
 
 void FormulaDlg::accept()
