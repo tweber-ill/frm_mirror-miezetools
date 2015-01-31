@@ -23,7 +23,7 @@
 #include "msin.h"
 #include "../chi2.h"
 #include "../../tlibs/helper/misc.h"
-#include "../../tlibs/math/fourier.h"
+#include "../../helper/mfourier.h"
 
 
 //----------------------------------------------------------------------
@@ -163,7 +163,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	double dPhase = 0.;
 	double dContrast_tmp = 0.;
 
-	tl::Fourier fourier(iLen);
+	MFourier fourier(iLen);
 	fourier.get_contrast(dNumOsc, py, dContrast_tmp, dPhase);
 
 	// shift phase half a bin for correct alignment with mcstas data

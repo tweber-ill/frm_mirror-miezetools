@@ -14,12 +14,12 @@
 #include "../tlibs/helper/misc.h"
 #include "../tlibs/math/math.h"
 #include "../tlibs/math/mieze.hpp"
-#include "../tlibs/math/fourier.h"
 #include "../tlibs/helper/log.h"
 
 #include "../main/settings.h"
 
 #include "../helper/mieze.h"
+#include "../helper/mfourier.h"
 
 
 bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt)
@@ -106,7 +106,7 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 	const unsigned int iNumFoils = vecFoils.size();
 	const unsigned int iNumTC = vecFoils[0].GetLength();
-	tl::Fourier fourier(iNumTC);
+	MFourier fourier(iNumTC);
 
 	double *pdyTotal = new double[iNumTC];
 	double *pdyerrTotal = new double[iNumTC];

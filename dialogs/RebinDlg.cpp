@@ -6,7 +6,7 @@
 
 #include "RebinDlg.h"
 #include "../plot/plot.h"
-#include "../tlibs/math/fourier.h"
+#include "../helper/mfourier.h"
 
 
 RebinDlg::RebinDlg(QWidget* pParent) : QDialog(pParent), m_pCurPlot(0)
@@ -62,7 +62,7 @@ void RebinDlg::ApplyChanges()
 
 	double *pdYNew = new double[iDatLen];
 
-	tl::Fourier fourier(iDatLen);
+	MFourier fourier(iDatLen);
 	fourier.phase_correction_0(pdYOrg, pdYNew, -dShift);
 
 

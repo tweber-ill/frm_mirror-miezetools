@@ -1,4 +1,7 @@
 CC = gcc
+
+USE_FFTW = 1
+
 #CC = i686-w64-mingw32-gcc
 INC = -I. -I/usr/include/qt4 -I/usr/local/include -I/usr/include/qt4/QtCore \
 	-I/usr/include/qt4/QtGui -I./tools/plot_gpl/src/qtterminal \
@@ -6,14 +9,13 @@ INC = -I. -I/usr/include/qt4 -I/usr/local/include -I/usr/include/qt4/QtCore \
 LIB_DIRS = -L/usr/lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/local/lib \
 	-L/usr/lib64/root
 
-#DEFINES = -DUSE_GPL -DUSE_FFTW
-DEFINES = -DUSE_FFTW
+DEFINES = 
 
 FLAGS = ${INC} -O2 -march=native -std=c++11 -DNDEBUG ${DEFINES}
 #FLAGS = ${INC} -std=c++11 -ggdb ${DEFINES}
 
 STD_LIBS = -lstdc++ -lm
-MATH_LIBS = -lMinuit2 -lfftw3
+MATH_LIBS = -lMinuit2
 MISC_LIBS = 
 LAPACK_LIBS = -L/usr/local/lib64 -llapacke -llapack -lblas -lgfortran
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
@@ -21,6 +23,21 @@ QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 #QT_LIBS += -lQtOpenGL -lGL -lGLU -lX11
 LIBS_FORMULA = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${STD_LIBS}
 LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}
+
+
+# FFTW
+ifeq (${USE_FFTW}, 1)
+	DEFINES += -DUSE_FFTW
+	MATH_LIBS += -lfftw3
+	FFTW_OBJ = obj/fftw.o
+else
+	FFTW_OBJ =
+endif
+
+
+.PHONY: all clean
+
+all: cattus
 
 
 cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/mainwnd_mdi.o \
@@ -33,7 +50,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o \
 	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
-	obj/spec_char.o obj/string_map.o obj/log.o
+	obj/spec_char.o obj/string_map.o obj/log.o obj/mfourier.o ${FFTW_OBJ}
 	${CC} ${FLAGS} -o bin/cattus $+ ${LIBS}
 	strip bin/cattus
 
@@ -106,6 +123,10 @@ obj/RebinDlg.o: dialogs/RebinDlg.cpp dialogs/RebinDlg.h
 	${CC} ${FLAGS} -c -o $@ $<
 
 obj/fourier.o: tlibs/math/fourier.cpp tlibs/math/fourier.h
+	${CC} ${FLAGS} -c -o $@ $<
+obj/fftw.o: tlibs/math/fftw.cpp tlibs/math/fftw.h
+	${CC} ${FLAGS} -c -o $@ $<
+obj/mfourier.o: helper/mfourier.cpp helper/mfourier.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/string.o: tlibs/string/string.cpp tlibs/string/string.h
 	${CC} ${FLAGS} -c -o $@ $<

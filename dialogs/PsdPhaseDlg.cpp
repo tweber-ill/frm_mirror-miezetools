@@ -13,9 +13,9 @@
 #include "ListDlg.h"
 #include "../main/settings.h"
 #include "../helper/mieze.h"
+#include "../helper/mfourier.h"
 
 #include "../tlibs/math/mieze.hpp"
-#include "../tlibs/math/fourier.h"
 #include "../tlibs/helper/misc.h"
 #include "../tlibs/math/math.h"
 #include "../tlibs/helper/log.h"
@@ -385,7 +385,7 @@ Plot3d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot3d* pD
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 
-	tl::Fourier fourier(pDat->GetDepth());
+	MFourier fourier(pDat->GetDepth());
 	double *pdMem = new double[pDat->GetDepth()*5];
 	double *pdY = pdMem;
 	double *pdY_shift = pdMem + 1*pDat->GetDepth();
@@ -487,7 +487,7 @@ Plot4d* PsdPhaseCorrDlg::DoPhaseCorr(const Plot2d* pPhasesPlot, const Plot4d* pD
 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 
-	tl::Fourier fourier(pDat->GetDepth());
+	MFourier fourier(pDat->GetDepth());
 	double *pdMem = new double[pDat->GetDepth()*5];
 	double *pdY = pdMem;
 	double *pdY_shift = pdMem + 1*pDat->GetDepth();

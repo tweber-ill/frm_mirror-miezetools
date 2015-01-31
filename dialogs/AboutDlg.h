@@ -55,8 +55,10 @@ public:
 		strLibs += " (http://www.boost.org).\n";
 		strLibs += "Uses Minuit version 2 (http://root.cern.ch).";
 		strLibs += "\n";
+#ifdef USE_FFTW
 		strLibs += "Uses FFTW version 3 (http://www.fftw.org).";
 		strLibs += "\n";
+#endif
 		strLibs += "Uses TLIBS version " + QString(TLIBS_VERSION) + ".";
 		//strLibs += "Uses Lapack/e version 3 (http://www.netlib.org/lapack).";
 		//strLibs += "\n";

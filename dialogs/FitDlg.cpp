@@ -14,7 +14,6 @@
 #include "../tlibs/string/string.h"
 #include "../tlibs/helper/misc.h"
 #include "../tlibs/math/math.h"
-#include "../tlibs/math/fourier.h"
 #include "../tlibs/math/mieze.hpp"
 
 #include "../plot/plot.h"
@@ -23,6 +22,7 @@
 #include "../plot/plot4d.h"
 
 #include "../helper/mieze.h"
+#include "../helper/mfourier.h"
 
 #include "../main/settings.h"
 
@@ -569,9 +569,9 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 	const double dNumOsc = Settings::Get<double>("mieze/num_osc");
 	const double dMinCts = Settings::Get<int>("misc/min_counts");
 
-	tl::Fourier *pFFT = 0;
+	MFourier *pFFT = 0;
 	if(iFkt == FIT_MIEZE_SINE_PIXELWISE_FFT)
-		pFFT = new tl::Fourier(iTCnt);
+		pFFT = new MFourier(iTCnt);
 
 	for(unsigned int iY=0; iY<iH; ++iY)
 	{
