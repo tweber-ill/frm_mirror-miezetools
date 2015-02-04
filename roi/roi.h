@@ -17,7 +17,7 @@ namespace ublas = boost::numeric::ublas;
 class XYRange;
 #include <QtGui/QPainter>
 
-#include "../../tlibs/file/xml.h"
+#include "../tlibs/file/xml.h"
 
 #define CIRCLE_VERTICES 256
 
