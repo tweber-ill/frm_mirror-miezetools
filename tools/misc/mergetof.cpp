@@ -1,11 +1,11 @@
-// gcc -o mergetof mergetof.cpp ../../helper/string.cpp ../../helper/comp.cpp ../../helper/log.cpp ../../helper/file.cpp ../../helper/rand.cpp -lstdc++ -std=c++11 -lboost_iostreams -lQtCore
+// gcc -o mergetof mergetof.cpp ../../tlibs/file/file.cpp ../../tlibs/file/comp.cpp ../../tlibs/helper/log.cpp ../../tlibs/math/rand.cpp -std=c++11 -lstdc++ -lboost_iostreams -lQtCore
 
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../../helper/file.h"
-#include "../../helper/string.h"
-#include "../../helper/comp.h"
+#include "../../tlibs/file/file.h"
+#include "../../tlibs/string/string.h"
+#include "../../tlibs/file/comp.h"
 
 
 int main(int argc, char** argv)
@@ -31,21 +31,21 @@ int main(int argc, char** argv)
 
 	for(int iInFile=0; iInFile<iNumInFiles; ++iInFile)
 	{
-		TmpFile *pTmp = 0;
+		tl::TmpFile *pTmp = 0;
 
 		const char* pcFile = argv[iInFile+1];
 		std::string strFile = pcFile;
 
 		std::cout << strFile << "...";
 
-		std::string strExt = get_fileext(strFile);
+		std::string strExt = tl::get_fileext(strFile);
 		if(strExt == "gz" || strExt == "bz2" || strExt == "xz")
 		{
-			pTmp = new TmpFile();
+			pTmp = new tl::TmpFile();
 			pTmp->open();
 
 			strFile = pTmp->GetFileName();
-			decomp_file_to_file(pcFile, strFile.c_str());
+			tl::decomp_file_to_file(pcFile, strFile.c_str());
 			pcFile = strFile.c_str();
 		}
 
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 
 		if(!pcStrings)
 		{
-			iRemaining = unsigned(get_file_size(ifstr)) - iTOFSize*sizeof(int);
+			iRemaining = unsigned(tl::get_file_size(ifstr)) - iTOFSize*sizeof(int);
 			pcStrings = new char[iRemaining];
 			ifstr.read(pcStrings, iRemaining);
 

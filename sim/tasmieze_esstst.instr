@@ -259,8 +259,8 @@ INITIALIZE
 		dB00 = dMiezeF1*2.*M_PI / GAMMA_N;
 		dB01 = dMiezeF2*2.*M_PI / GAMMA_N;
 
-		dBGrad0 = dB00*2.;	// TODO
-		dBGrad1 = dB01*2.;
+		dBGrad0 = dB00*3.;	// TODO
+		dBGrad1 = dB01*3.;
 
 		printf("Coil 0: B_0=%g T, B_rf=%g T, freq=%g Hz\n", dB00, dB_rf0, dMiezeF1);
 		printf("Coil 1: B_0=%g T, B_rf=%g T, freq=%g Hz\n", dB01, dB_rf1, dMiezeF2);

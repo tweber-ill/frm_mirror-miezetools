@@ -3,7 +3,6 @@
  *
  * @author Tobias Weber <tweber@frm2.tum.de>
  * @date August 2012
- * @license GPLv2 or GPLv3
  */
 
 #ifndef __MIEZE_FOURIER__
