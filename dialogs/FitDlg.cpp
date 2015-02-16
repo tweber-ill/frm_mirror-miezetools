@@ -23,6 +23,7 @@
 
 #include "../helper/mieze.h"
 #include "../helper/mfourier.h"
+#include "../helper/misc.h"
 
 #include "../main/settings.h"
 
@@ -729,9 +730,9 @@ void FitDlg::DoFit()
 			double *px = tl::vec_to_array<double>(*pvecDatX);
 			double *py = tl::vec_to_array<double>(*pvecDatY);
 			double *pyerr = tl::vec_to_array<double>(*pvecDatYErr);
-			tl::autodeleter<double> _a0(px, 1);
-			tl::autodeleter<double> _a1(py, 1);
-			tl::autodeleter<double> _a2(pyerr, 1);
+			autodeleter<double> _a0(px, 1);
+			autodeleter<double> _a1(py, 1);
+			autodeleter<double> _a2(pyerr, 1);
 			const unsigned int iLen = pvecDatX->size();
 
 			if(bAssumeErrorIfZero)

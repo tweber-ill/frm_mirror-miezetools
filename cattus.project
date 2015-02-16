@@ -157,6 +157,7 @@
     <File Name="helper/formulas.h"/>
     <File Name="helper/blob.cpp"/>
     <File Name="helper/formulas.cpp"/>
+    <File Name="helper/misc.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="loader">
     <File Name="loader/loadcasc.cpp"/>

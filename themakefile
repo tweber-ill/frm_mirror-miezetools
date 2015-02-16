@@ -44,18 +44,18 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/subwnd.o obj/settings.o obj/data.o obj/data1.o obj/data2.o obj/data3.o obj/data4.o \
 	obj/FormulaDlg.o obj/CombineDlg.o obj/ComboDlg.o obj/FitDlg.o obj/ListDlg.o \
 	obj/RoiDlg.o obj/SettingsDlg.o obj/PsdPhaseDlg.o obj/RadialIntDlg.o obj/ExportDlg.o \
-	obj/PlotPropDlg.o obj/fourier.o obj/string.o obj/xml.o obj/loadcasc.o obj/loadnicos.o \
+	obj/PlotPropDlg.o obj/fourier.o obj/xml.o obj/loadcasc.o obj/loadnicos.o \
 	obj/loadtxt.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o obj/roi.o \
 	obj/chi2.o obj/fitter.o obj/functions.o obj/parser.o obj/freefit.o \
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/interpolation.o \
-	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o obj/comp.o \
+	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o  \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
 	obj/spec_char.o obj/string_map.o obj/log.o obj/mfourier.o ${FFTW_OBJ}
 	${CC} ${FLAGS} -o bin/cattus $+ ${LIBS}
 	strip bin/cattus
 
-formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/string.o obj/settings.o obj/plot_nopars.o \
-	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/comp.o obj/export.o obj/data2.o \
+formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/settings.o obj/plot_nopars.o \
+	obj/data.o obj/data1.o obj/blob.o obj/roi.o obj/xml.o obj/export.o obj/data2.o \
 	obj/string_map.o obj/log.o
 	${CC} ${FLAGS} -o bin/formula $+ ${LIBS_FORMULA}
 	strip bin/formula
@@ -128,8 +128,6 @@ obj/fftw.o: tlibs/math/fftw.cpp tlibs/math/fftw.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/mfourier.o: helper/mfourier.cpp helper/mfourier.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/string.o: tlibs/string/string.cpp tlibs/string/string.h
-	${CC} ${FLAGS} -c -o $@ $<
 obj/string_map.o: helper/string_map.cpp helper/string_map.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/spec_char.o: tlibs/string/spec_char.cpp tlibs/string/spec_char.h
@@ -141,8 +139,6 @@ obj/linalg2.o: tlibs/math/linalg2.cpp tlibs/math/linalg2.h
 obj/blob.o: helper/blob.cpp helper/blob.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/formulas.o: helper/formulas.cpp helper/formulas.h
-	${CC} ${FLAGS} -c -o $@ $<
-obj/comp.o: tlibs/file/comp.cpp tlibs/file/comp.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/file.o: tlibs/file/file.cpp tlibs/file/file.h
 	${CC} ${FLAGS} -c -o $@ $<

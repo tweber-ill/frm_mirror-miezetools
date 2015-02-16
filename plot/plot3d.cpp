@@ -12,6 +12,7 @@
 
 #include "../tlibs/string/string.h"
 #include "../tlibs/helper/misc.h"
+#include "../helper/misc.h"
 
 Plot3d::Plot3d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 		: Plot2d(pParent, pcTitle, bCountData), m_iCurT(0)
@@ -103,9 +104,9 @@ Plot* Plot3d::ConvertTo1d(int iParam)
 	double *pdx = tl::vec_to_array<double>(*pvecDatX);
 	double *pdy = tl::vec_to_array<double>(*pvecDatY);
 	double *pdyerr = tl::vec_to_array<double>(*pvecDatYErr);
-	tl::autodeleter<double> _a0(pdx, 1);
-	tl::autodeleter<double> _a1(pdy, 1);
-	tl::autodeleter<double> _a2(pdyerr, 1);
+	autodeleter<double> _a0(pdx, 1);
+	autodeleter<double> _a1(pdy, 1);
+	autodeleter<double> _a2(pdyerr, 1);
 
 	Plot *pPlot = new Plot(0, strTitle.c_str());
 	pPlot->plot(dat.GetLength(), pdx, pdy, pdyerr);

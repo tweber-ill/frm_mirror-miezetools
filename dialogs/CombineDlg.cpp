@@ -9,6 +9,7 @@
 #include "../data/fit_data.h"
 #include "../fitter/models/msin.h"
 #include "../fitter/parser.h"
+#include "../helper/misc.h"
 
 #include <vector>
 #include <algorithm>
@@ -246,7 +247,7 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 				strXVal = (*pParamsStat)[strXParam];
 
 			double dXErr = 0.;
-			tl::get_val_and_err(strXVal, pdX[iCur], dXErr);
+			get_val_and_err(strXVal, pdX[iCur], dXErr);
 			strLabX = strXParam;
 		}
 		else
@@ -305,7 +306,7 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 			else if(pParamsStat && pParamsStat->HasKey(strParam))
 				strVal = (*pParamsStat)[strParam];
 
-			tl::get_val_and_err(strVal, pdY[iCur], pdYErr[iCur]);
+			get_val_and_err(strVal, pdY[iCur], pdYErr[iCur]);
 			strLabY = strParam;
 		}
 

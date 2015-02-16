@@ -119,7 +119,7 @@ void load_xml_vecs(unsigned int iNumVecs,
 					void *pvMemComp = blob.map(iBlobIdx, iLenComp);
 
 					double *pdMemUncomp = pvecs[iObj]->data();
-					if(!tl::decomp_mem_to_mem_fix(pvMemComp, (unsigned int)iLenComp, (void*)pdMemUncomp, pvecs[iObj]->size()*sizeof(double)))
+					if(!tl::decomp_mem_to_mem_fix<char>(pvMemComp, (unsigned int)iLenComp, (void*)pdMemUncomp, pvecs[iObj]->size()*sizeof(double)))
 						tl::log_err("Cannot decompress data in blob.");
 
 					blob.unmap(pvMemComp);
@@ -170,7 +170,7 @@ void save_xml_vecs(unsigned int iNumVecs,
 			}
 			else
 			{
-				if(!tl::comp_mem_to_stream((void*)pvecs[iObj]->data(), pvecs[iObj]->size()*sizeof(double), ostrBlob/*, COMP_BZ2*/))
+				if(!tl::comp_mem_to_stream<char>((void*)pvecs[iObj]->data(), pvecs[iObj]->size()*sizeof(double), ostrBlob/*, COMP_BZ2*/))
 					tl::log_err("Cannot compress data in blob.");
 			}
 

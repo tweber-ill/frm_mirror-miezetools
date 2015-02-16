@@ -138,7 +138,7 @@ bool StringMap::Serialize(std::ostream& ostrSer) const
 		iCurIdx += strVal.length()+1;
 	}
 
-	bool bOk = tl::comp_mem_to_stream(pcMem, iLen, ostrSer, tl::COMP_BZ2);
+	bool bOk = tl::comp_mem_to_stream<char>(pcMem, iLen, ostrSer, tl::Compressor::BZ2);
 	delete[] pcMem;
 
 	return bOk;
@@ -171,8 +171,8 @@ static inline std::vector<std::string> split0(const char* pcMem, unsigned int iL
 bool StringMap::Deserialize(const void* pvMem, unsigned int iLen)
 {
 	char *pcUncomp = 0;
-	unsigned int iLenUncomp = 0;
-	if(!tl::decomp_mem_to_mem(pvMem, iLen, (void*&)pcUncomp, iLenUncomp))
+	std::size_t iLenUncomp = 0;
+	if(!tl::decomp_mem_to_mem<char>(pvMem, iLen, (void*&)pcUncomp, iLenUncomp))
 		return false;
 
 	std::vector<std::string> vecStrings = split0(pcUncomp, iLenUncomp);

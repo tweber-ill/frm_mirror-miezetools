@@ -20,6 +20,7 @@
 
 #include "../helper/mieze.h"
 #include "../helper/mfourier.h"
+#include "../helper/misc.h"
 
 
 bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt)
@@ -30,9 +31,9 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 	double *px = tl::vec_to_array<double>(*pvecDatX);
 	double *py = tl::vec_to_array<double>(*pvecDatY);
 	double *pyerr = tl::vec_to_array<double>(*pvecDatYErr);
-	tl::autodeleter<double> _a0(px, 1);
-	tl::autodeleter<double> _a1(py, 1);
-	tl::autodeleter<double> _a2(pyerr, 1);
+	autodeleter<double> _a0(px, 1);
+	autodeleter<double> _a1(py, 1);
+	autodeleter<double> _a2(pyerr, 1);
 	const unsigned int iLen = pvecDatX->size();
 
 
@@ -110,15 +111,15 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 
 	double *pdyTotal = new double[iNumTC];
 	double *pdyerrTotal = new double[iNumTC];
-	tl::autodeleter<double> _a1(pdyTotal, 1);
-	tl::autodeleter<double> _a2(pdyerrTotal, 1);
+	autodeleter<double> _a1(pdyTotal, 1);
+	autodeleter<double> _a2(pdyerrTotal, 1);
 	for(unsigned int iTc=0; iTc<iNumTC; ++iTc)
 		pdyTotal[iTc] = pdyerrTotal[iTc] = 0.;
 
 	double *pdPhases = new double[iNumTC];
 	double *pdPhaseErrs = new double[iNumTC];
-	tl::autodeleter<double> _a7(pdPhases, 1);
-	tl::autodeleter<double> _a7err(pdPhaseErrs, 1);
+	autodeleter<double> _a7(pdPhases, 1);
+	autodeleter<double> _a7err(pdPhaseErrs, 1);
 
 	double dMeanPhase = 0.;
 	double dTotalCnts = 0.;
@@ -178,9 +179,9 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 	double *pdxFoil = new double[iNumTC];
 	double *pdyFoil = new double[iNumTC];
 	double *pdyFoilCorr = new double[iNumTC];
-	tl::autodeleter<double> _a8(pdxFoil, 1);
-	tl::autodeleter<double> _a9(pdyFoil, 1);
-	tl::autodeleter<double> _a10(pdyFoilCorr, 1);
+	autodeleter<double> _a8(pdxFoil, 1);
+	autodeleter<double> _a9(pdyFoil, 1);
+	autodeleter<double> _a10(pdyFoilCorr, 1);
 
 	for(unsigned int iFoil=0; iFoil<iNumFoils; ++iFoil)
 	{

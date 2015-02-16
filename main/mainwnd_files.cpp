@@ -14,6 +14,7 @@
 #include "../tlibs/file/file.h"
 #include "../tlibs/helper/log.h"
 #include "../tlibs/file/loadtxt.h"
+#include "../helper/misc.h"
 #include "../loader/loadnicos.h"
 #include "../loader/loadcasc.h"
 
@@ -332,7 +333,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 			StringMap mapStr;
 			mapStr.SetMap(vecmap_to_map<std::string>(pdat->GetCommMap()));
 
-			tl::autodeleter<NicosData> _a0(pnicosdat);
+			autodeleter<NicosData> _a0(pnicosdat);
 			std::string strCtrName = Settings::Get<QString>("nicos/counter_name").toStdString();
 
 			bool bSelectNewXColumn = 0;
