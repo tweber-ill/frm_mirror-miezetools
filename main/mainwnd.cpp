@@ -802,14 +802,14 @@ void MiezeMainWnd::Interpolation(SubWindowBase* pSWB, InterpFkt iFkt)
 
 	if(iFkt == INTERP_BEZIER)
 	{
-		tl::Bezier bezier(iLen, px, py);
+		tl::Bezier<double> bezier(iLen, px, py);
 		pPlot->plot_param(bezier);
 	}
 	else if(iFkt == INTERP_BSPLINE)
 	{
 		const int iDegree = Settings::Get<int>("interpolation/spline_degree");
 
-		tl::BSpline spline(iLen, px, py, iDegree);
+		tl::BSpline<double> spline(iLen, px, py, iDegree);
 		pPlot->plot_param(spline);
 	}
 	else
