@@ -1,11 +1,13 @@
 CC = gcc
 
 USE_FFTW = 1
+USE_JIT = 0
+
 
 #CC = i686-w64-mingw32-gcc
 INC = -I. -I/usr/include/qt4 -I/usr/local/include -I/usr/include/qt4/QtCore \
-	-I/usr/include/qt4/QtGui -I./tools/plot_gpl/src/qtterminal \
-	-I/usr/include/root -I/usr/include/lapacke
+	-I/usr/include/qt4/QtGui \
+	-I/usr/include/root
 LIB_DIRS = -L/usr/lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/local/lib \
 	-L/usr/lib64/root
 
@@ -17,7 +19,6 @@ FLAGS = ${INC} -O2 -march=native -std=c++11 -DNDEBUG ${DEFINES}
 STD_LIBS = -lstdc++ -lm
 MATH_LIBS = -lMinuit2
 MISC_LIBS = 
-LAPACK_LIBS = -L/usr/local/lib64 -llapacke -llapack -lblas -lgfortran
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns
 #QT_LIBS += -lQtOpenGL -lGL -lGLU -lX11
@@ -35,6 +36,12 @@ else
 endif
 
 
+ifeq (${USE_JIT}, 1)
+	DEFINES += -DUSE_JIT
+	LIBS += -L/usr/lib64/llvm -lLLVM-3.5
+endif
+
+
 .PHONY: all clean
 
 all: cattus
@@ -46,7 +53,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/RoiDlg.o obj/SettingsDlg.o obj/PsdPhaseDlg.o obj/RadialIntDlg.o obj/ExportDlg.o \
 	obj/PlotPropDlg.o obj/fourier.o obj/xml.o obj/loadcasc.o obj/loadnicos.o \
 	obj/loadtxt.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o obj/roi.o \
-	obj/chi2.o obj/fitter.o obj/functions.o obj/parser.o obj/freefit.o \
+	obj/chi2.o obj/fitter.o obj/parser.o obj/freefit.o \
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o \
 	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o  \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
@@ -171,8 +178,6 @@ obj/roi.o: roi/roi.cpp roi/roi.h
 obj/chi2.o: fitter/chi2.cpp fitter/chi2.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/fitter.o: fitter/fitter.cpp fitter/fitter.h
-	${CC} ${FLAGS} -c -o $@ $<
-obj/functions.o: fitter/functions.cpp fitter/functions.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/parser.o: fitter/parser.cpp fitter/parser.h
 	${CC} ${FLAGS} -c -o $@ $<

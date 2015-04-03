@@ -10,6 +10,19 @@
 #include <string>
 #include <vector>
 
+#ifdef USE_JIT
+	#define __STDC_CONSTANT_MACROS
+	#define __STDC_FORMAT_MACROS
+	#define __STDC_LIMIT_MACROS
+
+	#include <llvm/IR/LLVMContext.h>
+	#include <llvm/IR/Module.h>
+	#include <llvm/IR/IRBuilder.h>
+	#include <llvm/ExecutionEngine/JIT.h>
+#endif
+
+
+
 //----------------------------------------------------------------------
 
 struct Node
@@ -40,15 +53,36 @@ class Parser
 		std::vector<Symbol> m_syms;
 		std::vector<Symbol> m_vecFreeParams;
 
-		bool m_bOk;
+		bool m_bOk = false;
+
+#ifdef USE_JIT
+		static int s_iInstances;
+
+		llvm::Module *m_pVMModule = nullptr;
+		llvm::LLVMContext *m_pVMContext = nullptr;
+		llvm::IRBuilder<> *m_pVMBuilder = nullptr;
+
+		llvm::Function *m_pVMFunc = nullptr;
+		llvm::BasicBlock *m_pVMBlock = nullptr;
+
+		llvm::ExecutionEngine *m_pVMExec = nullptr;
+
+		double (*m_pFunc)() = nullptr;
+
+		void InitJIT();
+		void DeinitJIT();
+		llvm::Value* Compile(const Node& node);
+#endif
+
+		bool Compile();
+		double Eval();
 
 	public:
 		Parser(const std::vector<Symbol>* pvecFreeParams=0);
 		Parser(const Parser& parser);
+		virtual ~Parser();
 
 		Parser& operator=(const Parser& parser);
-
-		virtual ~Parser();
 
 		void SetFreeParams(const std::vector<Symbol>& vecFreeParams);
 

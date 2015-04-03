@@ -18,15 +18,28 @@ namespace ascii = boost::spirit::ascii;
 namespace ph = boost::phoenix;
 namespace fus = boost::fusion;
 
+#include <boost/math/special_functions/erf.hpp>
+#include <boost/math/special_functions/sign.hpp>
+
 #include <ctype.h>
 #include <iostream>
 #include <sstream>
 #include <map>
-#include "parser.h"
-#include "functions.h"
+#include <unordered_map>
 
-#include "../tlibs/math/math.h"
-#include "../tlibs/helper/log.h"
+#include "parser.h"
+#include "tlibs/math/math.h"
+#include "tlibs/math/rand.h"
+#include "tlibs/helper/log.h"
+
+#ifdef USE_JIT
+	#include <llvm/ExecutionEngine/GenericValue.h>
+	#include <llvm/Support/ManagedStatic.h>
+	#include <llvm/Support/TargetSelect.h>
+	#include <llvm/IR/LegacyPassManager.h>
+	#include <llvm/LinkAllPasses.h>
+#endif
+
 
 //----------------------------------------------------------------------
 // old procedural interface
@@ -36,7 +49,7 @@ namespace fus = boost::fusion;
 // the second assumes one default free parameter, namely x
 
 static bool is_symbol_in_map(const std::vector<Symbol>& syms, const std::string& str, const std::vector<Symbol>& vecFreeParams, double* pdVal=0);
-static bool is_symbol_in_map(const std::vector<Symbol>& syms, const std::string& str, double* pdVal=0);
+static const double *get_symbol_ptr(const std::vector<Symbol>& syms, const std::string& str, const std::vector<Symbol>& vecFreeParams);
 
 // create a syntax tree out of a expression string
 static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::string& str, const std::vector<Symbol>& vecFreeParams);
@@ -48,7 +61,6 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, doubl
 
 // get a string representation of the syntax tree's expression
 static std::string get_expression(const Node& node, const std::vector<Symbol>& syms, const std::vector<Symbol>& vecFreeParams, bool bFillInSyms=false, bool bGnuPlotSyntax=true);
-static std::string get_expression(const Node& node, const std::vector<Symbol>& syms, bool bFillInSyms=false, bool bGnuPlotSyntax=true);
 
 // print tree & symbol map
 static void print_node(const Node& n, int iIndent=0);
@@ -97,14 +109,60 @@ BOOST_FUSION_ADAPT_STRUCT
 //----------------------------------------
 // globals
 // symbol tables with constants
-static std::map<std::string, double> g_syms;
+typedef std::unordered_map<std::string, double> t_syms;
+static t_syms g_syms =
+{
+	t_syms::value_type("pi", M_PI)
+};
 
 // functions with zero arguments
-static std::map<std::string, double (*)(void)> g_map_fkt0;
+typedef std::unordered_map<std::string, double (*)(void)> t_map_fkt0;
+static t_map_fkt0 g_map_fkt0 =
+{
+	t_map_fkt0::value_type("rand01", tl::rand01<double>)
+};
+
 // functions with one argument
-static std::map<std::string, double (*)(double)> g_map_fkt1;
+typedef std::unordered_map<std::string, double (*)(double)> t_map_fkt1;
+static t_map_fkt1 g_map_fkt1 =
+{
+	t_map_fkt1::value_type("abs", std::fabs),
+	t_map_fkt1::value_type("sin", std::sin),
+	t_map_fkt1::value_type("cos", std::cos),
+	t_map_fkt1::value_type("tan", std::tan),
+	t_map_fkt1::value_type("asin", std::asin),
+	t_map_fkt1::value_type("acos", std::acos),
+	t_map_fkt1::value_type("atan", std::atan),
+	t_map_fkt1::value_type("sinh", std::sinh),
+	t_map_fkt1::value_type("cosh", std::cosh),
+	t_map_fkt1::value_type("tanh", std::tanh),
+	t_map_fkt1::value_type("asinh", std::asinh),
+	t_map_fkt1::value_type("acosh", std::acosh),
+	t_map_fkt1::value_type("atanh", std::atanh),
+	t_map_fkt1::value_type("exp", std::exp),
+	t_map_fkt1::value_type("log", std::log),
+	t_map_fkt1::value_type("log10", std::log10),
+	t_map_fkt1::value_type("sqrt", std::sqrt),
+	t_map_fkt1::value_type("ceil", std::ceil),
+	t_map_fkt1::value_type("floor", std::floor),
+	t_map_fkt1::value_type("fabs", std::fabs),
+	t_map_fkt1::value_type("round", std::round),
+	t_map_fkt1::value_type("sign", [](double d)->double { return double(boost::math::sign(d)); }),
+	t_map_fkt1::value_type("erf", std::erf),
+	t_map_fkt1::value_type("erf_inv", [](double d)->double { return boost::math::erf_inv(d); }),
+	t_map_fkt1::value_type("rand_poisson", [](double d)->double { return double(tl::rand_poisson<int, double>(d)); })
+};
+
 // functions with two arguments
-static std::map<std::string, double (*)(double, double)> g_map_fkt2;
+typedef std::unordered_map<std::string, double (*)(double, double)> t_map_fkt2;
+static t_map_fkt2 g_map_fkt2 =
+{
+	t_map_fkt2::value_type("atan2", std::atan2),
+	t_map_fkt2::value_type("pow", std::pow),
+	t_map_fkt2::value_type("fmod", std::fmod),
+	t_map_fkt2::value_type("rand_norm", tl::rand_norm<double>),
+	t_map_fkt2::value_type("rand_real", tl::rand_real<double>)
+};
 //----------------------------------------
 
 static std::string get_op_name(int iOp)
@@ -217,8 +275,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 		int iNumArgs = node.vecChildren.size();
 		if(iNumArgs==0)
 		{
-			std::map<std::string, double (*)(void)>::iterator iter0
-					= g_map_fkt0.find(strFkt);
+			t_map_fkt0::iterator iter0 = g_map_fkt0.find(strFkt);
 
 			if(iter0 != g_map_fkt0.end())
 			{
@@ -228,8 +285,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 		}
 		else if(iNumArgs==1)
 		{
-			std::map<std::string, double (*)(double)>::iterator iter1
-					= g_map_fkt1.find(strFkt);
+			t_map_fkt1::iterator iter1 = g_map_fkt1.find(strFkt);
 
 			if(iter1 != g_map_fkt1.end())
 			{
@@ -239,8 +295,7 @@ static double eval_tree(const Node& node, const std::vector<Symbol>& syms, const
 		}
 		else if(iNumArgs==2)
 		{
-			std::map<std::string, double (*)(double, double)>::iterator iter2
-					= g_map_fkt2.find(strFkt);
+			t_map_fkt2::iterator iter2 = g_map_fkt2.find(strFkt);
 
 			if(iter2 != g_map_fkt2.end())
 			{
@@ -465,14 +520,6 @@ static std::string get_expression(const Node& node, const std::vector<Symbol>& s
 	return "";
 }
 
-static std::string get_expression(const Node& node, const std::vector<Symbol>& syms, bool bFillInSyms, bool bGnuPlotSyntax)
-{
-	std::vector<Symbol> vecFreeParams;
-	get_default_free_params(vecFreeParams);
-
-	return get_expression(node, syms, vecFreeParams, bFillInSyms, bGnuPlotSyntax);
-}
-
 static bool check_tree_sanity(const Node& n)
 {
 	for(const  Node& child : n.vecChildren)
@@ -486,7 +533,7 @@ static bool check_tree_sanity(const Node& n)
 		return false;
 	if((n.iType==NODE_MULT || n.iType==NODE_DIV) && n.vecChildren.size() < 2)
 		return false;
-	
+
 	if((n.iType==NODE_POW) && n.vecChildren.size() < 2)
 		return false;
 
@@ -787,7 +834,7 @@ static bool is_symbol_in_map(const std::vector<Symbol>& syms, const std::string&
 			return true;
 
 	// look in constants map
-	std::map<std::string,double>::const_iterator iter_c = g_syms.find(str);
+	t_syms::const_iterator iter_c = g_syms.find(str);
 	if(iter_c != g_syms.end())
 	{
 		if(pdVal)
@@ -805,12 +852,24 @@ static bool is_symbol_in_map(const std::vector<Symbol>& syms, const std::string&
 		return false;
 }
 
-static bool is_symbol_in_map(const std::vector<Symbol>& syms, const std::string& str, double* pdVal)
+static const double *get_symbol_ptr(const std::vector<Symbol>& syms, const std::string& str, const std::vector<Symbol>& vecFreeParams)
 {
-	std::vector<Symbol> vecFreeParams;
-	get_default_free_params(vecFreeParams);
+	// look in free parameters
+	for(const Symbol& symfree : vecFreeParams)
+		if(symfree.strIdent == str)
+			return &symfree.dVal;
 
-	return is_symbol_in_map(syms, str, vecFreeParams, pdVal);
+	// look in constants map
+	t_syms::const_iterator iter_c = g_syms.find(str);
+	if(iter_c != g_syms.end())
+		return &(*iter_c).second;
+
+	// look in symbol map
+	for(const Symbol& sym : syms)
+		if(sym.strIdent == str)
+			return &sym.dVal;
+
+	return nullptr;
 }
 
 static void print_symbol_map(const std::vector<Symbol>& syms)
@@ -834,58 +893,13 @@ static void print_symbol_map(const std::vector<Symbol>& syms)
 	tl::log_info(ostrFkts.str());
 }
 
-static void add_constants()
+static void init_globals()
 {
-	// already inited?
-	if(!g_syms.empty())
-		return;
+	static bool bInited = 0;
+	if(bInited) return;
+	bInited = 1;
 
-	g_syms["pi"] = M_PI;
-}
-
-static void add_functions()
-{
-	// already inited?
-	if(!g_map_fkt0.empty() || !g_map_fkt1.empty() || !g_map_fkt2.empty())
-		return;
-
-	init_special_functions();
-	g_map_fkt0["rand01"] = ::my_rand01;
-
-
-	g_map_fkt1["abs"] = ::fabs;
-	g_map_fkt1["sin"] = ::sin;
-	g_map_fkt1["cos"] = ::cos;
-	g_map_fkt1["tan"] = ::tan;
-	g_map_fkt1["asin"] = ::asin;
-	g_map_fkt1["acos"] = ::acos;
-	g_map_fkt1["atan"] = ::atan;
-
-	g_map_fkt1["sinh"] = ::sinh;
-	g_map_fkt1["cosh"] = ::cosh;
-	g_map_fkt1["tanh"] = ::tanh;
-	g_map_fkt1["asinh"] = ::my_asinh;
-	g_map_fkt1["acosh"] = ::my_acosh;
-	g_map_fkt1["atanh"] = ::my_atanh;
-
-	g_map_fkt1["exp"] = ::exp;
-	g_map_fkt1["log"] = ::log;
-	g_map_fkt1["log10"] = ::log10;
-
-	g_map_fkt1["sqrt"] = ::sqrt;
-
-	g_map_fkt1["ceil"] = ::ceil;
-	g_map_fkt1["floor"] = ::floor;
-	g_map_fkt1["fabs"] = ::fabs;
-	g_map_fkt1["round"] = ::my_round;
-	g_map_fkt1["sign"] = ::my_sign;
-
-	g_map_fkt1["erf"] = ::my_erf;
-	g_map_fkt1["erf_inv"] = ::my_erf_inv;
-
-	g_map_fkt2["atan2"] = ::atan2;
-	g_map_fkt2["pow"] = ::pow;
-	g_map_fkt2["fmod"] = ::fmod;
+	tl::init_rand();
 }
 
 static void clear_node(Node& node)
@@ -903,8 +917,7 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 	clear_node(node);
 
 	// fill in globals
-	add_constants();
-	add_functions();
+	init_globals();
 
 	expression_parser<std::string::const_iterator> pars;
 
@@ -950,6 +963,11 @@ static bool parse_expression(Node& node, std::vector<Symbol>& syms, const std::s
 Parser::Parser(const std::vector<Symbol>* pvecFreeParams)
 	: m_bOk(false)
 {
+#ifdef USE_JIT
+	if(s_iInstances++ == 0)
+		llvm::InitializeNativeTarget();
+#endif
+
 	// set "x" as default free param if no others given
 	if(!pvecFreeParams)
 	{
@@ -960,7 +978,15 @@ Parser::Parser(const std::vector<Symbol>* pvecFreeParams)
 	}
 }
 
-Parser::Parser(const Parser& parser) { this->operator=(parser); }
+Parser::Parser(const Parser& parser)
+{
+#ifdef USE_JIT
+	if(s_iInstances++ == 0)
+		llvm::InitializeNativeTarget();
+#endif
+
+	this->operator=(parser);
+}
 
 Parser& Parser::operator=(const Parser& parser)
 {
@@ -969,11 +995,22 @@ Parser& Parser::operator=(const Parser& parser)
 	this->m_vecFreeParams = parser.m_vecFreeParams;
 	this->m_bOk = parser.m_bOk;
 
+	// TODO: Copy already compiled bitcode
+	this->Compile();
+
 	return *this;
 }
-	
-Parser::~Parser() {}
-	
+
+Parser::~Parser()
+{
+#ifdef USE_JIT
+	DeinitJIT();
+
+	if(--s_iInstances == 0)
+		llvm::llvm_shutdown();
+#endif
+}
+
 void Parser::SetFreeParams(const std::vector<Symbol>& vecFreeParams)
 {
 	m_vecFreeParams = vecFreeParams;
@@ -1009,6 +1046,7 @@ bool Parser::ParseExpression(const std::string& str)
 {
 	clear(false);
 	m_bOk = ::parse_expression(m_node, m_syms, str, m_vecFreeParams);
+	Compile();
 
 	//log_info("--------------------------------------------------------------------------------");
 	tl::log_info("Parsing ", (m_bOk ? "successful" : "failed"));
@@ -1019,7 +1057,16 @@ bool Parser::ParseExpression(const std::string& str)
 	return m_bOk;
 }
 
+
+
 // evaluate the syntax tree
+#ifndef USE_JIT
+double Parser::Eval()
+{
+	return ::eval_tree(m_node, m_syms, m_vecFreeParams);
+}
+#endif
+
 double Parser::EvalTree(const double *px)
 {
 	if(px)
@@ -1027,7 +1074,7 @@ double Parser::EvalTree(const double *px)
 		for(unsigned int i=0; i<m_vecFreeParams.size(); ++i)
 			m_vecFreeParams[i].dVal = px[i];
 	}
-	return ::eval_tree(m_node, m_syms, m_vecFreeParams);
+	return Eval();
 }
 
 double Parser::EvalTree(double x)
@@ -1039,7 +1086,7 @@ double Parser::EvalTree(double x)
 	}
 
 	m_vecFreeParams[0].dVal = x;
-	return ::eval_tree(m_node, m_syms, m_vecFreeParams);
+	return Eval();
 }
 
 // get a string representation of the syntax tree's expression
@@ -1069,7 +1116,237 @@ bool Parser::CheckValidLexemes(const std::string& str)
 }
 
 
+
 //======================================================================
+// using LLVM JIT compiler
+
+// llvm-codegen: clang -c -emit-llvm -o 0.ll 0.cpp && llc -march=cpp -o 0.cxx 0.ll
+#ifdef USE_JIT
+
+int Parser::s_iInstances = 0;
+
+void Parser::InitJIT()
+{
+	DeinitJIT();
+
+	m_pVMContext = new llvm::LLVMContext();
+	m_pVMModule = new llvm::Module("parser", *m_pVMContext);
+
+	llvm::FunctionType* pFuncTy = llvm::FunctionType::get(
+			llvm::Type::getDoubleTy(*m_pVMContext),
+			std::vector<llvm::Type*>(), false);
+	m_pVMFunc = llvm::Function::Create(pFuncTy,
+			llvm::GlobalValue::LinkageTypes::InternalLinkage, "func", m_pVMModule);
+	m_pVMBlock = llvm::BasicBlock::Create(*m_pVMContext, "block", m_pVMFunc);
+
+	m_pVMBuilder = new llvm::IRBuilder<true>(m_pVMBlock);
+}
+
+void Parser::DeinitJIT()
+{
+	if(m_pVMBuilder) { delete m_pVMBuilder; m_pVMBuilder = nullptr; }
+	if(m_pVMBlock) { /*delete m_pVMBlock;*/ m_pVMBlock = nullptr; }
+	if(m_pVMFunc) { /*delete m_pVMFunc;*/ m_pVMFunc = nullptr; }
+	if(m_pVMExec) { /*delete m_pVMExec;*/ m_pVMExec = nullptr; }
+	if(m_pVMModule) { delete m_pVMModule; m_pVMModule = nullptr; }
+	if(m_pVMContext) { delete m_pVMContext; m_pVMContext = nullptr; }
+}
+
+static llvm::LoadInst* get_fkt_ptr(llvm::Module* pMod, llvm::BasicBlock *pBlock,
+		const std::string& strName, unsigned int iNumArgs)
+{
+	std::vector<llvm::Type*> vecArgs;
+	vecArgs.reserve(iNumArgs);
+	for(unsigned int iArg=0; iArg<iNumArgs; ++iArg)
+		vecArgs.push_back(llvm::Type::getDoubleTy(pMod->getContext()));
+
+	llvm::FunctionType* pFuncTy = llvm::FunctionType::get(
+			llvm::Type::getDoubleTy(pMod->getContext()), vecArgs, false);
+	const void *pvFunc = nullptr;
+
+	if(iNumArgs == 0)
+	{
+		typename decltype(g_map_fkt0)::const_iterator iter = g_map_fkt0.find(strName);
+		if(iter != g_map_fkt0.end())
+			pvFunc = (const void*)iter->second;
+	}
+	else if(iNumArgs == 1)
+	{
+		typename decltype(g_map_fkt1)::const_iterator iter = g_map_fkt1.find(strName);
+		if(iter != g_map_fkt1.end())
+			pvFunc = (const void*)iter->second;
+	}
+	else if(iNumArgs == 2)
+	{
+		typename decltype(g_map_fkt2)::const_iterator iter = g_map_fkt2.find(strName);
+		if(iter != g_map_fkt2.end())
+			pvFunc = (const void*)iter->second;
+	}
+
+	if(pvFunc)
+	{
+		llvm::PointerType* ptrtyFkt = llvm::PointerType::get(pFuncTy, 0);
+		llvm::AllocaInst* ptrFkt = new llvm::AllocaInst(ptrtyFkt, "pFkt", pBlock);
+		ptrFkt->setAlignment(8);
+
+		llvm::Value *pValFkt = llvm::ConstantInt::get(pMod->getContext(),
+				llvm::APInt(sizeof(void*)*8, long(pvFunc)));
+		llvm::StoreInst *pStore = new llvm::StoreInst(pValFkt, ptrFkt, false, pBlock);
+		pStore->setAlignment(8);
+
+		llvm::LoadInst *pLoadInst = new llvm::LoadInst(ptrFkt, "fkt", false, pBlock);
+		return pLoadInst;
+	}
+
+	tl::log_err("No such function: \"", strName, "\"");
+	return nullptr;
+
+/*
+	// try externally linked functions
+	llvm::Function* pFunc = llvm::Function::Create(pFuncTy, llvm::GlobalValue::ExternalLinkage, strName, pMod);
+	return pFunc;
+*/
+}
+
+static llvm::LoadInst* deref_dbl_ptr(llvm::Module* pMod, llvm::BasicBlock *pBlock,
+		const double *pd)
+{
+	llvm::PointerType* ptrtyDbl = llvm::PointerType::get(
+			llvm::Type::getDoubleTy(pMod->getContext()), 0);
+
+	llvm::AllocaInst* ptrDbl = new llvm::AllocaInst(ptrtyDbl, "pSym", pBlock);
+	ptrDbl->setAlignment(8);
+
+	llvm::Value *pVal = llvm::ConstantInt::get(pMod->getContext(),
+			llvm::APInt(sizeof(double*)*8, long(pd)));
+	llvm::StoreInst* pStore = new llvm::StoreInst(pVal, ptrDbl, false, pBlock);
+	pStore->setAlignment(8);
+
+	return new llvm::LoadInst(new llvm::LoadInst(ptrDbl, "", false, pBlock),
+			"", false, pBlock);
+}
+
+llvm::Value* Parser::Compile(const Node& node)
+{
+	const unsigned int iNumSub = node.vecChildren.size();
+
+	std::vector<llvm::Value*> vecSub;
+	vecSub.reserve(iNumSub);
+
+	for(const Node& child : node.vecChildren)
+		vecSub.push_back(Compile(child));
+
+	if(node.iType == NODE_CALL)
+	{
+		llvm::LoadInst *pFkt = get_fkt_ptr(m_pVMModule, m_pVMBlock, node.strIdent, vecSub.size());
+		return m_pVMBuilder->CreateCall(pFkt, vecSub, node.strIdent);
+		//return llvm::CallInst::Create(pFkt, vecSub, node.strIdent, m_pVMBlock);
+	}
+
+	if(iNumSub==0)
+	{
+		if(node.iType == NODE_DOUBLE)
+			return llvm::ConstantFP::get(*m_pVMContext, llvm::APFloat(node.dVal));
+		else if(node.iType == NODE_IDENT)
+		{
+			const double *pSym = get_symbol_ptr(m_syms, node.strIdent, m_vecFreeParams);
+			if(!pSym)
+			{
+				tl::log_err("Invalid symbol: \"", node.strIdent, "\"");
+				return nullptr;
+			}
+
+			return deref_dbl_ptr(m_pVMModule, m_pVMBlock, pSym);
+		}
+		else if(node.iType == NODE_NOP)
+		{
+			// nop: 0+0
+			llvm::Value* pZero = llvm::ConstantFP::get(*m_pVMContext, llvm::APFloat(0.));
+			return m_pVMBuilder->CreateFAdd(pZero, pZero, get_op_name(node.iType));
+		}
+	}
+	else if(iNumSub==1)		// unary operators
+	{
+		//llvm::Value *pValZero = llvm::ConstantFP::get(*m_pVMContext, llvm::APFloat(0.));
+		if(node.iType == NODE_PLUS)
+			return vecSub[0];
+			//return m_pVMBuilder->CreateFAdd(vecSub[0], pValZero, get_op_name(node.iType));
+		else if(node.iType == NODE_MINUS)
+			return m_pVMBuilder->CreateFNeg(vecSub[0], get_op_name(node.iType));
+			//return m_pVMBuilder->CreateFSub(pValZero, vecSub[0], get_op_name(node.iType));
+	}
+	else if(iNumSub==2)		// binary operators
+	{
+		if(node.iType == NODE_PLUS)
+			return m_pVMBuilder->CreateFAdd(vecSub[0], vecSub[1], get_op_name(node.iType));
+		else if(node.iType == NODE_MINUS)
+			return m_pVMBuilder->CreateFSub(vecSub[0], vecSub[1], get_op_name(node.iType));
+		else if(node.iType == NODE_MULT)
+			return m_pVMBuilder->CreateFMul(vecSub[0], vecSub[1], get_op_name(node.iType));
+		else if(node.iType == NODE_DIV)
+			return m_pVMBuilder->CreateFDiv(vecSub[0], vecSub[1], get_op_name(node.iType));
+		else if(node.iType == NODE_POW)
+		{
+			llvm::LoadInst *pPow = get_fkt_ptr(m_pVMModule, m_pVMBlock, "pow", 2);
+			return m_pVMBuilder->CreateCall(pPow, vecSub, "pow");
+		}
+		else if(node.iType == NODE_MINUS_INV)
+			return m_pVMBuilder->CreateFSub(vecSub[1], vecSub[0], get_op_name(node.iType));
+		else if(node.iType == NODE_DIV_INV)
+			return m_pVMBuilder->CreateFDiv(vecSub[1], vecSub[0], get_op_name(node.iType));
+	}
+
+	tl::log_err("Cannot compile node \"", get_op_name(node.iType),
+			"\" having ", iNumSub, " children.");
+	return nullptr;
+}
+
+bool Parser::Compile()
+{
+	tl::log_info("Using JIT compiler");
+	InitJIT();
+
+	m_pVMBuilder->CreateRet(Compile(m_node));
+
+	llvm::EngineBuilder builder(m_pVMModule);
+	builder.setEngineKind(llvm::EngineKind::JIT);
+	builder.setOptLevel(llvm::CodeGenOpt::Default);
+	m_pVMExec = builder.create();
+
+	/*// optimisation
+	m_pVMModule->setDataLayout(m_pVMExec->getDataLayout());
+	llvm::legacy::FunctionPassManager fpm(m_pVMModule);
+	//fpm.add(llvm::createInstructionCombiningPass());
+	fpm.add(llvm::createGVNPass());
+	fpm.add(llvm::createSCCPPass());
+	fpm.add(llvm::createCFGSimplificationPass());
+	fpm.run(*m_pVMFunc);*/
+
+	m_pFunc = (double(*)())m_pVMExec->getPointerToFunction(m_pVMFunc);
+	return 1;
+}
+
+double Parser::Eval()
+{
+	if(m_pFunc)
+		return m_pFunc();
+	else
+	{
+		llvm::GenericValue gv = m_pVMExec->runFunction(m_pVMFunc,
+				std::vector<llvm::GenericValue>());
+		return double(gv.DoubleVal);
+	}
+}
+
+#else
+
+bool Parser::Compile() { return 0; }
+
+#endif
+
+
+//======================================================================
+
 
 
 
@@ -1235,3 +1512,34 @@ std::vector<ParameterHints> parse_parameter_hints(const std::string& str)
 	}
 	return params;
 }
+
+
+
+/*
+// test
+// clang -I.. -o parsertst -DUSE_JIT parser.cpp ../tlibs/helper/log.cpp ../tlibs/math/rand.cpp -std=c++11 -lstdc++ -lm -L/usr/lib64/llvm -lLLVM-3.5
+#include <iostream>
+#include <limits>
+
+int main()
+{
+	tl::log_debug.SetEnabled(0);
+	tl::log_info.SetEnabled(0);
+
+	Parser pars;
+
+	while(1)
+	{
+		std::cout << "> ";
+		std::string strLine;
+		std::getline(std::cin, strLine);
+
+		pars.ParseExpression(strLine);
+		//pars.PrintTree();
+		std::cout << std::setprecision(std::numeric_limits<double>::max_digits10)
+				<< pars.EvalTree() << std::endl;
+	}
+
+	return 0;
+}
+*/
