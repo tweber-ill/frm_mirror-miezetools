@@ -9,7 +9,7 @@ __init__()
 {
 #	global INSTR = "tasmieze";
 	global INSTR = "tasmieze_nomono";
-	global num_neutrons = 2e6;
+	global num_neutrons = 4e4;
 
 	print("Running on " + interp_ver());
 
@@ -21,7 +21,7 @@ __init__()
 
 main()
 {
-#	global NUM_THREADS = 1;
+	global NUM_THREADS = 1;
 	do_compile = 1;
 	use_cpp = 0;
 

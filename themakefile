@@ -6,7 +6,7 @@ USE_JIT = 0
 
 #CC = i686-w64-mingw32-gcc
 INC = -I. -I/usr/include/qt4 -I/usr/local/include -I/usr/include/qt4/QtCore \
-	-I/usr/include/qt4/QtGui \
+	-I/usr/include/qt4/QtGui -I/usr/include/QtCore -I/usr/include/QtGui \
 	-I/usr/include/root
 LIB_DIRS = -L/usr/lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/local/lib \
 	-L/usr/lib64/root
@@ -20,7 +20,7 @@ STD_LIBS = -lstdc++ -lm
 MATH_LIBS = -lMinuit2
 MISC_LIBS = 
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
-	-lQtCore -lQtGui -lQtXml -lQtXmlPatterns
+	-lQtCore -lQtGui
 #QT_LIBS += -lQtOpenGL -lGL -lGLU -lX11
 LIBS_FORMULA = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${STD_LIBS}
 LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}

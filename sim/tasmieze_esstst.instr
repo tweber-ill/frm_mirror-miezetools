@@ -373,7 +373,7 @@ COMPONENT coil0_B0 = Pol_simpleBfield(
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=2*dB0BrfDist)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, -dB0BrfDist) RELATIVE MiezeCoil0Mid
-		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid*/
+		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid
 
 COMPONENT coil0_rf = Pol_simpleBfield(
 	fieldFunction = coil0_rf_field, Bx=0, By=0, Bz=0, filename = 0,
@@ -389,7 +389,7 @@ COMPONENT coil0_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_rf)
 COMPONENT coil0_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil0_B0)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dB0BrfDist) RELATIVE MiezeCoil0Mid
-		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid*/
+		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil0Mid
 
 
 
@@ -401,7 +401,7 @@ COMPONENT coil1_B0 = Pol_simpleBfield(
 	xwidth = dMiezeWidth, yheight = dMiezeHeight, zdepth=2*dB0BrfDist)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, -dB0BrfDist) RELATIVE MiezeCoil1Mid
-		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid*/
+		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid
 
 COMPONENT coil1_rf = Pol_simpleBfield(
 	fieldFunction = coil1_rf_field, Bx=0, By=0, Bz=0, filename = 0,
@@ -417,7 +417,7 @@ COMPONENT coil1_rf_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_rf)
 COMPONENT coil1_B0_stop = Pol_simpleBfield_stop(magnet_comp_stop=coil1_B0)
 		WHEN(bMiezeIdeal == 0)
 		AT (0.0, 0.0, dB0BrfDist)  RELATIVE MiezeCoil1Mid
-		/*ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid*/
+		ROTATED (0, dMiezeCoilTilt, 0) RELATIVE MiezeCoil1Mid
 
 
 COMPONENT coil1_grad = Pol_simpleBfield(

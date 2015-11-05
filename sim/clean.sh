@@ -10,6 +10,9 @@ rm -f tasmieze.c
 rm -f tasmieze_nomono.cpp
 rm -f tasmieze_nomono.c
 
+rm -f tasmieze_esstst.cpp
+rm -f tasmieze_esstst.c
+
 rm -f coiltest.cpp
 rm -f coiltest.c
 
