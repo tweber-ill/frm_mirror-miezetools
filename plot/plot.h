@@ -22,7 +22,7 @@
 #include "../main/subwnd.h"
 #include "../data/data.h"
 #include "../fitter/fitter.h"
-#include "../tlibs/math/funcmod.h"
+#include "../tlibs/fit/funcmod.h"
 #include "../tlibs/string/string.h"
 
 enum PlotType

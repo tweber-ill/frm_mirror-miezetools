@@ -35,7 +35,7 @@
 
 #include "../fitter/models/msin.h"
 #include "../fitter/models/gauss.h"
-#include "../tlibs/math/interpolation.h"
+#include "../tlibs/fit/interpolation.h"
 
 #include "../data/export.h"
 

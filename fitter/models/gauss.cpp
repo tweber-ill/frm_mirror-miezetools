@@ -8,7 +8,7 @@
 #include "../../tlibs/math/math.h"
 #include "../../tlibs/helper/log.h"
 #include "../../tlibs/helper/misc.h"
-#include "../../tlibs/math/interpolation.h"
+#include "../../tlibs/fit/interpolation.h"
 
 #include <limits>
 #include <algorithm>
