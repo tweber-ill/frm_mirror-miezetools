@@ -12,7 +12,7 @@
 #include <string>
 #include <iostream>
 #include "../roi/roi.h"
-#include "../tlibs/file/xml.h"
+#include "../tlibs/old/xml.h"
 #include "../helper/blob.h"
 #include "../tlibs/string/string.h"
 #include "../helper/string_map.h"

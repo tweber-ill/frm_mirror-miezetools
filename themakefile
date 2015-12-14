@@ -19,11 +19,12 @@ FLAGS = ${INC} -O2 -march=native -std=c++11 -DNDEBUG ${DEFINES}
 STD_LIBS = -lstdc++ -lm
 MATH_LIBS = -lMinuit2
 MISC_LIBS = 
+BOOST_LIBS = -lboost_iostreams -lboost_system -lboost_filesystem
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 	-lQtCore -lQtGui
 #QT_LIBS += -lQtOpenGL -lGL -lGLU -lX11
 LIBS_FORMULA = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${STD_LIBS}
-LIBS = ${LIB_DIRS} -fopenmp -lboost_iostreams ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}
+LIBS = ${LIB_DIRS} -fopenmp ${BOOST_LIBS} ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}
 
 
 # FFTW
@@ -55,7 +56,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/loadtxt.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o obj/roi.o \
 	obj/chi2.o obj/fitter.o obj/parser.o obj/freefit.o \
 	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o \
-	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/file.o  \
+	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/tmp.o  \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
 	obj/spec_char.o obj/string_map.o obj/log.o obj/mfourier.o ${FFTW_OBJ}
 	${CC} ${FLAGS} -o bin/cattus $+ ${LIBS}
@@ -139,7 +140,7 @@ obj/string_map.o: helper/string_map.cpp helper/string_map.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/spec_char.o: tlibs/string/spec_char.cpp tlibs/string/spec_char.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/xml.o: tlibs/file/xml.cpp tlibs/file/xml.h
+obj/xml.o: tlibs/old/xml.cpp tlibs/old/xml.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/linalg2.o: tlibs/math/linalg2.cpp tlibs/math/linalg2.h
 	${CC} ${FLAGS} -c -o $@ $<
@@ -147,7 +148,7 @@ obj/blob.o: helper/blob.cpp helper/blob.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/formulas.o: helper/formulas.cpp helper/formulas.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/file.o: tlibs/file/file.cpp tlibs/file/file.h
+obj/tmp.o: tlibs/file/tmp.cpp tlibs/file/tmp.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/rand.o: tlibs/math/rand.cpp tlibs/math/rand.h
 	${CC} ${FLAGS} -c -o $@ $<

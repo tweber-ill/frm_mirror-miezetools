@@ -26,7 +26,7 @@
 #include "../tlibs/file/file.h"
 #include "../tlibs/helper/misc.h"
 #include "../tlibs/math/mieze.hpp"
-#include "../tlibs/file/xml.h"
+#include "../tlibs/old/xml.h"
 
 #include "../dialogs/ListDlg.h"
 #include "../dialogs/SettingsDlg.h"

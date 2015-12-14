@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include "../../tlibs/file/file.h"
+#include "../../tlibs/file/tmp.h"
 #include "../../tlibs/string/string.h"
 #include "../../tlibs/file/comp.h"
 
