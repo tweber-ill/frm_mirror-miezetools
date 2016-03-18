@@ -15,7 +15,7 @@
 #include "../tlibs/string/string.h"
 #include "../tlibs/string/spec_char.h"
 #include "../tlibs/math/rand.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 
 #ifdef Q_WS_X11
 //#include <X11/Xlib.h>

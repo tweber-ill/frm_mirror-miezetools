@@ -7,7 +7,7 @@
 
 #include "loadcasc.h"
 #include "../main/settings.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 
 #include <QtCore/QVector>
 #include <QtCore/QList>

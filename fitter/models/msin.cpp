@@ -5,9 +5,9 @@
  * Date: April 2012
  */
 
-#include "../../tlibs/math/math.h"
-#include "../../tlibs/math/linalg.h"
-#include "../../tlibs/helper/log.h"
+#include "tlibs/math/math.h"
+#include "tlibs/math/linalg.h"
+#include "tlibs/log/log.h"
 
 #include <limits>
 #include <algorithm>
@@ -22,7 +22,7 @@
 
 #include "msin.h"
 #include "../chi2.h"
-#include "../../tlibs/helper/misc.h"
+#include "tlibs/helper/misc.h"
 #include "../../helper/mfourier.h"
 
 

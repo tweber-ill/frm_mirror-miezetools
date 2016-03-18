@@ -7,7 +7,7 @@
 #include "string_map.h"
 #include "../tlibs/string/string.h"
 #include "../tlibs/helper/misc.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 
 #ifndef NO_COMP
 	#include "../tlibs/file/comp.h"

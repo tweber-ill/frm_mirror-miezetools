@@ -30,7 +30,7 @@ namespace fus = boost::fusion;
 #include "parser.h"
 #include "tlibs/math/math.h"
 #include "tlibs/math/rand.h"
-#include "tlibs/helper/log.h"
+#include "tlibs/log/log.h"
 
 #ifdef USE_JIT
 	#include <llvm/ExecutionEngine/GenericValue.h>

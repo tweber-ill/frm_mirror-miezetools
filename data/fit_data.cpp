@@ -11,10 +11,10 @@
 #include "../fitter/models/msin.h"
 #include "../fitter/models/gauss.h"
 
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/math/math.h"
-#include "../tlibs/math/mieze.hpp"
-#include "../tlibs/helper/log.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/math/math.h"
+#include "tlibs/math/mieze.hpp"
+#include "tlibs/log/log.h"
 
 #include "../main/settings.h"
 

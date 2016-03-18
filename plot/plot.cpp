@@ -15,7 +15,7 @@
 #include <iostream>
 
 #include "../tlibs/string/string.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 #include "../fitter/models/freefit.h"
 
 #define PAD_X 18

@@ -5,7 +5,7 @@
  */
 
 #include "formulas.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 #include <map>
 
 static std::map<std::string, double> g_mapPrefixes;

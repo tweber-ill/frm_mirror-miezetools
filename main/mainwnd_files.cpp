@@ -13,7 +13,7 @@
 #include "../tlibs/file/comp.h"
 #include "../tlibs/file/file.h"
 #include "../tlibs/file/tmp.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 #include "../tlibs/file/loadtxt.h"
 #include "../helper/misc.h"
 #include "../loader/loadnicos.h"

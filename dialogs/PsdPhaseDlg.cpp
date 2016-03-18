@@ -18,7 +18,7 @@
 #include "../tlibs/math/mieze.hpp"
 #include "../tlibs/helper/misc.h"
 #include "../tlibs/math/math.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 
 #include "../fitter/models/msin.h"
 

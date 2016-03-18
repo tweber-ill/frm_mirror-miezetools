@@ -9,7 +9,7 @@
 
 #include "../plot/plot.h"
 #include "../plot/plot2d.h"
-#include "../tlibs/helper/log.h"
+#include "tlibs/log/log.h"
 
 #include <iostream>
 #include <fstream>

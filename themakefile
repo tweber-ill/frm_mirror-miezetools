@@ -152,7 +152,7 @@ obj/tmp.o: tlibs/file/tmp.cpp tlibs/file/tmp.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/rand.o: tlibs/math/rand.cpp tlibs/math/rand.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/log.o: tlibs/helper/log.cpp tlibs/helper/log.h
+obj/log.o: tlibs/log/log.cpp tlibs/log/log.h
 	${CC} ${FLAGS} -c -o $@ $<
 
 obj/loadcasc.o: loader/loadcasc.cpp loader/loadcasc.h

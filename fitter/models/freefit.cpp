@@ -18,7 +18,7 @@
 #include "freefit.h"
 #include "../chi2.h"
 
-#include "../../tlibs/helper/log.h"
+#include "tlibs/log/log.h"
 
 //----------------------------------------------------------------------
 // freefit model

@@ -7,7 +7,7 @@
 
 #include "mainwnd.h"
 #include "../tlibs/string/string.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 #include "settings.h"
 
 #include <QtGui/QMdiSubWindow>

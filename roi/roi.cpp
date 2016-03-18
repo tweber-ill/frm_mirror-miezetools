@@ -14,7 +14,7 @@
 #include "pnpoly.h"
 #include "../tlibs/math/math.h"
 #include "../tlibs/math/linalg.h"
-#include "../tlibs/helper/log.h"
+#include "../tlibs/log/log.h"
 #include "../data/data.h"
 
 //------------------------------------------------------------------------------

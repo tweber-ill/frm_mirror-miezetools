@@ -11,7 +11,7 @@
 #include "../../tlibs/math/math.h"
 #include "../../helper/formulas.h"
 #include "../../tlibs/helper/misc.h"
-#include "../../tlibs/helper/log.h"
+#include "../../tlibs/log/log.h"
 #include "../../main/settings.h"
 #include "../../data/export.h"
 
