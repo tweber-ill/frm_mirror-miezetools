@@ -7,7 +7,7 @@
 #ifndef __LOAD_NICOS__
 #define __LOAD_NICOS__
 
-#include "../tlibs/file/loadtxt.h"
+#include "../tlibs/old/loadtxt.h"
 #include <vector>
 #include <string>
 

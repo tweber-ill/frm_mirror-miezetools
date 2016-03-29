@@ -159,7 +159,7 @@ obj/loadcasc.o: loader/loadcasc.cpp loader/loadcasc.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/loadnicos.o: loader/loadnicos.cpp loader/loadnicos.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/loadtxt.o: tlibs/file/loadtxt.cpp tlibs/file/loadtxt.h
+obj/loadtxt.o: tlibs/old/loadtxt.cpp tlibs/old/loadtxt.h
 	${CC} ${FLAGS} -c -o $@ $<
 
 obj/plot.o: plot/plot.cpp plot/plot.h
