@@ -172,7 +172,7 @@ bool StringMap::Deserialize(const void* pvMem, unsigned int iLen)
 {
 	char *pcUncomp = 0;
 	std::size_t iLenUncomp = 0;
-	if(!tl::decomp_mem_to_mem<char>(pvMem, iLen, (void*&)pcUncomp, iLenUncomp))
+	if(!tl::decomp_mem_to_mem<char>((char*)pvMem, iLen, pcUncomp, iLenUncomp))
 		return false;
 
 	std::vector<std::string> vecStrings = split0(pcUncomp, iLenUncomp);

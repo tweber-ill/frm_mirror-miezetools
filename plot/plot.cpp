@@ -459,7 +459,7 @@ void Plot::plot(const Data1& dat, PlotType plttype, const char* pcLegend)
 #endif
 }
 
-void Plot::plot_param(const tl::FunctionModel_param& fkt, int iObj)
+void Plot::plot_param(const tl::FunctionModel_param<>& fkt, int iObj)
 {
 	const uint iCnt = 512;
 

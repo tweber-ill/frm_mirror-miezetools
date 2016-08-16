@@ -7,7 +7,7 @@
 #ifndef __NEUTRON_FORMULAS__
 #define __NEUTRON_FORMULAS__
 
-#include "../tlibs/math/neutrons.hpp"
+#include "../tlibs/math/neutrons.h"
 
 namespace units = boost::units;
 namespace co = boost::units::si::constants::codata;

@@ -26,8 +26,7 @@ public:
 		QString strLic;
 		strLic += "Cattus is free software: you can redistribute it and/or modify\n";
 		strLic += "it under the terms of the GNU General Public License as published by\n";
-		strLic += "the Free Software Foundation, either version 3 of the License, or\n";
-		strLic += "(at your option) any later version.\n\n";
+		strLic += "the Free Software Foundation, version 3 of the License.\n\n";
 		strLic += "Cattus is distributed in the hope that it will be useful,\n";
 		strLic += "but WITHOUT ANY WARRANTY; without even the implied warranty of\n";
 		strLic += "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n";

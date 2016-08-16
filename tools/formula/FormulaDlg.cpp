@@ -6,7 +6,7 @@
 
 #include "FormulaDlg.h"
 #include <boost/units/io.hpp>
-#include "../../tlibs/math/mieze.hpp"
+#include "../../tlibs/math/mieze.h"
 #include "../../tlibs/string/string.h"
 #include "../../tlibs/math/math.h"
 #include "../../helper/formulas.h"

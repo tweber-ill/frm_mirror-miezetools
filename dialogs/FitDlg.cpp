@@ -14,7 +14,7 @@
 #include "../tlibs/string/string.h"
 #include "../tlibs/helper/misc.h"
 #include "../tlibs/math/math.h"
-#include "../tlibs/math/mieze.hpp"
+#include "../tlibs/math/mieze.h"
 
 #include "../plot/plot.h"
 #include "../plot/plot2d.h"

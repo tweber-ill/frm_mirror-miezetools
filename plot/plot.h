@@ -87,7 +87,7 @@ public:
 	void plot(const Data1& dat, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
 	void plot_fkt(const FunctionModel& fkt, int iObj=-1, bool bKeepObj=false);
 	void replot_fkts();
-	void plot_param(const tl::FunctionModel_param& fkt, int iObj=-1);
+	void plot_param(const tl::FunctionModel_param<>& fkt, int iObj=-1);
 
 	void clear();
 	void clearfkt();

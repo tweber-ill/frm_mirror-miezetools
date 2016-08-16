@@ -9,7 +9,7 @@
 #include <boost/units/io.hpp>
 
 #include "../../helper/math.h"
-#include "../../helper/mieze.hpp"
+#include "../../helper/mieze.h"
 #include "../../helper/fourier.h"
 
 #include <fstream>

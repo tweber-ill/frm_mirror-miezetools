@@ -34,7 +34,7 @@ std::complex<T> phase_correction_1(const std::complex<T>& c,
 
 
 //------------------------------------------------------------------------------
-class MFourier : public tl::Fourier
+class MFourier : public tl::Fourier<double>
 {
 	public:
 		MFourier(unsigned int iSize);

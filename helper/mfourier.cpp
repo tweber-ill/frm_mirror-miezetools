@@ -7,7 +7,7 @@
 
 #include "mfourier.h"
 
-MFourier::MFourier(unsigned int iSize) : tl::Fourier(iSize)
+MFourier::MFourier(unsigned int iSize) : tl::Fourier<double>(iSize)
 {}
 
 MFourier::~MFourier()

@@ -15,7 +15,7 @@
 #include "../helper/mieze.h"
 #include "../helper/mfourier.h"
 
-#include "../tlibs/math/mieze.hpp"
+#include "../tlibs/math/mieze.h"
 #include "../tlibs/helper/misc.h"
 #include "../tlibs/math/math.h"
 #include "../tlibs/log/log.h"
