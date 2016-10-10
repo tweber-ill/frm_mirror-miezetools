@@ -1,4 +1,3 @@
-#include "../../helper/linalg.h"
 #include <vector>
 #include <cmath>
 #include <iostream>
@@ -6,53 +5,60 @@
 
 #include <mgl2/qt.h>
 
+#include "../../tlibs/math/linalg.h"
+using namespace tl;
 
-ublas::vector<double> helix_vec(double r, double c, const ublas::vector<double>& vecCoord, double dAngleScale=1.)
-{	
-	static std::vector<ublas::matrix<double> > matrices;
-	static std::vector<ublas::matrix<double> > inv_matrices;
+using t_real = double;
+using t_vec = ublas::vector<double>;
+using t_mat = ublas::matrix<double>;
+
+
+t_vec helix_vec(t_real r, t_real c, const t_vec& vecCoord, t_real dAngleScale=1.)
+{
+	static std::vector<t_mat > matrices;
+	static std::vector<t_mat > inv_matrices;
 
 	static bool bMatricesInited = 0;
-	static double dLastAngleScale = 1.;
+	static t_real dLastAngleScale = 1.;
 
 	if(dAngleScale != dLastAngleScale)
 	{
 		bMatricesInited = 0;
 		dLastAngleScale = dAngleScale;
 	}
-	
+
 	if(!bMatricesInited)
 	{
 		matrices.clear();
 		inv_matrices.clear();
 
-		const double dAngles[3] = {0., dAngleScale*120., dAngleScale*240.};
-		
-		for(double dAngle : dAngles)
+		const t_real dAngles[3] = {0., dAngleScale*120., dAngleScale*240.};
+
+		for(t_real dAngle : dAngles)
 		{
 			dAngle = dAngle/180.*M_PI;
 
-			ublas::matrix<double> matRotNeg = rotation_matrix_3d_x<double>(-dAngle);
-			ublas::matrix<double> matRotPos = rotation_matrix_3d_x<double>(dAngle);
-			
+			t_mat matRotNeg = rotation_matrix_3d_x<t_mat>(-dAngle);
+			t_mat matRotPos = rotation_matrix_3d_x<t_mat>(dAngle);
+
 			matrices.push_back(matRotPos);
 			inv_matrices.push_back(matRotNeg);
 		}
-		
+
 		bMatricesInited = 1;
 	}
-	
 
-	ublas::vector<double> vecRet = ublas::zero_vector<double>(3);
+
+	t_vec vecRet = ublas::zero_vector<t_real>(3);
 
 	for(int iMatrix=0; iMatrix<matrices.size(); ++iMatrix)
 	{
-		const ublas::matrix<double>& matRotNeg = inv_matrices[iMatrix];
-		const ublas::matrix<double>& matRotPos = matrices[iMatrix];
+		const t_mat& matRotNeg = inv_matrices[iMatrix];
+		const t_mat& matRotPos = matrices[iMatrix];
 
-		ublas::vector<double> vecCoordRot = ublas::prod(matRotNeg, vecCoord);
+		t_vec vecCoordRot = ublas::prod(matRotNeg, vecCoord);
 
-		ublas::vector<double> vec(3);
+		t_vec vec(3);
 
 		vec[0] = r * cos(vecCoordRot[2]);
 		vec[1] = r * sin(vecCoordRot[2]);
@@ -71,44 +77,44 @@ int draw(mglGraph *gr)
 	const int iCntX = 8;
 	const int iCntY = 96;
 	const int iCntZ = 96;
-	
+
 	mglData datx, daty, datz;
 
 	datx.Create(iCntX, iCntY, iCntZ);
 	daty.Create(iCntX, iCntY, iCntZ);
 	datz.Create(iCntX, iCntY, iCntZ);
 
-	double r = 1.;
-	double c = 1.;
-	
-	const double dTScale = 4.;
-	const double dXScale = 1.;
-	const double dYScale = 16.;
-	
-	const double dScale2 = 0.15;
+	t_real r = 1.;
+	t_real c = 1.;
 
-	static double dAngleScale = 0.;
+	const t_real dTScale = 4.;
+	const t_real dXScale = 1.;
+	const t_real dYScale = 16.;
+
+	const t_real dScale2 = 0.15;
+
+	static t_real dAngleScale = 0.;
 	std::cout << "angle scale: " << dAngleScale << std::endl;
 
 
 	for(int iZ=0; iZ<iCntZ; ++iZ)
 	{
-		double dT = double(iZ)/double(iCntZ-1) * 2.*M_PI;
+		t_real dT = t_real(iZ)/t_real(iCntZ-1) * 2.*M_PI;
 
 		for(int iY=0; iY<iCntY; ++iY)
 		{
-			double dY = double(iY)/double(iCntY-1);
+			t_real dY = t_real(iY)/t_real(iCntY-1);
 
 			for(int iX=0; iX<iCntX; ++iX)
 			{
-				double dX = double(iX)/double(iCntX-1);
+				t_real dX = t_real(iX)/t_real(iCntX-1);
 
-				ublas::vector<double> vecCoord(3);
+				t_vec vecCoord(3);
 				vecCoord[0] = dXScale*dX;
 				vecCoord[1] = dYScale*dY;
 				vecCoord[2] = dTScale*dT;
 
-				ublas::vector<double> vec = helix_vec(r, c, vecCoord, dAngleScale);
+				t_vec vec = helix_vec(r, c, vecCoord, dAngleScale);
 
 				int iIdx = iX + iY*iCntX + iZ*iCntX*iCntY;
 				datx.a[iIdx] = dScale2 * vec[0];
