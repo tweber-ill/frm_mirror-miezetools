@@ -125,7 +125,7 @@ int draw(mglGraph *gr)
 	//gr->Rotate(0, 0, 90);
 	gr->Vect3(datx, daty, datz, "fx");	// x slice
 
-	gr->WriteJPEG("helix.jpg");
+	gr->WritePNG("helix.png");
 
 	return 0;
 }
