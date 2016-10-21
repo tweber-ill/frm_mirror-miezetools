@@ -2,6 +2,7 @@
  * binary large object
  * @author tweber
  * @date 26-jun-2013
+ * @license GPLv3
  */
 
 #ifndef __MIEZE_BLOB__

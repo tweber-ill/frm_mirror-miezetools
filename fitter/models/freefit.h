@@ -1,8 +1,9 @@
 /*
  * A free function fitter using Minuit
  *
- * Author: Tobias Weber
- * Date: April 2012
+ * @author: Tobias Weber
+ * @date: April 2012
+ * @license GPLv3
  */
 
 #ifndef __FREEFIT__

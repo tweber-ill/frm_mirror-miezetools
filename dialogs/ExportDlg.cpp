@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 25-jul-2013
+ * @license GPLv3
  */
 
 #include "ExportDlg.h"

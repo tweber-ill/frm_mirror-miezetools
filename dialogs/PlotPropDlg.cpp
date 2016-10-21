@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 22-jul-2013
+ * @license GPLv3
  */
 
 #include "PlotPropDlg.h"

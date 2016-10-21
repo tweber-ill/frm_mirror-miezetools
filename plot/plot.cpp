@@ -3,6 +3,7 @@
  * plotter
  * @author tweber
  * @date 06-mar-2013
+ * @license GPLv3
  */
 
 #include "plot.h"

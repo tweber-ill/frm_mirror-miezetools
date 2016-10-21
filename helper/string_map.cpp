@@ -2,6 +2,7 @@
  * string helper
  * @author tweber
  * @date 06-mar-2013
+ * @license GPLv3
  */
 
 #include "string_map.h"

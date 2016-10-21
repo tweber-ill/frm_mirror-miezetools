@@ -1,7 +1,8 @@
 /*
  * Parser for the "free function" fitter model
- * Author: Tobias Weber
- * Date: April 2012
+ * @author: Tobias Weber
+ * @date: April 2012
+ * @license GPLv3
  */
 
 #include <boost/spirit/include/qi.hpp>

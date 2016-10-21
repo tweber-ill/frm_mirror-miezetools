@@ -3,6 +3,7 @@
  * roi stuff
  * @author tweber
  * @date 2011, 23-apr-2013
+ * @license GPLv3
  */
 
 #include <sstream>

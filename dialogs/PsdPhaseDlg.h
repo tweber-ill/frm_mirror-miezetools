@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 29-may-2013
+ * @license GPLv3
  */
 
 #ifndef __PSD_PHASE_DLG__

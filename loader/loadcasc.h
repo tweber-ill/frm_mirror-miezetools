@@ -3,6 +3,7 @@
  *
  * @author Tobias Weber
  * @date September 2012, 19-mar-2013
+ * @license GPLv3
  */
 
 #ifndef __PADTOF__

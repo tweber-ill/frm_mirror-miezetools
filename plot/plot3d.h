@@ -3,6 +3,7 @@
  * plotter
  * @author tweber
  * @date 15-mar-2013
+ * @license GPLv3
  */
 
 #ifndef __MIEZE_PLOT3D__

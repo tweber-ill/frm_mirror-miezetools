@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 30-sep-2013
+ * @license GPLv3
  */
 
 #include "NormDlg.h"

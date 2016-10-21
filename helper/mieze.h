@@ -2,6 +2,7 @@
  * more specialised mieze stuff than in tlibs
  * @author tweber
  * @date 2012, jan-2015
+ * @license GPLv3
  */
 
 #ifndef __CATTUS_MIEZE_H__

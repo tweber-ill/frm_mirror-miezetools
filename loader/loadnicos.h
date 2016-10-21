@@ -1,7 +1,8 @@
 /*
  * loading of nicos data files
  * @author tweber
- * @data 25-04-2013
+ * @date 25-04-2013
+ * @license GPLv3
  */
 
 #ifndef __LOAD_NICOS__

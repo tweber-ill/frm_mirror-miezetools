@@ -1,7 +1,8 @@
 /*
  * Formula Stuff
- * @author: Tobias Weber
- * @date: May 2012, 16-jul-2013
+ * @author Tobias Weber
+ * @date May 2012, 16-jul-2013
+ * @license GPLv3
  */
 
 #include "formulas.h"

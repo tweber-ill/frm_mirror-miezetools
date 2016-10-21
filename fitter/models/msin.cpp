@@ -1,8 +1,9 @@
 /*
  * A MIEZE signal fitter for the oscillation monitors using Minuit2
  *
- * Author: Tobias Weber
- * Date: April 2012
+ * @author: Tobias Weber
+ * @date: April 2012
+ * @license GPLv3
  */
 
 #include "tlibs/math/math.h"

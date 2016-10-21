@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 31-oct-2013
+ * @license GPLv3
  */
 
 #include "RebinDlg.h"

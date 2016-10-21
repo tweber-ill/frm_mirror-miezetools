@@ -1,8 +1,9 @@
 /*
  * A gauss n-dim fitter using Minuit
  *
- * Author: Tobias Weber
- * Date: July 2012
+ * @author: Tobias Weber
+ * @date: July 2012
+ * @license GPLv3
  */
 
 #ifndef __GAUSS_ND_H__

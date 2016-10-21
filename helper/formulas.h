@@ -1,7 +1,8 @@
 /*
  * neutron formulas
- * Author: Tobias Weber
- * Date: May 2012, 11-jul-2013
+ * @author: Tobias Weber
+ * @date: May 2012, 11-jul-2013
+ * @license GPLv3
  */
 
 #ifndef __NEUTRON_FORMULAS__

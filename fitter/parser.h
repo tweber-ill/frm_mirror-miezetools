@@ -2,6 +2,7 @@
  * Parser for the "free function" fitter model
  * Author: Tobias Weber
  * Date: April 2012
+ * @license GPLv3
  */
 
 #ifndef __FKT_PARSER__H__

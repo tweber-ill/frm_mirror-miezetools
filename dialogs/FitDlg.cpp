@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 10-apr-2013
+ * @license GPLv3
  */
 
 #include "FitDlg.h"

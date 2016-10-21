@@ -3,6 +3,7 @@
  * plotter
  * @author tweber
  * @date 11-mar-2013
+ * @license GPLv3
  */
 
 #include "plot2d.h"

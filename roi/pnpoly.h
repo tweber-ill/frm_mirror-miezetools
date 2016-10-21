@@ -31,18 +31,19 @@
  * Point Inclusion in Polygon Test
  * http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html 
  *
- * (modification for Cascade Viewer: using templates)
+ * (modification by tw: using templates)
  */
-template<class ArrayAdaptor>
-int pnpoly(int nvert, 
-           const ArrayAdaptor& vertx, const ArrayAdaptor& verty, 
-           double testx, double testy)
+template<class ArrayAdaptor, class T = double>
+int pnpoly(int nvert,
+	const ArrayAdaptor& vertx, const ArrayAdaptor& verty,
+	T testx, T testy)
 {
-  int i, j, c = 0;
-  for (i = 0, j = nvert-1; i < nvert; j = i++) {
-    if ( ((verty[i]>testy) != (verty[j]>testy)) &&
-	 (testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
-       c = !c;
-  }
-  return c;
+	int i, j, c = 0;
+	for (i = 0, j = nvert-1; i < nvert; j = i++)
+	{
+		if ( ((verty[i]>testy) != (verty[j]>testy)) &&
+			(testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+				c = !c;
+	}
+	return c;
 }

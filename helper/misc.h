@@ -2,6 +2,7 @@
  * misc helper
  * @author tweber
  * @date 07-mar-2013
+ * @license GPLv3
  */
 
 #ifndef __MIEZE_MISC_H__

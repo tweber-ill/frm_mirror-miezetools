@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 08-jul-2013
+ * @license GPLv3
  */
 
 #include "FormulaDlg.h"

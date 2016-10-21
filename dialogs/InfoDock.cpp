@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 29-aug-2013
+ * @license GPLv3
  */
 
 #include "InfoDock.h"

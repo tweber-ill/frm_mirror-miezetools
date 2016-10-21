@@ -2,6 +2,7 @@
  * mieze-tool
  * @author tweber
  * @date 03-apr-2013
+ * @license GPLv3
  */
 
 #ifndef __MIEZE_SETTINGS_DLG__

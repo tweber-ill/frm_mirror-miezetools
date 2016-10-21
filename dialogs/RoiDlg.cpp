@@ -2,6 +2,7 @@
  * Roi Dialog
  * @author tweber
  * @date 2011, 24-04-2013
+ * @license GPLv3
  */
 
 #include "RoiDlg.h"
