@@ -1,13 +1,13 @@
-/*
+/**
  * fitter base class
  *
- * @author: Tobias Weber
- * @date: April 2012
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @date April 2012
  *
  * general fitter structure (i.e. function => chi^2 calculation => calling
  * minuit) originally based on the examples in the Minuit user's guide:
  * http://seal.cern.ch/documents/minuit/mnusersguide.pdf
- * 
+ *
  * @license GPLv3
  */
 

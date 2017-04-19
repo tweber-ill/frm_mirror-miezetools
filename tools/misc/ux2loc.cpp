@@ -1,3 +1,9 @@
+/**
+ * Test
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @license GPLv3
+ */
+
 // clang -O2 -o ux2loc ux2loc.cpp -lstdc++ -std=c++11
 
 #include <chrono>

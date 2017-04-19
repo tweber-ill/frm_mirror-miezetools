@@ -1,7 +1,7 @@
-/*
+/**
  * Parser for the "free function" fitter model
- * Author: Tobias Weber
- * Date: April 2012
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @date April 2012
  * @license GPLv3
  */
 

@@ -1,6 +1,6 @@
-/*
+/**
  * mieze-tool
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 08-jul-2013
  * @license GPLv3
  */

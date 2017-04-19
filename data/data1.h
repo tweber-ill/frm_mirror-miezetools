@@ -1,8 +1,9 @@
-/*
+/**
  * mieze-tool
  * data representation
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 08-mar-2013
+ * @license GPLv3
  */
 
 #ifndef __MIEZE_DAT_1__

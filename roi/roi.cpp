@@ -1,7 +1,7 @@
-/*
+/**
  * mieze-tool
  * roi stuff
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 2011, 23-apr-2013
  * @license GPLv3
  */

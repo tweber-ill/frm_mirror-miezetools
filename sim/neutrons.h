@@ -1,6 +1,6 @@
-/*
+/**
  * Helper functions for mcstas
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 4-nov-14
  */
 

@@ -1,3 +1,9 @@
+/**
+ * Test
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @license GPLv3
+ */
+
 // gcc -o mergetof mergetof.cpp ../../tlibs/file/file.cpp ../../tlibs/file/comp.cpp ../../tlibs/helper/log.cpp ../../tlibs/math/rand.cpp -std=c++11 -lstdc++ -lboost_iostreams -lQtCore
 
 #include <iostream>

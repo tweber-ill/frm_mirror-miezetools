@@ -1,8 +1,9 @@
-/*
+/**
  * mieze-tool
  * data export
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 17-jun-2013
+ * @license GPLv3
  */
 
 #include "export.h"

@@ -1,6 +1,6 @@
-/*
+/**
  * string helper
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 06-mar-2013
  * @license GPLv3
  */

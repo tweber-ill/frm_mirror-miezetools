@@ -1,8 +1,9 @@
-/*
+/**
  * mieze-tool
  * main mdi window
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 04-mar-2013
+ * @license GPLv3
  */
 
 #include "mainwnd.h"
@@ -375,12 +376,6 @@ MiezeMainWnd::MiezeMainWnd()
 	// Help
 	QMenu* pMenuHelp = new QMenu(this);
 	pMenuHelp->setTitle("Help");
-	QAction* pBrowser = new QAction(this);
-	pBrowser->setText("Add Browser Toolbar");
-	pBrowser->setIcon(QIcon::fromTheme("applications-internet"));
-	pMenuHelp->addAction(pBrowser);
-
-	pMenuHelp->addSeparator();
 
 	QAction* pAbout = new QAction(this);
 	pAbout->setText("About...");
@@ -478,7 +473,6 @@ MiezeMainWnd::MiezeMainWnd()
 	//QObject::connect(pTaz, SIGNAL(triggered()), this, SLOT(ShowTaz()));
 
 	QObject::connect(pAbout, SIGNAL(triggered()), this, SLOT(ShowAbout()));
-	QObject::connect(pBrowser, SIGNAL(triggered()), this, SLOT(ShowBrowser()));
 
 	QObject::connect(pMenuWindows, SIGNAL(aboutToShow()), this, SLOT(UpdateSubWndList()));
 	QObject::connect(m_pmdi, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(SubWindowChanged()));
@@ -885,15 +879,6 @@ void MiezeMainWnd::ShowAbout()
 {
 	AboutDlg dlg(this);
 	dlg.exec();
-}
-
-void MiezeMainWnd::ShowBrowser()
-{
-#ifdef Q_WS_WIN
-	QMessageBox::critical(this, "Error", "Too many browser toolbars already installed.\nCannot add more.");
-#else
-	QMessageBox::information(this, "Unsupported", "This is not the right operating system\nfor such nonsense.");
-#endif
 }
 
 

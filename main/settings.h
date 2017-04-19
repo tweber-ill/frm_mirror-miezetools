@@ -1,8 +1,9 @@
-/*
+/**
  * mieze-tool
  * global settings
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 04-mar-2013
+ * @license GPLv3
  */
 
 #ifndef __MIEZE_SETTINGS__

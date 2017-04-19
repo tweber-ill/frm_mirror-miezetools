@@ -1,9 +1,0 @@
-tst(a)
-{
-	print(a);
-}
-
-main()
-{
-	tst(-5);
-}

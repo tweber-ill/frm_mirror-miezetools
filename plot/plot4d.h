@@ -1,7 +1,7 @@
-/*
+/**
  * mieze-tool
  * plotter
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 15-mar-2013
  * @license GPLv3
  */

@@ -1,7 +1,7 @@
 /**
  * pad/tof files
  *
- * @author Tobias Weber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date September 2012, 19-mar-2013
  * @license GPLv3
  */

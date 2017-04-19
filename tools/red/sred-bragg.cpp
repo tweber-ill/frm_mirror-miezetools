@@ -1,6 +1,7 @@
-/*
+/**
  * Sample reduction calculation with extinction (for HOPG analyser contrast reduction)
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @license GPLv3
  *
  * gcc -O2 -march=native -DNDEBUG -o sred-bragg sred-bragg.cpp -lstdc++ -std=c++11 -lm -fopenmp
  */

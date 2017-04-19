@@ -1,6 +1,6 @@
 /**
  * gcc -std=c++11 -o helix3_gpl helix3_gpl.cpp -lstdc++ -lm
- * @author tw
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @license GPLv3
  */
 
@@ -32,36 +32,22 @@ t_mat rot(t_real angle)
 
 t_vec helix_vec(const t_vec& vecCoord)
 {
-	std::vector<t_mat> matrices;
-	std::vector<t_mat> inv_matrices;
+	t_vec vecRet = ublas::zero_vector<t_real>(3);
 
+	// helix angles
 	for(t_real dAngle : {0., 120., 240.})
 	{
 		dAngle = dAngle/180.*M_PI;
+		t_mat matRot = rot(dAngle);
+		t_vec vecCoordRot = ublas::prod(ublas::trans(matRot), vecCoord);
 
-		t_mat matRotNeg = rot(-dAngle);
-		t_mat matRotPos = rot(dAngle);
-
-		matrices.push_back(matRotPos);
-		inv_matrices.push_back(matRotNeg);
-	}
-
-	t_vec vecRet = ublas::zero_vector<t_real>(3);
-
-	for(int iMatrix=0; iMatrix<matrices.size(); ++iMatrix)
-	{
-		const t_mat& matRotNeg = inv_matrices[iMatrix];
-		const t_mat& matRotPos = matrices[iMatrix];
-
-		t_vec vecCoordRot = ublas::prod(matRotNeg, vecCoord);
-
+		// helix position
 		t_vec vec(3);
-		vec[2] = cos(vecCoordRot[0]);
-		vec[1] = sin(vecCoordRot[0]);
+		vec[2] = std::cos(vecCoordRot[0]);
+		vec[1] = std::sin(vecCoordRot[0]);
 		vec[0] = 0;
 
-		vec = ublas::prod(matRotPos, vec);
-		vecRet += vec;
+		vecRet += ublas::prod(matRot, vec);
 	}
 
 	vecRet /= ublas::norm_2(vecRet);
@@ -137,4 +123,3 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-

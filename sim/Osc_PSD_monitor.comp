@@ -1,7 +1,7 @@
-/*
+/**
  * Pixelated oscillation monitor.
  *
- * Author: Tobias Weber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * based on 1) Osc_monitor.comp (by Georg Brandl)
  * 		which itself is based on TOF_monitor.comp (by KN, M. Hagen)
  * 2) PSD_monitor_4PI.comp (by Kim Lefmann and Kristian Nielsen)

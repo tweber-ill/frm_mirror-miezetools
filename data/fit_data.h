@@ -1,8 +1,9 @@
-/*
+/**
  * mieze-tool
  * data fitting
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 12-jul-2013
+ * @license GPLv3
  */
 
 #ifndef __FIT_DATA_H__

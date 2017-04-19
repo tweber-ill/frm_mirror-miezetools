@@ -1,3 +1,9 @@
+/**
+ * Test
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @license GPLv3
+ */
+
 #include <vector>
 #include <cmath>
 #include <iostream>

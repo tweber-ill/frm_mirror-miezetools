@@ -1,8 +1,0 @@
-main()
-{
-	str = read_file("test/readfile.scr");
-	str = replace(str, "str", "thestring");
-	print(str);
-
-	write_file("/tmp/test.scr", str);
-}

@@ -1,6 +1,6 @@
-/*
+/**
  * loading of nicos data files
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 25-04-2013
  * @license GPLv3
  */

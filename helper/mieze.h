@@ -1,6 +1,6 @@
 /**
  * more specialised mieze stuff than in tlibs
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 2012, jan-2015
  * @license GPLv3
  */

@@ -1,6 +1,6 @@
-/*
+/**
  * binary large object
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 26-jun-2013
  * @license GPLv3
  */

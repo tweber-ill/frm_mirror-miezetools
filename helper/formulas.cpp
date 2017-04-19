@@ -1,6 +1,6 @@
-/*
+/**
  * Formula Stuff
- * @author Tobias Weber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date May 2012, 16-jul-2013
  * @license GPLv3
  */

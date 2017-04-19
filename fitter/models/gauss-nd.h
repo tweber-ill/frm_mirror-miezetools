@@ -1,8 +1,8 @@
-/*
+/**
  * A gauss n-dim fitter using Minuit
  *
- * @author: Tobias Weber
- * @date: July 2012
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @date July 2012
  * @license GPLv3
  */
 

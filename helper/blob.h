@@ -1,6 +1,6 @@
-/*
+/**
  * binary large object
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 26-jun-2013
  * @license GPLv3
  */
@@ -9,6 +9,7 @@
 #define __MIEZE_BLOB__
 
 #include <QtCore/QFile>
+#include <vector>
 
 class Blob
 {

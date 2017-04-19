@@ -1,8 +1,9 @@
-/*
+/**
  * mieze-tool
  * base class for mdi subwindows
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 27-sep-2013
+ * @license GPLv3
  */
 
 #include "subwnd.h"

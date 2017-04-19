@@ -1,11 +1,11 @@
-/*
+/**
  * A combination of
  *  - a polarizer,
  *  - two RF coils (either bootstrap or normal) and
  *  - an analyzer
  *
- * Author: Tobias Weber
- * Date: May 2012
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @date May 2012
  */
 
 DEFINE COMPONENT MIEZE_box

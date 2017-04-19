@@ -1,3 +1,9 @@
+/**
+ * Test
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @license GPLv3
+ */
+
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 namespace ublas = boost::numeric::ublas;
@@ -35,7 +41,7 @@ t_vec helix_vec(t_real r, t_real c, const t_vec& vecCoord)
 
 	const t_real dAngles[3] = {0., 120., 240.};
 
-	for(int i=0; i<sizeof(dAngles)/sizeof(dAngles[0]); ++i)
+	for(std::size_t i=0; i<sizeof(dAngles)/sizeof(dAngles[0]); ++i)
 	{
 		t_real dAngle = dAngles[i];
 		dAngle = dAngle/180.*M_PI;

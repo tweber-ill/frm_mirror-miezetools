@@ -1,8 +1,9 @@
-/*
+/**
  * mieze-tool
  * main window, mdi specific stuff
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
  * @date 25-jul-2013
+ * @license GPLv3
  */
 
 #include "mainwnd.h"

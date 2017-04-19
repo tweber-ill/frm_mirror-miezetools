@@ -1,6 +1,7 @@
-/*
+/**
  * C reduction due to detector thickness
- * @author tweber
+ * @author Tobias Weber <tobias.weber@tum.de>
+ * @license GPLv3
  *
  * gcc -O2 -march=native -DNDEBUG -o dred dred.cpp ../../helper/fourier.cpp -lstdc++ -std=c++11 -lm -lfftw3
  */
