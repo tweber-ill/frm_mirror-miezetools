@@ -14,7 +14,7 @@
 
 #include "tlibs/helper/misc.h"
 #include "tlibs/math/math.h"
-#include "tlibs/math/mieze.h"
+#include "tlibs/phys/mieze.h"
 #include "tlibs/log/log.h"
 
 #include "../main/settings.h"

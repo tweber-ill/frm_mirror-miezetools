@@ -26,7 +26,7 @@
 #include "../tlibs/string/string.h"
 #include "../tlibs/file/file.h"
 #include "../tlibs/helper/misc.h"
-#include "../tlibs/math/mieze.h"
+#include "../tlibs/phys/mieze.h"
 #include "../tlibs/old/xml.h"
 
 #include "../dialogs/ListDlg.h"

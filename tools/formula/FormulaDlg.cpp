@@ -7,12 +7,12 @@
 
 #include "FormulaDlg.h"
 #include <boost/units/io.hpp>
-#include "../../tlibs/math/mieze.h"
+#include "../../tlibs/phys/mieze.h"
 #include "../../tlibs/string/string.h"
 #include "../../tlibs/math/math.h"
-#include "../../helper/formulas.h"
 #include "../../tlibs/helper/misc.h"
 #include "../../tlibs/log/log.h"
+#include "../../helper/formulas.h"
 #include "../../main/settings.h"
 #include "../../data/export.h"
 

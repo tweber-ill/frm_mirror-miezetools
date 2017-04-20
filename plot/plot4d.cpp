@@ -15,7 +15,7 @@
 #include "../tlibs/string/string.h"
 #include "../tlibs/helper/misc.h"
 #include "../tlibs/math/fourier.h"
-#include "../tlibs/math/mieze.h"
+#include "../tlibs/phys/mieze.h"
 #include "../helper/misc.h"
 #include "../data/fit_data.h"
 #include "../fitter/models/msin.h"
