@@ -159,10 +159,12 @@ void Plot2d::resizeEvent(QResizeEvent *pEvent)
 {
 }
 
-void Plot2d::paintEvent (QPaintEvent *pEvent)
+void Plot2d::paintEvent(QPaintEvent *pEvent)
 {
 	if(!m_pImg) return;
 	QSize size = this->size();
+	if(size.width()==0 || size.height()==0)
+		return;
 
 	QPainter painter(this);
 	painter.save();

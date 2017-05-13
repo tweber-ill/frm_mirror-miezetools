@@ -277,6 +277,8 @@ void Plot::paint()
 	GPL_Draw();
 #else
 	QSize size = this->size();
+	if(size.width()==0 || size.height()==0)
+		return;
 
 	if(m_pPixmap)
 	{
