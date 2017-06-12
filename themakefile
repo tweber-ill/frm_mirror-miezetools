@@ -140,7 +140,7 @@ obj/string_map.o: helper/string_map.cpp helper/string_map.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/spec_char.o: tlibs/string/spec_char.cpp tlibs/string/spec_char.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/xml.o: tlibs/old/xml.cpp tlibs/old/xml.h
+obj/xml.o: helper/xml.cpp helper/xml.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/linalg2.o: tlibs/math/linalg2.cpp tlibs/math/linalg2.h
 	${CC} ${FLAGS} -c -o $@ $<
@@ -159,7 +159,7 @@ obj/loadcasc.o: loader/loadcasc.cpp loader/loadcasc.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/loadnicos.o: loader/loadnicos.cpp loader/loadnicos.h
 	${CC} ${FLAGS} -c -o $@ $<
-obj/loadtxt.o: tlibs/old/loadtxt.cpp tlibs/old/loadtxt.h
+obj/loadtxt.o: loader/loadtxt.cpp loader/loadtxt.h
 	${CC} ${FLAGS} -c -o $@ $<
 
 obj/plot.o: plot/plot.cpp plot/plot.h

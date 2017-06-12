@@ -15,8 +15,8 @@
 #include "../tlibs/file/file.h"
 #include "../tlibs/file/tmp.h"
 #include "../tlibs/log/log.h"
-#include "../tlibs/old/loadtxt.h"
 #include "../helper/misc.h"
+#include "../loader/loadtxt.h"
 #include "../loader/loadnicos.h"
 #include "../loader/loadcasc.h"
 

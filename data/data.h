@@ -19,8 +19,8 @@ typedef unsigned char uchar;
 namespace ublas = boost::numeric::ublas;
 
 #include "../roi/roi.h"
-#include "../tlibs/old/xml.h"
 #include "../tlibs/string/string.h"
+#include "../helper/xml.h"
 #include "../helper/blob.h"
 #include "../helper/string_map.h"
 
