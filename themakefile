@@ -1,7 +1,19 @@
+#
+# Cattus makefile
+# @author Tobias Weber <tobias.weber@tum.de>
+# @date 2012-2014
+# @license GPLv3
+#
+
+
+# -----------------------------------------------------------------------------
 CC = gcc
+#CC = clang
 
 USE_FFTW = 1
 USE_JIT = 0
+
+# -----------------------------------------------------------------------------
 
 
 #CC = i686-w64-mingw32-gcc
@@ -13,8 +25,16 @@ LIB_DIRS = -L/usr/lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/local/lib \
 
 DEFINES = 
 
+
 FLAGS = ${INC} -O2 -march=native -std=c++11 -DNDEBUG ${DEFINES}
 #FLAGS = ${INC} -std=c++11 -ggdb ${DEFINES}
+
+
+ifeq ($(CC), gcc)
+	LIBS += -fopenmp
+else
+	LIBS += -lpthread
+endif
 
 STD_LIBS = -lstdc++ -lm
 MATH_LIBS = -lMinuit2
@@ -23,8 +43,9 @@ BOOST_LIBS = -lboost_iostreams -lboost_system -lboost_filesystem
 QT_LIBS = -L/usr/lib64/qt4 -L/usr/lib/x86_64-linux-gnu -L /usr/lib/qt4/lib \
 	-lQtCore -lQtGui
 #QT_LIBS += -lQtOpenGL -lGL -lGLU -lX11
-LIBS_FORMULA = -L/usr/lib64 -lboost_iostreams ${QT_LIBS} ${STD_LIBS}
-LIBS = ${LIB_DIRS} -fopenmp ${BOOST_LIBS} ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}
+
+LIBS += ${LIB_DIRS} ${BOOST_LIBS} ${MATH_LIBS} ${QT_LIBS} ${MISC_LIBS} ${STD_LIBS}
+LIBS_FORMULA = -L/usr/lib64 -lboost_system -lboost_iostreams ${QT_LIBS} ${STD_LIBS}
 
 
 # FFTW
@@ -43,9 +64,11 @@ ifeq (${USE_JIT}, 1)
 endif
 
 
+
 .PHONY: all clean
 
 all: cattus
+
 
 
 cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/mainwnd_mdi.o \
@@ -67,6 +90,7 @@ formula: obj/FormulaDlg.o obj/formula_main.o obj/formulas.o obj/settings.o obj/p
 	obj/string_map.o obj/log.o
 	${CC} ${FLAGS} -o bin/formula $+ ${LIBS_FORMULA}
 	strip bin/formula
+
 
 
 obj/main.o: main/main.cpp

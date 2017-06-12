@@ -10,6 +10,7 @@
 #include "../data/data.h"
 #include "../plot/plot.h"
 
+
 const StringMap* SubWindowBase::GetParamMapDyn() const
 {
 	const DataInterface *pIf = GetDataInterface();
@@ -23,6 +24,7 @@ const StringMap* SubWindowBase::GetParamMapDyn() const
 
 	return pParams;
 }
+
 
 const StringMap* SubWindowBase::GetParamMapStat() const
 {

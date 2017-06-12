@@ -14,7 +14,7 @@
 
 
 Data1::Data1(uint uiNum, const double* pValsX, const double* pValsY,
-			const double *pErrsY, const double *pErrsX)
+	const double *pErrsY, const double *pErrsX)
 	: DataInterface()
 {
 	if(uiNum)
@@ -79,7 +79,7 @@ double Data1::SumY() const
 }
 
 void Data1::GetData(const std::vector<double> **pvecX, const std::vector<double> **pvecY,
-			const std::vector<double> **pvecYErr, const std::vector<double> **pvecXErr)
+	const std::vector<double> **pvecYErr, const std::vector<double> **pvecXErr)
 {
 	if(IsRoiActive())
 	{

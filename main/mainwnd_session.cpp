@@ -48,9 +48,9 @@ static void session_load_progress_thread(std::vector<int>* pvecProgress, bool* p
 }
 
 static void session_load_thread(tl::Xml* xml, Blob* blob,
-								const std::vector<std::string>* vecBase,
-								const std::vector<unsigned int>* vecWndIdx,
-								SubWindowBase **pSWBs, int *piProgress)
+	const std::vector<std::string>* vecBase,
+	const std::vector<unsigned int>* vecWndIdx,
+	SubWindowBase **pSWBs, int *piProgress)
 {
 	for(unsigned int iWnd : *vecWndIdx)
 	{
@@ -201,7 +201,7 @@ void MiezeMainWnd::SessionLoadTriggered()
 	QSettings *pGlobals = Settings::GetGlobals();
 	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
 	QString strFile = QFileDialog::getOpenFileName(this, "Load Session...", strLastDir,
-					"Session Files (*.cattus)"/*, 0, QFileDialog::DontUseNativeDialog*/);
+		"Session Files (*.cattus)"/*, 0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile == "")
 		return;
 
@@ -233,7 +233,7 @@ void MiezeMainWnd::SessionSaveTriggered()
 	{
 		std::ostringstream ostrSaving;
 		ostrSaving << "Saving " << (iWnd+1) << " of " << vecWnd.size() << ": "
-				<< pWnd->windowTitle().toStdString() << ".";
+			<< pWnd->windowTitle().toStdString() << ".";
 		SetStatusMsg(ostrSaving.str().c_str(), 2);
 
 		pWnd = pWnd->GetActualWidget();
@@ -270,7 +270,7 @@ void MiezeMainWnd::SessionSaveAsTriggered()
 	QSettings *pGlobals = Settings::GetGlobals();
 	QString strLastDir = pGlobals->value("main/lastdir_session", ".").toString();
 	QString strFile = QFileDialog::getSaveFileName(this, "Save Session as...", strLastDir,
-					"Session Files (*.cattus)"/*, 0, QFileDialog::DontUseNativeDialog*/);
+		"Session Files (*.cattus)"/*, 0, QFileDialog::DontUseNativeDialog*/);
 	if(strFile == "")
 		return;
 
@@ -340,4 +340,6 @@ void MiezeMainWnd::LoadRecentSessionList()
 void MiezeMainWnd::LoadSession(const QString& strFile)
 {
 	LoadSession(strFile.toStdString());
+
+	update();
 }

@@ -23,8 +23,7 @@
 #define PAD_Y 18
 
 Plot::Plot(QWidget* pParent, const char* pcTitle) : SubWindowBase(pParent), m_pPixmap(0),
-						m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.),
-						m_bXIsLog(0), m_bYIsLog(0)
+	m_dxmin(0.), m_dxmax(0.), m_dymin(0.), m_dymax(0.), m_bXIsLog(0), m_bYIsLog(0)
 #ifdef USE_GPL
 	, m_pGPLWidget(0), m_pGPLInst(0)
 #endif
@@ -56,14 +55,14 @@ void Plot::GPL_Init()
 {
 	GPL_Deinit();
 
-        m_pGPLWidget = new QtGnuplotWidget(0,0,this);
+	m_pGPLWidget = new QtGnuplotWidget(0,0,this);
 	//m_pGPLWidget->setGeometry(0,0,320,240);
 	QDataStream strIn;
 	m_pGPLWidget->processEvent(GEDesactivate, strIn);
 	m_pGPLInst = new QtGnuplotInstance(/*m_pGPLWidget*/);
 
-        //connect(m_pGPLInst, SIGNAL(gnuplotOutput(const QString&)), this, SLOT(Coord_Output(const QString&)));
-        connect(m_pGPLWidget, SIGNAL(statusTextChanged(const QString&)), this, SLOT(Coord_Output(const QString&)));
+	//connect(m_pGPLInst, SIGNAL(gnuplotOutput(const QString&)), this, SLOT(Coord_Output(const QString&)));
+	connect(m_pGPLWidget, SIGNAL(statusTextChanged(const QString&)), this, SLOT(Coord_Output(const QString&)));
 
 	QGridLayout *pLayout = new QGridLayout(this);
 
@@ -174,10 +173,10 @@ void Plot::resizeEvent(QResizeEvent *pEvent)
 	//qDebug() << "plotter resizeEvent: " << pEvent->size();
 
 /*
-        QString strW = QString::number(m_pGPLWidget->size().width());
-        QString strH = QString::number(m_pGPLWidget->size().height());
-        (*m_pGPLInst) << "set term qt widget \"" << m_pGPLWidget->serverName() << "\" size "
-                        << strW << "," << strH << "\n";
+	QString strW = QString::number(m_pGPLWidget->size().width());
+	QString strH = QString::number(m_pGPLWidget->size().height());
+	(*m_pGPLInst) << "set term qt widget \"" << m_pGPLWidget->serverName() << "\" size "
+		<< strW << "," << strH << "\n";
 	//(*m_pGPLInst) << "replot\n";
 */
 
@@ -189,7 +188,7 @@ void Plot::RefreshPlot()
 	paint();
 
 #ifndef USE_GPL
-	repaint();
+	update();
 #endif
 }
 
@@ -273,9 +272,14 @@ void Plot::GPL_Draw()
 
 void Plot::paint()
 {
+	//std::cout << "Creating plot for " << windowTitle().toStdString() << "." << std::endl;
+
 #ifdef USE_GPL
+
 	GPL_Draw();
+
 #else
+
 	QSize size = this->size();
 	if(size.width()==0 || size.height()==0)
 		return;
@@ -302,6 +306,7 @@ void Plot::paint()
 	QPainter painter(m_pPixmap);
 	painter.save();
 	painter.setRenderHint(QPainter::Antialiasing, true);
+	painter.setRenderHint(QPainter::TextAntialiasing, true);
 
 	QFont fontMain("Nimbus Sans L", 10);
 	painter.setFont(fontMain);
@@ -388,10 +393,10 @@ void Plot::paint()
 				// error bars
 				if(err.y()!=0.)
 					painter.drawRect(QRectF(coord.x()-0.5/dScaleX, coord.y()-1.*err.y(),
-											1.5/dScaleX, 2.*err.y()));
+						1.5/dScaleX, 2.*err.y()));
 				if(err.x()!=0.)
 					painter.drawRect(QRectF(coord.x()-1.*err.x(), coord.y()-0.5/dScaleY,
-											2.*err.x(), 1.5/dScaleY));
+						2.*err.x(), 1.5/dScaleY));
 			}
 		}
 		else if(pltobj.plttype == PLOT_FKT)
@@ -423,23 +428,36 @@ void Plot::paint()
 	}
 
 	painter.restore();
+	painter.end();
+
 #endif
 }
 
-void Plot::paintEvent (QPaintEvent *pEvent)
+void Plot::paintEvent(QPaintEvent *pEvent)
 {
+	if(!pEvent || pEvent->rect().width()==0 || pEvent->rect().height()==0)
+		return;
+	//std::cout << "Repaint event for " << windowTitle().toStdString() << "." << std::endl;
+
 #ifndef USE_GPL
+
 	QPainter painter(this);
 	if(!m_pPixmap)
 		paint();
 
-	painter.drawPixmap(0,0,*m_pPixmap);
+	painter.setClipping(1);
+	painter.setClipRegion(pEvent->region());
+	painter.drawPixmap(0, 0, *m_pPixmap);
+	painter.end();
 	mouseMoveEvent(0);
+
 #endif
+
+	SubWindowBase::paintEvent(pEvent);
 }
 
 void Plot::plot(unsigned int iNum, const double *px, const double *py, const double *pyerr, const double *pxerr,
-							PlotType plttype, const char* pcLegend)
+	PlotType plttype, const char* pcLegend)
 {
 	plot(Data1(iNum, px, py, pyerr, pxerr), plttype, pcLegend);
 }
@@ -656,7 +674,7 @@ void Plot::clearfkt()
 void Plot::clear()
 {
 	m_vecObjs.clear();
-	this->repaint();
+	update();
 }
 
 void Plot::MergeParamMaps()
@@ -672,7 +690,7 @@ void Plot::MergeParamMaps()
 
 void Plot::RefreshStatusMsgs()
 {
-	QString strTitle = this->windowTitle();
+	QString strTitle = windowTitle();
 	emit SetStatusMsg(strTitle.toAscii().data(), 0);
 	emit SetStatusMsg("", 1);
 }
@@ -733,6 +751,7 @@ void Plot::MapToCoordSys(double dPixelX, double dPixelY, double &dX, double &dY,
 		if(dY > m_dymax) dY = m_dymax;
 	}
 }
+
 
 void Plot::mouseMoveEvent(QMouseEvent* pEvent)
 {
@@ -951,6 +970,7 @@ void Plot::SetLabel(LabelType iWhich, const char* pcLab)
 	RefreshPlot();
 }
 
+
 void Plot::SaveImageAs() const
 {
 #ifdef USE_GPL
@@ -958,5 +978,6 @@ void Plot::SaveImageAs() const
 		m_pGPLWidget->exportToPdf();
 #endif
 }
+
 
 #include "plot.moc"

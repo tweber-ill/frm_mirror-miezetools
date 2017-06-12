@@ -68,7 +68,6 @@ protected:
 	NormDlg *m_pnormdlg;
 
 	unsigned int m_iPlotCnt;
-	std::string GetPlotTitle(const std::string& strFile);
 
 	QMenu* pMenuWindows, *pMenuPlot;
 	QMenu *m_pMenu1d, *m_pMenu2d, *m_pMenu3d, *m_pMenu4d;
@@ -76,39 +75,59 @@ protected:
 
 	QLabel *m_pStatusLabelLeft, *m_pStatusLabelMiddle, *m_pStatusLabelRight;
 
-	virtual void keyPressEvent (QKeyEvent * event);
-
-	SubWindowBase* GetActivePlot(bool bResolveWidget=1);
-
-	Plot* Convert3d1d(Plot3d* pPlot3d);
-	Plot* Convert4d1d(Plot4d* pPlot4d, int iFoil=-1);
-
 	std::string m_strLastXColumn;
 	std::string m_strLastYColumn;
 
 	// recent files
 	QStringList m_lstRecentFiles;
 	QMenu *m_pMenuLoadRecent;
+
+	// recent sessions
+	QStringList m_lstRecentSessions;
+	QMenu *m_pMenuLoadRecentSession;
+
+	std::string m_strCurSess;
+
+
+protected:
+	SubWindowBase* GetActivePlot(bool bResolveWidget=1);
+
+	Plot* Convert3d1d(Plot3d* pPlot3d);
+	Plot* Convert4d1d(Plot4d* pPlot4d, int iFoil=-1);
+
+	std::string GetPlotTitle(const std::string& strFile);
+
+	// recent files
 	void LoadRecentFileList();
 	void UpdateRecentFileMenu();
 	void AddRecentFile(const QString& strFile);
 
 	// recent sessions
-	QStringList m_lstRecentSessions;
-	QMenu *m_pMenuLoadRecentSession;
 	void LoadRecentSessionList();
 	void UpdateRecentSessionMenu();
 	void AddRecentSession(const QString& strSession);
 
-
-	std::string m_strCurSess;
 	QMdiSubWindow* FindSubWindow(SubWindowBase* pSWB);
 	std::vector<SubWindowBase*> GetSubWindows(bool bResolveActualWidget=1);
-
 
 	void _GetActiveROI(bool bAntiRoi=0);
 	void _SetGlobalROIForAll(bool bAntiRoi=0);
 	void _SetGlobalROIForActive(bool bAntiRoi=0);
+
+	// events
+	virtual void keyPressEvent(QKeyEvent *pEvt) override;
+	virtual void paintEvent(QPaintEvent *pEvt) override;
+
+
+public:
+	MiezeMainWnd();
+	virtual ~MiezeMainWnd();
+
+	void LoadFile(const std::string& strFile);
+	void LoadSession(const std::string& strFile);
+	void MakePlot(const Data1& dat, const std::string& strTitle);
+
+	QMdiArea* GetMdiArea() { return m_pmdi; }
 
 
 protected slots:
@@ -152,12 +171,9 @@ protected slots:
 	void BezierInterpolation();
 	void BSplineInterpolation();
 
-	//void ShowReso();
 	void ShowPSDPhaseCorr();
 	void CalcPSDPhases();
 	void ShowFormulas();
-	//void ShowLatticeCalc();
-	//void ShowTaz();
 
 	void ShowAbout();
 
@@ -178,16 +194,6 @@ protected slots:
 	void NormalizeTriggered();
 
 	void PlotParamsDynChanged(const StringMap&);
-
-public:
-	MiezeMainWnd();
-	virtual ~MiezeMainWnd();
-
-	void LoadFile(const std::string& strFile);
-	void LoadSession(const std::string& strFile);
-	void MakePlot(const Data1& dat, const std::string& strTitle);
-
-	QMdiArea* GetMdiArea() { return m_pmdi; }
 
 public slots:
 	void SetStatusMsg(const char* pcMsg, int iPos);

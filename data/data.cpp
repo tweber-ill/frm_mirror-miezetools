@@ -96,11 +96,11 @@ bool DataInterface::SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const
 
 
 void load_xml_vecs(unsigned int iNumVecs,
-						std::vector<double>** pvecs,
-						const std::string* pstrs,
-						tl::Xml& xml,
-						const std::string& strBase,
-						Blob& blob)
+	std::vector<double>** pvecs,
+	const std::string* pstrs,
+	tl::Xml& xml,
+	const std::string& strBase,
+	Blob& blob)
 {
 	bool bInBlob = xml.Query<bool>((strBase + "in_blob").c_str(), 0);
 

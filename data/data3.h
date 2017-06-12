@@ -24,9 +24,9 @@ protected:
 
 public:
 	Data3(uint iW=128, uint iH=128, uint iD=16,
-				const double* pDat=0, const double *pErr=0);
+		const double* pDat=0, const double *pErr=0);
 	virtual ~Data3() {}
-	virtual DataType GetType() const { return DATA_3D; }
+	virtual DataType GetType() const override { return DATA_3D; }
 
 	uint GetWidth() const { return m_iWidth; }
 	uint GetHeight() const { return m_iHeight; }
@@ -60,8 +60,8 @@ public:
 	void RecalcMinMaxTotal();
 	void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false);
 
-	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase) override;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const override;
 };
 
 #endif

@@ -7,8 +7,6 @@
 
 #include <QtCore/QMetaType>
 #include <QtGui/QApplication>
-//#include <QtGui/QCleanlooksStyle>
-#include <QtOpenGL/QGLWidget>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,17 +16,14 @@
 #include "../tlibs/math/rand.h"
 #include "../tlibs/log/log.h"
 
-#ifdef Q_WS_X11
-//#include <X11/Xlib.h>
-extern "C" int XInitThreads();
-#endif
-
 #include "mainwnd.h"
 #include "settings.h"
 
 #include "../dialogs/SettingsDlg.h"
 
+
 extern void init_formulas();
+
 
 static inline void load_files(MiezeMainWnd& wnd, int iNum, char **pcFiles)
 {
@@ -51,13 +46,6 @@ int main(int argc, char **argv)
 	{
 		tl::log_info("Starting up Cattus.");
 
-/*
-#ifdef Q_WS_X11
-		XInitThreads();
-#endif
-		QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-*/
-
 		int iRet = -1;
 		tl::init_rand();
 		tl::init_spec_chars();
@@ -65,8 +53,6 @@ int main(int argc, char **argv)
 
 		QSettings *pGlobals = Settings::GetGlobals();
 		QApplication a(argc, argv);
-		//std::cout << a.type() << std::endl;
-		//a.setStyle(new QCleanlooksStyle);
 
 		::setlocale(LC_ALL, "C");
 		QLocale::setDefault(QLocale::English);

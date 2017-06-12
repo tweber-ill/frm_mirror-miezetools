@@ -21,12 +21,12 @@
 class Plot2d : public SubWindowBase
 { Q_OBJECT
 protected:
-	virtual QSize	minimumSizeHint () const;
-	virtual void paintEvent (QPaintEvent *pEvent);
-	virtual void resizeEvent(QResizeEvent *pEvent);
+	virtual QSize minimumSizeHint () const override;
+	virtual void paintEvent(QPaintEvent *pEvent) override;
+	virtual void resizeEvent(QResizeEvent *pEvent) override;
 	virtual void RefreshStatusMsgs();
 
-	virtual void mouseMoveEvent(QMouseEvent* pEvent);
+	virtual void mouseMoveEvent(QMouseEvent* pEvent) override;
 	uint GetSpectroColor(double dVal) const;
 	uint GetSpectroColor01(double dVal) const;
 
@@ -49,12 +49,12 @@ public:
 	const Data2& GetData2() const { return m_dat; }
 	Data2& GetData2() { return m_dat; }
 
-	virtual SubWindowBase* clone() const;
+	virtual SubWindowBase* clone() const override;
 
 	void plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr=0);
 	void plot(const Data2& dat);
 	void clear();
-	virtual void RefreshPlot();
+	virtual void RefreshPlot() override;
 
 	void SetLog(bool bLog);
 	bool GetLog() const;
@@ -73,11 +73,11 @@ public:
 	const QString& GetYStr() const { return m_strYAxis; }
 	const QString& GetZStr() const { return m_strZAxis; }
 
-	virtual std::string GetLabel(LabelType iWhich) const;
-	virtual void SetLabel(LabelType iWhich, const char* pcLab);
+	virtual std::string GetLabel(LabelType iWhich) const override;
+	virtual void SetLabel(LabelType iWhich, const char* pcLab) override;
 
-	virtual SubWindowType GetType() const { return PLOT_2D; }
-	virtual double GetTotalCounts() const { return m_dat.GetTotal(); }
+	virtual SubWindowType GetType() const override { return PLOT_2D; }
+	virtual double GetTotalCounts() const override { return m_dat.GetTotal(); }
 
 	bool IsCountData() const { return m_bCountData; }
 	bool IsCyclicData() const { return m_bCyclicData; }
@@ -85,18 +85,19 @@ public:
 
 	void CheckCyclicData();
 
-	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false);
-	virtual PlotInfo GetPlotInfo() const;
+	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight,
+		bool bKeepTotalCounts=false) override;
+	virtual PlotInfo GetPlotInfo() const override;
 
-	virtual const DataInterface* GetDataInterface() const { return &m_dat; }
-	virtual DataInterface* GetDataInterface() { return &m_dat; }
+	virtual const DataInterface* GetDataInterface() const override { return &m_dat; }
+	virtual DataInterface* GetDataInterface() override { return &m_dat; }
 
 public:
-	virtual void SetROI(const Roi* pROI, bool bAntiRoi=0);
-	virtual Roi* GetROI(bool bAntiRoi=0);
+	virtual void SetROI(const Roi* pROI, bool bAntiRoi=0) override;
+	virtual Roi* GetROI(bool bAntiRoi=0) override;
 
-	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase) override;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const override;
 };
 
 #endif

@@ -22,12 +22,12 @@ protected:
 
 public:
 	Data1(uint uiNum=0, const double* pValsX=0, const double* pValsY=0,
-								const double *pErrsY=0, const double *pErrsX=0);
+		const double *pErrsY=0, const double *pErrsX=0);
 	//Data1(const Data1& dat);
 	//const Data1& operator=(const Data1&);
 
 	virtual ~Data1() {}
-	virtual DataType GetType() const { return DATA_1D; }
+	virtual DataType GetType() const override { return DATA_1D; }
 
 	const double* GetXPtr() const { return m_vecValsX.data(); }
 	const double* GetYPtr() const { return m_vecValsY.data(); }
@@ -78,8 +78,10 @@ public:
 
 	double SumY() const;
 
-	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob, bool bSaveActualData=1) const;
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase) override;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob, bool bSaveActualData) const;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const override
+	{ return SaveXML(ostr, ostrBlob, 1); }
 };
 
 #endif

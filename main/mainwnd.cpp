@@ -43,19 +43,16 @@
 
 
 MiezeMainWnd::MiezeMainWnd()
-					: m_pmdi(new QMdiArea(this)),
-					  m_pinfo(new InfoDock(this)),
-					  m_iPlotCnt(1),
-					  m_pcombinedlg(0), m_pfitdlg(0),
-					  m_proidlg(new RoiDlg(this)),
-					  m_pantiroidlg(new RoiDlg(this)),
-					  m_pphasecorrdlg(0),
-					  m_pradialintdlg(0),
-					  m_pformuladlg(0),
-					  m_pplotpropdlg(0),
-					  m_prebindlg(0),
-					  m_pexportdlg(0),
-					  m_pnormdlg(0)
+	: m_pmdi(new QMdiArea(this)),
+	  m_pinfo(new InfoDock(this)),
+	  m_iPlotCnt(1),
+	  m_pcombinedlg(0), m_pfitdlg(0),
+	  m_proidlg(new RoiDlg(this)),
+	  m_pantiroidlg(new RoiDlg(this)),
+	  m_pphasecorrdlg(0), m_pradialintdlg(0),
+	  m_pformuladlg(0),	m_pplotpropdlg(0),
+	  m_prebindlg(0), m_pexportdlg(0),
+	  m_pnormdlg(0)
 {
 	this->setWindowIcon(QIcon("res/mainicon.png"));
 	this->setWindowTitle(WND_TITLE);
@@ -352,16 +349,6 @@ MiezeMainWnd::MiezeMainWnd()
 	QMenu *pMenuCalc = new QMenu(this);
 	pMenuCalc->setTitle("Calculations");
 
-	//QAction *pReso = new QAction(this);
-	//pReso->setText("Resolution...");
-	//pMenuCalc->addAction(pReso);
-
-	//QAction *pTaz = new QAction(this);
-	//pTaz->setText("TAS Layout...");
-	//pMenuCalc->addAction(pTaz);
-
-	//pMenuCalc->addSeparator();
-
 	QAction *pFormulas = new QAction(this);
 	pFormulas->setText("Formulas...");
 	pMenuCalc->addAction(pFormulas);
@@ -482,6 +469,7 @@ MiezeMainWnd::MiezeMainWnd()
 	LoadRecentSessionList();
 }
 
+
 MiezeMainWnd::~MiezeMainWnd()
 {
 	if(m_pcombinedlg) delete m_pcombinedlg;
@@ -507,6 +495,7 @@ void MiezeMainWnd::MakePlot(const Data1& dat, const std::string& strTitle)
 	pPlot->setWindowTitle(strTitle.c_str());
 	AddSubWindow(pPlot);
 }
+
 
 std::string MiezeMainWnd::GetPlotTitle(const std::string& strFile)
 {
@@ -563,7 +552,7 @@ void MiezeMainWnd::_SetGlobalROIForAll(bool bAntiRoi)
 	for(SubWindowBase *pWnd : vec)
 	{
 		pWnd->SetROI(pRoi, bAntiRoi);
-		pWnd->repaint();
+		pWnd->update();
 	}
 }
 
@@ -582,8 +571,9 @@ void MiezeMainWnd::_SetGlobalROIForActive(bool bAntiRoi)
 	pWnd = pWnd->GetActualWidget();
 	pWnd->SetROI(pRoi, bAntiRoi);
 
-	pWnd->repaint();
+	pWnd->update();
 }
+
 
 void MiezeMainWnd::GetActiveROI() { _GetActiveROI(0); }
 void MiezeMainWnd::SetGlobalROIForAll() { _SetGlobalROIForAll(0); }
@@ -592,6 +582,7 @@ void MiezeMainWnd::SetGlobalROIForActive() { _SetGlobalROIForActive(0); }
 void MiezeMainWnd::GetActiveAntiROI() { _GetActiveROI(1); }
 void MiezeMainWnd::SetGlobalAntiROIForAll() { _SetGlobalROIForAll(1); }
 void MiezeMainWnd::SetGlobalAntiROIForActive() { _SetGlobalROIForActive(1); }
+
 // --------------------------------------------------------------------------------
 
 
@@ -605,24 +596,6 @@ void MiezeMainWnd::SettingsTriggered()
 	}
 }
 
-void MiezeMainWnd::keyPressEvent (QKeyEvent * event)
-{
-	SubWindowBase* pWndBase = 0;
-	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
-	if(pWnd && pWnd->widget())
-		pWndBase = (SubWindowBase*)pWnd->widget();
-
-	if(event->key()==Qt::Key_L && pWndBase)
-	{
-		if(pWndBase->GetType() == PLOT_2D || pWndBase->GetType() == PLOT_3D  || pWndBase->GetType() == PLOT_4D)
-		{
-			Plot2d* plt = (Plot2d*)pWndBase->GetActualWidget();
-			plt->SetLog(!plt->GetLog());
-		}
-	}
-	else
-		QMainWindow::keyPressEvent(event);
-}
 
 void MiezeMainWnd::SetStatusMsg(const char* pcMsg, int iPos)
 {
@@ -639,9 +612,10 @@ void MiezeMainWnd::SetStatusMsg(const char* pcMsg, int iPos)
 	if(pLabel->text() != strMsg)
 	{
 		pLabel->setText(pcMsg);
-		pLabel->repaint();
+		pLabel->update();
 	}
 }
+
 
 void MiezeMainWnd::ShowListWindowsDlg()
 {
@@ -661,6 +635,7 @@ void MiezeMainWnd::ShowListWindowsDlg()
 	}*/
 }
 
+
 void MiezeMainWnd::ToggleInfoWindow()
 {
 	if(!m_pinfo->isVisible())
@@ -668,6 +643,7 @@ void MiezeMainWnd::ToggleInfoWindow()
 	else
 		m_pinfo->hide();
 }
+
 
 void MiezeMainWnd::ShowCombineGraphsDlg()
 {
@@ -686,7 +662,6 @@ void MiezeMainWnd::ShowCombineGraphsDlg()
 	m_pcombinedlg->show();
 	m_pcombinedlg->activateWindow();
 }
-
 
 
 
@@ -770,6 +745,7 @@ void MiezeMainWnd::QuickFit(SubWindowBase* pSWB, int iFkt, int iParam)
 		AddSubWindow(res.pPlot);
 	}
 }
+
 
 void MiezeMainWnd::Interpolation(SubWindowBase* pSWB, InterpFkt iFkt)
 {
@@ -949,7 +925,7 @@ void MiezeMainWnd::SumFoils()
 	SubWindowBase* pSWB = GetActivePlot();
 	if(!pSWB) return;
 	pSWB = pSWB->GetActualWidget();
-	if(pSWB->GetType()!=PLOT_4D && !pSWB->GetType()!=PLOT_3D)
+	if(!(pSWB->GetType()==PLOT_4D || pSWB->GetType()==PLOT_3D))
 		return;
 
 	Plot2d* pPlot2d = pSWB->ConvertTo2d();
@@ -1031,6 +1007,39 @@ void MiezeMainWnd::RebinTriggered()
 	m_prebindlg->activateWindow();
 }
 // --------------------------------------------------------------------------------
+
+
+// --------------------------------------------------------------------------------
+// events
+
+void MiezeMainWnd::keyPressEvent(QKeyEvent *pEvt)
+{
+	SubWindowBase* pWndBase = 0;
+	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
+	if(pWnd && pWnd->widget())
+		pWndBase = (SubWindowBase*)pWnd->widget();
+
+	if(pEvt->key()==Qt::Key_L && pWndBase)
+	{
+		if(pWndBase->GetType() == PLOT_2D ||
+			pWndBase->GetType() == PLOT_3D  ||
+			pWndBase->GetType() == PLOT_4D)
+		{
+			Plot2d* plt = (Plot2d*)pWndBase->GetActualWidget();
+			plt->SetLog(!plt->GetLog());
+		}
+	}
+	else
+		QMainWindow::keyPressEvent(pEvt);
+}
+
+void MiezeMainWnd::paintEvent(QPaintEvent *pEvt)
+{
+	m_pmdi->update();
+	QMainWindow::paintEvent(pEvt);
+}
+// --------------------------------------------------------------------------------
+
 
 
 #include "mainwnd.moc"

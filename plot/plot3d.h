@@ -34,23 +34,24 @@ public:
 	Data3& GetData() { return m_dat3; }
 	uint GetCurT() const { return m_iCurT; }
 
-	virtual SubWindowType GetType() const { return PLOT_3D; }
-	virtual double GetTotalCounts() const { return m_dat3.GetTotal(); }
+	virtual SubWindowType GetType() const override { return PLOT_3D; }
+	virtual double GetTotalCounts() const override { return m_dat3.GetTotal(); }
 
-	virtual Plot* ConvertTo1d(int iParam=0);
-	virtual Plot2d* ConvertTo2d(int iFoil=-1);
-	virtual Plot3d* ConvertTo3d(int iParam=-1) { return this; }
+	virtual Plot* ConvertTo1d(int iParam=0) override;
+	virtual Plot2d* ConvertTo2d(int iFoil=-1) override ;
+	virtual Plot3d* ConvertTo3d(int iParam=-1) override { return this; }
 
-	virtual SubWindowBase* clone() const;
-	virtual void RefreshStatusMsgs();
+	virtual SubWindowBase* clone() const override;
+	virtual void RefreshStatusMsgs() override;
 
-	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false);
+	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight,
+		bool bKeepTotalCounts=false) override;
 
-	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase);
-	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const;
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase) override;
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const override;
 
-	virtual const DataInterface* GetDataInterface() const { return &m_dat3; }
-	virtual DataInterface* GetDataInterface() { return &m_dat3; }
+	virtual const DataInterface* GetDataInterface() const override { return &m_dat3; }
+	virtual DataInterface* GetDataInterface() override { return &m_dat3; }
 };
 
 
@@ -69,29 +70,32 @@ public:
 
 	//operator Plot3d*() { return (Plot3d*)GetActualWidget(); }
 
-	virtual SubWindowType GetType() const { return PLOT_3D; }
-	virtual SubWindowBase* GetActualWidget() { return m_pPlot; }
+	virtual SubWindowType GetType() const override { return PLOT_3D; }
+	virtual SubWindowBase* GetActualWidget() override { return m_pPlot; }
 
 	virtual std::string GetTitle() const { return m_pPlot->GetTitle(); }
 	virtual void SetTitle(const char* pcTitle) { m_pPlot->SetTitle(pcTitle); }
-	virtual double GetTotalCounts() const { return m_pPlot->GetTotalCounts(); }
+	virtual double GetTotalCounts() const override { return m_pPlot->GetTotalCounts(); }
 
-	virtual std::string GetLabel(LabelType iWhich) const;
-	virtual void SetLabel(LabelType iWhich, const char* pcLab);
+	virtual std::string GetLabel(LabelType iWhich) const override ;
+	virtual void SetLabel(LabelType iWhich, const char* pcLab) override ;
 
-	virtual Plot* ConvertTo1d(int iFoil) { return m_pPlot->ConvertTo1d(iFoil); }
-	virtual Plot2d* ConvertTo2d(int iFoil=-1) { return m_pPlot->ConvertTo2d(iFoil); }
-	virtual Plot3d* ConvertTo3d(int iParam=-1) { return m_pPlot->ConvertTo3d(iParam); }
+	virtual Plot* ConvertTo1d(int iFoil) override { return m_pPlot->ConvertTo1d(iFoil); }
+	virtual Plot2d* ConvertTo2d(int iFoil=-1) override { return m_pPlot->ConvertTo2d(iFoil); }
+	virtual Plot3d* ConvertTo3d(int iParam=-1) override { return m_pPlot->ConvertTo3d(iParam); }
 
-	virtual const DataInterface* GetDataInterface() const { return m_pPlot->GetDataInterface(); }
-	virtual DataInterface* GetDataInterface() { return m_pPlot->GetDataInterface(); }
+	virtual const DataInterface* GetDataInterface() const override { return m_pPlot->GetDataInterface(); }
+	virtual DataInterface* GetDataInterface() override { return m_pPlot->GetDataInterface(); }
 
-	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight, bool bKeepTotalCounts=false)
+	virtual void ChangeResolution(unsigned int iNewWidth, unsigned int iNewHeight,
+		bool bKeepTotalCounts=false) override
 	{ m_pPlot->ChangeResolution(iNewWidth, iNewHeight, bKeepTotalCounts); }
-	virtual PlotInfo GetPlotInfo() const { return m_pPlot->GetPlotInfo(); }
+	virtual PlotInfo GetPlotInfo() const override { return m_pPlot->GetPlotInfo(); }
 
-	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase) { return m_pPlot->LoadXML(xml, blob, strBase); }
-	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const { return m_pPlot->SaveXML(ostr, ostrBlob); }
+	virtual bool LoadXML(tl::Xml& xml, Blob& blob, const std::string& strBase) override
+	{ return m_pPlot->LoadXML(xml, blob, strBase); }
+	virtual bool SaveXML(std::ostream& ostr, std::ostream& ostrBlob) const override
+	{ return m_pPlot->SaveXML(ostr, ostrBlob); }
 
 public slots:
 	void DataLoaded();

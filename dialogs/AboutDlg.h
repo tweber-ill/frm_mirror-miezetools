@@ -49,7 +49,7 @@ public:
 		QString strLibs;
 		strLibs += "Uses Qt version ";
 		strLibs += QString(QT_VERSION_STR);
-		strLibs += " (http://qt.digia.com).\n";
+		strLibs += " (http://www.qt.io).\n";
 		strLibs += "Uses Boost version ";
 		strLibs += QString(BOOST_LIB_VERSION);
 		strLibs += " (http://www.boost.org).\n";
@@ -59,7 +59,7 @@ public:
 		strLibs += "Uses FFTW version 3 (http://www.fftw.org).";
 		strLibs += "\n";
 #endif
-		strLibs += "Uses TLIBS version " + QString(TLIBS_VERSION) + ".";
+		strLibs += "Uses tLibs version " + QString(TLIBS_VERSION) + ".";
 		//strLibs += "Uses Lapack/e version 3 (http://www.netlib.org/lapack).";
 		//strLibs += "\n";
 

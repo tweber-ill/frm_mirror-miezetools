@@ -161,6 +161,9 @@ void Plot2d::resizeEvent(QResizeEvent *pEvent)
 
 void Plot2d::paintEvent(QPaintEvent *pEvent)
 {
+	if(!pEvent || pEvent->rect().width()==0 || pEvent->rect().height()==0)
+		return;
+
 	if(!m_pImg) return;
 	QSize size = this->size();
 	if(size.width()==0 || size.height()==0)
@@ -168,7 +171,12 @@ void Plot2d::paintEvent(QPaintEvent *pEvent)
 
 	QPainter painter(this);
 	painter.save();
+
+	painter.setClipping(1);
+	painter.setClipRegion(pEvent->region());
+
 	painter.setRenderHint(QPainter::Antialiasing, true);
+	painter.setRenderHint(QPainter::TextAntialiasing, true);
 
 	// axis labels
 	painter.setFont(QFont("Nimbus Sans L", 10));
@@ -236,6 +244,8 @@ void Plot2d::paintEvent(QPaintEvent *pEvent)
 
 
 	painter.restore();
+	painter.end();
+	SubWindowBase::paintEvent(pEvent);
 }
 
 void Plot2d::plot(unsigned int iW, unsigned int iH, const double *pdat, const double *perr)
@@ -286,7 +296,7 @@ void Plot2d::RefreshPlot()
 		}
 	}
 
-	this->repaint(rect());
+	this->update(rect());
 	RefreshStatusMsgs();
 }
 

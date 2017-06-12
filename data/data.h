@@ -43,18 +43,19 @@ class Data4;
 #define BLOB_SIZE 256
 
 extern void load_xml_vecs(unsigned int iNumVecs,
-		std::vector<double>** pvecs,
-		const std::string* pstrs,
-		tl::Xml& xml,
-		const std::string& strBase,
-		Blob& blob);
+	std::vector<double>** pvecs,
+	const std::string* pstrs,
+	tl::Xml& xml,
+	const std::string& strBase,
+	Blob& blob);
 
 extern void save_xml_vecs(unsigned int iNumVecs,
-					const std::vector<double>** pvecs,
-					const std::string* pstrs,
-					std::ostream& ostr,
-					std::ostream& ostrBlob,
-					bool bSaveInBlob);
+	const std::vector<double>** pvecs,
+	const std::string* pstrs,
+	std::ostream& ostr,
+	std::ostream& ostrBlob,
+	bool bSaveInBlob);
+
 
 class RoiFlags
 {
@@ -172,8 +173,8 @@ protected:
 
 public:
 	XYRange() : m_iWidth(0), m_iHeight(0),
-				m_dXMin(0.), m_dXMax(1.), m_dYMin(0.), m_dYMax(1.),
-				m_bHasRange(0), m_bXIsLog(0), m_bYIsLog(0)
+		m_dXMin(0.), m_dXMax(1.), m_dYMin(0.), m_dYMax(1.),
+		m_bHasRange(0), m_bXIsLog(0), m_bYIsLog(0)
 	{}
 
 	void SetXRange(double dXMin, double dXMax);

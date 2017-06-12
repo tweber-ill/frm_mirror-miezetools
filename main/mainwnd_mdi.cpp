@@ -11,6 +11,7 @@
 
 #include <QtGui/QMdiSubWindow>
 
+
 QMdiSubWindow* MiezeMainWnd::FindSubWindow(SubWindowBase* pSWB)
 {
 	QList<QMdiSubWindow*> lst = m_pmdi->subWindowList();
@@ -26,6 +27,7 @@ QMdiSubWindow* MiezeMainWnd::FindSubWindow(SubWindowBase* pSWB)
 
 	return 0;
 }
+
 
 std::vector<SubWindowBase*> MiezeMainWnd::GetSubWindows(bool bResolveActualWidget)
 {
@@ -47,6 +49,7 @@ std::vector<SubWindowBase*> MiezeMainWnd::GetSubWindows(bool bResolveActualWidge
 
 	return vec;
 }
+
 
 void MiezeMainWnd::UpdateSubWndList()
 {
@@ -85,6 +88,10 @@ void MiezeMainWnd::UpdateSubWndList()
 	}
 }
 
+
+/**
+ * called on activation of sub-window
+ */
 void MiezeMainWnd::SubWindowChanged()
 {
 	QMdiSubWindow* pWnd = m_pmdi->activeSubWindow();
@@ -141,6 +148,7 @@ void MiezeMainWnd::SubWindowChanged()
 		emit SubWindowActivated(pSWB);
 }
 
+
 void MiezeMainWnd::PlotParamsDynChanged(const StringMap&)
 {
 	SubWindowBase *pSWB = GetActivePlot(1);
@@ -159,10 +167,12 @@ void MiezeMainWnd::PlotParamsDynChanged(const StringMap&)
 		m_pinfo->SetParamsDyn(pSWB->GetDataInterface()->GetParamMapDyn());
 }
 
+
 void MiezeMainWnd::SubWindowDestroyed(SubWindowBase *pSWB)
 {
 	emit SubWindowRemoved(pSWB);
 }
+
 
 void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd, bool bShow)
 {
@@ -190,6 +200,7 @@ void MiezeMainWnd::AddSubWindow(SubWindowBase* pWnd, bool bShow)
 		//std::cout << "subwindow added" << std::endl;
 	}
 }
+
 
 SubWindowBase* MiezeMainWnd::GetActivePlot(bool bResolveWidget)
 {
