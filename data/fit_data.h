@@ -18,6 +18,8 @@
 #define FIT_MIEZE_SINE 					0
 #define FIT_GAUSSIAN 					1
 #define FIT_MULTI_GAUSSIAN 				2
+#define FIT_MIEZE_EXP 					3
+#define FIT_MIEZE_EXP_FIXEDP0			4
 #define FIT_INVALID						-1
 
 #define FIT_MIEZE_SINE_PIXELWISE 		0

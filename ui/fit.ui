@@ -244,6 +244,16 @@
            <string>Multi-Gaussian</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Spin-Echo Exponential</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Spin-Echo Exponential (P0=1)</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="2" column="2">

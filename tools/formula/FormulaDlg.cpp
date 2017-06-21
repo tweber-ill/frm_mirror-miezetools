@@ -71,7 +71,7 @@ FormulaDlg::FormulaDlg(QWidget* pParent) : QDialog(pParent), m_pPlanePlot(0)
 		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeCond()));
 		QObject::connect(pSpin, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeFields()));
 	}
-	
+
 	QObject::connect(spinMl1, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeFields()));
 	QObject::connect(spinMl2, SIGNAL(valueChanged(double)), this, SLOT(CalcMiezeFields()));
 

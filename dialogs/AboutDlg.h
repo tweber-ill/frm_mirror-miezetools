@@ -65,7 +65,7 @@ public:
 
 		this->labelTitle->setText("Cattus");
 		this->labelVersion->setText("Version 0.4.1");
-		this->labelAuthor->setText("Written by\nTobias Weber <tobias.weber@tum.de>,\n2012 - 2014.");
+		this->labelAuthor->setText("Written by\nTobias Weber <tobias.weber@tum.de>,\n2010 - 2012, 2012 - 2014, 2017.");
 		this->labelLic->setText(strLic);
 		this->labelBuild->setText(strBuild);
 		this->labelDate->setText(strDate);

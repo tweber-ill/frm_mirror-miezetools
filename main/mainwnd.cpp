@@ -231,6 +231,18 @@ MiezeMainWnd::MiezeMainWnd()
 
 	pMenuQuickFit->addSeparator();
 
+	QAction *pQFitExp = new QAction(this);
+	pQFitExp->setText("Spin-Echo Exponential");
+	pQFitExp->setShortcut(Qt::ALT + Qt::Key_E);
+	pMenuQuickFit->addAction(pQFitExp);
+
+	QAction *pQFitExpP0 = new QAction(this);
+	pQFitExpP0->setText("Spin-Echo Exponential (P0=1)");
+	pQFitExpP0->setShortcut(Qt::ALT + Qt::Key_F);
+	pMenuQuickFit->addAction(pQFitExpP0);
+
+	pMenuQuickFit->addSeparator();
+
 	QAction *pQFitGauss = new QAction(this);
 	pQFitGauss->setText("Gaussian");
 	pQFitGauss->setShortcut(Qt::ALT + Qt::Key_G);
@@ -429,6 +441,8 @@ MiezeMainWnd::MiezeMainWnd()
 	QObject::connect(pFit, SIGNAL(triggered()), this, SLOT(ShowFitDlg()));
 	QObject::connect(pQFitMieze, SIGNAL(triggered()), this, SLOT(QuickFitMIEZE()));
 	QObject::connect(pQFitMiezeArea, SIGNAL(triggered()), this, SLOT(QuickFitMIEZEpixel()));
+	QObject::connect(pQFitExp, SIGNAL(triggered()), this, SLOT(QuickFitExp()));
+	QObject::connect(pQFitExpP0, SIGNAL(triggered()), this, SLOT(QuickFitExpFixedP0()));
 	QObject::connect(pQFitGauss, SIGNAL(triggered()), this, SLOT(QuickFitGauss()));
 	QObject::connect(pQFitDGauss, SIGNAL(triggered()), this, SLOT(QuickFitDoubleGauss()));
 	QObject::connect(pQFitTGauss, SIGNAL(triggered()), this, SLOT(QuickFitTripleGauss()));
@@ -719,6 +733,8 @@ void MiezeMainWnd::ShowFitDlg()
 }
 
 void MiezeMainWnd::QuickFitMIEZE() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MIEZE_SINE); }
+void MiezeMainWnd::QuickFitExp() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MIEZE_EXP); }
+void MiezeMainWnd::QuickFitExpFixedP0() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MIEZE_EXP_FIXEDP0); }
 void MiezeMainWnd::QuickFitGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_GAUSSIAN); }
 void MiezeMainWnd::QuickFitDoubleGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MULTI_GAUSSIAN, 2); }
 void MiezeMainWnd::QuickFitTripleGauss() { QuickFit((SubWindowBase*)GetActivePlot(), FIT_MULTI_GAUSSIAN, 3); }

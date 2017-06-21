@@ -10,6 +10,7 @@
 
 #include "../fitter/models/freefit.h"
 #include "../fitter/models/msin.h"
+#include "../fitter/models/mexp.h"
 #include "../fitter/models/gauss.h"
 
 #include "tlibs/helper/misc.h"
@@ -66,6 +67,18 @@ bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel**
 		//	std::cout << "C = " << pModel->GetContrast() << " +- " << pModel->GetContrastErr()
 		//				<< ", phase = " << pModel->GetPhase()/M_PI*180. << " +- " << pModel->GetPhaseErr()/M_PI*180.
 		//				<< std::endl;
+		*pFkt = pModel;
+	}
+	else if(params.iFkt == FIT_MIEZE_EXP) 			// Spin-echo exponential
+	{
+		MiezeExpModel *pModel = 0;
+		bOk = ::get_mieze_gamma(iLen, px, py, pyerr, &pModel, 0);
+		*pFkt = pModel;
+	}
+	else if(params.iFkt == FIT_MIEZE_EXP_FIXEDP0) 	// Spin-echo exponential with P0=1
+	{
+		MiezeExpModel *pModel = 0;
+		bOk = ::get_mieze_gamma(iLen, px, py, pyerr, &pModel, 1);
 		*pFkt = pModel;
 	}
 	else if(params.iFkt == FIT_GAUSSIAN) 			// Gaussian

@@ -493,7 +493,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 	FitData::fit(dat, fitparams, &pFkt);
 
 	if(pFkt)
-	{	
+	{
 		if(iFkt == FIT_MIEZE_SINE) 				// MIEZE sine
 		{
 			MiezeSinModel *pModel = (MiezeSinModel*)pFkt;
@@ -639,9 +639,9 @@ SpecialFitPixelResult FitDlg::DoSpecialFitPixel(SubWindowBase* pSWB, int iFoil, 
 	res.pPlot[1] = new Plot2d(0, (strTitle + std::string("phase")).c_str(), 0, 1);
 
 	res.pPlot[0]->SetLabels(pPlot3d->GetXStr().toStdString().c_str(),
-							pPlot3d->GetYStr().toStdString().c_str());
+		pPlot3d->GetYStr().toStdString().c_str());
 	res.pPlot[1]->SetLabels(pPlot3d->GetXStr().toStdString().c_str(),
-							pPlot3d->GetYStr().toStdString().c_str());
+		pPlot3d->GetYStr().toStdString().c_str());
 
 	res.pPlot[0]->plot(dat2_c);
 	res.pPlot[1]->plot(dat2_ph);
@@ -672,7 +672,9 @@ void FitDlg::DoSpecialFitPixelwise()
 
 		emit AddSubWindow(res.pPlot[0]);
 		if(!checkOnlyContrast->isChecked())
+		{
 			emit AddSubWindow(res.pPlot[1]);
+		}
 		else
 		{
 			if(res.pPlot[1])
@@ -752,9 +754,9 @@ void FitDlg::DoFit()
 
 			FreeFktModel *pModel;
 			bool bOk = ::get_freefit(iLen, px, py, pyerr,
-									strFkt.c_str(), bLimits?strLimits.c_str():0, bHints?strHints.c_str():0,
-									vecFittedNames, vecFittedParams, vecFittedErrs,
-									&pModel);
+				strFkt.c_str(), bLimits?strLimits.c_str():0, bHints?strHints.c_str():0,
+				vecFittedNames, vecFittedParams, vecFittedErrs,
+				&pModel);
 
 			 if(pModel)
 			 {
