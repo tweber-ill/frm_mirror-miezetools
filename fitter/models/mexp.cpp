@@ -29,7 +29,8 @@
 
 //----------------------------------------------------------------------
 
-const double MiezeExpModel::s_dhbar = tl::co::hbar / tl::one_eV / tl::units::si::second * 1e18; // in mueV*ps
+// hbar in mueV*ps
+const double MiezeExpModel::s_dhbar = tl::co::hbar / tl::one_eV / tl::units::si::second * 1e18;
 
 
 MiezeExpModel::MiezeExpModel(double dP0, double dGamma, double dP0Err, double dGammaErr)
@@ -105,19 +106,20 @@ bool get_mieze_gamma(unsigned int iLen,
 
 
 	typedef std::pair<const double*, const double*> t_minmax;
-	t_minmax minmax_y = boost::minmax_element(py, py+iLen);
+	t_minmax minmax_x = boost::minmax_element(px, px+iLen);
 
-	const double dMin = *minmax_y.first;
-	const double dMax = *minmax_y.second;
+	double dMin = *minmax_x.first;
+	double dMax = *minmax_x.second;
+	if(dMax < dMin) std::swap(dMax, dMin);
 
 
 	// hints
 	double dP0 = 1.;
-	double dGamma = 500.;
+	double dGamma = MiezeExpModel::s_dhbar / (dMax-dMin);
 
 	ROOT::Minuit2::MnUserParameters params;
-	params.Add("P0", dP0, 0.1*dP0);
-	params.Add("Gamma", dGamma, 0.1*dGamma);
+	params.Add("P0", dP0, 0.25*dP0);
+	params.Add("Gamma", dGamma, 0.25*dGamma);
 
 	params.SetLimits("P0", 0., 1.);
 	params.SetLowerLimit("Gamma", 0.);

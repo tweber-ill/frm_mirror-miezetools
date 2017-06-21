@@ -14,11 +14,12 @@
 
 class MiezeExpModel : public FunctionModel
 {
+	public:
+		static const double s_dhbar;	// hbar in mueV*ps
+
 	protected:
 		double m_dP0, m_dP0Err;
 		double m_dGamma, m_dGammaErr;
-
-		static const double s_dhbar;
 
 	public:
 		MiezeExpModel(double dP0=1., double dGamma=500.,
