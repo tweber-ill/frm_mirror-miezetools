@@ -6,7 +6,7 @@
  */
 
 #include "loadnicos.h"
-#include "../tlibs/string/string.h"
+#include "tlibs/string/string.h"
 
 #include <algorithm>
 

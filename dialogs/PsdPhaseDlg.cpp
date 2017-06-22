@@ -12,16 +12,17 @@
 
 #include "PsdPhaseDlg.h"
 #include "ListDlg.h"
-#include "../main/settings.h"
-#include "../helper/mieze.h"
-#include "../helper/mfourier.h"
+#include "main/settings.h"
+#include "helper/mieze.h"
+#include "helper/mfourier.h"
 
-#include "../tlibs/phys/mieze.h"
-#include "../tlibs/math/math.h"
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/log/log.h"
+#include "tlibs/phys/mieze.h"
+#include "tlibs/math/math.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/log/log.h"
 
-#include "../fitter/models/msin.h"
+#include "fitter/models/msin.h"
+
 
 namespace units = boost::units;
 namespace co = boost::units::si::constants::codata;

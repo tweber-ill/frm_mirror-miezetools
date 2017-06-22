@@ -10,10 +10,10 @@
 
 #include <QtGui/QDialog>
 
-#include "../ui/ui_radialint.h"
-#include "../main/subwnd.h"
-#include "../plot/plot2d.h"
-#include "../plot/plot.h"
+#include "ui/ui_radialint.h"
+#include "main/subwnd.h"
+#include "plot/plot2d.h"
+#include "plot/plot.h"
 
 #include <vector>
 

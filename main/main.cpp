@@ -11,15 +11,15 @@
 #include <fstream>
 #include <string>
 
-#include "../tlibs/string/string.h"
-#include "../tlibs/string/spec_char.h"
-#include "../tlibs/math/rand.h"
-#include "../tlibs/log/log.h"
+#include "tlibs/string/string.h"
+#include "tlibs/string/spec_char.h"
+#include "tlibs/math/rand.h"
+#include "tlibs/log/log.h"
 
 #include "mainwnd.h"
 #include "settings.h"
 
-#include "../dialogs/SettingsDlg.h"
+#include "dialogs/SettingsDlg.h"
 
 
 extern void init_formulas();

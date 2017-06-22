@@ -11,9 +11,9 @@
 #include <iostream>
 #include <sstream>
 
-#include "../tlibs/string/string.h"
-#include "../tlibs/helper/misc.h"
-#include "../helper/misc.h"
+#include "tlibs/string/string.h"
+#include "tlibs/helper/misc.h"
+#include "helper/misc.h"
 
 Plot3d::Plot3d(QWidget* pParent, const char* pcTitle,  bool bCountData)
 		: Plot2d(pParent, pcTitle, bCountData), m_iCurT(0)

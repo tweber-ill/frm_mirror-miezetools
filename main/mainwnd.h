@@ -19,22 +19,22 @@
 #include <mutex>
 
 #include "subwnd.h"
-#include "../plot/plot.h"
-#include "../plot/plot2d.h"
-#include "../plot/plot3d.h"
-#include "../plot/plot4d.h"
+#include "plot/plot.h"
+#include "plot/plot2d.h"
+#include "plot/plot3d.h"
+#include "plot/plot4d.h"
 
-#include "../dialogs/CombineDlg.h"
-#include "../dialogs/RoiDlg.h"
-#include "../dialogs/FitDlg.h"
-#include "../dialogs/PsdPhaseDlg.h"
-#include "../dialogs/RadialIntDlg.h"
-#include "../dialogs/PlotPropDlg.h"
-#include "../dialogs/RebinDlg.h"
-#include "../dialogs/ExportDlg.h"
-#include "../dialogs/InfoDock.h"
-#include "../dialogs/NormDlg.h"
-#include "../tools/formula/FormulaDlg.h"
+#include "dialogs/CombineDlg.h"
+#include "dialogs/RoiDlg.h"
+#include "dialogs/FitDlg.h"
+#include "dialogs/PsdPhaseDlg.h"
+#include "dialogs/RadialIntDlg.h"
+#include "dialogs/PlotPropDlg.h"
+#include "dialogs/RebinDlg.h"
+#include "dialogs/ExportDlg.h"
+#include "dialogs/InfoDock.h"
+#include "dialogs/NormDlg.h"
+#include "tools/formula/FormulaDlg.h"
 
 
 #define MAX_RECENT_FILES 32

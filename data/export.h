@@ -10,7 +10,7 @@
 #ifndef __MIEZE_DATA_EXPORT__
 #define __MIEZE_DATA_EXPORT__
 
-#include "../main/subwnd.h"
+#include "main/subwnd.h"
 #include "data.h"
 #include <vector>
 

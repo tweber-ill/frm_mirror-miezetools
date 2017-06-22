@@ -18,11 +18,11 @@ typedef unsigned char uchar;
 #include <boost/numeric/ublas/matrix.hpp>
 namespace ublas = boost::numeric::ublas;
 
-#include "../roi/roi.h"
-#include "../tlibs/string/string.h"
-#include "../helper/xml.h"
-#include "../helper/blob.h"
-#include "../helper/string_map.h"
+#include "roi/roi.h"
+#include "tlibs/string/string.h"
+#include "helper/xml.h"
+#include "helper/blob.h"
+#include "helper/string_map.h"
 
 enum DataType
 {

@@ -6,7 +6,7 @@
  */
 
 #include "NormDlg.h"
-#include "../plot/plot.h"
+#include "plot/plot.h"
 #include <QtGui/QMessageBox>
 
 

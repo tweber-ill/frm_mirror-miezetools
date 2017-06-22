@@ -10,8 +10,9 @@
 
 #include <vector>
 #include <QtGui/QDialog>
-#include "../ui/ui_normalize.h"
-#include "../main/subwnd.h"
+#include "ui/ui_normalize.h"
+#include "main/subwnd.h"
+
 
 class NormDlg : public QDialog, Ui::NormDlg
 {Q_OBJECT

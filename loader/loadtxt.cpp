@@ -7,11 +7,11 @@
  */
 
 #include "loadtxt.h"
-#include "../tlibs/file/file.h"
-#include "../tlibs/string/string.h"
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/math/math.h"
-#include "../tlibs/log/log.h"
+#include "tlibs/file/file.h"
+#include "tlibs/string/string.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/math/math.h"
+#include "tlibs/log/log.h"
 
 #include <string>
 #include <iostream>

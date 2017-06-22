@@ -14,9 +14,10 @@
 #include <QtGui/QKeyEvent>
 #include <vector>
 
-#include "../main/subwnd.h"
-#include "../data/data.h"
-#include "../roi/roi.h"
+#include "main/subwnd.h"
+#include "data/data.h"
+#include "roi/roi.h"
+
 
 class Plot2d : public SubWindowBase
 { Q_OBJECT

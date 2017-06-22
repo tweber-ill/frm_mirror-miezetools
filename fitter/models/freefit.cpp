@@ -17,8 +17,6 @@
 #include <Minuit2/MnPrint.h>
 
 #include "freefit.h"
-#include "../chi2.h"
-
 #include "tlibs/log/log.h"
 
 //----------------------------------------------------------------------
@@ -83,7 +81,7 @@ double FreeFktModel::operator()(double x) const
 	return const_cast<Parser&>(m_parser).EvalTree(x);	// !!
 }
 
-FunctionModel* FreeFktModel::copy() const
+tl::FitterFuncModel<double>* FreeFktModel::copy() const
 {
 	return new FreeFktModel(m_parser);
 }
@@ -161,7 +159,7 @@ bool get_freefit(unsigned int iLen,
 		tl::log_err("Free function model could not be created.");
 		return 0;
 	}
-	Chi2Function fkt(&freemod, iLen, px, py, pdy);
+	tl::Chi2Function<double> fkt(&freemod, iLen, px, py, pdy);
 
 	const double *pdMax = std::max_element(py,py+iLen),
 				  dMin = *std::min_element(py,py+iLen);

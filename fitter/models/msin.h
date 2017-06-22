@@ -9,11 +9,11 @@
 #ifndef __MIEZE_SIN__
 #define __MIEZE_SIN__
 
-#include "../fitter.h"
+#include "tlibs/fit/minuit.h"
 
 
 // sin function model with fixed frequency
-class MiezeSinModel : public FunctionModel
+class MiezeSinModel : public tl::FitterFuncModel<double>
 {
 	protected:
 		double m_dfreq, m_dfreqerr;
@@ -28,17 +28,17 @@ class MiezeSinModel : public FunctionModel
 
 		virtual bool SetParams(const std::vector<double>& vecParams);
 		virtual double operator()(double x) const;
-		virtual FunctionModel* copy() const;
+		virtual tl::FitterFuncModel<double>* copy() const;
 		virtual std::string print(bool bFillInSyms=true) const;
 
 		double GetContrast() const;
 		double GetContrastErr() const;
-		
+
 		double GetFreq() const { return m_dfreq; }
 		double GetAmp() const { return m_damp; }
 		double GetPhase() const { return m_dphase; }
 		double GetOffs() const { return m_doffs; }
-		
+
 		double GetFreqErr() const { return m_dfreqerr; }
 		double GetAmpErr() const { return m_damperr; }
 		double GetPhaseErr() const { return m_dphaseerr; }

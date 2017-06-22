@@ -23,22 +23,22 @@
 
 #include "settings.h"
 
-#include "../tlibs/string/string.h"
-#include "../tlibs/file/file.h"
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/phys/mieze.h"
-#include "../helper/xml.h"
+#include "tlibs/string/string.h"
+#include "tlibs/file/file.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/phys/mieze.h"
+#include "helper/xml.h"
 
-#include "../dialogs/ListDlg.h"
-#include "../dialogs/SettingsDlg.h"
-#include "../dialogs/AboutDlg.h"
-#include "../dialogs/ComboDlg.h"
+#include "dialogs/ListDlg.h"
+#include "dialogs/SettingsDlg.h"
+#include "dialogs/AboutDlg.h"
+#include "dialogs/ComboDlg.h"
 
-#include "../fitter/models/msin.h"
-#include "../fitter/models/gauss.h"
-#include "../tlibs/fit/interpolation.h"
+#include "fitter/models/msin.h"
+#include "fitter/models/gauss.h"
+#include "tlibs/fit/interpolation.h"
 
-#include "../data/export.h"
+#include "data/export.h"
 
 
 

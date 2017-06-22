@@ -8,25 +8,25 @@
 #include "FitDlg.h"
 #include "ListDlg.h"
 
-#include "../fitter/models/freefit.h"
-#include "../fitter/models/msin.h"
-#include "../fitter/models/gauss.h"
+#include "fitter/models/freefit.h"
+#include "fitter/models/msin.h"
+#include "fitter/models/gauss.h"
 
-#include "../tlibs/string/string.h"
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/math/math.h"
-#include "../tlibs/phys/mieze.h"
+#include "tlibs/string/string.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/math/math.h"
+#include "tlibs/phys/mieze.h"
 
-#include "../plot/plot.h"
-#include "../plot/plot2d.h"
-#include "../plot/plot3d.h"
-#include "../plot/plot4d.h"
+#include "plot/plot.h"
+#include "plot/plot2d.h"
+#include "plot/plot3d.h"
+#include "plot/plot4d.h"
 
-#include "../helper/mieze.h"
-#include "../helper/mfourier.h"
-#include "../helper/misc.h"
+#include "helper/mieze.h"
+#include "helper/mfourier.h"
+#include "helper/misc.h"
 
-#include "../main/settings.h"
+#include "main/settings.h"
 
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMessageBox>
@@ -486,7 +486,7 @@ SpecialFitResult FitDlg::DoSpecialFit(SubWindowBase* pSWB, int iFkt, int iParam)
 	}
 
 	Data1& dat = res.pPlot->GetData(0).dat;
-	FunctionModel* pFkt = 0;
+	tl::FitterFuncModel<double>* pFkt = 0;
 	FitDataParams fitparams;
 	fitparams.iFkt = iFkt;
 	fitparams.iNumPeaks = iParam;

@@ -15,12 +15,13 @@
 #include <vector>
 #include <string>
 
-#include "../main/subwnd.h"
-#include "../ui/ui_psd_phase.h"
-#include "../ui/ui_psd_phase_corr.h"
-#include "../plot/plot2d.h"
-#include "../plot/plot3d.h"
-#include "../plot/plot4d.h"
+#include "main/subwnd.h"
+#include "ui/ui_psd_phase.h"
+#include "ui/ui_psd_phase_corr.h"
+#include "plot/plot2d.h"
+#include "plot/plot3d.h"
+#include "plot/plot4d.h"
+
 
 class PsdPhaseDlg : public QDialog, Ui::PsdPhaseDlg
 {Q_OBJECT

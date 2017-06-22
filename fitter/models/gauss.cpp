@@ -6,10 +6,10 @@
  * @license GPLv3
  */
 
-#include "../../tlibs/math/math.h"
-#include "../../tlibs/log/log.h"
-#include "../../tlibs/helper/misc.h"
-#include "../../tlibs/fit/interpolation.h"
+#include "tlibs/math/math.h"
+#include "tlibs/log/log.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/fit/interpolation.h"
 
 #include <limits>
 #include <algorithm>
@@ -22,9 +22,7 @@
 #include <Minuit2/MnPrint.h>
 
 #include "gauss.h"
-#include "../chi2.h"
-
-#include "../../main/settings.h"
+#include "main/settings.h"
 
 
 //----------------------------------------------------------------------
@@ -108,16 +106,16 @@ double GaussModel::operator()(double x) const
 	double dNorm = 1.;
 	if(m_bNormalized)
 		dNorm = 1./(sqrt(2.*M_PI*fabs(m_spread)));
-	
+
 	return m_amp * dNorm
 		* exp(-0.5 * ((x-m_x0)/m_spread)*((x-m_x0)/m_spread)) + m_offs;
 }
 
-FunctionModel* GaussModel::copy() const
+tl::FitterFuncModel<double>* GaussModel::copy() const
 {
 	return new GaussModel(m_amp, m_spread, m_x0,
-							m_amperr, m_spreaderr, m_x0err,
-							m_bNormalized, m_offs, m_offserr);
+		m_amperr, m_spreaderr, m_x0err,
+		m_bNormalized, m_offs, m_offserr);
 }
 
 void GaussModel::Normalize()
@@ -181,7 +179,7 @@ bool get_gauss(unsigned int iLen,
 
 
 	GaussModel gmod;
-	Chi2Function fkt(&gmod, iLen, px, py, pdy);
+	tl::Chi2Function<double> fkt(&gmod, iLen, px, py, pdy);
 
 	typedef std::pair<const double*, const double*> t_minmax;
 	t_minmax minmax_x = boost::minmax_element(px, px+iLen);
@@ -535,7 +533,7 @@ double MultiGaussModel::operator()(double x) const
 	return dRes;
 }
 
-FunctionModel* MultiGaussModel::copy() const
+tl::FitterFuncModel<double>* MultiGaussModel::copy() const
 {
 	return new MultiGaussModel(*this);
 }
@@ -581,7 +579,7 @@ bool get_multigauss(unsigned int iLen,
 
 
 	MultiGaussModel gmod(iNumGauss);
-	Chi2Function fkt(&gmod, iLen, px, py, pdy);
+	tl::Chi2Function<double> fkt(&gmod, iLen, px, py, pdy);
 
 	typedef std::pair<const double*, const double*> t_minmax;
 	//t_minmax minmax_x = boost::minmax_element(px, px+iLen);

@@ -8,7 +8,7 @@
 #ifndef __MIEZE_MISC_H__
 #define __MIEZE_MISC_H__
 
-#include "../tlibs/string/string.h"
+#include "tlibs/string/string.h"
 
 template<class T> class autodeleter
 {

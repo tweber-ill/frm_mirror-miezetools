@@ -22,7 +22,6 @@
 #include <Minuit2/MnPrint.h>
 
 #include "mexp.h"
-#include "../chi2.h"
 #include "tlibs/helper/misc.h"
 #include "tlibs/phys/units.h"
 
@@ -63,7 +62,7 @@ double MiezeExpModel::operator()(double dTau) const
 	return m_dP0 * std::exp(-m_dGamma * dTau / s_dhbar);
 }
 
-FunctionModel* MiezeExpModel::copy() const
+tl::FitterFuncModel<double>* MiezeExpModel::copy() const
 {
 	return new MiezeExpModel(m_dP0, m_dGamma, m_dP0Err, m_dGammaErr);
 }
@@ -102,7 +101,7 @@ bool get_mieze_gamma(unsigned int iLen,
 	}
 
 	MiezeExpModel expmod{};
-	Chi2Function fkt(&expmod, iLen, px, py, pdy);
+	tl::Chi2Function<double> fkt(&expmod, iLen, px, py, pdy);
 
 
 	typedef std::pair<const double*, const double*> t_minmax;

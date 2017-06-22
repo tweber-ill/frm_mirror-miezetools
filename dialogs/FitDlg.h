@@ -8,11 +8,11 @@
 #ifndef __MIEZE_FIT_DLG__
 #define __MIEZE_FIT_DLG__
 
-#include "../ui/ui_fit.h"
-#include "../main/subwnd.h"
-#include "../plot/plot.h"
-#include "../plot/plot2d.h"
-#include "../data/fit_data.h"
+#include "ui/ui_fit.h"
+#include "main/subwnd.h"
+#include "plot/plot.h"
+#include "plot/plot2d.h"
+#include "data/fit_data.h"
 
 #include <string>
 #include <map>

@@ -9,7 +9,7 @@
 #ifndef __MIEZE_FOURIER__
 #define __MIEZE_FOURIER__
 
-#include "../tlibs/math/fourier.h"
+#include "tlibs/math/fourier.h"
 
 
 //------------------------------------------------------------------------------

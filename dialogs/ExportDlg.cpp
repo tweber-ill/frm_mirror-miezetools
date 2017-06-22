@@ -7,9 +7,9 @@
 
 #include "ExportDlg.h"
 #include "ListDlg.h"
-#include "../tlibs/string/string.h"
-#include "../main/settings.h"
-#include "../data/export.h"
+#include "tlibs/string/string.h"
+#include "main/settings.h"
+#include "data/export.h"
 
 #include <set>
 #include <QtGui/QMdiSubWindow>

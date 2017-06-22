@@ -8,17 +8,17 @@
 
 #include "mainwnd.h"
 #include "settings.h"
-#include "../dialogs/ComboDlg.h"
-#include "../tlibs/string/string.h"
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/file/comp.h"
-#include "../tlibs/file/file.h"
-#include "../tlibs/file/tmp.h"
-#include "../tlibs/log/log.h"
-#include "../helper/misc.h"
-#include "../loader/loadtxt.h"
-#include "../loader/loadnicos.h"
-#include "../loader/loadcasc.h"
+#include "dialogs/ComboDlg.h"
+#include "tlibs/string/string.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/file/comp.h"
+#include "tlibs/file/file.h"
+#include "tlibs/file/tmp.h"
+#include "tlibs/log/log.h"
+#include "helper/misc.h"
+#include "loader/loadtxt.h"
+#include "loader/loadnicos.h"
+#include "loader/loadcasc.h"
 
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QMessageBox>
@@ -26,7 +26,7 @@
 #include <QtCore/QSignalMapper>
 #include <QtCore/QTemporaryFile>
 
-#include "../data/export.h"
+#include "data/export.h"
 
 #include <fstream>
 

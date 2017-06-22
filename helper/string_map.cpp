@@ -6,12 +6,12 @@
  */
 
 #include "string_map.h"
-#include "../tlibs/string/string.h"
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/log/log.h"
+#include "tlibs/string/string.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/log/log.h"
 
 #ifndef NO_COMP
-	#include "../tlibs/file/comp.h"
+	#include "tlibs/file/comp.h"
 #endif
 
 StringMap::StringMap(const char* pcKeyValSep, const char* pcComment)

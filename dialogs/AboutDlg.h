@@ -9,10 +9,10 @@
 #define __MIEZE_ABOUT__
 
 #include <QtGui/QDialog>
-#include "../ui/ui_about.h"
+#include "ui/ui_about.h"
 
 #include <boost/version.hpp>
-#include "../tlibs/version.h"
+#include "tlibs/version.h"
 
 class AboutDlg : public QDialog, Ui::AboutDlg
 {Q_OBJECT

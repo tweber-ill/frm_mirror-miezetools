@@ -9,9 +9,9 @@
 #define __ROI_DLG__
 
 #include <QtGui/QDialog>
-#include "../ui/ui_roi.h"
+#include "ui/ui_roi.h"
 
-#include "../roi/roi.h"
+#include "roi/roi.h"
 
 
 class RoiDlg : public QDialog, Ui::RoiDlg

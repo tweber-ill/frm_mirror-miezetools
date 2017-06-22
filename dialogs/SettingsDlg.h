@@ -10,7 +10,7 @@
 
 
 #include <QtGui/QDialog>
-#include "../ui/ui_settings.h"
+#include "ui/ui_settings.h"
 
 
 class SettingsDlg : public QDialog, Ui::SettingsDlg

@@ -9,10 +9,10 @@
 #ifndef __MIEZE_EXP__
 #define __MIEZE_EXP__
 
-#include "../fitter.h"
+#include "tlibs/fit/minuit.h"
 
 
-class MiezeExpModel : public FunctionModel
+class MiezeExpModel : public tl::FitterFuncModel<double>
 {
 	public:
 		static const double s_dhbar;	// hbar in mueV*ps
@@ -28,12 +28,12 @@ class MiezeExpModel : public FunctionModel
 
 		virtual bool SetParams(const std::vector<double>& vecParams);
 		virtual double operator()(double x) const;
-		virtual FunctionModel* copy() const;
+		virtual tl::FitterFuncModel<double>* copy() const;
 		virtual std::string print(bool bFillInSyms=true) const;
 
 		double GetP0() const { return m_dP0; }
 		double GetGamma() const { return m_dGamma; }
-		
+
 		double GetP0Err() const { return m_dP0Err; }
 		double GetGammaErr() const { return m_dGammaErr; }
 

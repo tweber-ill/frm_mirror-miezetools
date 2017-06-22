@@ -6,7 +6,7 @@
  */
 
 #include "blob.h"
-#include "../tlibs/log/log.h"
+#include "tlibs/log/log.h"
 #include <iostream>
 
 

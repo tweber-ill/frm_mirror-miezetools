@@ -20,11 +20,10 @@
 	#include <QtGnuplotWidget.h>
 #endif
 
-#include "../main/subwnd.h"
-#include "../data/data.h"
-#include "../fitter/fitter.h"
-#include "../tlibs/fit/funcmod.h"
-#include "../tlibs/string/string.h"
+#include "main/subwnd.h"
+#include "data/data.h"
+#include "tlibs/fit/minuit.h"
+#include "tlibs/string/string.h"
 
 enum PlotType
 {
@@ -86,7 +85,7 @@ public:
 
 	void plot(unsigned int iNum, const double *px, const double *py, const double *pyerr=0, const double *pdxerr=0, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
 	void plot(const Data1& dat, PlotType plttype=PLOT_DATA, const char* pcLegend=0);
-	void plot_fkt(const FunctionModel& fkt, int iObj=-1, bool bKeepObj=false);
+	void plot_fkt(const tl::FitterFuncModel<double>& fkt, int iObj=-1, bool bKeepObj=false);
 	void replot_fkts();
 	void plot_param(const tl::FunctionModel_param<>& fkt, int iObj=-1);
 

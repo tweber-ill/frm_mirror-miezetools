@@ -9,8 +9,8 @@
 #define __REBIN_DLG_H__
 
 #include <QtGui/QDialog>
-#include "../main/subwnd.h"
-#include "../ui/ui_rebin.h"
+#include "main/subwnd.h"
+#include "ui/ui_rebin.h"
 
 
 class RebinDlg : public QDialog, Ui::RebinDlg

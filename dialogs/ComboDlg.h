@@ -9,7 +9,7 @@
 #define __COMBO_DLG__
 
 #include <QtGui/QDialog>
-#include "../ui/ui_combo.h"
+#include "ui/ui_combo.h"
 
 #include <vector>
 #include <string>

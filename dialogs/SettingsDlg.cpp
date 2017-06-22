@@ -6,12 +6,10 @@
  */
 
 #include "SettingsDlg.h"
-#include "../main/settings.h"
-#include "../tlibs/string/string.h"
-#include "../tlibs/log/log.h"
-
-#include "../fitter/parser.h"
-#include "../fitter/fitter.h"
+#include "main/settings.h"
+#include "tlibs/string/string.h"
+#include "tlibs/log/log.h"
+#include "fitter/parser.h"
 
 #include <iostream>
 #include <sstream>

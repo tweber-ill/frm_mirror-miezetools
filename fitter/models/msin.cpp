@@ -22,9 +22,8 @@
 #include <Minuit2/MnPrint.h>
 
 #include "msin.h"
-#include "../chi2.h"
 #include "tlibs/helper/misc.h"
-#include "../../helper/mfourier.h"
+#include "helper/mfourier.h"
 
 
 //----------------------------------------------------------------------
@@ -69,10 +68,10 @@ double MiezeSinModel::operator()(double x) const
 	return m_damp*sin(m_dfreq*x + m_dphase) + m_doffs;
 }
 
-FunctionModel* MiezeSinModel::copy() const
+tl::FitterFuncModel<double>* MiezeSinModel::copy() const
 {
 	return new MiezeSinModel(m_dfreq, m_damp, m_dphase, m_doffs,
-							m_dfreqerr, m_damperr, m_dphaseerr, m_doffserr);
+		m_dfreqerr, m_damperr, m_dphaseerr, m_doffserr);
 }
 
 double MiezeSinModel::GetContrast() const
@@ -145,7 +144,7 @@ bool get_mieze_contrast(double& dFreq, double& dNumOsc, unsigned int iLen,
 	}
 
 	MiezeSinModel sinmod(dFreq);
-	Chi2Function fkt(&sinmod, iLen, px, py, pdy);
+	tl::Chi2Function<double> fkt(&sinmod, iLen, px, py, pdy);
 
 
 	typedef std::pair<const double*, const double*> t_minmax;

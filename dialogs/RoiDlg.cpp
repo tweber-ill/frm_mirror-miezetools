@@ -6,8 +6,8 @@
  */
 
 #include "RoiDlg.h"
-#include "../main/settings.h"
-#include "../tlibs/string/string.h"
+#include "main/settings.h"
+#include "tlibs/string/string.h"
 
 #include <QtGui/QMenu>
 #include <QtGui/QFileDialog>

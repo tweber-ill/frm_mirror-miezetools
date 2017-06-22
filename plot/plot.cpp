@@ -15,9 +15,9 @@
 #include <limits>
 #include <iostream>
 
-#include "../tlibs/string/string.h"
-#include "../tlibs/log/log.h"
-#include "../fitter/models/freefit.h"
+#include "tlibs/string/string.h"
+#include "tlibs/log/log.h"
+#include "fitter/models/freefit.h"
 
 #define PAD_X 18
 #define PAD_Y 18
@@ -524,7 +524,7 @@ void Plot::plot_param(const tl::FunctionModel_param<>& fkt, int iObj)
 #endif
 }
 
-void Plot::plot_fkt(const FunctionModel& fkt, int iObj, bool bKeepObj)
+void Plot::plot_fkt(const tl::FitterFuncModel<double>& fkt, int iObj, bool bKeepObj)
 {
 	const uint iCnt = 512;
 	PlotObj* pltobj = 0;

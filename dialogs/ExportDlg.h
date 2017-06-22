@@ -12,8 +12,8 @@
 #include <QtGui/QWidget>
 #include <QtGui/QMdiArea>
 
-#include "../ui/ui_export.h"
-#include "../main/subwnd.h"
+#include "ui/ui_export.h"
+#include "main/subwnd.h"
 
 
 class ExportDlg : public QDialog, Ui::ExportDlg

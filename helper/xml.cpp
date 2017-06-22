@@ -6,8 +6,8 @@
  */
 
 #include "xml.h"
-#include "../tlibs/string/string.h"
-#include "../tlibs/helper/misc.h"
+#include "tlibs/string/string.h"
+#include "tlibs/helper/misc.h"
 #include <fstream>
 #include <list>
 #include <vector>

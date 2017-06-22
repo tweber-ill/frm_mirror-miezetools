@@ -9,12 +9,12 @@
 #ifndef __FREEFIT__
 #define __FREEFIT__
 
-#include "../fitter.h"
+#include "tlibs/fit/minuit.h"
 #include "../parser.h"
 
 
 // fit to a user-entered function
-class FreeFktModel : public FunctionModel
+class FreeFktModel : public tl::FitterFuncModel<double>
 {
 	protected:
 		Parser m_parser;
@@ -34,7 +34,7 @@ class FreeFktModel : public FunctionModel
 		virtual bool SetParams(const std::vector<double>& vecParams);
 		virtual double operator()(double x) const;
 
-		virtual FunctionModel* copy() const;
+		virtual tl::FitterFuncModel<double>* copy() const;
 		virtual std::string print(bool bFillInSyms=1) const;
 
 		const Node& GetRootNode() const

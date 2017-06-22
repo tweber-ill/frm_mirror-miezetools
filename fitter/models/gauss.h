@@ -9,11 +9,11 @@
 #ifndef __FITTER_GAUSS__
 #define __FITTER_GAUSS__
 
-#include "../fitter.h"
+#include "tlibs/fit/minuit.h"
 
 
 // gauss model
-class GaussModel : public FunctionModel
+class GaussModel : public tl::FitterFuncModel<double>
 {
 	protected:
 		double m_amp, m_spread, m_x0;
@@ -30,7 +30,7 @@ class GaussModel : public FunctionModel
 
 		virtual bool SetParams(const std::vector<double>& vecParams);
 		virtual double operator()(double x) const;
-		virtual FunctionModel* copy() const;
+		virtual tl::FitterFuncModel<double>* copy() const;
 		virtual std::string print(bool bFillInSyms=true) const;
 
 		double GetMean() const;
@@ -70,7 +70,7 @@ struct MultiGaussParams
 };
 
 // multi gauss model
-class MultiGaussModel : public FunctionModel
+class MultiGaussModel : public tl::FitterFuncModel<double>
 {
 	protected:
 		bool m_bNormalized;
@@ -85,7 +85,7 @@ class MultiGaussModel : public FunctionModel
 
 		virtual bool SetParams(const std::vector<double>& vecParams);
 		virtual double operator()(double x) const;
-		virtual FunctionModel* copy() const;
+		virtual tl::FitterFuncModel<double>* copy() const;
 		virtual std::string print(bool bFillInSyms=true) const;
 
 		double GetMean(unsigned int iNum) const;

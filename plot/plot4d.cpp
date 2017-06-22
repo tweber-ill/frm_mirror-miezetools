@@ -12,14 +12,14 @@
 #include <sstream>
 #include <math.h>
 
-#include "../tlibs/string/string.h"
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/math/fourier.h"
-#include "../tlibs/phys/mieze.h"
-#include "../helper/misc.h"
-#include "../data/fit_data.h"
-#include "../fitter/models/msin.h"
-#include "../main/settings.h"
+#include "tlibs/string/string.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/math/fourier.h"
+#include "tlibs/phys/mieze.h"
+#include "helper/misc.h"
+#include "data/fit_data.h"
+#include "fitter/models/msin.h"
+#include "main/settings.h"
 
 
 Plot4d::Plot4d(QWidget* pParent, const char* pcTitle,  bool bCountData)

@@ -6,14 +6,15 @@
  */
 
 #include "PlotPropDlg.h"
-#include "../plot/plot.h"
-#include "../plot/plot2d.h"
-#include "../plot/plot3d.h"
-#include "../plot/plot4d.h"
-#include "../tlibs/string/string.h"
+#include "plot/plot.h"
+#include "plot/plot2d.h"
+#include "plot/plot3d.h"
+#include "plot/plot4d.h"
+#include "tlibs/string/string.h"
+
 
 PlotPropDlg::PlotPropDlg(QWidget* pParent)
-				: QDialog(pParent), m_pCurPlot(0)
+	: QDialog(pParent), m_pCurPlot(0)
 {
 	setupUi(this);
 	connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(ButtonBoxClicked(QAbstractButton*)));

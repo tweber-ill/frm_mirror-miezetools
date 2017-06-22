@@ -7,9 +7,9 @@
  */
 
 #include "data.h"
-#include "../tlibs/file/comp.h"
-#include "../tlibs/file/file.h"
-#include "../tlibs/log/log.h"
+#include "tlibs/file/comp.h"
+#include "tlibs/file/file.h"
+#include "tlibs/log/log.h"
 
 #include <fstream>
 

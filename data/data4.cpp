@@ -7,8 +7,8 @@
  */
 
 #include "data4.h"
-#include "../tlibs/math/math.h"
-#include "../tlibs/string/string.h"
+#include "tlibs/math/math.h"
+#include "tlibs/string/string.h"
 
 #include <limits>
 #include <boost/algorithm/minmax_element.hpp>

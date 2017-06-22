@@ -6,11 +6,12 @@
  */
 
 #include "RadialIntDlg.h"
-#include "../roi/roi.h"
-#include "../plot/plot3d.h"
-#include "../plot/plot4d.h"
-#include "../data/fit_data.h"
-#include "../fitter/models/msin.h"
+#include "roi/roi.h"
+#include "plot/plot3d.h"
+#include "plot/plot4d.h"
+#include "data/fit_data.h"
+#include "fitter/models/msin.h"
+
 
 RadialIntDlg::RadialIntDlg(QWidget* pParent)
 			: QDialog(pParent), m_pPlot(new Plot(this))
@@ -223,7 +224,7 @@ void RadialIntDlg::Calc()
 
 			FitDataParams params;
 			params.iFkt = FIT_MIEZE_SINE;
-			FunctionModel *pFkt = 0;
+			tl::FitterFuncModel<double> *pFkt = 0;
 			bool bOk = FitData::fit(dat1, params, &pFkt);
 			MiezeSinModel *pSin = (MiezeSinModel*)pFkt;
 

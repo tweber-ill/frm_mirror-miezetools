@@ -6,8 +6,8 @@
  */
 
 #include "RebinDlg.h"
-#include "../plot/plot.h"
-#include "../helper/mfourier.h"
+#include "plot/plot.h"
+#include "helper/mfourier.h"
 
 
 RebinDlg::RebinDlg(QWidget* pParent) : QDialog(pParent), m_pCurPlot(0)

@@ -7,8 +7,8 @@
  */
 
 #include "subwnd.h"
-#include "../data/data.h"
-#include "../plot/plot.h"
+#include "data/data.h"
+#include "plot/plot.h"
 
 
 const StringMap* SubWindowBase::GetParamMapDyn() const

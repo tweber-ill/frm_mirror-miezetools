@@ -13,9 +13,10 @@
 #include <iostream>
 #include <sstream>
 
-#include "../tlibs/helper/misc.h"
-#include "../tlibs/math/math.h"
-#include "../tlibs/string/string.h"
+#include "tlibs/helper/misc.h"
+#include "tlibs/math/math.h"
+#include "tlibs/string/string.h"
+
 
 #define PAD_X 24
 #define PAD_Y 24

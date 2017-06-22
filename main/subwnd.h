@@ -12,11 +12,11 @@
 #include <QtGui/QWidget>
 #include <string>
 #include <iostream>
-#include "../roi/roi.h"
-#include "../helper/xml.h"
-#include "../helper/blob.h"
-#include "../tlibs/string/string.h"
-#include "../helper/string_map.h"
+#include "roi/roi.h"
+#include "helper/xml.h"
+#include "helper/blob.h"
+#include "tlibs/string/string.h"
+#include "helper/string_map.h"
 
 
 class DataInterface;

@@ -10,9 +10,10 @@
 
 #include <QtGui/QDialog>
 #include <QtGui/QWidget>
-#include "../ui/ui_plot_properties.h"
+#include "ui/ui_plot_properties.h"
 
-#include "../main/subwnd.h"
+#include "main/subwnd.h"
+
 
 class PlotPropDlg : public QDialog, Ui::PlotPropertiesDlg
 { Q_OBJECT

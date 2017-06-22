@@ -10,8 +10,8 @@
 
 #include <QtGui/QDialog>
 #include <list>
-#include "../ui/ui_list_graphs.h"
-#include "../main/subwnd.h"
+#include "ui/ui_list_graphs.h"
+#include "main/subwnd.h"
 
 
 class ListGraphsItem : public QListWidgetItem

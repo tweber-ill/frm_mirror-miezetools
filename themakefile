@@ -75,8 +75,7 @@ cattus: obj/main.o obj/mainwnd.o obj/mainwnd_files.o obj/mainwnd_session.o obj/m
 	obj/RoiDlg.o obj/SettingsDlg.o obj/PsdPhaseDlg.o obj/RadialIntDlg.o obj/ExportDlg.o \
 	obj/PlotPropDlg.o obj/fourier.o obj/xml.o obj/loadcasc.o obj/loadnicos.o \
 	obj/loadtxt.o obj/plot.o obj/plot2d.o obj/plot3d.o obj/plot4d.o obj/roi.o \
-	obj/chi2.o obj/fitter.o obj/parser.o obj/freefit.o \
-	obj/freefit-nd.o obj/gauss.o obj/gauss-nd.o obj/msin.o obj/mexp.o \
+	obj/parser.o obj/freefit.o obj/gauss.o obj/msin.o obj/mexp.o \
 	obj/blob.o obj/export.o obj/fit_data.o obj/formulas.o obj/tmp.o  \
 	obj/rand.o obj/InfoDock.o obj/NormDlg.o obj/RebinDlg.o \
 	obj/spec_char.o obj/string_map.o obj/log.o obj/mfourier.o ${FFTW_OBJ}
@@ -197,10 +196,6 @@ obj/plot3d.o: plot/plot3d.cpp plot/plot3d.h
 obj/plot4d.o: plot/plot4d.cpp plot/plot4d.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/roi.o: roi/roi.cpp roi/roi.h
-	${CC} ${FLAGS} -c -o $@ $<
-obj/chi2.o: fitter/chi2.cpp fitter/chi2.h
-	${CC} ${FLAGS} -c -o $@ $<
-obj/fitter.o: fitter/fitter.cpp fitter/fitter.h
 	${CC} ${FLAGS} -c -o $@ $<
 obj/parser.o: fitter/parser.cpp fitter/parser.h
 	${CC} ${FLAGS} -c -o $@ $<

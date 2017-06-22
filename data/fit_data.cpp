@@ -8,24 +8,24 @@
 
 #include "fit_data.h"
 
-#include "../fitter/models/freefit.h"
-#include "../fitter/models/msin.h"
-#include "../fitter/models/mexp.h"
-#include "../fitter/models/gauss.h"
+#include "fitter/models/freefit.h"
+#include "fitter/models/msin.h"
+#include "fitter/models/mexp.h"
+#include "fitter/models/gauss.h"
 
 #include "tlibs/helper/misc.h"
 #include "tlibs/math/math.h"
 #include "tlibs/phys/mieze.h"
 #include "tlibs/log/log.h"
 
-#include "../main/settings.h"
+#include "main/settings.h"
 
-#include "../helper/mieze.h"
-#include "../helper/mfourier.h"
-#include "../helper/misc.h"
+#include "helper/mieze.h"
+#include "helper/mfourier.h"
+#include "helper/misc.h"
 
 
-bool FitData::fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt)
+bool FitData::fit(const Data1& dat, const FitDataParams& params, tl::FitterFuncModel<double>** pFkt)
 {
 	const std::vector<double> *pvecDatX, *pvecDatY, *pvecDatYErr;
 	const_cast<Data1&>(dat).GetData(&pvecDatX, &pvecDatY, &pvecDatYErr);
@@ -150,7 +150,7 @@ Data1 FitData::mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::ve
 		{
 			FitDataParams params;
 			params.iFkt = FIT_MIEZE_SINE;
-			FunctionModel *pFkt = 0;
+			tl::FitterFuncModel<double> *pFkt = 0;
 			bool bOk = FitData::fit(*dat, params, &pFkt);
 			MiezeSinModel *pModel = (MiezeSinModel*) pFkt;
 

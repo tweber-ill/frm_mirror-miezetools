@@ -8,8 +8,8 @@
 
 #include "export.h"
 
-#include "../plot/plot.h"
-#include "../plot/plot2d.h"
+#include "plot/plot.h"
+#include "plot/plot2d.h"
 #include "tlibs/log/log.h"
 
 #include <iostream>

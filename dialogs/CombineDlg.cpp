@@ -7,10 +7,10 @@
 
 #include "CombineDlg.h"
 #include "ListDlg.h"
-#include "../data/fit_data.h"
-#include "../fitter/models/msin.h"
-#include "../fitter/parser.h"
-#include "../helper/misc.h"
+#include "data/fit_data.h"
+#include "fitter/models/msin.h"
+#include "fitter/parser.h"
+#include "helper/misc.h"
 
 #include <vector>
 #include <algorithm>
@@ -271,7 +271,7 @@ Plot* CombineGraphsDlg::CreatePlot(const std::string& strTitle, QWidget* pPlotPa
 				iComboIdx == COMBINE_TYPE_PHASES)
 		{
 			Plot* pPlot1 = pSWB->ConvertTo1d(-1);
-			FunctionModel* pFkt = 0;
+			tl::FitterFuncModel<double>* pFkt = 0;
 			FitDataParams fitparams;
 			fitparams.iFkt = FIT_MIEZE_SINE;
 			FitData::fit(pPlot1->GetData(0).dat, fitparams, &pFkt);

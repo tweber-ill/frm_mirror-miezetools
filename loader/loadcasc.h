@@ -12,8 +12,8 @@
 #include <QtCore/QFile>
 #include <vector>
 #include <map>
-#include "../tlibs/string/string.h"
-#include "../helper/string_map.h"
+#include "tlibs/string/string.h"
+#include "helper/string_map.h"
 
 
 class PadFile

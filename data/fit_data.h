@@ -10,7 +10,7 @@
 #define __FIT_DATA_H__
 
 #include "data.h"
-#include "../fitter/fitter.h"
+#include "tlibs/fit/minuit.h"
 
 #include <vector>
 
@@ -39,7 +39,7 @@ struct FitDataParams
 class FitData
 {
 public:
-	static bool fit(const Data1& dat, const FitDataParams& params, FunctionModel** pFkt);
+	static bool fit(const Data1& dat, const FitDataParams& params, tl::FitterFuncModel<double>** pFkt);
 	static Data1 mieze_sum_foils(const std::vector<Data1>& vecFoils, const std::vector<double>* pvecFoilPhases=0);
 };
 
