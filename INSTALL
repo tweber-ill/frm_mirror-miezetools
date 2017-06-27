@@ -1,0 +1,22 @@
+Installing dependencies
+-----------------------
+
+For example, on *buntu systems, use the following commands:
+	* sudo su
+	* apt-get install build-essential libboost-all-dev libqt4-dev fftw3-dev wget
+	* wget http://www.cern.ch/mathlibs/sw/5_34_14/Minuit2/Minuit2-5.34.14.tar.gz
+	* tar -xzvf Minuit2-5.34.14.tar.gz
+	* cd Minuit2-5.34.14
+	* ./configure
+	* make && make install
+	* exit
+
+
+
+Building Cattus
+---------------
+
+	* 'cd' into the miezetools directory
+	* Get tlibs: ./setup_tlibs.sh
+	* Compile using: ./build.sh
+	* Run with: ./cattus
