@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Mieze-Tools
+# @author Tobias Weber <tobias.weber@tum.de>
+# @license GPLv3
+#
 
 if [ ! -d tlibs ] || [ ! -f tlibs/AUTHORS ]
 then

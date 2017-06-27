@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# tlibs
+# @author Tobias Weber <tobias.weber@tum.de>
+# @license GPLv3
+#
 
 TLIBS=tlibs-master.tar.bz2
 TLIBS_DIR=tlibs
