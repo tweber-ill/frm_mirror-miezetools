@@ -189,7 +189,7 @@ void MiezeMainWnd::LoadSession(const std::string& strSess)
 	delete[] pSWBs;
 
 	SetStatusMsg("Session loaded.", 2);
-	setWindowTitle((std::string(WND_TITLE) + " - " + tl::get_file(m_strCurSess)).c_str());
+	setWindowTitle((std::string(WND_TITLE) + " - " + tl::get_file_nodir(m_strCurSess)).c_str());
 
 	QSettings *pGlobals = Settings::GetGlobals();
 	pGlobals->setValue("main/lastdir_session", QString(tl::get_dir(strSess).c_str()));
@@ -282,7 +282,7 @@ void MiezeMainWnd::SessionSaveAsTriggered()
 	m_strCurSess = strFile1;
 	SessionSaveTriggered();
 
-	setWindowTitle((std::string(WND_TITLE) + " - " + tl::get_file(m_strCurSess)).c_str());
+	setWindowTitle((std::string(WND_TITLE) + " - " + tl::get_file_nodir(m_strCurSess)).c_str());
 	pGlobals->setValue("main/lastdir_session", QString(tl::get_dir(strFile1).c_str()));
 }
 // --------------------------------------------------------------------------------

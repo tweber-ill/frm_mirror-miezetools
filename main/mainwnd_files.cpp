@@ -55,7 +55,7 @@ void MiezeMainWnd::LoadFile(const std::string& _strFile)
 		}
 	}
 
-	std::string strFileNoDir = tl::get_file(_strFile);
+	std::string strFileNoDir = tl::get_file_nodir(_strFile);
 
 	if(tl::str_is_equal(strExt, std::string("tof")))
 	{
@@ -449,7 +449,7 @@ void MiezeMainWnd::FileLoadTriggered()
 	for(const QString& strFile : strFiles)
 	{
 		std::string strFile1 = strFile.toStdString();
-		std::string strFileNoDir = tl::get_file(strFile1);
+		std::string strFileNoDir = tl::get_file_nodir(strFile1);
 
 		std::ostringstream ostrMsg;
 		ostrMsg << "Loading " << (iFile+1) << " of " << strFiles.size() << ": "
